@@ -1,0 +1,190 @@
+# Default values for tekton-pipelines.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+images:
+  argocd:    argoproj/argocd:v2.1.3
+  bash:      docker.io/library/bash:5.1.8
+  awscli:    docker.io/amazon/aws-cli:2.2.46
+  kaniko:    gcr.io/kaniko-project/executor@sha256:6ecc43ae139ad8cfa11604b592aaedddcabff8cef469eda303f1fb5afe5e3034
+  git:       alpine/git:v2.32.0
+  kustomize: k8s.gcr.io/kustomize/kustomize:v4.4.0 # https://github.com/kubernetes/k8s.io/blob/main/k8s.gcr.io/images/k8s-staging-kustomize/images.yaml
+  kubectl:   bitnami/kubectl:1.21.5
+  slack:     cloudposse/slack-notifier:0.4.0
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACKS                                                                                                           │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+buildpacks:
+  enabled: true
+  cnbPlatformAPI: "0.4"
+  generate:
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: FRONTEND                                                                                                  │
+# │ Purpose:                                                                                                             │
+# │ This generated buildpack should be used by SPA apps, like angular/react                                              │
+# │ It will build static based on `build:ENV` command declared in the package.json file and then copy buildpack related  │
+# │ files into the resulting folder, which then is going to be detected by the buildpack.                                │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    - name: buildpack-frontend-build-pipeline
+      enabled: false
+      buildTaskSteps:
+        - name: build-static
+          image: node:14
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash                
+            [ -f package.json ] && (
+              yes | npm install --silent;
+              npm run build:$(params.environment) || echo "unable to build $(params.environment)";
+              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null;
+              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath); ) || echo "unable to build package.json" && exit 1;
+          securityContext:
+            privileged: true
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: PHP                                                                                                       │
+# │ Purpose:                                                                                                             │
+# │ This generated buildpack should be used by our PHP / Laravel apps where we may have package.json (i.e. frontend      │
+# │ solution as part of the PHP code repository. It will compile static files if package.json is present and then will   │
+# │ remove generated folders so that buildpack does not detect it as nodejs code                                         │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    - name: buildpack-php-build-pipeline
+      enabled: false
+      buildTaskSteps:
+        - name: build-static
+          image: node:14
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            set -e
+            [ -f package.json ] && (
+              yes | npm install --silent;
+              npm run build:$(params.environment) || echo "unable to build $(params.environment)";
+              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found         
+          securityContext:
+            privileged: true
+    
+        - name: fix-php-detection
+          image: docker.io/library/bash:5.1.8
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/usr/bin/env bash
+            # workaround to fix no PHP detection, when package.json presents
+            # so that we don't get nodejs buildpack detected, but instead the PHP
+            # buildpack is detected and used
+            set -e
+            [[ -f composer.json && -f package.json ]] && (rm -f package.json; ls -la .;) || echo "no php-fix is needed"
+  
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: DJANGO                                                                                                    │
+# │ Purpose:                                                                                                             │
+# │ This generated buildpack pipeline should be used by our Python team using sa3p templated solution, where the         │
+# │ requirements.txt is named after the environment and stored inside the requirements folder                            │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    - name: buildpack-django-build-pipeline
+      enabled: false
+      buildTaskSteps:
+        - name: copy-requirements
+          image: docker.io/library/bash:5.1.8
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/usr/bin/env bash
+            set -e
+            [ -f manage.py ] && (cp requirements/$(params.environment)*.txt requirements.txt \
+              || echo "Unable to find requirements for $(params.environment)")
+            [ -f requirements.txt ] && echo "Found requirements.txt" \
+              || (echo "requirements.txt is not found! Halting execution."; exit 1;)          
+    
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: DOTNET                                                                                                    │
+# │ This generated buildpack pipeline is used by our dotnet team and has a custom step that is used to obtain semantic   │
+# │ version based on git tags of the repository utilizing GitVersion cli. It updates dotnet related source files with    │
+# │ semantic version that is then displayed in API calls, like this https://api.site.com/api/meta/version                │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    - name: buildpack-dotnet-build-pipeline
+      enabled: false
+      buildTaskSteps:
+        - name: git-fetch-tags
+          image: alpine/git:v2.32.0
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            git fetch --tags
+          securityContext:
+            privileged: true
+            runAsUser: 0
+        
+        - name: get-semantic-version
+          workingDir: $(resources.inputs.app.path)
+          image: gittools/gitversion:5.6.10-alpine.3.12-x64-3.1
+          imagePullPolicy: IfNotPresent
+          script: |
+            #!/usr/bin/env ash
+            # so we are making a hack, that if we try to merge hotfix branch into main we should 
+            [ -e GitVersion-hotfix.yml ] && /tools/dotnet-gitversion | grep hotfix 1>/dev/null && (echo "hotfix"; rm -rf GitVersion.yml; cp GitVersion-hotfix.yml GitVersion.yml)
+    
+            BRANCH=$(params.branch)
+    
+            # since this is a busybox we can't use bash regexp here
+            if echo $BRANCH | grep -E '^refs/heads/(main|release/[0-9.]+)$' > /dev/null;
+            then
+              local_tags=$(git tag --points-at HEAD)
+              echo "remove local head tags"
+              echo $local_tags
+              git tag -d $local_tags
+            fi
+    
+            pure_branch=`echo $BRANCH | sed 's/refs\/heads\///'`
+            echo "PURE BRANCH:" $pure_branch
+            
+            # make sure we're not in detached head status
+            git symbolic-ref -q HEAD || git checkout $pure_branch
+            git branch
+    
+            /tools/dotnet-gitversion /updateprojectfiles
+            git status
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+            chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+            echo "semantic version updated"
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: NODEJS                                                                                                    │
+# │ Various Nodejs legacy projects                                                                                       │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+    - name: buildpack-nodejs-build-pipeline
+      enabled: false
+    
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: GO                                                                                                        │
+# │ Various GO apps                                                                                                      │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    - name: buildpack-go-build-pipeline
+      enabled: false
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: RUBY                                                                                                      │
+# │ Used mostly by our wiki docs (frontend & devops teams)                                                               │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    - name: buildpack-ruby-build-pipeline
+      enabled: false
+
+kaniko:
+  enabled: true
+
+imagePullPolicy: IfNotPresent
+
+

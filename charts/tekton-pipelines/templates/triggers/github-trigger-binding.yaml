@@ -1,0 +1,26 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: github-trigger-binding
+spec:
+  params:
+  - name: head_commit
+    value: $(body.head_commit.id)
+  - name: head_commit_message
+    value: $(body.head_commit.message)
+  - name: pusher_name
+    value: $(body.head_commit.author.name)
+  - name: pusher_email
+    value: $(body.pusher.email)
+  - name: pusher_avatar
+    value: $(body.sender.avatar_url)
+  - name: pusher_url
+    value: $(body.sender.html_url)
+  - name: repository_name
+    value: $(body.repository.full_name)
+  - name: repository_url
+    value: $(body.repository.html_url)
+  - name: repository_ssh_url
+    value: $(body.repository.ssh_url)
+  - name: branch
+    value: $(body.ref)

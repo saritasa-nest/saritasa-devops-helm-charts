@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: argocd-deploy
+  
+spec:
+  description: >-
+    The task parses project.toml file and stores its environment variables
+    values to platform dir for further processing by buildpack task.
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+    
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+      - secretRef:
+          name: $(params.application)-argocd-secret         # used for authentication (username/password or auth token)
+  
+  steps:
+    - name: deploy
+      image: {{ .Values.images.argocd | default "argoproj/argocd:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/bin/bash
+
+        argocd login $ARGOCD_SERVER \
+          --grpc-web \
+          --grpc-web-root-path $ARGOCD_ROOT_PATH \
+          --username $ARGOCD_USERNAME \
+          --password $ARGOCD_PASSWORD
+
+        argocd app sync $(params.application) \
+          --grpc-web \
+          --grpc-web-root-path $ARGOCD_ROOT_PATH \
+          --server $ARGOCD_SERVER
+        
+        argocd app wait $(params.application) \
+          --health \
+          --grpc-web \
+          --grpc-web-root-path $ARGOCD_ROOT_PATH \
+          --server $ARGOCD_SERVER
+
+        # jq is not available in this image
+        # synced=`argocd app get $(params.application) -o json | jq .status.sync.status | tr -d \"`
+        # synced=`argocd app get $(params.application) | grep "Sync Status" | awk '{print $3}'`
+        healthy=`argocd app get $(params.application) | grep "Health Status:" | awk '{print $3}'`
+        [[ "$healthy" == "Healthy" ]] && echo "Sync completed succcessfully" || (echo "Failed" && exit 1)

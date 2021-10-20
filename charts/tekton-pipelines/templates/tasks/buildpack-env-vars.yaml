@@ -1,0 +1,83 @@
+# I dislike this hack
+# https://github.com/tektoncd/catalog/blob/main/task/buildpacks/0.3/buildpacks.yaml#L68-L113
+# but we should use it until this is resolved:
+# - https://github.com/buildpacks/tekton-integration/issues/33
+# - https://github.com/buildpacks/tekton-integration/issues/32
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: set-env-vars
+spec:
+  description: >-
+    The task parses project.toml file and stores its environment variables
+    values to platform dir for further processing by buildpack task.
+
+  workspaces:
+    - name: source
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+    
+    - name: platform_dir
+      type: string
+      description: The name of the platform directory.
+      
+  steps:
+    - name: clean
+      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env bash
+        # clean platform env dir before new run, so when env var is removed from project.toml file 
+        # it wouldn't influence the build
+        set -e
+
+        ENV_PATH=$(workspaces.source.path)/$(params.platform_dir)/env
+        
+        if [ -d $ENV_PATH ]; then
+          echo "clean everything from $ENV_PATH"
+          rm $ENV_PATH/*
+        fi
+
+    - name: set
+      image: saritasallc/python3:0.1@sha256:cb4be451c918cbd924e5380b1027afa66e232c8524e75afd4c2c771df213210e
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env python3
+        
+        import toml, os, sys
+
+        source_path = "$(resources.inputs.app.path)/project.toml"
+        env_dir = "$(workspaces.source.path)/$(params.platform_dir)/env"
+
+        try:
+          with open(source_path, "r") as f:
+            settings = toml.load(f)
+        except FileNotFoundError:
+          quit()
+        except Exception as e:
+          raise Exception("Unable to parse project.toml file\nTraceback: {e}")
+
+        env_vars = settings.get("build", {}).get("env", [])
+        env_vars = {item["name"]: item["value"] for item in env_vars}
+
+        # create directory if not exists
+        if env_vars and not os.path.exists(env_dir):
+            os.makedirs(env_dir)
+
+        # create env variables files
+        for name, value in env_vars.items():
+          with open(f"{env_dir}/{name}", "w") as f:
+            f.write(value)
+            print(
+              f"Created `{env_dir}/{name}` var file with `{value}` value",
+              file=sys.stdout
+            )
