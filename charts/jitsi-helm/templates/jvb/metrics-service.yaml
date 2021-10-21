@@ -4,8 +4,8 @@ kind: Service
 metadata:
   name: {{ include "jitsi-meet.jvb.fullname" . }}-metrics
   annotations:
-    prometheus.io/scrape: true
-    prometheus.io/port: 9888
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9888"
   labels:
   {{- include "jitsi-meet.jvb.labels" . | nindent 4 }}
 spec:
