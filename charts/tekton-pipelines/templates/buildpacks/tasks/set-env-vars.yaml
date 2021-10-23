@@ -1,3 +1,5 @@
+{{ if .Values.buildpacks.enabled }}
+
 # I dislike this hack
 # https://github.com/tektoncd/catalog/blob/main/task/buildpacks/0.3/buildpacks.yaml#L68-L113
 # but we should use it until this is resolved:
@@ -7,7 +9,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: set-env-vars
+  name: buildpack-set-env-vars
 spec:
   description: >-
     The task parses project.toml file and stores its environment variables
@@ -81,3 +83,5 @@ spec:
               f"Created `{env_dir}/{name}` var file with `{value}` value",
               file=sys.stdout
             )
+
+{{ end }}

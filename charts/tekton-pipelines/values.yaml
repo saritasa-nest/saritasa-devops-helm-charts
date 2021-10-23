@@ -18,7 +18,7 @@ images:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 buildpacks:
-  enabled: true
+  enabled: false
   cnbPlatformAPI: "0.4"
   generate:
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -30,12 +30,13 @@ buildpacks:
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-frontend-build-pipeline
-      enabled: false
+      enabled: true
+      buildTaskName: buildpack-frontend
       buildTaskSteps:
         - name: build-static
           image: node:14
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir2: $(resources.inputs.app.path)
           script: |
             #!/bin/bash                
             [ -f package.json ] && (
@@ -46,6 +47,7 @@ buildpacks:
           securityContext:
             privileged: true
 
+
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
 # │ Purpose:                                                                                                             │
@@ -55,7 +57,12 @@ buildpacks:
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-php-build-pipeline
-      enabled: false
+      enabled: true
+      description: |-
+        Additional steps in the build task are required for
+        - compile static with node.js (old legacy projects, where static html is bundled with the PHP repo)
+        - fix PHP detection if repo contains buth node.js and php code
+      buildTaskName: buildpack-php
       buildTaskSteps:
         - name: build-static
           image: node:14
@@ -91,6 +98,7 @@ buildpacks:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-django-build-pipeline
       enabled: false
+      buildTaskName: buildpack-django
       buildTaskSteps:
         - name: copy-requirements
           image: docker.io/library/bash:5.1.8
@@ -113,6 +121,7 @@ buildpacks:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-dotnet-build-pipeline
       enabled: false
+      buildTaskName: buildpack-dotnet
       buildTaskSteps:
         - name: git-fetch-tags
           image: alpine/git:v2.32.0
@@ -164,6 +173,7 @@ buildpacks:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-nodejs-build-pipeline
       enabled: false
+      buildTaskName: buildpack-nodejs
     
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
@@ -172,6 +182,7 @@ buildpacks:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-go-build-pipeline
       enabled: false
+      buildTaskName: buildpack-go
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: RUBY                                                                                                      │
@@ -180,8 +191,19 @@ buildpacks:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-ruby-build-pipeline
       enabled: false
+      buildTaskName: buildpack-ruby
+
 
 kaniko:
   enabled: true
 
 imagePullPolicy: IfNotPresent
+
+podTemplate: 
+  nodeSelector:
+    ci: "true"
+  tolerations:
+    - key: "ci"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"

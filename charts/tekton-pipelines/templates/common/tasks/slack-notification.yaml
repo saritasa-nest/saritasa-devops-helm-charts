@@ -42,7 +42,7 @@ spec:
 
     - name: repository_url
       type: string
-      description: git repository url
+      description: git repository https url
 
     - name: branch
       type: string

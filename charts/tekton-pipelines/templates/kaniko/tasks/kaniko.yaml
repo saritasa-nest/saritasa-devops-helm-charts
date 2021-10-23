@@ -1,3 +1,4 @@
+{{ if .Values.kaniko.enabled }}
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -88,4 +89,4 @@ spec:
       # makes it explicit that it needs to run as root.
       securityContext:
         runAsUser: 0
-      
+{{ end }}

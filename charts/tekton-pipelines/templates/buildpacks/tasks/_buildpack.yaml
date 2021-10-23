@@ -1,11 +1,11 @@
+{{- define "task.buildpack" -}}
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: buildpack
+  name: {{ .pipeline.buildTaskName }}
 spec:
-  description: >-
-    The Buildpacks task builds source into a container image and pushes it to a AWS ECR registry,
-    using Cloud Native Buildpacks.
+  description: |-
+    {{- .pipeline.description | default (printf "The Buildpacks %s task builds source into a container image and pushes it to a AWS ECR registry, using Cloud Native Buildpacks" (.pipeline.buildTaskName)) | nindent 4}}
 
   workspaces:
     - name: source
@@ -26,6 +26,15 @@ spec:
     - name: builder_image
       type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
+
+    - name: run_image
+      type: string
+      description: reference to a run image to use
+      default: ""
+
+    - name: docker_registry
+      type: string
+      description: private docker registry address
 
     - name: cache
       type: string
@@ -64,16 +73,7 @@ spec:
     - name: skip_restore
       type: string
       description: do not write layer metadata or restore cached layers
-      default: "false"
-
-    - name: run_image
-      type: string
-      description: reference to a run image to use
-      default: ""
-
-    - name: docker_registry
-      type: string
-      description: aws private ecr registry address
+      default: "false"    
 
     - name: environment
       type: string
@@ -82,15 +82,15 @@ spec:
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
-        value: {{ .Values.buildpacks.cnbPlatformAPI | default "0.4" | quote }}
+        value: {{ .cnbPlatformAPI | default "0.4" | quote }}
     envFrom:
       - configMapRef:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
     - name: prepare
-      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      image: {{ .images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .imagePullPolicy }}
       script: |
           #!/usr/bin/env bash
           set -e
@@ -107,75 +107,24 @@ spec:
       securityContext:
         privileged: true
 
-    - name: python
-      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+    # insert customized steps as defined in the values.yaml of the helm chart
+    {{- range .pipeline.buildTaskSteps }}
+    - name: {{ .name }}
+      image: {{ .image | quote }}
+      imagePullPolicy: {{ .imagePullPolicy }}
+      {{- if .workingDir }}
+      workingDir: {{ .workingDir }}
+      {{- end }}
       script: |
-        #!/usr/bin/env bash
-        # python related
-        # we should have a requirements.txt file in the build folder for our buildpack to work correctly
-        # as a result we just copy it.
-        set -e
-        if [ -f manage.py ]; then
-          case $(params.environment) in
-            dev|develop|development)
-              [ -f requirements/dev.txt ]         && cp requirements/dev.txt requirements.txt
-              [ -f requirements/develop.txt ]     && cp requirements/develop.txt requirements.txt
-              [ -f requirements/development.txt ] && cp requirements/development.txt requirements.txt
-              ;;
-            staging)
-              [ -f requirements/staging.txt ]     && cp requirements/staging.txt requirements.txt
-              ;;
-            prod|production)
-              [ -f requirements/prod.txt ]        && cp requirements/prod.txt requirements.txt
-              [ -f requirements/production.txt ]  && cp requirements/production.txt requirements.txt
-              ;;
-            *)
-              cp requirements/$(params.environment).txt requirements.txt
-              ;;
-          esac
-
-          [ -f requirements.txt ] && echo "Found requirements.txt" || exit 1
-        fi
-
-    - name: nodejs
-      image: node:14
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
-      script: |
-        #!/bin/bash
-        set -e
-        APP=$(resources.inputs.app.path)
-        if [ -f package.json ]; then
-          cd $APP
-          yes | npm install --silent
-          npm run build:$(params.environment) || echo "unable to build  $(params.environment)"
-          rm -rf node_modules && echo "remove node_modules dir"
-        fi
-      securityContext:
-        privileged: true
-
-    - name: php
-      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
-      workingDir: $(resources.inputs.app.path)
-      script: |
-        #!/usr/bin/env bash
-        # php related
-        # Workaround to fix no PHP detection, when package.json presents
-
-        set -e
-        if [[ -f composer.json && -f package.json ]]; then
-          rm -f package.json
-          ls -la .
-        fi
+        {{- .script | nindent 8 }}
+    {{- end }}
 
     # if you need to debug this step you can do:
     # insert `sleep 3000` after the aws ecr get-login-password command and then get inside the container
     # k exec -ti `k --no-headers=true get pods -l tekton.dev/task=buildpack | awk '{print $1}'` -c step-create bash
     - name: build
       image: $(params.builder_image)
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      imagePullPolicy: {{ .imagePullPolicy }}
       workingDir: $(resources.inputs.app.path)
       script: |
         #!/bin/bash
@@ -197,6 +146,7 @@ spec:
           -previous-image=$(resources.outputs.image.url) \
           -run-image=$(params.run_image) \
           $(resources.outputs.image.url)
+
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -211,3 +161,5 @@ spec:
       emptyDir: {}
     - name: layers-dir
       emptyDir: {}
+---
+{{- end }}
