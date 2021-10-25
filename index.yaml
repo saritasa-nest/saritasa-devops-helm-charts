@@ -87,4 +87,32 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/jitsi-meet-0.2.0/jitsi-meet-0.2.0.tgz
     version: 0.2.0
-generated: "2021-10-25T08:01:39.84947375Z"
+  saritasa-tekton:
+  - apiVersion: v2
+    appVersion: v0.28.2
+    created: "2021-10-25T23:32:29.866405033Z"
+    description: A Helm chart for Tekton
+    digest: 088ed5b3762b329aed44c248eb060823919423b232d9b7ec3ac08c92ee84dd84
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-0.1.0/saritasa-tekton-0.1.0.tgz
+    version: 0.1.0
+  saritasa-tekton-pipelines:
+  - apiVersion: v2
+    appVersion: v0.28.2
+    created: "2021-10-25T23:32:30.012335639Z"
+    description: A Helm chart for Tekton Pipelines
+    digest: 26ed909da55b00d2b6e3a2c497ea5cd2145fcd0f1bc901c4c3997da20d2965d1
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-pipelines
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-10-25T23:32:30.01236184Z"
