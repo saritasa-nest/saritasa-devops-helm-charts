@@ -211,3 +211,13 @@ podTemplate:
       operator: "Equal"
       value: "true"
       effect: "NoSchedule"
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ Install the saritasa-tekton helm chart (tekton engine, triggers, dashboard, webhooks etc)                            │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+saritasa-tekton:
+  enabled: false
+  
+  
