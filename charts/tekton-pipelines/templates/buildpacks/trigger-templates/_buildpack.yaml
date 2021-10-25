@@ -11,50 +11,17 @@ spec:
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
   params:
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
-
-    - name: sha
-      type: string
-      description: sha commit ID of the image deployed in cluster
-
-    - name: head_commit
-      type: string
-      description: full SHA commit ID
-
-    - name: head_commit_message
-      type: string
-      description: description of the commit (by developer)
-
-    - name: pusher_name
-      type: string
-      description: author name
-
-    - name: pusher_email
-      type: string
-      description: author email
-
-    - name: pusher_avatar
-      type: string
-      description: author avatar
-
-    - name: pusher_url
-      type: string
-      description: author link to profile
-
-    - name: repository_url
-      type: string
-      description: git repository https url 
+    {{ include "pipeline.defaultParams" . | nindent 4 }}
+    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
 
     - name: repository_ssh_url    
       type: string
       description: git repository ssh url 
 
-    - name: branch
+    - name: kubernetes_repository_ssh_url
       type: string
-      description: git branch
-    
+      description: git repository ssh url for kubernetes manifests repo
+
     - name: buildpack_builder_image
       type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
@@ -62,36 +29,12 @@ spec:
     - name: buildpack_runner_image
       type: string
       description: reference to a run image to use
-
-    - name: docker_registry
-      type: string
-      description: private docker registry address
-
-    - name: docker_registry_repository
-      type: string
-      description: private docker registry repository address
       
     - name: source_subpath
       type: string
       description: a subpath within the `source` input where the source to build is located.
       default: ""
-
-    - name: kubernetes_repository_ssh_url
-      type: string
-      description: git repository ssh url for kubernetes manifests repo
-      
-    - name: kubernetes_repository_kustomize_path
-      type: string
-      description: overlay path for kustomize call
-
-    - name: kubernetes_branch
-      type: string
-      description: git branch for kustomize managed git repo
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
-      
+          
 
   resourcetemplates:
   - kind: PipelineRun
@@ -106,71 +49,20 @@ spec:
       pipelineRef:
         name: {{ .pipeline.name }}
       params:
-        - name: "application"
-          value: "$(tt.params.application)"
-        - name: sha
-          value: "$(tt.params.sha)"
-        - name: head_commit
-          value: "$(tt.params.head_commit)"
-        - name: head_commit_message
-          value: "$(tt.params.head_commit_message)"
-        - name: pusher_name
-          value: "$(tt.params.pusher_name)"
-        - name: pusher_email
-          value: "$(tt.params.pusher_email)"
-        - name: pusher_avatar
-          value: "$(tt.params.pusher_avatar)"
-        - name: pusher_url
-          value: "$(tt.params.pusher_url)"
-        - name: repository_url
-          value: "$(tt.params.repository_url)"
-        - name: branch
-          value: "$(tt.params.branch)"
+        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}        
         - name: buildpack_builder_image
           value: "$(tt.params.buildpack_builder_image)"
         - name: buildpack_runner_image
-          value: "$(tt.params.buildpack_runner_image)"
-        - name: docker_registry
-          value: "$(tt.params.docker_registry)"
-        - name: docker_registry_repository
-          value: "$(tt.params.docker_registry_repository)"        
+          value: "$(tt.params.buildpack_runner_image)"          
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
-        - name: kubernetes_repository_kustomize_path    
-          value: "$(tt.params.kubernetes_repository_kustomize_path)"
-        - name: kubernetes_branch    
-          value: "$(tt.params.kubernetes_branch)"
-        - name: environment
-          value: "$(tt.params.environment)"
+        
 
       resources:
-        - name: app
-          resourceSpec:
-            type: git
-            params:
-              - name: url
-                value: $(tt.params.repository_ssh_url)
-              - name: revision
-                value: $(tt.params.head_commit)
-        - name: kubernetes-repo
-          resourceSpec:
-            type: git
-            params:
-              - name: url
-                value: $(tt.params.kubernetes_repository_ssh_url)
-              - name: revision
-                value: $(tt.params.kubernetes_branch)
-        - name: image
-          resourceSpec:
-            type: image
-            params:
-              - name: url
-                value: $(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)
+        {{- include "pipeline.defaultResources" . | nindent 8 }}
 
       workspaces:
-      - name: source
-        persistentVolumeClaim:
-          claimName: $(tt.params.application)-workspace-pvc
+        {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
       
       podTemplate:
         volumes:

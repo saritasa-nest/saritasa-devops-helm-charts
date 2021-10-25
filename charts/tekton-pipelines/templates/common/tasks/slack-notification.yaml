@@ -8,53 +8,11 @@ spec:
     You can see my question about dealing with task status here: https://github.com/tektoncd/pipeline/issues/3762
 
   params:
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
-    
-    - name: sha
-      type: string
-      description: sha commit ID of the image deployed in cluster
-
-    - name: head_commit
-      type: string
-      description: full SHA commit ID
-
-    - name: head_commit_message
-      type: string
-      description: description of the commit (by developer)
-
-    - name: pusher_name
-      type: string
-      description: author name
-      
-    - name: pusher_email
-      type: string
-      description: author email
-
-    - name: pusher_avatar
-      type: string
-      description: author avatar
-
-    - name: pusher_url
-      type: string
-      description: author link to profile
-
-    - name: repository_url
-      type: string
-      description: git repository https url
-
-    - name: branch
-      type: string
-      description: git branch
+    {{ include "pipeline.defaultParams" . | nindent 4 }}
 
     - name: status
       type: string
       description: status of the deployment (i.e. "succeeded")
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
 
   results:
     - name: thread
@@ -90,7 +48,7 @@ spec:
 
   steps:
     - name: get-thread-msg
-      image: saritasallc/python3:0.4
+      image: {{ .Values.images.python | default "saritasallc/python3:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         #!/usr/bin/env sh

@@ -11,6 +11,7 @@ images:
   kustomize: k8s.gcr.io/kustomize/kustomize:v4.4.0 # https://github.com/kubernetes/k8s.io/blob/main/k8s.gcr.io/images/k8s-staging-kustomize/images.yaml
   kubectl:   bitnami/kubectl:1.21.5
   slack:     cloudposse/slack-notifier:0.4.0
+  python:    saritasallc/python3:0.4
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACKS                                                                                                           │
@@ -18,7 +19,7 @@ images:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
 buildpacks:
-  enabled: false
+  enabled: true
   cnbPlatformAPI: "0.4"
   generate:
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -57,7 +58,7 @@ buildpacks:
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
     - name: buildpack-php-build-pipeline
-      enabled: true
+      enabled: false
       description: |-
         Additional steps in the build task are required for
         - compile static with node.js (old legacy projects, where static html is bundled with the PHP repo)
@@ -195,6 +196,9 @@ buildpacks:
 
 
 kaniko:
+  enabled: true
+
+wordpress:
   enabled: true
 
 imagePullPolicy: IfNotPresent
