@@ -4,11 +4,6 @@ description: A Helm chart for Tekton
 
 type: application
 
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.0
-
 # This is the version number of the tekton engine application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
@@ -16,3 +11,12 @@ version: 0.1.0
 appVersion: "v0.28.2"
 dashboardVersion: "v0.21.0"
 triggersVersions: "v0.16.0"
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.1.0
+
+maintainers:
+  - url: https://www.saritasa.com/
+    name: Saritasa
