@@ -18,7 +18,9 @@ spec:
       {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/jicofo/configmap.yaml") . | sha256sum }}
+      {{ if not .Values.jicofo.xmpp.existingSecret }}
         checksum/secret: {{ include (print $.Template.BasePath "/jicofo/xmpp-secret.yaml") . | sha256sum }}
+      {{ end }}
       {{- range $annotation, $value := mergeOverwrite .Values.global.podAnnotations .Values.jvb.podAnnotations }}
         {{ $annotation }}: {{ $value|quote }}
       {{- end }}
@@ -37,8 +39,13 @@ spec:
           image: "{{ .Values.jicofo.image.repository }}:{{ default .Chart.AppVersion .Values.jicofo.image.tag }}"
           imagePullPolicy: {{ pluck "pullPolicy" .Values.jicofo.image .Values.image | first }}
           envFrom:
+          {{ if not .Values.jicofo.xmpp.existingSecret }}
           - secretRef:
               name: {{ include "call-nested" (list . "prosody" "prosody.fullname") }}-jicofo
+          {{ else }}
+          - secretRef:
+              name: {{ .Values.jicofo.xmpp.existingSecret }}
+          {{ end }}
           - configMapRef:
               name: {{ include "call-nested" (list . "prosody" "prosody.fullname") }}-common
           - configMapRef:

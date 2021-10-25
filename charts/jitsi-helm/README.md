@@ -103,6 +103,7 @@ Parameter | Description | Default
 `jicofo.xmpp.user` | Name of the XMPP user used by jicofo to authenticate | `focus`
 `jicofo.xmpp.password` | Password used by jicofo to authenticate on the XMPP service | 10 random chars
 `jicofo.xmpp.componentSecret` | Values of the secret used by jicofo for the xmpp-component | 10 random chars
+`jicofo.xmpp.existingSecret` | Name of the already existing secret that can be used (if it is set no need to pass `jicofo.xmpp.user`, `jicofo.xmpp.password`, `jicofo.xmpp.componentSecret`) | ``
 `jvb.service.enabled` | Boolean to enable os disable the jvb service creation | `false` if `jvb.useHostPort` is `true` otherwise `true`
 `jvb.service.type` | Type of the jvb service | `ClusterIP`
 `jvb.UDPPort` | UDP port used by jvb, also affects port of service, and hostPort | `10000`
@@ -110,6 +111,7 @@ Parameter | Description | Default
 `jvb.extraEnvs` | Map containing additional environment variables to jvb | '{}'
 `jvb.xmpp.user` | Name of the XMPP user used by jvb to authenticate | `jvb`
 `jvb.xmpp.password` | Password used by jvb to authenticate on the XMPP service | 10 random chars
+`jvb.xmpp.existingSecret` | Name of the already existing secret that can be used (if it is set no need to pass `jvb.xmpp.user`, `jvb.xmpp.password`) | ``
 `jvb.livenessProbe` | Map that holds the liveness probe, you can add parameters such as timeout or retries following the Kubernetes spec | A livenessProbe map
 `jvb.readinessProbe` | Map that holds the liveness probe, you can add parameters such as timeout or retries following the Kubernetes spec | A readinessProbe map
 `jvb.metrics.enabled` | Boolean that control the metrics exporter for jvb. If true the `ServiceMonitor` will also created | `false`
