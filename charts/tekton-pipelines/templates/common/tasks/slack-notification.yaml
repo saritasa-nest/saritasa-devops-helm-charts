@@ -15,8 +15,6 @@ spec:
       description: status of the deployment (i.e. "succeeded")
 
   results:
-    - name: thread
-      description: Slack thread in which tekton CI notifications should be sent.
     - name: failed_info
       description: Info about failed build.
     - name: failed_task
@@ -31,11 +29,7 @@ spec:
       - configMapRef:
           name: $(params.application)-build-pipeline-config
       - secretRef:
-          name: $(params.application)-slack-secret
-      - secretRef:
-          # Slack docs to obtain token
-          # https://github.com/saritasa-nest/saritasa-devops-docs/blob/main/_infra/slack.md#get-slack-api-token
-          name: slack-api-token-secret  # used for slack api token (common for all projects)
+          name: $(params.application)-slack-secret  # used for webhook URL      
 
     env:
       - name: POD_NAME
@@ -47,13 +41,6 @@ spec:
         mountPath: /etc/podinfo
 
   steps:
-    - name: get-thread-msg
-      image: {{ .Values.images.python | default "saritasallc/python3:latest" }}
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
-      script: |
-        #!/usr/bin/env sh
-        echo $(python get-thread | jq ".thread" -r) | tee $(results.thread.path)
-
     - name: get-failed-info
       image: {{ .Values.images.kubectl | default "bitnami/kubectl:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -94,9 +81,6 @@ spec:
 
         echo "result: $status"
 
-        thread="$(cat $(results.thread.path))"
-        echo "thread: $thread"
-
         if [ "$status" = "succeeded" ]; then
           color="good"
           thumb_url="$(params.pusher_avatar)"
@@ -120,7 +104,6 @@ spec:
         -user_name "Tekton" \
         -icon_emoji ":white_check_mark:" \
         -color "$color" \
-        -thread "$thread" \
         -author_name "[$(params.application)] by $(params.pusher_name)" \
         -author_link "$(params.pusher_url)" \
         -title "$(params.head_commit_message)" \
