@@ -1,0 +1,22 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $.Values.environment 
+                  "namespace"         $.Release.Namespace 
+                  "storageClassName"  $.Values.storageClassName }}
+
+# workspace pvc contains git repo cloned for the component by tekton
+{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "workspace-pvc")        "storage" "10Gi") }}
+{{ if contains "buildpack" $component.pipeline }}
+# buildpacks cache pvc contains cache layers used by buildpacks
+{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "buildpacks-cache-pvc") "storage" "5Gi") }}
+{{- end }} # if contains
+
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range
+{{- end }} # if apps

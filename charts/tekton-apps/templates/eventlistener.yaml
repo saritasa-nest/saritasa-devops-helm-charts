@@ -1,0 +1,29 @@
+{{ if .Values.apps }}
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: build-pipeline-event-listener
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1000"
+spec:
+  serviceAccountName: trigger-sa
+  triggers:
+  {{- range $project := .Values.apps }}
+  {{- if $project.enabled }}
+  # ========================================================================
+  # {{ $project.project | upper }} PROJECT
+  {{- range $component := $project.components }}
+  # ========================================================================
+  # 🐤 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT
+  # ========================================================================
+  {{- $data := dict "project"           $project
+                    "component"         $component
+                    "environment"       $.Values.environment 
+                    "eventlistener"     $.Values.eventlistener 
+                    "gitBranchPrefixes" $.Values.gitBranchPrefixes }}
+  {{- include "tekton-apps.eventlistener.trigger" $data | nindent 4 }}
+  {{- end }} # range component
+  {{- end }} # if project.enabled
+  {{- end }} # range
+  {{- end }} # if apps

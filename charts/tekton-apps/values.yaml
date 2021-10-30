@@ -1,0 +1,92 @@
+
+environment: dev # or staging or prod
+
+# or main, staging (for fixed merges into staging) or like release (if we use gitflow and semantic versioning)
+# you can overwrite it in apps[project].components[component].eventlistener.filter
+# which could be set to something like this
+# filter: (body.ref.startsWith('refs/heads/develop/') || body.ref.startsWith('refs/heads/release/'))
+# 
+gitBranchPrefixes: 
+ - develop 
+
+storageClassName: gp2
+
+aws:
+  region: "us-west-2"
+  dns: versuspoker.com
+
+# default docker registry
+defaultRegistry: 332927762005.dkr.ecr.us-west-2.amazonaws.com
+
+slack:
+  prefix: client
+  suffix: ci
+  imagesLocation: https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com # this is s3 bucket with public images that we upload through terraform code (!!! NO SLASH at the end pls)
+
+argocd:
+  server: deploy.versuspoker.com
+  rootPath: "/"
+
+eventlistener:
+  enableWebhookSecret: true
+  extraOverlays: []
+    #   - key: truncated_sha
+    #     expression: "body.head_commit.id.truncate(7)"
+    #   - key: branch_name
+    #     expression: "body.ref.split('/')[2]"
+
+apps:
+  - project: vp
+    enabled: true
+    mailList: vp@saritasa.com
+    devopsMailList: devops+vp@saritasa.com
+    jiraURL: https://saritasa.atlassian.net/browse/vp
+    tektonURL: https://tekton.versuspoker.com/#/namespaces/ci/pipelineruns
+    slack: client-vp-ci
+    kubernetesRepository: 
+      name: vp-kubernetes-aws
+      branch: main
+      url: git@github.com:saritasa-nest/vp-kubernetes-aws.git
+    
+    components:
+      - name: backend
+        repository: vp-backend      
+        pipeline: buildpack
+        applicationURL: https://api.versuspoker.com        
+        eventlistener:
+          template: buildpack-backend-build-pipeline-trigger-template
+        extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap 
+          KEY: value
+        triggerBinding:
+          - name: docker_registry_repository
+            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/backend                    
+          - name: buildpack_builder_image
+            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/google/builder:v1
+          - name: buildpack_runner_image
+            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/google/runner:v1
+  
+      - name: frontend
+        repository: vp-frontend      
+        pipeline: buildpack
+        applicationURL: https://versuspoker.com        
+        eventlistener:
+          enableWebhookSecret: false
+          filter: (body.ref.startsWith('refs/heads/develop/') || body.ref.startsWith('refs/heads/release/'))
+          template: buildpack-frontend-build-pipeline-trigger-template        
+          extraOverlays: []
+          # - key: truncated_sha
+          #   expression: "body.head_commit.id.truncate(7)"
+          eventTypes: ["pull_request", "push"]
+        extraBuildConfigParams: {}
+        triggerBinding:
+          - name: docker_registry_repository
+            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/frontend                    
+          - name: buildpack_builder_image
+            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/paketo/builder:full
+          - name: buildpack_runner_image
+            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/paketo/runner:full
+          - name: source_subpath
+            value: dist/web
+    
+
+        
