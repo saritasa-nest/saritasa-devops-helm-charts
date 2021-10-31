@@ -88,5 +88,4 @@ apps:
           - name: source_subpath
             value: dist/web
     
-
-        
+runPostInstallJob: false
