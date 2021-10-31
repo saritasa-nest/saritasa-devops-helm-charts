@@ -5,9 +5,7 @@
 {{- range $component := $project.components }}
 {{- $data := dict "project"           $project
                   "component"         $component
-                  "environment"       $.Values.environment 
-                  "namespace"         $.Release.Namespace 
-                  "storageClassName"  $.Values.storageClassName }}
+                  "environment"       $.Values.environment }}
 
 # ========================================================================
 # 🌱 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT TRIGGER BINDING

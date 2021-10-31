@@ -183,9 +183,10 @@ spec:
 {{ end }}
 
 
-
 {{/*
 Check if list of maps (dict name, value) contains a specific named key and then render it or default
+the way you use it:
+{{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_branch" "default" "main" ) | nindent 2 }}
 */}}
 {{- define "tekton-apps.get-triggerbinding-value-or-default" -}}
 {{- $search := dict "found" false }}
