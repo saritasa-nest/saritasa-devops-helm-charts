@@ -3,29 +3,25 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: kaniko-build-pipeline-trigger-template
+  namespace: {{ .Release.Namespace }}
 spec:
   params:
-    {{ include "pipeline.defaultParams" . | nindent 4 }}
-    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
 
     - name: repository_ssh_url
-      type: string
       description: git repository ssh url 
 
     - name: kubernetes_repository_ssh_url
-      type: string
       description: git repository ssh url for kubernetes manifests repo
     
     - name: docker_file
-      type: string
       default: Dockerfile
       description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
 
     - name: docker_context
-      type: string
       default: "."
       description: dockerfile context path
-
 
   resourcetemplates:
   - kind: PipelineRun

@@ -3,6 +3,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: redeploy
+  namespace: {{ .Release.Namespace }}
 spec:
   description: >-
     Deletes pod from the deployment and waits for deployment to bring a new one

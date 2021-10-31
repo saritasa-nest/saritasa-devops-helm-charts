@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: argocd-deploy
+  namespace: {{ .Release.Namespace }}
   
 spec:
   description: >-

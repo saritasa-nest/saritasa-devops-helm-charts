@@ -3,6 +3,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: {{ .pipeline.name }}
+  namespace: {{.namespace }}
 spec:
   description: |-
     {{- .pipeline.description | default (printf "Pipeline will only build the image utilizing %s task and then send notification via slack. The deployment is done via argocd" (.pipeline.buildTaskName)) | nindent 4}}
@@ -41,7 +42,7 @@ spec:
       type: image
 
   tasks:
-    - name: buildpack-set-env-vars
+    - name: set-env-vars
       taskRef:
         name: buildpack-set-env-vars
       resources:
@@ -51,8 +52,6 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: environment
-          value: "$(params.environment)"
         - name: platform_dir
           value: "$(params.platform_dir)"
       workspaces:

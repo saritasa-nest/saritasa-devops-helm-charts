@@ -2,6 +2,8 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:     
   name: slack-notification
+  namespace: {{ .Release.Namespace }}
+  
 spec:
   description: >-
     Send slack notification with various information about pipeline progress/result.

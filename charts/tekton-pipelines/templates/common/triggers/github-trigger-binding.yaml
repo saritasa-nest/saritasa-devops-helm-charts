@@ -2,6 +2,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
 metadata:
   name: github-trigger-binding
+  namespace: {{ .Release.Namespace }}
 spec:
   params:
   - name: head_commit

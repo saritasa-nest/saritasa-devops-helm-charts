@@ -3,6 +3,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: {{ .pipeline.buildTaskName }}
+  namespace: {{ .namespace }}
 spec:
   description: |-
     {{- .pipeline.description | default (printf "The Buildpacks %s task builds source into a container image and pushes it to a AWS ECR registry, using Cloud Native Buildpacks" (.pipeline.buildTaskName)) | nindent 4}}

@@ -2,6 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: kustomize
+  namespace: {{ .Release.Namespace }}
 spec:
   description: >-
     Updates image tag in the kustomize overlay of the app
@@ -61,16 +62,15 @@ spec:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.kubernetes-repo.path)      
       script: |    
+        set +x
         # apply changes only if it exists, otherwise do nothing
-        if [ ! `git status --porcelain` ]; then
+        if [ $(git status --porcelain | wc -l) -eq 0 ]; then
           echo "There are no changes, nothing to commit"
           exit
         fi
 
         # the params.branch comes from github push event and looks like this: "refs/heads/staging"
-        # so we had to get only the end of the string
-        # branch=`echo $(params.branch)| awk -F\/ '$0=$3'`
-        # git checkout $branch
+        # so we had to get only the end of the string        
         git commit -am "feat: $(params.environment) argocd deployment $(params.kustomize_overlay_path), new image: $(params.image)"
         # mkdir /root/.ssh && cp -r $HOME/.ssh/* /root/.ssh
         # git push

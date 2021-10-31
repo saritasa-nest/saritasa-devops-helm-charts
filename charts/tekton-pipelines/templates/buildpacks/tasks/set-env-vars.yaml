@@ -10,6 +10,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: buildpack-set-env-vars
+  namespace: {{ .Release.Namespace }}
 spec:
   description: >-
     The task parses project.toml file and stores its environment variables

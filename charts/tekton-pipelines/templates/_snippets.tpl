@@ -29,6 +29,7 @@
 
 - name: pusher_avatar
   type: string
+  description: author url avatar image
 
 - name: pusher_url
   type: string
@@ -44,6 +45,41 @@
 
 - name: branch
   type: string
+  description: git branch
+{{- end}}
+
+{{- define "trigger-template.defaultParams" -}}
+- name: application
+  description: name of the argocd application we're going to deploy/sync
+
+- name: sha
+  description: sha commit ID of the image deployed in cluster
+
+- name: head_commit
+  description: full SHA commit ID
+
+- name: head_commit_message
+  description: description of the commit (by developer)
+  
+- name: pusher_name
+  description: author name
+
+- name: pusher_email
+  description: author email
+
+- name: pusher_avatar
+  description: author url avatar image
+
+- name: pusher_url
+  description: author link to profile
+
+- name: repository_url
+  description: git repository https url 
+
+- name: environment
+  description: environment name of the app being built, i.e. dev/staging/prod
+
+- name: branch
   description: git branch
 {{- end}}
 
@@ -68,6 +104,21 @@
 
 - name: kubernetes_branch
   type: string
+  default: main
+  description: git branch for kustomize managed git repo
+{{- end}}
+
+{{- define "trigger-template.defaultDockerKubernetesParams" -}}
+- name: docker_registry
+  description: private docker registry address
+
+- name: docker_registry_repository
+  description: private docker registry repository address
+
+- name: kubernetes_repository_kustomize_path
+  description: overlay path for kustomize call
+
+- name: kubernetes_branch
   default: main
   description: git branch for kustomize managed git repo
 {{- end}}

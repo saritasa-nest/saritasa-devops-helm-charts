@@ -30,21 +30,23 @@ buildpacks:
 # │ files into the resulting folder, which then is going to be detected by the buildpack.                                │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-frontend-build-pipeline
-      enabled: true
+    buildpackFrontendBuildPipeline:
+      name: buildpack-frontend-build-pipeline
+      enabled: false
       buildTaskName: buildpack-frontend
       buildTaskSteps:
         - name: build-static
           image: node:14
           imagePullPolicy: IfNotPresent
-          workingDir2: $(resources.inputs.app.path)
+          workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash                
             [ -f package.json ] && (
+              echo "install node.js dependencies"
               yes | npm install --silent;
-              npm run build:$(params.environment) || echo "unable to build $(params.environment)";
+              npm run build:$(params.environment);
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null;
-              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath); ) || echo "unable to build package.json" && exit 1;
+              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath); ) || (echo "unable to build $(params.environment) env" && exit 1;)
           securityContext:
             privileged: true
 
@@ -57,7 +59,8 @@ buildpacks:
 # │ remove generated folders so that buildpack does not detect it as nodejs code                                         │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-php-build-pipeline
+    buildpackPhpBuildPipeline:
+      name: buildpack-php-build-pipeline
       enabled: false
       description: |-
         Additional steps in the build task are required for
@@ -97,7 +100,8 @@ buildpacks:
 # │ requirements.txt is named after the environment and stored inside the requirements folder                            │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-django-build-pipeline
+    buildpackDjangoBuildPipeline:
+      name: buildpack-django-build-pipeline
       enabled: false
       buildTaskName: buildpack-django
       buildTaskSteps:
@@ -112,7 +116,7 @@ buildpacks:
               || echo "Unable to find requirements for $(params.environment)")
             [ -f requirements.txt ] && echo "Found requirements.txt" \
               || (echo "requirements.txt is not found! Halting execution."; exit 1;)          
-    
+
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
 # │ This generated buildpack pipeline is used by our dotnet team and has a custom step that is used to obtain semantic   │
@@ -120,7 +124,8 @@ buildpacks:
 # │ semantic version that is then displayed in API calls, like this https://api.site.com/api/meta/version                │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-dotnet-build-pipeline
+    buildpackDotnetBuildPipeline:
+      name: buildpack-dotnet-build-pipeline
       enabled: false
       buildTaskName: buildpack-dotnet
       buildTaskSteps:
@@ -172,16 +177,18 @@ buildpacks:
 # │ Various Nodejs legacy projects                                                                                       │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-nodejs-build-pipeline
+    buildpackNodejsBuildPipeline:
+      name: buildpack-nodejs-build-pipeline
       enabled: false
       buildTaskName: buildpack-nodejs
-    
+
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
 # │ Various GO apps                                                                                                      │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-go-build-pipeline
+    buildpackGoBuildPipeline:
+      name: buildpack-go-build-pipeline
       enabled: false
       buildTaskName: buildpack-go
 
@@ -190,16 +197,17 @@ buildpacks:
 # │ Used mostly by our wiki docs (frontend & devops teams)                                                               │
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-    - name: buildpack-ruby-build-pipeline
+    buildpackRubyBuildPipeline:
+      name: buildpack-ruby-build-pipeline
       enabled: false
       buildTaskName: buildpack-ruby
 
 
 kaniko:
-  enabled: true
+  enabled: false
 
 wordpress:
-  enabled: true
+  enabled: false
 
 imagePullPolicy: IfNotPresent
 

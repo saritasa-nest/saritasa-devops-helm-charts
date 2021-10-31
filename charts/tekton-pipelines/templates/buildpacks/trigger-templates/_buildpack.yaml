@@ -3,6 +3,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: {{ .pipeline.name }}-trigger-template
+  namespace: {{ .namespace }}
 spec:
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -11,27 +12,22 @@ spec:
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
   params:
-    {{ include "pipeline.defaultParams" . | nindent 4 }}
-    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
 
     - name: repository_ssh_url    
-      type: string
       description: git repository ssh url 
 
     - name: kubernetes_repository_ssh_url
-      type: string
       description: git repository ssh url for kubernetes manifests repo
 
     - name: buildpack_builder_image
-      type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
     
     - name: buildpack_runner_image
-      type: string
       description: reference to a run image to use
       
     - name: source_subpath
-      type: string
       description: a subpath within the `source` input where the source to build is located.
       default: ""
           
@@ -57,7 +53,6 @@ spec:
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
         
-
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
 

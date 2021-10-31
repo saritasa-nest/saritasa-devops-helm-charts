@@ -3,6 +3,8 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: kaniko
+  namespace: {{ .Release.Namespace }}
+  
 spec:
   description: >-
     This is task for legacy Saritasa projects written with Dockerfile, compilation is done by using Kaniko

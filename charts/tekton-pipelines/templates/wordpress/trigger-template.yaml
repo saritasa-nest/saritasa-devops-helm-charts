@@ -3,12 +3,12 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: wordpress-build-pipeline-trigger-template
+  namespace: {{ .Release.Namespace }}
 spec:
   params:
-    {{ include "pipeline.defaultParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultParams" . | nindent 4 }}
     
     - name: kubernetes_namespace
-      type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
   resourcetemplates:
