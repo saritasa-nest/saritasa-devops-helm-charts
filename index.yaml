@@ -144,6 +144,24 @@ entries:
   saritasa-tekton-pipelines:
   - apiVersion: v2
     appVersion: v0.28.2
+    created: "2021-10-31T15:58:43.57869363Z"
+    dependencies:
+    - condition: saritasa-tekton.enabled
+      name: saritasa-tekton
+      repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      version: ~0.1.x
+    description: A Helm chart for Tekton Pipelines
+    digest: fa1d7a463ade656aac0b18e33155e5aee245a174d0a14d6cb589ee727ded8a7e
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-pipelines
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.2/saritasa-tekton-pipelines-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
+    appVersion: v0.28.2
     created: "2021-10-26T00:42:48.16560019Z"
     dependencies:
     - condition: saritasa-tekton.enabled
@@ -173,4 +191,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2021-10-31T15:57:38.031170155Z"
+generated: "2021-10-31T15:58:43.578856629Z"
