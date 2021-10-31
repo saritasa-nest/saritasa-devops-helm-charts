@@ -143,6 +143,19 @@ entries:
   saritasa-tekton-apps:
   - apiVersion: v2
     appVersion: v0.28.2
+    created: "2021-10-31T18:17:24.320799824Z"
+    description: A Helm chart for tekton apps (rbac, eventlistener)
+    digest: 456e7bc608da24e206d84ffb977d9c7c50d2b19e0e197f5193a7208a99b8bfb5
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-apps
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-apps-0.1.3/saritasa-tekton-apps-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: v0.28.2
     created: "2021-10-31T16:24:07.8619512Z"
     description: A Helm chart for tekton apps (rbac, eventlistener)
     digest: 49a55998bb1858c90493ec4c289b2dc33bf1d06acd1e9f09fce943c965bdbed8
@@ -235,4 +248,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2021-10-31T16:48:57.980600989Z"
+generated: "2021-10-31T18:17:24.320959925Z"
