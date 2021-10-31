@@ -60,7 +60,7 @@ Create a proper name prefix for various resources based on client, component, en
 */}}
 {{- define "tekton-apps.eventlistener._filter" -}}
 {{- range  $prefix := $  -}}
-body.ref.startsWith('refs/heads/{{- $prefix -}}/'),
+body.ref.startsWith('refs/heads/{{- $prefix -}}'),
 {{- end -}}
 {{- end }}
 
