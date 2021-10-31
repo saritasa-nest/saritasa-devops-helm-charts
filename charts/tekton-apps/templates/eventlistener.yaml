@@ -5,9 +5,9 @@ metadata:
   name: build-pipeline-event-listener
   namespace: {{ .Release.Namespace }}
   annotations:
-    argocd.argoproj.io/sync-wave: "1000"
+    argocd.argoproj.io/sync-wave: "10"
 spec:
-  serviceAccountName: trigger-sa
+  serviceAccountName: build-bot-sa
   triggers:
   {{- range $project := .Values.apps }}
   {{- if $project.enabled }}

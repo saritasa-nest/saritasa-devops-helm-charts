@@ -152,6 +152,8 @@ kind: ServiceAccount
 metadata:
   name: {{ include "tekton-apps.resourceName" $ }}
   namespace: {{ .namespace }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 secrets:
 {{- if .secret }}
 - name: {{ .secret }}
@@ -170,7 +172,7 @@ metadata:
   name: {{ include "tekton-apps.resourceName" $ }}
   namespace: {{ .namespace }}
   annotations:
-    argocd.argoproj.io/sync-wave: "11"
+    argocd.argoproj.io/sync-wave: "100"
 spec:
   accessModes:
   - ReadWriteOnce
