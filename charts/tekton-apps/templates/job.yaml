@@ -9,7 +9,7 @@ metadata:
   name: finalize-pvc-mounts
   namespace: {{ .Release.Namespace }}
   annotations:
-    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/sync-wave: "110" # run after the PVCs are synced (PVCs sync wave = 100)
 spec:
   ttlSecondsAfterFinished: 100
   template:
