@@ -1,5 +1,5 @@
 
-environment: dev # or staging or prod
+environment: "" # or staging or prod
 
 # or main, staging (for fixed merges into staging) or like release (if we use gitflow and semantic versioning)
 # you can overwrite it in apps[project].components[component].eventlistener.filter
@@ -13,10 +13,10 @@ storageClassName: gp2
 
 aws:
   region: "us-west-2"
-  dns: versuspoker.com
+  dns: site.com
 
 # default docker registry
-defaultRegistry: 332927762005.dkr.ecr.us-west-2.amazonaws.com
+defaultRegistry: "" # XXX.dkr.ecr.us-west-2.amazonaws.com
 
 slack:
   prefix: client
@@ -24,7 +24,7 @@ slack:
   imagesLocation: https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com # this is s3 bucket with public images that we upload through terraform code (!!! NO SLASH at the end pls)
 
 argocd:
-  server: deploy.versuspoker.com
+  server: deploy.site.com
   rootPath: "/"
 
 eventlistener:
@@ -35,57 +35,57 @@ eventlistener:
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
 
-apps:
-  - project: vp
-    enabled: true
-    mailList: vp@saritasa.com
-    devopsMailList: devops+vp@saritasa.com
-    jiraURL: https://saritasa.atlassian.net/browse/vp
-    tektonURL: https://tekton.versuspoker.com/#/namespaces/ci/pipelineruns
-    slack: client-vp-ci
-    kubernetesRepository: 
-      name: vp-kubernetes-aws
-      branch: main
-      url: git@github.com:saritasa-nest/vp-kubernetes-aws.git
+apps: []
+  # - project: xxx
+  #   enabled: true
+  #   mailList: xxx@saritasa.com
+  #   devopsMailList: devops+xxx@saritasa.com
+  #   jiraURL: https://saritasa.atlassian.net/browse/xxx
+  #   tektonURL: https://tekton.site.com/#/namespaces/ci/pipelineruns
+  #   slack: client-xxx-ci
+  #   kubernetesRepository: 
+  #     name: xxx-kubernetes-aws
+  #     branch: main
+  #     url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
     
-    components:
-      - name: backend
-        repository: vp-backend      
-        pipeline: buildpack
-        applicationURL: https://api.versuspoker.com        
-        eventlistener:
-          template: buildpack-backend-build-pipeline-trigger-template
-        extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap 
-          KEY: value
-        triggerBinding:
-          - name: docker_registry_repository
-            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/backend                    
-          - name: buildpack_builder_image
-            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/google/builder:v1
-          - name: buildpack_runner_image
-            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/google/runner:v1
+  #   components:
+  #     - name: backend
+  #       repository: xxx-backend      
+  #       pipeline: buildpack
+  #       applicationURL: https://api.site.com        
+  #       eventlistener:
+  #         template: buildpack-backend-build-pipeline-trigger-template
+  #       extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap 
+  #         KEY: value
+  #       triggerBinding:
+  #         - name: docker_registry_repository
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend                    
+  #         - name: buildpack_builder_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1
+  #         - name: buildpack_runner_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
   
-      - name: frontend
-        repository: vp-frontend      
-        pipeline: buildpack
-        applicationURL: https://versuspoker.com        
-        eventlistener:
-          enableWebhookSecret: false
-          filter: (body.ref.startsWith('refs/heads/develop/') || body.ref.startsWith('refs/heads/release/'))
-          template: buildpack-frontend-build-pipeline-trigger-template        
-          extraOverlays: []
-          # - key: truncated_sha
-          #   expression: "body.head_commit.id.truncate(7)"
-          eventTypes: ["pull_request", "push"]
-        extraBuildConfigParams: {}
-        triggerBinding:
-          - name: docker_registry_repository
-            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/frontend                    
-          - name: buildpack_builder_image
-            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/paketo/builder:full
-          - name: buildpack_runner_image
-            value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/dev/buildpacks/paketo/runner:full
-          - name: source_subpath
-            value: dist/web
+  #     - name: frontend
+  #       repository: xxx-frontend      
+  #       pipeline: buildpack
+  #       applicationURL: https://site.com        
+  #       eventlistener:
+  #         enableWebhookSecret: false
+  #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
+  #         template: buildpack-frontend-build-pipeline-trigger-template        
+  #         extraOverlays: []
+  #         # - key: truncated_sha
+  #         #   expression: "body.head_commit.id.truncate(7)"
+  #         eventTypes: ["pull_request", "push"]
+  #       extraBuildConfigParams: {}
+  #       triggerBinding:
+  #         - name: docker_registry_repository
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend                    
+  #         - name: buildpack_builder_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/builder:full
+  #         - name: buildpack_runner_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
+  #         - name: source_subpath
+  #           value: dist/web
     
 runPostInstallJob: false
