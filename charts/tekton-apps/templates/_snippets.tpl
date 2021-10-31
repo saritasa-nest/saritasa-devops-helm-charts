@@ -173,6 +173,7 @@ metadata:
   namespace: {{ .namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "100"
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   accessModes:
   - ReadWriteOnce
