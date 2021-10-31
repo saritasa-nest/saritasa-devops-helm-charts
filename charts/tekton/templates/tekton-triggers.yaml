@@ -447,6 +447,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
     triggers.tekton.dev/release: "v0.16.0"
     version: "v0.16.0"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: triggers.tekton.dev
   scope: Cluster
@@ -503,6 +505,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
     triggers.tekton.dev/release: "v0.16.0"
     version: "v0.16.0"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: triggers.tekton.dev
   scope: Cluster
@@ -573,6 +577,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
     triggers.tekton.dev/release: "v0.16.0"
     version: "v0.16.0"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -679,6 +685,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
     triggers.tekton.dev/release: "v0.16.0"
     version: "v0.16.0"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -751,6 +759,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
     triggers.tekton.dev/release: "v0.16.0"
     version: "v0.16.0"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -825,6 +835,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
     triggers.tekton.dev/release: "v0.16.0"
     version: "v0.16.0"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced

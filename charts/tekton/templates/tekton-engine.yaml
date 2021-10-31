@@ -515,6 +515,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   preserveUnknownFields: false
@@ -595,6 +597,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   versions:
@@ -648,6 +652,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   preserveUnknownFields: false
@@ -728,6 +734,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   preserveUnknownFields: false
@@ -837,6 +845,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   versions:
@@ -890,6 +900,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   preserveUnknownFields: false
@@ -957,6 +969,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   preserveUnknownFields: false
@@ -1037,6 +1051,8 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
     pipeline.tekton.dev/release: "v0.28.2"
     version: "v0.28.2"
+  annotations:
+    "helm.sh/hook": "pre-install"
 spec:
   group: tekton.dev
   preserveUnknownFields: false
