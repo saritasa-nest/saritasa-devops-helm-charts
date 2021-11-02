@@ -1,4 +1,4 @@
-{{- if .Values.dashboard.ingress.enabled -}}
+{{- if and .Values.engine.enabled .Values.dashboard.ingress.enabled -}}
 # tekton dashboard ingress
 {{ if and .Values.dashboard.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.dashboard.ingress.annotations "kubernetes.io/ingress.class") }}
@@ -50,7 +50,7 @@ spec:
 ---
 {{- end }}
 
-{{- if .Values.webhook.ingress.enabled -}}
+{{- if and .Values.engine.enabled .Values.triggers.enabled .Values.webhook.ingress.enabled -}}
 # tekton github webhook
 {{ if and .Values.webhook.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.webhook.ingress.annotations "kubernetes.io/ingress.class") }}

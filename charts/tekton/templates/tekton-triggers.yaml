@@ -1,4 +1,4 @@
-{{- if .Values.triggers.enabled -}}
+{{- if and .Values.engine.enabled  .Values.triggers.enabled -}}
 # Copyright 2019 The Tekton Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
