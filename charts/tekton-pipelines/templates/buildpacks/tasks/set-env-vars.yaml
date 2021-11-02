@@ -28,23 +28,23 @@ spec:
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
-    
+
     - name: platform_dir
       type: string
       description: The name of the platform directory.
-      
+
   steps:
     - name: clean
       image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         #!/usr/bin/env bash
-        # clean platform env dir before new run, so when env var is removed from project.toml file 
+        # clean platform env dir before new run, so when env var is removed from project.toml file
         # it wouldn't influence the build
         set -e
 
         ENV_PATH=$(workspaces.source.path)/$(params.platform_dir)/env
-        
+
         if [ -d $ENV_PATH ]; then
           echo "clean everything from $ENV_PATH"
           rm $ENV_PATH/*
@@ -55,7 +55,7 @@ spec:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         #!/usr/bin/env python3
-        
+
         import toml, os, sys
 
         source_path = "$(resources.inputs.app.path)/project.toml"

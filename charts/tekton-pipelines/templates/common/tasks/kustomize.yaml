@@ -16,22 +16,22 @@ spec:
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
-    
+
     - name: image
       type: string
       description: new image for the application
-    
+
     - name: kustomize_overlay_path
       type: string
       description: overlay path for kustomize call
-    
+
     - name: kubernetes_branch
       default: "main"
-    
+
     - name: environment
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
-  
+
   stepTemplate:
     envFrom:
       - configMapRef:
@@ -41,7 +41,7 @@ spec:
     - name: git-set-user
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)      
+      workingDir: $(resources.inputs.kubernetes-repo.path)
       script: |
         git config user.email "$DEVOPS_GROUP_EMAIL"
         git config user.name "tekton-kustomize"
@@ -56,12 +56,12 @@ spec:
         application=${app%-$env}
         cd $(params.kustomize_overlay_path) && \
           /app/kustomize edit set image $application=$(params.image)
-    
+
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)      
-      script: |    
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
         set +x
         git checkout $(params.kubernetes_branch)
 

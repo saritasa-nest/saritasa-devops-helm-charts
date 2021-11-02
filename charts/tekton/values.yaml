@@ -12,7 +12,7 @@ domainZone: "site.com"
 #     --from-file=.dockerconfigjson=$HOME/.docker/config.json \
 #     --type=kubernetes.io/dockerconfigjson
 # ----------------------------------------------------------------------------
-# 
+#
 engine:
   enabled: true
   config: {}
@@ -20,7 +20,7 @@ engine:
     # defaultTimeoutMinutes: "60"
     # defaultPodTemplate: |
     #   imagePullSecrets:
-    #     - name: "docker-saritasa-infra-v2-ro"      
+    #     - name: "docker-saritasa-infra-v2-ro"
     #   nodeSelector:
     #     ci: "true"
   controller:
@@ -30,7 +30,7 @@ engine:
       # https://github.com/tektoncd/pipeline/blob/main/docs/tekton-controller-performance-configuration.md
       # "-kube-api-qps", "5",
       # "-kube-api-burst", "10",
-      # "-threads-per-controller", "20",      
+      # "-threads-per-controller", "20",
 
 triggers:
   enabled: true
@@ -39,14 +39,14 @@ dashboard:
   enabled: false
   ingress: {}
     # enabled: true
-    # annotations: 
+    # annotations:
     #   kubernetes.io/ingress.class: "nginx"
     #   nginx.ingress.kubernetes.io/proxy-body-size: 100m
     #   cert-manager.io/cluster-issuer: "letsencrypt-prod"
     #   nginx.ingress.kubernetes.io/auth-type: basic
     #   nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth
     #   nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
-    #   argocd.argoproj.io/sync-wave: "1"      
+    #   argocd.argoproj.io/sync-wave: "1"
     # hosts:
     #   - host: tekton.site.com
     #     paths:
@@ -56,8 +56,8 @@ dashboard:
     #           service:
     #             name: tekton-dashboard
     #             port:
-    #               number: 9097    
-    # tls: 
+    #               number: 9097
+    # tls:
     #  - secretName: tekton.site.com-crt
     #    hosts:
     #      - tekton.site.com
@@ -67,7 +67,7 @@ webhook:
   namespace: "ci"
   ingress: {}
     # enabled: true
-    # annotations: 
+    # annotations:
     #   kubernetes.io/ingress.class: "nginx"
     #   nginx.ingress.kubernetes.io/proxy-body-size: 100m
     #   cert-manager.io/cluster-issuer: "letsencrypt-prod"
@@ -81,15 +81,15 @@ webhook:
     #           service:
     #             name: el-build-pipeline-event-listener
     #             port:
-    #               number: 8080    
-    # tls: 
+    #               number: 8080
+    # tls:
     #  - secretName: webhook.site.com-crt
     #    hosts:
     #      - webhook.site.com
 
 
 imagePullSecrets: []
-# - name: "docker-saritasa-infra-v2-ro"  
+# - name: "docker-saritasa-infra-v2-ro"
 
 serviceAccount:
   # Specifies whether a service account should be created

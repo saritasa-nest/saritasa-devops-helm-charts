@@ -16,7 +16,7 @@ metadata:
   name: {{ printf "%s-%s-%s-build-pipeline-config" $project.project $component.name $.Values.environment }}
   namespace: {{ $.Release.Namespace }}
   labels: {{ include "tekton-apps.labels" $ | nindent 4 }}
-  
+
 data:
   APPLICATION_URL: {{ $component.applicationURL }}
   MAIL_LIST: {{ include "tekton-apps.mailList" $data }}
@@ -26,7 +26,7 @@ data:
   ARGOCD_ROOT_PATH: {{ $.Values.argocd.rootPath | default "/" }}
   AWS_REGION: {{ $.Values.aws.region }}
   SLACK_CHANNEL: {{ include "tekton-apps.slackChannel" $data }}
-  SLACK_FAILURE_ICON_URL: {{ $.Values.slack.imagesLocation | default "https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com" }}/argocd-robot-sad.png  
+  SLACK_FAILURE_ICON_URL: {{ $.Values.slack.imagesLocation | default "https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com" }}/argocd-robot-sad.png
   SLACK_SUCCESS_ICON_URL: {{ $.Values.slack.imagesLocation | default "https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com" }}/argocd-robot.png
   SLACK_FOOTER_ICON: {{ $.Values.slack.imagesLocation | default "https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com" }}/k8s.png
   SLACK_FOOTER: Tekton
@@ -40,4 +40,3 @@ data:
 {{- end }} # range component
 {{- end }} # if project.enabled
 {{- end }} # range project
-

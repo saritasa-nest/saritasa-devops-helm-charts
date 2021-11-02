@@ -7,7 +7,7 @@ metadata:
 spec:
   params:
     {{ include "trigger-template.defaultParams" . | nindent 4 }}
-    
+
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
@@ -21,7 +21,7 @@ spec:
       pipelineRef:
         name: wordpress-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}        
+        {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
       podTemplate:

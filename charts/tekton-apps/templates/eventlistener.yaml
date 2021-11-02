@@ -19,8 +19,8 @@ spec:
   # ========================================================================
   {{- $data := dict "project"           $project
                     "component"         $component
-                    "environment"       $.Values.environment 
-                    "eventlistener"     $.Values.eventlistener 
+                    "environment"       $.Values.environment
+                    "eventlistener"     $.Values.eventlistener
                     "gitBranchPrefixes" $.Values.gitBranchPrefixes }}
   {{- include "tekton-apps.eventlistener.trigger" $data | nindent 4 }}
   {{- end }} # range component

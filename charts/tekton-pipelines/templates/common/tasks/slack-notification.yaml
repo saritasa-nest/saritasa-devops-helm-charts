@@ -1,9 +1,9 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
-metadata:     
+metadata:
   name: slack-notification
   namespace: {{ .Release.Namespace }}
-  
+
 spec:
   description: >-
     Send slack notification with various information about pipeline progress/result.
@@ -31,7 +31,7 @@ spec:
       - configMapRef:
           name: $(params.application)-build-pipeline-config
       - secretRef:
-          name: $(params.application)-slack-secret  # used for webhook URL      
+          name: $(params.application)-slack-secret  # used for webhook URL
 
     env:
       - name: POD_NAME

@@ -4,7 +4,7 @@ kind: Task
 metadata:
   name: kaniko
   namespace: {{ .Release.Namespace }}
-  
+
 spec:
   description: >-
     This is task for legacy Saritasa projects written with Dockerfile, compilation is done by using Kaniko
@@ -32,7 +32,7 @@ spec:
 
     - name: docker_file
       type: string
-      description: name of the dockerfile 
+      description: name of the dockerfile
       default: "Dockerfile"
 
     - name: docker_context
@@ -50,10 +50,10 @@ spec:
     - name: environment
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
-  
+
   results:
     - name: password
-      description: The password to authenticate to ecr registry.  
+      description: The password to authenticate to ecr registry.
 
   stepTemplate:
     envFrom:
@@ -61,15 +61,15 @@ spec:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
-    - name: authenticate      
+    - name: authenticate
       image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.app.path)
       script: |
         #!/bin/bash
         aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
-    
-    - name: build      
+
+    - name: build
       image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.app.path)

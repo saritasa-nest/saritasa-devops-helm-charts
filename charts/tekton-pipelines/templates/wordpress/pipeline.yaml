@@ -7,11 +7,11 @@ metadata:
 spec:
   description: >-
     Pipeline will trigger redeployments of the POD of the deployment managed by the bitnami wordpress HELM
-    chart. 
+    chart.
 
   params:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
-     
+
     - name: kubernetes_namespace
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment

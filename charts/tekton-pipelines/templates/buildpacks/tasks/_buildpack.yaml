@@ -74,12 +74,12 @@ spec:
     - name: skip_restore
       type: string
       description: do not write layer metadata or restore cached layers
-      default: "false"    
+      default: "false"
 
     - name: environment
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
-  
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
@@ -131,7 +131,7 @@ spec:
         #!/bin/bash
 
         aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.docker_registry)
-        
+
         /cnb/lifecycle/creator \
           -app=$(params.source_subpath) \
           -project-metadata=project.toml \
@@ -156,7 +156,7 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
-        
+
   volumes:
     - name: empty-dir
       emptyDir: {}

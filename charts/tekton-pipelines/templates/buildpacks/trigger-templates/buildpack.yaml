@@ -1,5 +1,5 @@
 {{- range $pipeline := .Values.buildpacks.generate }}
-{{$data := dict "pipeline"    $pipeline 
+{{$data := dict "pipeline"    $pipeline
                 "namespace"   $.Release.Namespace
                 "podTemplate" $.Values.podTemplate }}
 {{ if and $.Values.buildpacks.enabled $pipeline.enabled }}

@@ -40,7 +40,7 @@ buildpacks:
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
-            #!/bin/bash                
+            #!/bin/bash
             [ -f package.json ] && (
               echo "install node.js dependencies"
               yes | npm install --silent;
@@ -78,10 +78,10 @@ buildpacks:
             [ -f package.json ] && (
               yes | npm install --silent;
               npm run build:$(params.environment) || echo "unable to build $(params.environment)";
-              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found         
+              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found
           securityContext:
             privileged: true
-    
+
         - name: fix-php-detection
           image: docker.io/library/bash:5.1.8
           workingDir: $(resources.inputs.app.path)
@@ -92,7 +92,7 @@ buildpacks:
             # buildpack is detected and used
             set -e
             [[ -f composer.json && -f package.json ]] && (rm -f package.json; ls -la .;) || echo "no php-fix is needed"
-  
+
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DJANGO                                                                                                    │
 # │ Purpose:                                                                                                             │
@@ -115,7 +115,7 @@ buildpacks:
             [ -f manage.py ] && (cp requirements/$(params.environment)*.txt requirements.txt \
               || echo "Unable to find requirements for $(params.environment)")
             [ -f requirements.txt ] && echo "Found requirements.txt" \
-              || (echo "requirements.txt is not found! Halting execution."; exit 1;)          
+              || (echo "requirements.txt is not found! Halting execution."; exit 1;)
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
@@ -138,18 +138,18 @@ buildpacks:
           securityContext:
             privileged: true
             runAsUser: 0
-        
+
         - name: get-semantic-version
           workingDir: $(resources.inputs.app.path)
           image: gittools/gitversion:5.6.10-alpine.3.12-x64-3.1
           imagePullPolicy: IfNotPresent
           script: |
             #!/usr/bin/env ash
-            # so we are making a hack, that if we try to merge hotfix branch into main we should 
+            # so we are making a hack, that if we try to merge hotfix branch into main we should
             [ -e GitVersion-hotfix.yml ] && /tools/dotnet-gitversion | grep hotfix 1>/dev/null && (echo "hotfix"; rm -rf GitVersion.yml; cp GitVersion-hotfix.yml GitVersion.yml)
-    
+
             BRANCH=$(params.branch)
-    
+
             # since this is a busybox we can't use bash regexp here
             if echo $BRANCH | grep -E '^refs/heads/(main|release/[0-9.]+)$' > /dev/null;
             then
@@ -158,14 +158,14 @@ buildpacks:
               echo $local_tags
               git tag -d $local_tags
             fi
-    
+
             pure_branch=`echo $BRANCH | sed 's/refs\/heads\///'`
             echo "PURE BRANCH:" $pure_branch
-            
+
             # make sure we're not in detached head status
             git symbolic-ref -q HEAD || git checkout $pure_branch
             git branch
-    
+
             /tools/dotnet-gitversion /updateprojectfiles
             git status
             chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
@@ -211,7 +211,7 @@ wordpress:
 
 imagePullPolicy: IfNotPresent
 
-podTemplate: 
+podTemplate:
   nodeSelector:
     ci: "true"
   tolerations:
@@ -227,5 +227,3 @@ podTemplate:
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 saritasa-tekton:
   enabled: false
-  
-  

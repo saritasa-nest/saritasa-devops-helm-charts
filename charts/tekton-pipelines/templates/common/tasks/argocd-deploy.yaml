@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: argocd-deploy
   namespace: {{ .Release.Namespace }}
-  
+
 spec:
   description: >-
     The task parses project.toml file and stores its environment variables
@@ -13,7 +13,7 @@ spec:
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
-    
+
   stepTemplate:
     envFrom:
       - configMapRef:

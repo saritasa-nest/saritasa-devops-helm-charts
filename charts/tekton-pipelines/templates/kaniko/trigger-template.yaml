@@ -10,11 +10,11 @@ spec:
     {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
 
     - name: repository_ssh_url
-      description: git repository ssh url 
+      description: git repository ssh url
 
     - name: kubernetes_repository_ssh_url
       description: git repository ssh url for kubernetes manifests repo
-    
+
     - name: docker_file
       default: Dockerfile
       description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
@@ -36,18 +36,18 @@ spec:
       pipelineRef:
         name: kaniko-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}        
+        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
         - name: docker_file
           value: "$(tt.params.docker_file)"
         - name: docker_context
           value: "$(tt.params.docker_context)"
-        
+
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
-      
+
       podTemplate:
         volumes:
         - name: podinfo

@@ -5,9 +5,9 @@ environment: "" # or staging or prod
 # you can overwrite it in apps[project].components[component].eventlistener.filter
 # which could be set to something like this
 # filter: (body.ref.startsWith('refs/heads/develop/') || body.ref.startsWith('refs/heads/release/'))
-# 
-gitBranchPrefixes: 
- - develop 
+#
+gitBranchPrefixes:
+ - develop
 
 storageClassName: gp2
 
@@ -43,36 +43,36 @@ apps: []
   #   jiraURL: https://saritasa.atlassian.net/browse/xxx
   #   tektonURL: https://tekton.site.com/#/namespaces/ci/pipelineruns
   #   slack: client-xxx-ci
-  #   kubernetesRepository: 
+  #   kubernetesRepository:
   #     name: xxx-kubernetes-aws
   #     branch: main
   #     url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
-    
+
   #   components:
   #     - name: backend
-  #       repository: xxx-backend      
+  #       repository: xxx-backend
   #       pipeline: buildpack
-  #       applicationURL: https://api.site.com        
+  #       applicationURL: https://api.site.com
   #       eventlistener:
   #         template: buildpack-backend-build-pipeline-trigger-template
-  #       extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap 
+  #       extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
   #         KEY: value
   #       triggerBinding:
   #         - name: docker_registry_repository
-  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend                    
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend
   #         - name: buildpack_builder_image
   #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1
   #         - name: buildpack_runner_image
   #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
-  
+
   #     - name: frontend
-  #       repository: xxx-frontend      
+  #       repository: xxx-frontend
   #       pipeline: buildpack
-  #       applicationURL: https://site.com        
+  #       applicationURL: https://site.com
   #       eventlistener:
   #         enableWebhookSecret: false
   #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
-  #         template: buildpack-frontend-build-pipeline-trigger-template        
+  #         template: buildpack-frontend-build-pipeline-trigger-template
   #         extraOverlays: []
   #         # - key: truncated_sha
   #         #   expression: "body.head_commit.id.truncate(7)"
@@ -80,14 +80,14 @@ apps: []
   #       extraBuildConfigParams: {}
   #       triggerBinding:
   #         - name: docker_registry_repository
-  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend                    
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend
   #         - name: buildpack_builder_image
   #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/builder:full
   #         - name: buildpack_runner_image
   #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
   #         - name: source_subpath
   #           value: dist/web
-    
+
 runPostInstallMountPvcJob: false
 
 serviceAccount:

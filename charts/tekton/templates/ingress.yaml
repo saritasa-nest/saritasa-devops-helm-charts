@@ -22,7 +22,7 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-spec:  
+spec:
   {{- if .Values.dashboard.ingress.tls }}
   tls:
     {{- range .Values.dashboard.ingress.tls }}
@@ -74,7 +74,7 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-spec:  
+spec:
   {{- if .Values.webhook.ingress.tls }}
   tls:
     {{- range .Values.webhook.ingress.tls }}

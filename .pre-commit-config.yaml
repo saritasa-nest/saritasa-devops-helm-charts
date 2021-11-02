@@ -1,0 +1,20 @@
+repos:
+- repo: git://github.com/pre-commit/pre-commit-hooks
+  rev: v4.0.1
+  hooks:
+    # Git style
+    - id: check-added-large-files
+    - id: check-merge-conflict
+    - id: forbid-new-submodules
+    - id: no-commit-to-branch
+    - id: check-symlinks
+    - id: mixed-line-ending
+      args: [--fix=auto]
+
+    # Common errors
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+      args: [--markdown-linebreak-ext=md]
+
+    # Cross platform
+    - id: check-case-conflict

@@ -18,7 +18,7 @@
 - name: head_commit_message
   type: string
   description: description of the commit (by developer)
-  
+
 - name: pusher_name
   type: string
   description: author name
@@ -37,7 +37,7 @@
 
 - name: repository_url
   type: string
-  description: git repository https url 
+  description: git repository https url
 
 - name: environment
   type: string
@@ -60,7 +60,7 @@
 
 - name: head_commit_message
   description: description of the commit (by developer)
-  
+
 - name: pusher_name
   description: author name
 
@@ -74,7 +74,7 @@
   description: author link to profile
 
 - name: repository_url
-  description: git repository https url 
+  description: git repository https url
 
 - name: environment
   description: environment name of the app being built, i.e. dev/staging/prod
@@ -95,7 +95,7 @@
   description: private docker registry address
 
 - name: docker_registry_repository
-  type: string    
+  type: string
   description: private docker registry repository address
 
 - name: kubernetes_repository_kustomize_path
@@ -157,12 +157,12 @@
 - name: docker_registry
   value: "$(tt.params.docker_registry)"
 - name: docker_registry_repository
-  value: "$(tt.params.docker_registry_repository)"        
+  value: "$(tt.params.docker_registry_repository)"
 {{- end }}
 {{- if .kubernetes }}
-- name: kubernetes_repository_kustomize_path    
+- name: kubernetes_repository_kustomize_path
   value: "$(tt.params.kubernetes_repository_kustomize_path)"
-- name: kubernetes_branch    
+- name: kubernetes_branch
   value: "$(tt.params.kubernetes_branch)"
 {{- end }}
 - name: environment

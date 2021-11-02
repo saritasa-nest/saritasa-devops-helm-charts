@@ -15,22 +15,22 @@ spec:
     {{ include "trigger-template.defaultParams" . | nindent 4 }}
     {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
 
-    - name: repository_ssh_url    
-      description: git repository ssh url 
+    - name: repository_ssh_url
+      description: git repository ssh url
 
     - name: kubernetes_repository_ssh_url
       description: git repository ssh url for kubernetes manifests repo
 
     - name: buildpack_builder_image
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
-    
+
     - name: buildpack_runner_image
       description: reference to a run image to use
-      
+
     - name: source_subpath
       description: a subpath within the `source` input where the source to build is located.
       default: ""
-          
+
 
   resourcetemplates:
   - kind: PipelineRun
@@ -45,20 +45,20 @@ spec:
       pipelineRef:
         name: {{ .pipeline.name }}
       params:
-        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}        
+        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
         - name: buildpack_builder_image
           value: "$(tt.params.buildpack_builder_image)"
         - name: buildpack_runner_image
-          value: "$(tt.params.buildpack_runner_image)"          
+          value: "$(tt.params.buildpack_runner_image)"
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
-        
+
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
-      
+
       podTemplate:
         volumes:
         - name: $(tt.params.application)-buildpacks-cache

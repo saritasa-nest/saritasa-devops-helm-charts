@@ -5,8 +5,8 @@
 {{- range $component := $project.components }}
 {{- $data := dict "project"           $project
                   "component"         $component
-                  "environment"       $.Values.environment 
-                  "namespace"         $.Release.Namespace 
+                  "environment"       $.Values.environment
+                  "namespace"         $.Release.Namespace
                   "storageClassName"  $.Values.storageClassName }}
 
 # workspace pvc contains git repo cloned for the component by tekton

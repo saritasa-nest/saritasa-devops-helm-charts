@@ -12,7 +12,7 @@ spec:
   params:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
     {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
-    
+
     - name: docker_file
       type: string
       default: Dockerfile
@@ -22,7 +22,7 @@ spec:
       type: string
       default: "."
       description: dockerfile context path
-    
+
 
   workspaces:
     - name: source
@@ -34,7 +34,7 @@ spec:
       type: git
     - name: image
       type: image
-  
+
   tasks:
     - name: kaniko
       taskRef:
@@ -70,7 +70,7 @@ spec:
             resource: kubernetes-repo
       params:
         - name: application
-          value: "$(params.application)"        
+          value: "$(params.application)"
         - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
         - name: kustomize_overlay_path
@@ -79,7 +79,7 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
-      runAfter: 
+      runAfter:
         - kaniko
 
     - name: deploy
@@ -88,7 +88,7 @@ spec:
       params:
         - name : application
           value: "$(params.application)"
-      runAfter: 
+      runAfter:
         - kustomize
 
   {{ include "task.finalNotification" . | nindent 2 }}

@@ -2,7 +2,7 @@
 Create a default mail list address for the project
 */}}
 {{- define "tekton-apps.mailList" -}}
-{{ $email := ternary .project.mailList (printf "%s@%s" .project.project "saritasa.com") 
+{{ $email := ternary .project.mailList (printf "%s@%s" .project.project "saritasa.com")
              (hasKey .project "mailList") -}}
 {{- $email }}
 {{- end }}
@@ -11,7 +11,7 @@ Create a default mail list address for the project
 Create a default devops mail list address for the project
 */}}
 {{- define "tekton-apps.devopsMailList" -}}
-{{ $email := ternary .project.devopsMailList (printf "devops+%s@%s" .project.project "saritasa.com") 
+{{ $email := ternary .project.devopsMailList (printf "devops+%s@%s" .project.project "saritasa.com")
              (hasKey .project "devopsMailList") -}}
 {{- $email }}
 {{- end }}
@@ -20,7 +20,7 @@ Create a default devops mail list address for the project
 Create a default slack channel used to send notification (typically client-NAME-ci)
 */}}
 {{- define "tekton-apps.slackChannel" -}}
-{{ $email := ternary .project.slack (printf "%s-%s-%s" .slackConf.prefix .project.project .slackConf.suffix) 
+{{ $email := ternary .project.slack (printf "%s-%s-%s" .slackConf.prefix .project.project .slackConf.suffix)
              (hasKey .project "slack") -}}
 {{- $email }}
 {{- end }}
@@ -29,7 +29,7 @@ Create a default slack channel used to send notification (typically client-NAME-
 Create a default Jira project URL
 */}}
 {{- define "tekton-apps.jiraProjectURL" -}}
-{{ $email := ternary .project.jiraURL (printf "https://saritasa.atlassian.net/browse/%s" .project.project) 
+{{ $email := ternary .project.jiraURL (printf "https://saritasa.atlassian.net/browse/%s" .project.project)
              (hasKey .project "jiraURL") -}}
 {{- $email }}
 {{- end }}
@@ -38,7 +38,7 @@ Create a default Jira project URL
 Create a default Tekton URL to be accessible from the slack notification to developers.
 */}}
 {{- define "tekton-apps.tektonURL" -}}
-{{ $email := ternary .project.tektonURL (printf "https://%s.%s/#/namespaces/ci/pipelineruns" "tekton" .awsConf.dns) 
+{{ $email := ternary .project.tektonURL (printf "https://%s.%s/#/namespaces/ci/pipelineruns" "tekton" .awsConf.dns)
              (hasKey .project "tektonURL") -}}
 {{- $email }}
 {{- end }}
@@ -79,7 +79,7 @@ Create an element for eventlistener trigger array items
   interceptors:
   - ref:
       name: "cel"
-    params: 
+    params:
       - name: "filter"
         value: {{ $filter }} &&
                body.head_commit.author.name != "tekton-kustomize" &&
@@ -106,12 +106,12 @@ Create an element for eventlistener trigger array items
           secretKey: secret-token
       {{- end }}
       - name: "eventTypes"
-        value: 
+        value:
       {{- if .component.eventlistener.eventTypes }}
         {{- toYaml .component.eventlistener.eventTypes | nindent 8 }}
       {{- else }}
         - "push"
-      {{- end }}      
+      {{- end }}
   bindings:
   - name: sha
     value: $(extensions.truncated_sha)
@@ -193,7 +193,7 @@ the way you use it:
 */}}
 {{- define "tekton-apps.get-triggerbinding-value-or-default" -}}
 {{- $search := dict "found" false }}
-{{- range $item := .triggerBinding }}  
+{{- range $item := .triggerBinding }}
 {{- if contains $.name $item.name }}{{- $_ := set $search "found" true }}{{- end }}
 {{- end }}
 {{- if not $search.found -}}

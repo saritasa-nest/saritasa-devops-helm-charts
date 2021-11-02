@@ -1,8 +1,8 @@
 {{- range $pipeline := .Values.buildpacks.generate }}
-{{$data := dict "pipeline"        $pipeline 
+{{$data := dict "pipeline"        $pipeline
                 "namespace"       $.Release.Namespace
-                "cnbPlatformAPI"  $.Values.buildpacks.cnbPlatformAPI 
-                "images"          $.Values.images 
+                "cnbPlatformAPI"  $.Values.buildpacks.cnbPlatformAPI
+                "images"          $.Values.images
                 "imagePullPolicy" $.Values.imagePullPolicy }}
 {{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
 {{ include "task.buildpack" $data }}

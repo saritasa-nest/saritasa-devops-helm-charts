@@ -78,7 +78,7 @@ spec:
         - name: docker_registry
           value: $(params.docker_registry)
         - name: cache
-          value: $(params.application)-buildpacks-cache        
+          value: $(params.application)-buildpacks-cache
         - name: source_subpath
           value: "$(params.source_subpath)"
         - name: platform_dir
@@ -100,7 +100,7 @@ spec:
             resource: kubernetes-repo
       params:
         - name: application
-          value: "$(params.application)"        
+          value: "$(params.application)"
         - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
         - name: kustomize_overlay_path
@@ -117,8 +117,8 @@ spec:
         name: argocd-deploy
       params:
         - name : application
-          value: "$(params.application)"        
-      runAfter: 
+          value: "$(params.application)"
+      runAfter:
         - kustomize
 
   {{ include "task.finalNotification" . | nindent 2 }}
