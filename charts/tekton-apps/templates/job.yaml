@@ -1,4 +1,4 @@
-{{ if and .Values.apps .Values.runPostInstallJob }}
+{{ if and .Values.apps .Values.runPostInstallMountPvcJob }}
 # this job is needed to make sure the tekton-apps app in argocd gets healthy state
 # which happens only after the provisioned PVCs gets bound state, which is impossible until the very first run
 # of the tekton pipeline utilizing these PVCs
