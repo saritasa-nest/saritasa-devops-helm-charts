@@ -2,19 +2,25 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# this is required name of the hosted zone
+# -- This is required name of the hosted zone.
+# All public services would be created under this hosted zone
 domainZone: "site.com"
 
+# If you want solution to pull images using a specific docker registry
+# credentials:
+#
 # https://github.com/tektoncd/pipeline/blob/main/docs/podtemplates.md
 # if you need to create dockerhub secrets you can follow the example below
-# ----------------------------------------------------------------------------
+#
 # kubectl create secret -n argo-cd generic docker-saritasa-infra-v2-ro \
 #     --from-file=.dockerconfigjson=$HOME/.docker/config.json \
 #     --type=kubernetes.io/dockerconfigjson
-# ----------------------------------------------------------------------------
 #
+
 engine:
+  # -- if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc)
   enabled: true
+  # -- tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm
   config: {}
     # defaultServiceAccount: "build-bot-sa"
     # defaultTimeoutMinutes: "60"
@@ -23,20 +29,26 @@ engine:
     #     - name: "docker-saritasa-infra-v2-ro"
     #   nodeSelector:
     #     ci: "true"
+
+  # -- controller launch arguments
+  # @default -- use args multiline string to set additional launch arguments for the tekton controller
   controller:
     args: |
-      # performance considerations
-      # uncomment 3 lines below if you need it
-      # https://github.com/tektoncd/pipeline/blob/main/docs/tekton-controller-performance-configuration.md
-      # "-kube-api-qps", "5",
-      # "-kube-api-burst", "10",
-      # "-threads-per-controller", "20",
+      performance considerations
+      uncomment 3 lines below if you need it
+      https://github.com/tektoncd/pipeline/blob/main/docs/tekton-controller-performance-configuration.md
+      "-kube-api-qps", "5",
+      "-kube-api-burst", "10",
+      "-threads-per-controller", "20",
 
 triggers:
+  # -- enable tekton triggers
   enabled: true
 
 dashboard:
+  # -- enable tekton dashboard
   enabled: false
+  # -- tekton ingress configuration
   ingress: {}
     # enabled: true
     # annotations:
@@ -63,8 +75,11 @@ dashboard:
     #      - tekton.site.com
 
 webhook:
+  # -- enable tekton eventlistener webhook (github trigger)
   enabled: true
+  # -- namespace where this webhook should be installed
   namespace: "ci"
+  # -- webhook ingress configuration
   ingress: {}
     # enabled: true
     # annotations:
@@ -87,24 +102,28 @@ webhook:
     #    hosts:
     #      - webhook.site.com
 
-
+# -- list of docker registry secrets to pull images
 imagePullSecrets: []
 # - name: "docker-saritasa-infra-v2-ro"
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: "build-bot-sa"
 
+# -- what node to run tekton related pods
 nodeSelector: {}
 #  tekton_builder: "true"
 
+# -- tolerations for tekton related pods
 tolerations: []
 
+# -- affinity for tekton-related pods
+# @default -- default is to avoid running tekton pods on windows nodes.
 affinity:
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:

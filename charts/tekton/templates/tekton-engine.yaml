@@ -1688,7 +1688,9 @@ spec:
             # Experimental. Uncomment below to disable TaskRun and PipelineRun
             # reconcilers' built-in taskRef and pipelineRef resolution procedures.
             # "-experimental-disable-in-tree-resolution",
-            {{ .Values.engine.controller.args | nindent 12 }}
+            {{- if .Values.engine.controller.args }}
+            {{- .Values.engine.controller.args | nindent 12 }}
+            {{- end }}
           ]
           volumeMounts:
             - name: config-logging
