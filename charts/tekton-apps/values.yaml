@@ -88,4 +88,8 @@ apps: []
   #         - name: source_subpath
   #           value: dist/web
     
-runPostInstallJob: false
+runPostInstallMountPvcJob: false
+
+serviceAccount:
+  # The name of the service account to use.
+  name: "build-bot-sa"
