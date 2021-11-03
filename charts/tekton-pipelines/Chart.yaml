@@ -73,24 +73,9 @@ description: |
           buildpacks:
             enabled: true
             generate:
-          # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-          # │ BUILDPACK: FRONTEND                                                                                                  │
-          # │ Purpose:                                                                                                             │
-          # │ This generated buildpack should be used by SPA apps, like angular/react                                              │
-          # │ It will build static based on `build:ENV` command declared in the package.json file and then copy buildpack related  │
-          # │ files into the resulting folder, which then is going to be detected by the buildpack.                                │
-          # │                                                                                                                      │
-          # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
               buildpackFrontendBuildPipeline:
                 enabled: true
 
-          # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-          # │ BUILDPACK: DJANGO                                                                                                    │
-          # │ Purpose:                                                                                                             │
-          # │ This generated buildpack pipeline should be used by our Python team using sa3p templated solution, where the         │
-          # │ requirements.txt is named after the environment and stored inside the requirements folder                            │
-          # │                                                                                                                      │
-          # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
               buildpackDjangoBuildPipeline:
                 enabled: true
 

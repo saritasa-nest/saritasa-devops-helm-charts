@@ -87,24 +87,9 @@ spec:
         buildpacks:
           enabled: true
           generate:
-        # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-        # │ BUILDPACK: FRONTEND                                                                                                  │
-        # │ Purpose:                                                                                                             │
-        # │ This generated buildpack should be used by SPA apps, like angular/react                                              │
-        # │ It will build static based on `build:ENV` command declared in the package.json file and then copy buildpack related  │
-        # │ files into the resulting folder, which then is going to be detected by the buildpack.                                │
-        # │                                                                                                                      │
-        # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
             buildpackFrontendBuildPipeline:
               enabled: true
 
-        # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-        # │ BUILDPACK: DJANGO                                                                                                    │
-        # │ Purpose:                                                                                                             │
-        # │ This generated buildpack pipeline should be used by our Python team using sa3p templated solution, where the         │
-        # │ requirements.txt is named after the environment and stored inside the requirements folder                            │
-        # │                                                                                                                      │
-        # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
             buildpackDjangoBuildPipeline:
               enabled: true
 
@@ -156,18 +141,15 @@ buildpacks:
 | buildpacks.cnbPlatformAPI | string | `"0.4"` | cnb (cloud native buildpacks) platform API to support see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md) |
 | buildpacks.enabled | bool | `false` | should we enable buildpack based pipelines |
 | buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskName | string | `"buildpack-django"` | the generated name of the tekton task implementing the "build" step |
-| buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskSteps | list | see values.yaml for the default values | steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI |
-| buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskSteps[0] | object | `{"image":"docker.io/library/bash:5.1.8","imagePullPolicy":"IfNotPresent","name":"copy-requirements","script":"#!/usr/bin/env bash\nset -e\n[ -f manage.py ] && (cp requirements/$(params.environment)*.txt requirements.txt \\\n  || echo \"Unable to find requirements for $(params.environment)\")\n[ -f requirements.txt ] && echo \"Found requirements.txt\" \\\n  || (echo \"requirements.txt is not found! Halting execution.\"; exit 1;)\n","workingDir":"$(resources.inputs.app.path)"}` | copy requirements to the root folder, as buildpacks expects them there. |
+| buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackDjangoBuildPipeline.enabled | bool | `false` | should we enable the django buildpack pipeline |
 | buildpacks.generate.buildpackDjangoBuildPipeline.name | string | `"buildpack-django-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskName | string | `"buildpack-dotnet"` | the generated name of the tekton task implementing the "build" step |
-| buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskSteps | list | see values.yaml for the default values | steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI |
-| buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskSteps[0] | object | `{"image":"alpine/git:v2.32.0","imagePullPolicy":"IfNotPresent","name":"git-fetch-tags","script":"git fetch --tags\n","securityContext":{"privileged":true,"runAsUser":0},"workingDir":"$(resources.inputs.app.path)"}` | get all tags so that GitVersion can calculate semver properly |
+| buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackDotnetBuildPipeline.enabled | bool | `false` | should we enable the dotnet buildpack pipeline |
 | buildpacks.generate.buildpackDotnetBuildPipeline.name | string | `"buildpack-dotnet-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskName | string | `"buildpack-frontend"` | the generated name of the tekton task implementing the "build" step |
-| buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskSteps | list | see values.yaml for the default values | steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI |
-| buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskSteps[0] | object | `{"image":"node:14","imagePullPolicy":"IfNotPresent","name":"build-static","script":"#!/bin/bash\n[ -f package.json ] && (\n  echo \"install node.js dependencies\"\n  yes | npm install --silent;\n  npm run build:$(params.environment);\n  cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null;\n  chown -R $(params.user_id):$(params.group_id) $(params.source_subpath); ) || (echo \"unable to build $(params.environment) env\" && exit 1;)\n","securityContext":{"privileged":true},"workingDir":"$(resources.inputs.app.path)"}` | build static content and move it into the folder which we then pass as an argument to `/cnb/lifecycle/creator` CLI for detection |
+| buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackFrontendBuildPipeline.enabled | bool | `false` | should we enable the frontend buildpack pipeline |
 | buildpacks.generate.buildpackFrontendBuildPipeline.name | string | `"buildpack-frontend-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackGoBuildPipeline.buildTaskName | string | `"buildpack-go"` | the generated name of the tekton task implementing the "build" step |
@@ -177,9 +159,7 @@ buildpacks:
 | buildpacks.generate.buildpackNodejsBuildPipeline.enabled | bool | `false` | should we enable the nodejs buildpack pipeline |
 | buildpacks.generate.buildpackNodejsBuildPipeline.name | string | `"buildpack-nodejs-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackPhpBuildPipeline.buildTaskName | string | `"buildpack-php"` | the generated name of the tekton task implementing the "build" step |
-| buildpacks.generate.buildpackPhpBuildPipeline.buildTaskSteps | list | see values.yaml for the default values | steps to run in the `buildpack-php` task prior to executing /cnb/lifecycle/creator CLI |
-| buildpacks.generate.buildpackPhpBuildPipeline.buildTaskSteps[0] | object | `{"image":"node:14","imagePullPolicy":"IfNotPresent","name":"build-static","script":"#!/bin/bash\nset -e\n[ -f package.json ] && (\n  yes | npm install --silent;\n  npm run build:$(params.environment) || echo \"unable to build $(params.environment)\";\n  rm -rf node_modules && echo \"remove node_modules dir\";) || echo \"No package.json found\n","securityContext":{"privileged":true},"workingDir":"$(resources.inputs.app.path)"}` | build static content and move it into the folder which then will be added into the resulted container. we also remove node_modules folder to avoid a wrong detection later in the task |
-| buildpacks.generate.buildpackPhpBuildPipeline.buildTaskSteps[1] | object | `{"image":"docker.io/library/bash:5.1.8","name":"fix-php-detection","script":"#!/usr/bin/env bash\n# workaround to fix no PHP detection, when package.json presents\n# so that we don't get nodejs buildpack detected, but instead the PHP\n# buildpack is detected and used\nset -e\n[[ -f composer.json && -f package.json ]] && (rm -f package.json; ls -la .;) || echo \"no php-fix is needed\"\n","workingDir":"$(resources.inputs.app.path)"}` | make sure we don't have nodejs related files so we get a proper PHP detection |
+| buildpacks.generate.buildpackPhpBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-php` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackPhpBuildPipeline.description | string | `"Additional steps in the build task are required for\n- compile static with node.js (old legacy projects, where static html is bundled with the PHP repo)\n- fix PHP detection if repo contains buth node.js and php code"` |  |
 | buildpacks.generate.buildpackPhpBuildPipeline.enabled | bool | `false` | should we enable the php buildpack pipeline |
 | buildpacks.generate.buildpackPhpBuildPipeline.name | string | `"buildpack-php-build-pipeline"` | the name of the generated pipeline |

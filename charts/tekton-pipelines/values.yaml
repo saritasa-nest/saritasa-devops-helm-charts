@@ -52,9 +52,8 @@ buildpacks:
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-frontend
       # -- steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI
-      # @default -- see values.yaml for the default values
+      # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        # -- build static content and move it into the folder which we then pass as an argument to `/cnb/lifecycle/creator` CLI for detection
         - name: build-static
           image: node:14
           imagePullPolicy: IfNotPresent
@@ -91,10 +90,8 @@ buildpacks:
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-php
       # -- steps to run in the `buildpack-php` task prior to executing /cnb/lifecycle/creator CLI
-      # @default -- see values.yaml for the default values
+      # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        # -- build static content and move it into the folder which then will be added into the resulted container.
-        # we also remove node_modules folder to avoid a wrong detection later in the task
         - name: build-static
           image: node:14
           imagePullPolicy: IfNotPresent
@@ -108,7 +105,7 @@ buildpacks:
               rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found
           securityContext:
             privileged: true
-        # -- make sure we don't have nodejs related files so we get a proper PHP detection
+
         - name: fix-php-detection
           image: docker.io/library/bash:5.1.8
           workingDir: $(resources.inputs.app.path)
@@ -135,9 +132,8 @@ buildpacks:
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-django
       # -- steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI
-      # @default -- see values.yaml for the default values
+      # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        # -- copy requirements to the root folder, as buildpacks expects them there.
         - name: copy-requirements
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
@@ -165,9 +161,8 @@ buildpacks:
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-dotnet
       # -- steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI
-      # @default -- see values.yaml for the default values
+      # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        # -- get all tags so that GitVersion can calculate semver properly
         - name: git-fetch-tags
           image: alpine/git:v2.32.0
           imagePullPolicy: IfNotPresent
@@ -178,9 +173,6 @@ buildpacks:
             privileged: true
             runAsUser: 0
 
-        # --
-        # update semver in dotnet project files prior to running the build step with `/cnb/lifecycle/creator`.
-        # That means we modify the source code with GitVersion prior running the detector.
         - name: get-semantic-version
           workingDir: $(resources.inputs.app.path)
           image: gittools/gitversion:5.6.10-alpine.3.12-x64-3.1
