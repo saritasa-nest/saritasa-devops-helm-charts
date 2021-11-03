@@ -1,40 +1,54 @@
 
-environment: "" # or staging or prod
+# -- environment these apps are handling
+# possible values: dev, staging, prod
+environment: ""
 
 # or main, staging (for fixed merges into staging) or like release (if we use gitflow and semantic versioning)
 # you can overwrite it in apps[project].components[component].eventlistener.filter
 # which could be set to something like this
-# filter: (body.ref.startsWith('refs/heads/develop/') || body.ref.startsWith('refs/heads/release/'))
-#
+# filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release'))
+# this is used to filter branches in git getting push events before starting the pipelinerun
 gitBranchPrefixes:
  - develop
 
+# -- storage class for PVCs associated with the apps
 storageClassName: gp2
 
-aws:
-  region: "us-west-2"
-  dns: site.com
+# -- aws configuration
+aws: {}
+  # region: "us-west-2"
+  # dns: site.com
 
-# default docker registry
-defaultRegistry: "" # XXX.dkr.ecr.us-west-2.amazonaws.com
+# -- default docker registry
+# ex: XXX.dkr.ecr.us-west-2.amazonaws.com
+defaultRegistry: ""
 
 slack:
+  # -- channel prefix
   prefix: client
+  # -- channel suffix
   suffix: ci
+  # -- slack notification images (s3 bucket prefix)
   imagesLocation: https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com # this is s3 bucket with public images that we upload through terraform code (!!! NO SLASH at the end pls)
 
+
 argocd:
+  # -- argocd public URL
   server: deploy.site.com
+  # -- argocd root path (web URL root path)
   rootPath: "/"
 
 eventlistener:
+  # -- should we enable eventlistener for tekton triggers?
   enableWebhookSecret: true
+  # -- should we add additional overlays for each app running under trigger?
   extraOverlays: []
     #   - key: truncated_sha
     #     expression: "body.head_commit.id.truncate(7)"
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
 
+# -- list of projects and the project's apps to be triggered
 apps: []
   # - project: xxx
   #   enabled: true
@@ -88,6 +102,8 @@ apps: []
   #         - name: source_subpath
   #           value: dist/web
 
+
+# -- run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy"
 runPostInstallMountPvcJob: false
 
 serviceAccount:
