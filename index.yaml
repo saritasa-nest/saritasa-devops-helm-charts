@@ -3,6 +3,16 @@ entries:
   demo:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2021-11-03T03:13:37.168122765Z"
+    description: A Helm chart for Kubernetes
+    digest: 129c051fd857f2b78b8f552977879caf20bdb2d80fc22150bc678214e91e6031
+    name: demo
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/demo-0.0.2/demo-0.0.2.tgz
+    version: 0.0.2
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2021-08-22T22:05:07.507318901Z"
     description: A Helm chart for Kubernetes
     digest: f0f6cf0eca8d577c172d94069d690f86d92d3346933659dfbe5cb2a3fcf8b49b
@@ -90,6 +100,66 @@ entries:
   saritasa-tekton:
   - apiVersion: v2
     appVersion: v0.28.2
+    created: "2021-11-03T03:13:37.48809032Z"
+    description: 'A Helm chart for Tekton.  Implements: - tekton engine - tekton dashboard
+      - tekton triggers - tekton dashboard ingress - webhook ingress  ## `example
+      usage with argocd`  Install the chart:  ``` helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      ```  then create the manifest and apply:   ```yaml apiVersion: argoproj.io/v1alpha1
+      kind: Application metadata:   name: tekton-engine   namespace: argo-cd   finalizers:   -
+      resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "40" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: tekton-pipelines   project: default   source:     chart:
+      saritasa-tekton     helm:       values: |         domainZone: staging.site.com          #
+      install engine         engine:           enabled: true           config:             defaultServiceAccount:
+      "build-bot-sa"             defaultTimeoutMinutes: "60"             defaultPodTemplate:
+      |               nodeSelector:                 ci: "true"          # install
+      triggers         triggers:           enabled: true          # install dashboard
+      with a public ingress         dashboard:           enabled: true           ingress:             enabled:
+      true             annotations:               kubernetes.io/ingress.class: "nginx"               nginx.ingress.kubernetes.io/proxy-body-size:
+      100m               cert-manager.io/cluster-issuer: "letsencrypt-prod"               nginx.ingress.kubernetes.io/auth-type:
+      basic               nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth               nginx.ingress.kubernetes.io/auth-realm:
+      "Authentication Required"               argocd.argoproj.io/sync-wave: "1"             hosts:               -
+      host: tekton.staging.site.com                 paths:                   - path:
+      /                     pathType: Prefix                     backend:                       service:                         name:
+      tekton-dashboard                         port:                           number:
+      9097             tls:              - secretName: tekton.staging.site.com-crt                hosts:                  -
+      tekton.staging.site.com          # install github webhook ingress that invokes
+      tekton''s eventlistener         webhook:           enabled: true           namespace:
+      "ci"           ingress:             enabled: true             annotations:               kubernetes.io/ingress.class:
+      "nginx"               nginx.ingress.kubernetes.io/proxy-body-size: 100m               cert-manager.io/cluster-issuer:
+      "letsencrypt-prod"               argocd.argoproj.io/sync-wave: "10"             hosts:               -
+      host: webhook.staging.site.com                 paths:                   - path:
+      /                     pathType: Prefix                     backend:                       service:                         name:
+      el-build-pipeline-event-listener                         port:                           number:
+      8080             tls:              - secretName: webhook.staging.site.com-crt                hosts:                  -
+      webhook.staging.site.com          serviceAccount:           create: true           name:
+      "build-bot-sa"          nodeSelector:           tekton_builder: "true"      repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.4"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true  ```  Keep in mind that tekton has config-default configmap,
+      an example you can see [here](https://github.com/tektoncd/pipeline/blob/main/config/config-defaults.yaml).
+      You can customize it values in this map `engine.config: {}`.  Just add keys
+      in the map and they will be added into the tekton-pipelines/config-defaults
+      configmap.  ```yaml engine:   config:     defaultServiceAccount: "build-bot-sa"     defaultTimeoutMinutes:
+      "60"     defaultPodTemplate: |       nodeSelector:         ci: "true" ```  If
+      you want to pull images from a private registry (or if you want to skip 200
+      pulls on dockerhub)  ``` imagePullSecrets:   - name: "your-docker-secret-name"
+      ```  You can generate that secret by doing the following  ``` kubectl create
+      secret -n argo-cd generic docker-saritasa-infra-v2-ro \   --from-file=.dockerconfigjson=~/.docker/config.json
+      \   --type=kubernetes.io/dockerconfigjson ```  Make dure this `~/.docker/config.json`
+      is cleaned from non-infra-v2 registries first. '
+    digest: edd807df11329e203e7ba37a05bf907eb992438297a33e243b53f8e058cb7f04
+    maintainers:
+    - email: nospam@saritasa.com
+      name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-0.1.4/saritasa-tekton-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: v0.28.2
     created: "2021-10-31T16:24:07.699080661Z"
     description: A Helm chart for Tekton
     digest: 11fea928ff6833ade2780b0fbd541ae23ec6f3c281a8318c8212532e2f11b380
@@ -141,6 +211,112 @@ entries:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-0.1.0/saritasa-tekton-0.1.0.tgz
     version: 0.1.0
   saritasa-tekton-apps:
+  - apiVersion: v2
+    appVersion: v0.28.2
+    created: "2021-11-03T03:13:37.650014817Z"
+    description: 'A Helm chart for tekton apps (rbac, eventlistener)  Implements:
+      - dynamic records for eventlistener - PVCs - RBAC - configmaps for each app
+      - triggerbindings for each app - kubernetes job to make sure the PVCs are bound
+      and argocd marks the app as healthy  ## `example usage with argocd`  Install
+      the chart:  ``` helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      ```  then declare dynamic list of projects (and associated components of that
+      project like backend, api, frontend, etc) that would be dynamically added into
+      the tekton''s eventlistener manifest.  Each component should be a separate git
+      repository.  ```yaml --- apiVersion: argoproj.io/v1alpha1 kind: Application
+      metadata:   name: tekton-apps   namespace: argo-cd   finalizers:   - resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "41" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: ci   project: default   source:     chart:
+      saritasa-tekton-apps     helm:       values: |         environment: staging          gitBranchPrefixes:           -
+      staging          storageClassName: gp2          aws:           region: "us-west-2"           dns:
+      staging.site.com          defaultRegistry: xxx.dkr.ecr.us-west-2.amazonaws.com          argocd:           server:
+      deploy.staging.site.com          eventlistener:           enableWebhookSecret:
+      true          apps:           - project: vp             enabled: true             mailList:
+      vp@site.com             devopsMailList: devops+vp@site.com             jiraURL:
+      https://site.atlassian.net/browse/vp             tektonURL: https://tekton.staging.site.com/#/namespaces/ci/pipelineruns             slack:
+      client-vp-ci             kubernetesRepository:               name: vp-kubernetes-aws               branch:
+      main               url: git@github.com:org-name/vp-kubernetes-aws.git              components:               -
+      name: backend                 repository: vp-backend                 pipeline:
+      buildpack-django-build-pipeline                 applicationURL: https://api.staging.site.com                 eventlistener:                   template:
+      buildpack-django-build-pipeline-trigger-template                 triggerBinding:                   -
+      name: docker_registry_repository                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/backend                   -
+      name: buildpack_builder_image                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/google/builder:v1                   -
+      name: buildpack_runner_image                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/google/runner:v1                -
+      name: frontend                 repository: vp-frontend                 pipeline:
+      buildpack-frontend-build-pipeline                 applicationURL: https://staging.site.com                 eventlistener:                   template:
+      buildpack-frontend-build-pipeline-trigger-template                 triggerBinding:                   -
+      name: docker_registry_repository                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/frontend                   -
+      name: buildpack_builder_image                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/paketo/builder:full                   -
+      name: buildpack_runner_image                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/paketo/runner:full                   -
+      name: source_subpath                     value: dist/web          # make sure
+      PVCs are bound after the chart is synced         # by temporarily mount them
+      into short-live job.         runPostInstallMountPvcJob: false      repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.14"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true    ```    What is important to know is that any key defined
+      in apps[PROJECT].components[NAME].triggerBinding would be added as is   into
+      the generated triggerbinding associated with your app. However the chart renders
+      some default values - such as   application, environment, docker_registry based
+      on the values in this values.yaml file.     - apps[PROJECT].components[NAME].repository
+      - the name of the repository containing the code   - apps[PROJECT].components[NAME].pipeline
+      - the name of the pipeline building the code in the repository above   - apps[PROJECT].components[NAME].eventlistener.template
+      - the name of the trigger template for the component to be used   - apps[PROJECT].components[NAME].eventlistener.enableWebhookSecret
+      - should you enable the git web hook for this particular app/component in the
+      eventlistener configuration   - apps[PROJECT].components[NAME].eventlistener.filter
+      - custom filter for the component of the eventlistener   - apps[PROJECT].components[NAME].eventlistener.extraOverlays
+      - extra overlays to be added into the eventlistener for the component   - apps[PROJECT].components[NAME].eventlistener.eventTypes
+      - github event types to trigger the ci/cd   - apps[PROJECT].components[NAME].extraBuildConfigParams
+      - additional key/values to be added into `build-pipeline-config configmap` ConfigMap
+      associated with the app   - apps[PROJECT].components[NAME].triggerBinding -
+      values to be added into the TriggerBinding manifest    an example of argocd
+      app with the additional params above:    ```yaml   apiVersion: argoproj.io/v1alpha1   kind:
+      Application   metadata:     name: tekton-apps     namespace: argo-cd     finalizers:     -
+      resources-finalizer.argocd.argoproj.io     annotations:       argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true       argocd.argoproj.io/sync-wave: "41"   spec:     destination:       server:
+      https://kubernetes.default.svc       namespace: ci     project: default     source:       chart:
+      saritasa-tekton-apps       helm:         values: |           environment: staging            gitBranchPrefixes:             -
+      staging            storageClassName: gp2            aws:             region:
+      "us-west-2"             dns: staging.site.com            defaultRegistry: xxx.dkr.ecr.us-west-2.amazonaws.com            argocd:             server:
+      deploy.staging.site.com            eventlistener:             enableWebhookSecret:
+      true            apps:             - project: xxx               enabled: true               mailList:
+      xxx@saritasa.com               devopsMailList: devops+xxx@saritasa.com               jiraURL:
+      https://saritasa.atlassian.net/browse/xxx               tektonURL: https://tekton.site.com/#/namespaces/ci/pipelineruns               slack:
+      client-xxx-ci               kubernetesRepository:                 name: xxx-kubernetes-aws                 branch:
+      main                 url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git                components:                 -
+      name: backend                   repository: xxx-backend                   pipeline:
+      buildpack                   applicationURL: https://api.site.com                   eventlistener:                     template:
+      buildpack-backend-build-pipeline-trigger-template                   extraBuildConfigParams:
+      # what additional K/V pairs you want to add into the build-pipeline-config configmap                     KEY:
+      value                   triggerBinding:                     - name: docker_registry_repository                       value:
+      XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend                     - name:
+      buildpack_builder_image                       value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1                     -
+      name: buildpack_runner_image                       value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1                  -
+      name: frontend                   repository: xxx-frontend                   pipeline:
+      buildpack                   applicationURL: https://site.com                   eventlistener:                     enableWebhookSecret:
+      false                     filter: (body.ref.startsWith(''refs/heads/develop'')
+      || body.ref.startsWith(''refs/heads/release/''))                     template:
+      buildpack-frontend-build-pipeline-trigger-template                     extraOverlays:
+      []                     # - key: truncated_sha                     #   expression:
+      "body.head_commit.id.truncate(7)"                     eventTypes: ["pull_request",
+      "push"]                   extraBuildConfigParams: {}                   triggerBinding:                     -
+      name: docker_registry_repository                       value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend                     -
+      name: buildpack_builder_image                       value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/builder:full                     -
+      name: buildpack_runner_image                       value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full                     -
+      name: source_subpath                       value: dist/web            # make
+      sure PVCs are bound after the chart is synced           # by temporarily mount
+      them into short-live job.           runPostInstallMountPvcJob: false        repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/       targetRevision:
+      "0.1.14"     syncPolicy:       automated:         prune: true         selfHeal:
+      true       syncOptions:         - CreateNamespace=true    ``` '
+    digest: 1c9b2ee923b7b6f4221a7078cfc8cbd3ea4860cabdb6e9574b4df96f579b08c7
+    maintainers:
+    - email: nospam@saritasa.com
+      name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-apps
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-apps-0.1.14/saritasa-tekton-apps-0.1.14.tgz
+    version: 0.1.14
   - apiVersion: v2
     appVersion: v0.28.2
     created: "2021-10-31T21:04:22.310225804Z"
@@ -300,6 +476,51 @@ entries:
   saritasa-tekton-pipelines:
   - apiVersion: v2
     appVersion: v0.28.2
+    created: "2021-11-03T03:13:37.810119195Z"
+    dependencies:
+    - condition: saritasa-tekton.enabled
+      name: saritasa-tekton
+      repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      version: ~0.1.x
+    description: 'A Helm chart for Tekton Pipelines  Implements: - common tekton tasks
+      - common tekton pipelines - common tekton trigger templates - common tekton
+      trigger bindings  Implemented pipelines include: - buildpack based pipelines
+      based on generator template (php, python, frontend, nodejs, ruby, go) - kaniko
+      pipeline - wordpress pipeline  ## `example usage with argocd`  Install the chart:  ```
+      helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      ```  then if you want to support only frontend and django pipelines based on
+      buildpack without any script modifications:  ```yaml apiVersion: argoproj.io/v1alpha1
+      kind: Application metadata:   name: tekton-pipelines   namespace: argo-cd   finalizers:   -
+      resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "60" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: ci   project: default   source:     chart:
+      saritasa-tekton-pipelines     helm:       values: |         buildpacks:           enabled:
+      true           generate:             buildpackFrontendBuildPipeline:               enabled:
+      true              buildpackDjangoBuildPipeline:               enabled: true      repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.4"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true ```  If you want to modify the behavior of the build step
+      you can easily do that by redefining steps you want to run prior to running
+      the `build` step of the associated buildpack pipeline. You can create multiple
+      versions of pipelines as a result. Just make sure to give them a different name  an
+      example:  ```yaml buildpacks:   enabled: true   generate:     buildpackFrontendBuildPipelineNew:       name:
+      buildpack-frontend-build-pipeline-new       enabled: false       buildTaskName:
+      buildpack-frontend-new       buildTaskSteps:         - name: hello1           image:
+      node:14           imagePullPolicy: IfNotPresent           workingDir: $(resources.inputs.app.path)           script:
+      |             #!/bin/bash             echo "hello world1"          - name: hello2           image:
+      node:15           imagePullPolicy: IfNotPresent           workingDir: $(resources.inputs.app.path)           script:
+      |             #!/bin/bash             echo "hello world2" ``` '
+    digest: f262ade0f7535582f02f25092d5d86ad94fd0193454f20809b8c914d4b749ed3
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-pipelines
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.4/saritasa-tekton-pipelines-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: v0.28.2
     created: "2021-10-31T16:48:57.980479692Z"
     dependencies:
     - condition: saritasa-tekton.enabled
@@ -365,4 +586,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2021-10-31T21:04:22.310310107Z"
+generated: "2021-11-03T03:13:37.810400398Z"
