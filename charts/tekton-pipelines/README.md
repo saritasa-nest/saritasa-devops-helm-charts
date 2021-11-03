@@ -178,7 +178,9 @@ buildpacks:
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
-| podTemplate | object | `{"nodeSelector":{"ci":"true"},"tolerations":[{"effect":"NoSchedule","key":"ci","operator":"Equal","value":"true"}]}` | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
+| podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
+| podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
+| podTemplate.tolerations | list | `[{"effect":"NoSchedule","key":"ci","operator":"Equal","value":"true"}]` | tolerations |
 | saritasa-tekton.enabled | bool | `false` | should we configure dependency chart here. |
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |
 
