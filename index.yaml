@@ -3,6 +3,16 @@ entries:
   demo:
   - apiVersion: v2
     appVersion: 1.16.0
+    created: "2021-11-08T23:31:50.551420552Z"
+    description: A Helm chart for Kubernetes
+    digest: 379f16e79eba3af6fdd88b2669c553266376b45e4fd27110bf8e4572c6d59d01
+    name: demo
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/demo-0.0.3/demo-0.0.3.tgz
+    version: 0.0.3
+  - apiVersion: v2
+    appVersion: 1.16.0
     created: "2021-11-03T03:13:37.168122765Z"
     description: A Helm chart for Kubernetes
     digest: 129c051fd857f2b78b8f552977879caf20bdb2d80fc22150bc678214e91e6031
@@ -586,4 +596,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2021-11-03T03:13:37.810400398Z"
+generated: "2021-11-08T23:31:50.551509255Z"
