@@ -107,6 +107,48 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/jitsi-meet-0.2.0/jitsi-meet-0.2.0.tgz
     version: 0.2.0
+  saritasa-rbac:
+  - apiVersion: v2
+    created: "2021-11-09T01:38:40.494906828Z"
+    description: 'A Helm chart for Kubernetes implementing RBAC rules  You can see
+      role bindings this way   ```sh ➜ k crew install rbac-lookup ➜ k rbac-lookup
+      --kind group G saritasa   saritasa:sso:developers    ci                 Role/saritasa-developers-role   saritasa:sso:developers    ingress-nginx      Role/saritasa-developers-role   saritasa:sso:developers    postgres           Role/saritasa-developers-role   saritasa:sso:developers    prod               Role/saritasa-developers-readonly-role   saritasa:sso:developers    cluster-wide       ClusterRole/saritasa-developers-readonly-clusterrole
+      ````  ## `example usage with agocd`  Install the chart:  ``` helm repo add saritasa
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/ ```  Make the argocd
+      manifest  ```yaml apiVersion: argoproj.io/v1alpha1 kind: Application metadata:   name:
+      rbac   namespace: argo-cd   finalizers:   - resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "1000" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: prod   project: default   source:     chart:
+      saritasa-rbac     helm:       values: |         chartVersion: 0.1.0         developers:           ci:
+      true           ingressNginx: true           postgres: true         devops: true         enabled:
+      true     repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.0"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true ````  You can also add any ad-hoc RBAC role/bindings via
+      .Values.extraRbac multiline string  For example:  ```yaml extraRbac: |   kind:
+      Role   apiVersion: rbac.authorization.k8s.io/v1   metadata:    name: cheesecake-users-readonly-role    namespace:
+      {{ .Release.Namespace }}   rules:     - apiGroups: [""]       resources:  ["services",
+      "pods", "pods/log", "configmaps"]       verbs: ["get", "list", "watch"]     -
+      apiGroups: [""]       resources:  ["pods"]       verbs: ["delete"]     - apiGroups:
+      [""]       resources: ["pods/portforward", "services/portforward", "pods/exec"]       verbs:
+      ["create"]     - apiGroups: ["extensions"]       resources:  ["*"]       verbs:
+      ["get", "list", "watch"]     - apiGroups: ["batch"]       resources:  ["*"]       verbs:
+      ["get", "list", "watch"]     - apiGroups: ["apps"]       resources:  ["*"]       verbs:
+      ["get", "list", "watch"]     - apiGroups: ["tekton.dev"]       resources:  ["*"]       verbs:  ["taskruns",
+      "pipelineruns", "pipelines", "tasks"]    ---   kind: RoleBinding   apiVersion:
+      rbac.authorization.k8s.io/v1   metadata:     name: cheesecake:users     namespace:
+      {{ .Release.Namespace }}   roleRef:     apiGroup: rbac.authorization.k8s.io     kind:
+      Role     name: cheesecake-users-readonly-role   subjects:   - apiGroup: rbac.authorization.k8s.io     kind:
+      Group     name: cheesecake:users ```` '
+    digest: c9438bc2a77898c2f50dce320a07e1173bb9fbfdc53215084b9c7504f5a49f2f
+    maintainers:
+    - email: nospam@saritasa.com
+      name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-rbac
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-rbac-0.1.0/saritasa-rbac-0.1.0.tgz
+    version: 0.1.0
   saritasa-tekton:
   - apiVersion: v2
     appVersion: v0.28.2
@@ -596,4 +638,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2021-11-08T23:31:50.551509255Z"
+generated: "2021-11-09T01:38:40.494990729Z"
