@@ -1,6 +1,45 @@
+
 # saritasa-rbac
 
+## `license`
+```
+          ,-.
+ ,     ,-.   ,-.
+/ \   (   )-(   )
+\ |  ,.>-(   )-<
+ \|,' (   )-(   )
+  Y ___`-'   `-'
+  |/__/   `-'
+  |
+  |
+  |    -hi-
+__|_____________
+
+/* Copyright (C) Saritasa,LLC - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Dmitry Semenov, November 2021
+ */
+
+```
+
+## `chart.deprecationWarning`
+
+## `chart.name`
+
+saritasa-rbac
+
+## `chart.version`
+
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Saritasa | nospam@saritasa.com | https://www.saritasa.com/ |
+
+## `chart.description`
 
 A Helm chart for Kubernetes implementing RBAC rules
 
@@ -112,13 +151,7 @@ extraRbac: |
     name: cheesecake:users
 ````
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Saritasa | nospam@saritasa.com | https://www.saritasa.com/ |
-
-## Values
+## `chart.valuesTable`
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
