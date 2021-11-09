@@ -60,13 +60,12 @@ description: |
       chart: saritasa-rbac
       helm:
         values: |
-          chartVersion: 0.1.0
-          developers:
-            ci: true
-            ingressNginx: true
-            postgres: true
-          devops: true
-          enabled: true
+          rbac:
+            developers:
+              ci: true
+              ingressNginx: true
+              postgres: true
+            devops: true
       repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
       targetRevision: "0.1.0"
     syncPolicy:
