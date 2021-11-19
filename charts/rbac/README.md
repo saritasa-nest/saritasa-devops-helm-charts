@@ -31,7 +31,7 @@ saritasa-rbac
 
 ## `chart.version`
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -46,7 +46,7 @@ A Helm chart for Kubernetes implementing RBAC rules
 You can see role bindings this way
 
 ```sh
-➜ k crew install rbac-lookup
+➜ k krew install rbac-lookup
 ➜ k rbac-lookup --kind group G saritasa
   saritasa:sso:developers    ci                 Role/saritasa-developers-role
   saritasa:sso:developers    ingress-nginx      Role/saritasa-developers-role

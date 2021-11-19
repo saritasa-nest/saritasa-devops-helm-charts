@@ -92,6 +92,7 @@ spec:
     - name: prepare
       image: {{ .images.bash | default "docker.io/library/bash:latest" }}
       imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
       script: |
           #!/usr/bin/env bash
           set -e
@@ -126,6 +127,7 @@ spec:
     - name: build
       image: $(params.builder_image)
       imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
       workingDir: $(resources.inputs.app.path)
       script: |
         #!/bin/bash

@@ -7,7 +7,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.0
+version: 0.1.1
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -21,7 +21,7 @@ description: |
 
 
   ```sh
-  ➜ k crew install rbac-lookup
+  ➜ k krew install rbac-lookup
   ➜ k rbac-lookup --kind group G saritasa
     saritasa:sso:developers    ci                 Role/saritasa-developers-role
     saritasa:sso:developers    ingress-nginx      Role/saritasa-developers-role
