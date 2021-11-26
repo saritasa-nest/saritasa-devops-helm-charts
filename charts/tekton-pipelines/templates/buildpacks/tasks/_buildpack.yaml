@@ -24,6 +24,10 @@ spec:
       type: string
       description: name of the argocd application we're going to deploy/sync
 
+    - name: branch
+      type: string
+      description: the git branch we build
+
     - name: builder_image
       type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
