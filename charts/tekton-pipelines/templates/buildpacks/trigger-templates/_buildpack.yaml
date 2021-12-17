@@ -1,0 +1,81 @@
+{{- define "trigger-template.buildpack" -}}
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: {{ .pipeline.name }}-trigger-template
+  namespace: {{ .namespace }}
+spec:
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Parameters of the triggertemplate are pushed here based on triggerbindings   │
+# │ objects                                                                      │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+  params:
+    {{ include "trigger-template.defaultParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
+
+    - name: repository_ssh_url
+      description: git repository ssh url
+
+    - name: kubernetes_repository_ssh_url
+      description: git repository ssh url for kubernetes manifests repo
+
+    - name: buildpack_builder_image
+      description: the image on which builds will run (must include lifecycle and compatible buildpacks).
+
+    - name: buildpack_runner_image
+      description: reference to a run image to use
+
+    - name: source_subpath
+      description: a subpath within the `source` input where the source to build is located.
+      default: ""
+
+
+  resourcetemplates:
+  - kind: PipelineRun
+    apiVersion: tekton.dev/v1beta1
+    metadata:
+      generateName: $(tt.params.application)-build-pipeline-run-
+    spec:
+      serviceAccountName: $(tt.params.application)-build-pipeline-sa
+      serviceAccountNames:
+        - taskName: kustomize
+          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+      pipelineRef:
+        name: {{ .pipeline.name }}
+      params:
+        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
+        - name: buildpack_builder_image
+          value: "$(tt.params.buildpack_builder_image)"
+        - name: buildpack_runner_image
+          value: "$(tt.params.buildpack_runner_image)"
+        - name: source_subpath
+          value: "$(tt.params.source_subpath)"
+
+      resources:
+        {{- include "pipeline.defaultResources" . | nindent 8 }}
+
+      workspaces:
+        {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
+
+      podTemplate:
+        volumes:
+        - name: $(tt.params.application)-buildpacks-cache
+          persistentVolumeClaim:
+            claimName: $(tt.params.application)-buildpacks-cache-pvc
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "labels"
+                fieldRef:
+                  fieldPath: metadata.labels
+              - path: "annotations"
+                fieldRef:
+                  fieldPath: metadata.annotations
+        {{- if .podTemplate }}
+        {{ toYaml .podTemplate | nindent  8 }}
+        {{end }}
+
+---
+{{- end }}

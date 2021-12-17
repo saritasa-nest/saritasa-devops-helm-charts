@@ -12,4 +12,3 @@ app.kubernetes.io/component: web
 {{ include "jitsi-meet.selectorLabels" . }}
 app.kubernetes.io/component: web
 {{- end -}}
-

@@ -1,6 +1,6 @@
-{{- if .Values.dashboard.ingress.enabled -}}
+{{- if and .Values.engine.enabled .Values.dashboard.ingress.enabled -}}
 # tekton dashboard ingress
-{{- if and .Values.dashboard.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+{{ if and .Values.dashboard.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.dashboard.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.dashboard.ingress.annotations "kubernetes.io/ingress.class" .Values.dashboard.ingress.className}}
   {{- end }}
@@ -15,6 +15,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: tekton-dashboard
+  namespace: tekton-pipelines
   labels:
     {{- include "tekton.labels" . | nindent 4 }}
   {{- with .Values.dashboard.ingress.annotations }}
@@ -22,9 +23,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.dashboard.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.dashboard.ingress.className }}
-  {{- end }}
   {{- if .Values.dashboard.ingress.tls }}
   tls:
     {{- range .Values.dashboard.ingress.tls }}
@@ -52,9 +50,9 @@ spec:
 ---
 {{- end }}
 
-{{- if .Values.webhook.ingress.enabled -}}
+{{- if and .Values.engine.enabled .Values.triggers.enabled .Values.webhook.ingress.enabled -}}
 # tekton github webhook
-{{- if and .Values.webhook.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+{{ if and .Values.webhook.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.webhook.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.webhook.ingress.annotations "kubernetes.io/ingress.class" .Values.webhook.ingress.className}}
   {{- end }}
@@ -77,9 +75,6 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.webhook.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.webhook.ingress.className }}
-  {{- end }}
   {{- if .Values.webhook.ingress.tls }}
   tls:
     {{- range .Values.webhook.ingress.tls }}

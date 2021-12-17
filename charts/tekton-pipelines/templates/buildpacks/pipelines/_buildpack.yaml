@@ -1,0 +1,128 @@
+{{- define "pipeline.buildpack" -}}
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: {{ .pipeline.name }}
+  namespace: {{.namespace }}
+spec:
+  description: |-
+    {{- .pipeline.description | default (printf "Pipeline will only build the image utilizing %s task and then send notification via slack. The deployment is done via argocd" (.pipeline.buildTaskName)) | nindent 4}}
+
+  params:
+    {{ include "pipeline.defaultParams" . | nindent 4 }}
+    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
+
+    - name: buildpack_builder_image
+      type: string
+      description: the image on which builds will run (must include lifecycle and compatible buildpacks).
+
+    - name: buildpack_runner_image
+      type: string
+      description: reference to a run image to use
+
+    - name: source_subpath
+      type: string
+      description: a subpath within the `source` input where the source to build is located.
+      default: ""
+
+    - name: platform_dir
+      type: string
+      description: name of the platform directory. for buildpack /cnb/lifecycle/creator
+      default: "platform"
+
+  workspaces:
+    - name: source
+
+  resources:
+    - name: app
+      type: git
+    - name: kubernetes-repo
+      type: git
+    - name: image
+      type: image
+
+  tasks:
+    - name: set-env-vars
+      taskRef:
+        name: buildpack-set-env-vars
+      resources:
+        inputs:
+          - name: app
+            resource: app
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: platform_dir
+          value: "$(params.platform_dir)"
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: {{ .pipeline.buildTaskName }}
+      taskRef:
+        name: {{ .pipeline.buildTaskName }}
+      resources:
+          inputs:
+            - name: app
+              resource: app
+          outputs:
+              - name: image
+                resource: image
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: branch
+          value: "$(params.branch)"
+        - name: builder_image
+          value: "$(params.buildpack_builder_image)"
+        - name: run_image
+          value: "$(params.buildpack_runner_image)"
+        - name: docker_registry
+          value: $(params.docker_registry)
+        - name: cache
+          value: $(params.application)-buildpacks-cache
+        - name: source_subpath
+          value: "$(params.source_subpath)"
+        - name: platform_dir
+          value: "$(params.platform_dir)"
+        - name: environment
+          value: "$(params.environment)"
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - set-env-vars
+
+    - name: kustomize
+      taskRef:
+        name: kustomize
+      resources:
+        inputs:
+          - name: kubernetes-repo
+            resource: kubernetes-repo
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: image
+          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+        - name: kustomize_overlay_path
+          value: "$(params.kubernetes_repository_kustomize_path)"
+        - name: kubernetes_branch
+          value: "$(params.kubernetes_branch)"
+        - name: environment
+          value: "$(params.environment)"
+      runAfter:
+        - {{ .pipeline.buildTaskName }}
+
+    - name: deploy
+      taskRef:
+        name: argocd-deploy
+      params:
+        - name : application
+          value: "$(params.application)"
+      runAfter:
+        - kustomize
+
+  {{ include "task.finalNotification" . | nindent 2 }}
+---
+{{- end }}

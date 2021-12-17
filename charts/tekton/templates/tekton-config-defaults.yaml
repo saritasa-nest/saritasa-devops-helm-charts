@@ -1,3 +1,4 @@
+{{- if .Values.engine.enabled }}
 {{ $config := .Values.engine.config  | default dict -}}
 apiVersion: v1
 kind: ConfigMap
@@ -11,3 +12,5 @@ data:
   default-pod-template: |
     {{- .Values.engine.config.defaultPodTemplate | nindent 4 }}
   {{end}}
+
+{{ end }}

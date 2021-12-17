@@ -1,0 +1,8 @@
+{{- range $pipeline := .Values.buildpacks.generate }}
+{{$data := dict "pipeline"    $pipeline
+                "namespace"   $.Release.Namespace
+                "podTemplate" $.Values.podTemplate }}
+{{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
+{{ include "trigger-template.buildpack" $data }}
+{{ end }}
+{{- end}}

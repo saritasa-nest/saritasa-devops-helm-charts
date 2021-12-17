@@ -1,3 +1,4 @@
+{{- if .Values.engine.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,4 +9,5 @@ metadata:
     app.kubernetes.io/part-of: tekton-pipelines
 data:
   metrics.backend-destination: prometheus
-  
+
+{{ end }}
