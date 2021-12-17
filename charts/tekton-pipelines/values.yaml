@@ -57,6 +57,7 @@ buildpacks:
         - name: build-static
           image: node:14
           imagePullPolicy: IfNotPresent
+          resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
@@ -95,6 +96,7 @@ buildpacks:
         - name: build-static
           image: node:14
           imagePullPolicy: IfNotPresent
+          resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
@@ -102,12 +104,14 @@ buildpacks:
             [ -f package.json ] && (
               yes | npm install --silent;
               npm run build:$(params.environment) || echo "unable to build $(params.environment)";
-              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found
+              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found"
           securityContext:
             privileged: true
 
         - name: fix-php-detection
           image: docker.io/library/bash:5.1.8
+          imagePullPolicy: IfNotPresent
+          resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/usr/bin/env bash
@@ -137,6 +141,7 @@ buildpacks:
         - name: copy-requirements
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
+          resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/usr/bin/env bash
@@ -166,6 +171,7 @@ buildpacks:
         - name: git-fetch-tags
           image: alpine/git:v2.32.0
           imagePullPolicy: IfNotPresent
+          resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             git fetch --tags
@@ -177,6 +183,7 @@ buildpacks:
           workingDir: $(resources.inputs.app.path)
           image: gittools/gitversion:5.6.10-alpine.3.12-x64-3.1
           imagePullPolicy: IfNotPresent
+          resources: {}
           script: |
             #!/usr/bin/env ash
             # so we are making a hack, that if we try to merge hotfix branch into main we should

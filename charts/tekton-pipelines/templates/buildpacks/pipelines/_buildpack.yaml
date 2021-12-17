@@ -71,6 +71,8 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
+        - name: branch
+          value: "$(params.branch)"
         - name: builder_image
           value: "$(params.buildpack_builder_image)"
         - name: run_image

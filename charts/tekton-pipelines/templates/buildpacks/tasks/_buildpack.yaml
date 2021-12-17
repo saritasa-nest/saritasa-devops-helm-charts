@@ -24,6 +24,10 @@ spec:
       type: string
       description: name of the argocd application we're going to deploy/sync
 
+    - name: branch
+      type: string
+      description: the git branch we build
+
     - name: builder_image
       type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
@@ -92,6 +96,7 @@ spec:
     - name: prepare
       image: {{ .images.bash | default "docker.io/library/bash:latest" }}
       imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
       script: |
           #!/usr/bin/env bash
           set -e
@@ -126,6 +131,7 @@ spec:
     - name: build
       image: $(params.builder_image)
       imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
       workingDir: $(resources.inputs.app.path)
       script: |
         #!/bin/bash
