@@ -97,6 +97,7 @@ jicofo:
     user: focus
     password:
     componentSecret:
+    existingSecret:
 
   livenessProbe:
     tcpSocket:
@@ -123,6 +124,7 @@ jvb:
   xmpp:
     user: jvb
     password:
+    existingSecret:
 
   stunServers: 'meet-jit-si-turnrelay.jitsi.net:443'
   useHostPort: false
@@ -195,6 +197,7 @@ xmpp:
 
 extraCommonEnvs: {}
 
+# Don't forget to update `extraEnvFrom` if existingSecret is used for jvb and jicofo, otherwise there would be error
 prosody:
   enabled: true
   server:
