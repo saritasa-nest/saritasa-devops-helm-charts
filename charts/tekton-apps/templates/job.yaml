@@ -1,0 +1,59 @@
+{{ if and .Values.apps .Values.runPostInstallMountPvcJob }}
+# this job is needed to make sure the tekton-apps app in argocd gets healthy state
+# which happens only after the provisioned PVCs gets bound state, which is impossible until the very first run
+# of the tekton pipeline utilizing these PVCs
+# this job will self destruct after 100s (including all the PODS it will create)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: finalize-pvc-mounts
+  namespace: {{ .Release.Namespace }}
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+        - name: mount-pvc
+          image: alpine
+          command:
+            - /bin/ash
+            - -c
+            - |
+              echo "Mounting PVC to make sure the tekton-apps is in HEALTHY state"
+          volumeMounts:
+          {{- range $project := .Values.apps }}
+          {{- range $component := $project.components }}
+          {{- $data := dict "project"           $project
+                            "component"         $component
+                            "environment"       $.Values.environment }}
+          {{- $workspace := include "tekton-apps.resourceName" (set $data "suffix" "workspace-pvc") }}
+          {{- $cache     := include "tekton-apps.resourceName" (set $data "suffix" "buildpacks-cache-pvc") }}
+            - mountPath: "/tmp/{{ $workspace }}"
+              name: {{ $workspace }}
+          {{- if contains "buildpack" $component.pipeline }}
+            - mountPath: "/tmp/{{ $cache }}"
+              name: {{ $cache }}
+          {{- end }}
+          {{- end }}
+          {{ end }}
+      restartPolicy: Never
+      volumes:
+      {{- range $project := .Values.apps }}
+      {{- range $component := $project.components }}
+      {{- $data := dict "project"           $project
+                        "component"         $component
+                        "environment"       $.Values.environment }}
+      {{- $workspace := include "tekton-apps.resourceName" (set $data "suffix" "workspace-pvc") }}
+      {{- $cache     := include "tekton-apps.resourceName" (set $data "suffix" "buildpacks-cache-pvc") }}
+        - name: {{ $workspace }}
+          persistentVolumeClaim:
+            claimName: {{ $workspace }}
+      {{- if contains "buildpack" $component.pipeline }}
+        - name: {{ $cache }}
+          persistentVolumeClaim:
+            claimName: {{ $cache }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+
+{{ end }}

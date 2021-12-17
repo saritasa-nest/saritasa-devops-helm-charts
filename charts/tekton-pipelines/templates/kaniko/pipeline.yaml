@@ -1,0 +1,96 @@
+{{ if .Values.kaniko.enabled }}
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: kaniko-build-pipeline
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    Pipeline will only build the image utilizing dockerfile using kaniko and then send notification via slack.
+    The deployment is done via argocd
+
+  params:
+    {{ include "pipeline.defaultParams" . | nindent 4 }}
+    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
+
+    - name: docker_file
+      type: string
+      default: Dockerfile
+      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
+
+    - name: docker_context
+      type: string
+      default: "."
+      description: dockerfile context path
+
+
+  workspaces:
+    - name: source
+
+  resources:
+    - name: app
+      type: git
+    - name: kubernetes-repo
+      type: git
+    - name: image
+      type: image
+
+  tasks:
+    - name: kaniko
+      taskRef:
+        name: kaniko
+      resources:
+          inputs:
+            - name: app
+              resource: app
+          outputs:
+              - name: image
+                resource: image
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: docker_registry
+          value: $(params.docker_registry)
+        - name: environment
+          value: "$(params.environment)"
+        - name: docker_file
+          value: "$(params.docker_file)"
+        - name: docker_context
+          value: "$(params.docker_context)"
+      workspaces:
+        - name: source
+          workspace: source
+
+    - name: kustomize
+      taskRef:
+        name: kustomize
+      resources:
+        inputs:
+          - name: kubernetes-repo
+            resource: kubernetes-repo
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: image
+          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+        - name: kustomize_overlay_path
+          value: "$(params.kubernetes_repository_kustomize_path)"
+        - name: kubernetes_branch
+          value: "$(params.kubernetes_branch)"
+        - name: environment
+          value: "$(params.environment)"
+      runAfter:
+        - kaniko
+
+    - name: deploy
+      taskRef:
+        name: argocd-deploy
+      params:
+        - name : application
+          value: "$(params.application)"
+      runAfter:
+        - kustomize
+
+  {{ include "task.finalNotification" . | nindent 2 }}
+
+{{ end }}

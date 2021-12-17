@@ -1,0 +1,5 @@
+# the block below makes sure that our required variables are
+# declared in the values file and if not that will throw the error
+# so even the block below is commeted, it's still evaluated by the HELM and error
+# will be generated if the variable's value is not set
+# {{ .Values.domainZone | required "Domain Zone is required and should be non-empty string" }}

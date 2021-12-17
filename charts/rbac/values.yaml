@@ -1,0 +1,59 @@
+rbac:
+  developers:
+    # -- should we add ci namespace access to saritasa developers
+    ci: false
+    # -- should we add ability to work with ingress-nginx pods in ingress-nginx ns
+    ingressNginx: false
+    # -- should we add mysql (cli tools, port-forwarder) namespace access to saritasa developers
+    mysql: false
+    # -- should we add mssql (cli tools, port-forwarder) namespace access to saritasa developers
+    mssql: false
+    # -- should we add postgres (cli tools, port-forwarder) namespace access to saritasa developers
+    postgres: false
+  # -- should we create cluster role/binding for devops team
+  devops: false
+
+# -- additional rbac to add (should become multiline string)
+extraRbac: ""
+  # kind: Role
+  # apiVersion: rbac.authorization.k8s.io/v1
+  # metadata:
+  #  name: cheesecake-users-readonly-role
+  #  namespace: {{ .Release.Namespace }}
+  # rules:
+  #   - apiGroups: [""]
+  #     resources:  ["services", "pods", "pods/log", "configmaps"]
+  #     verbs: ["get", "list", "watch"]
+  #   - apiGroups: [""]
+  #     resources:  ["pods"]
+  #     verbs: ["delete"]
+  #   - apiGroups: [""]
+  #     resources: ["pods/portforward", "services/portforward", "pods/exec"]
+  #     verbs: ["create"]
+  #   - apiGroups: ["extensions"]
+  #     resources:  ["*"]
+  #     verbs: ["get", "list", "watch"]
+  #   - apiGroups: ["batch"]
+  #     resources:  ["*"]
+  #     verbs: ["get", "list", "watch"]
+  #   - apiGroups: ["apps"]
+  #     resources:  ["*"]
+  #     verbs: ["get", "list", "watch"]
+  #   - apiGroups: ["tekton.dev"]
+  #     resources:  ["*"]
+  #     verbs:  ["taskruns", "pipelineruns", "pipelines", "tasks"]
+
+  # ---
+  # kind: RoleBinding
+  # apiVersion: rbac.authorization.k8s.io/v1
+  # metadata:
+  #   name: cheesecake:users
+  #   namespace: {{ .Release.Namespace }}
+  # roleRef:
+  #   apiGroup: rbac.authorization.k8s.io
+  #   kind: Role
+  #   name: cheesecake-users-readonly-role
+  # subjects:
+  # - apiGroup: rbac.authorization.k8s.io
+  #   kind: Group
+  #   name: cheesecake:users

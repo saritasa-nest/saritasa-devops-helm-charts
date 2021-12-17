@@ -1,0 +1,250 @@
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │  Default params for pipelines                                                │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.defaultParams" -}}
+- name: application
+  type: string
+  description: name of the argocd application we're going to deploy/sync
+
+- name: sha
+  type: string
+  description: sha commit ID of the image deployed in cluster
+
+- name: head_commit
+  type: string
+  description: full SHA commit ID
+
+- name: head_commit_message
+  type: string
+  description: description of the commit (by developer)
+
+- name: pusher_name
+  type: string
+  description: author name
+
+- name: pusher_email
+  type: string
+  description: author email
+
+- name: pusher_avatar
+  type: string
+  description: author url avatar image
+
+- name: pusher_url
+  type: string
+  description: author link to profile
+
+- name: repository_url
+  type: string
+  description: git repository https url
+
+- name: environment
+  type: string
+  description: environment name of the app being built, i.e. dev/staging/prod
+
+- name: branch
+  type: string
+  description: git branch
+{{- end}}
+
+{{- define "trigger-template.defaultParams" -}}
+- name: application
+  description: name of the argocd application we're going to deploy/sync
+
+- name: sha
+  description: sha commit ID of the image deployed in cluster
+
+- name: head_commit
+  description: full SHA commit ID
+
+- name: head_commit_message
+  description: description of the commit (by developer)
+
+- name: pusher_name
+  description: author name
+
+- name: pusher_email
+  description: author email
+
+- name: pusher_avatar
+  description: author url avatar image
+
+- name: pusher_url
+  description: author link to profile
+
+- name: repository_url
+  description: git repository https url
+
+- name: environment
+  description: environment name of the app being built, i.e. dev/staging/prod
+
+- name: branch
+  description: git branch
+{{- end}}
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Default params for pipelines where we update kubernetes-aws repository       │
+# │ with new version of the image from the docker registry                       │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.defaultDockerKubernetesParams" -}}
+- name: docker_registry
+  type: string
+  description: private docker registry address
+
+- name: docker_registry_repository
+  type: string
+  description: private docker registry repository address
+
+- name: kubernetes_repository_kustomize_path
+  type: string
+  description: overlay path for kustomize call
+
+- name: kubernetes_branch
+  type: string
+  default: main
+  description: git branch for kustomize managed git repo
+{{- end}}
+
+{{- define "trigger-template.defaultDockerKubernetesParams" -}}
+- name: docker_registry
+  description: private docker registry address
+
+- name: docker_registry_repository
+  description: private docker registry repository address
+
+- name: kubernetes_repository_kustomize_path
+  description: overlay path for kustomize call
+
+- name: kubernetes_branch
+  default: main
+  description: git branch for kustomize managed git repo
+{{- end}}
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Default bound params for trigger template that are collected from the        │
+# │ triggerbindings.                                                             │
+# │ Accepts two arguments:                                                       │
+# │ - docker (bool)                                                              │
+# │ - kubernetes (bool)                                                          │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.defaultTTBoundParams" -}}
+- name: "application"
+  value: "$(tt.params.application)"
+- name: sha
+  value: "$(tt.params.sha)"
+- name: head_commit
+  value: "$(tt.params.head_commit)"
+- name: head_commit_message
+  value: "$(tt.params.head_commit_message)"
+- name: pusher_name
+  value: "$(tt.params.pusher_name)"
+- name: pusher_email
+  value: "$(tt.params.pusher_email)"
+- name: pusher_avatar
+  value: "$(tt.params.pusher_avatar)"
+- name: pusher_url
+  value: "$(tt.params.pusher_url)"
+- name: repository_url
+  value: "$(tt.params.repository_url)"
+- name: branch
+  value: "$(tt.params.branch)"
+{{- if .docker }}
+- name: docker_registry
+  value: "$(tt.params.docker_registry)"
+- name: docker_registry_repository
+  value: "$(tt.params.docker_registry_repository)"
+{{- end }}
+{{- if .kubernetes }}
+- name: kubernetes_repository_kustomize_path
+  value: "$(tt.params.kubernetes_repository_kustomize_path)"
+- name: kubernetes_branch
+  value: "$(tt.params.kubernetes_branch)"
+{{- end }}
+- name: environment
+  value: "$(tt.params.environment)"
+{{- end}}
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Default resources for the pipeline run. Defined in trigger template          │
+# │ - app: our git repository with the code we're building                       │
+# │ - kubernetes-repo: out git repo containing kube manifests                    │
+# │ - image: docker registry image                                               │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.defaultResources" -}}
+- name: app
+  resourceSpec:
+    type: git
+    params:
+      - name: url
+        value: $(tt.params.repository_ssh_url)
+      - name: revision
+        value: $(tt.params.head_commit)
+- name: kubernetes-repo
+  resourceSpec:
+    type: git
+    params:
+      - name: url
+        value: $(tt.params.kubernetes_repository_ssh_url)
+      - name: revision
+        value: $(tt.params.kubernetes_branch)
+- name: image
+  resourceSpec:
+    type: image
+    params:
+      - name: url
+        value: $(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)
+{{- end}}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Default workspaces associated with tekton pipeline runs                      │
+# │ - source: contains app git repo source code cloned by tekton                 │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.defaultWorkspaces" -}}
+- name: source
+  persistentVolumeClaim:
+    claimName: $(tt.params.application)-workspace-pvc
+{{- end}}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ slack notification reusable snippet in various pipelines                     │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "task.finalNotification" -}}
+finally:
+  - name: slack-notification
+    taskRef:
+      name: slack-notification
+    params:
+      - name: application
+        value: "$(params.application)"
+      - name: sha
+        value: "$(params.sha)"
+      - name: head_commit
+        value: "$(params.head_commit)"
+      - name: head_commit_message
+        value: "$(params.head_commit_message)"
+      - name: pusher_name
+        value: "$(params.pusher_name)"
+      - name: pusher_email
+        value: "$(params.pusher_email)"
+      - name: pusher_avatar
+        value: "$(params.pusher_avatar)"
+      - name: pusher_url
+        value: "$(params.pusher_url)"
+      - name: repository_url
+        value: "$(params.repository_url)"
+      - name: branch
+        value: "$(params.branch)"
+      - name: environment
+        value: "$(params.environment)"
+      - name: status
+        value: "$(tasks.deploy.status)"
+{{- end }}

@@ -1,0 +1,94 @@
+{{ if .Values.kaniko.enabled }}
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kaniko
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  description: >-
+    This is task for legacy Saritasa projects written with Dockerfile, compilation is done by using Kaniko
+    https://www.baeldung.com/ops/kaniko
+
+  workspaces:
+    - name: source
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+    outputs:
+      - name: image
+        type: image
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: docker_registry
+      type: string
+      description: aws private ecr registry address
+
+    - name: docker_file
+      type: string
+      description: name of the dockerfile
+      default: "Dockerfile"
+
+    - name: docker_context
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: "."
+
+    - name: extra_args
+      type: array
+      description: extra args to be passed into kaniko builder
+      default: []
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+  results:
+    - name: password
+      description: The password to authenticate to ecr registry.
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  steps:
+    - name: authenticate
+      image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.app.path)
+      script: |
+        #!/bin/bash
+        aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
+
+    - name: build
+      image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.app.path)
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - $(params.extra_args[*])
+        - --build-arg=ENVIRONMENT=$(params.environment)
+        - --dockerfile=$(resources.inputs.app.path)/$(params.docker_file)
+        - --context=$(resources.inputs.app.path)/$(params.docker_context)
+        - --destination=$(resources.outputs.image.url)
+        # - --verbosity=debug
+
+      # kaniko assumes it is running as root, which means this example fails on platforms
+      # that default to run containers as random uid (like OpenShift). Adding this securityContext
+      # makes it explicit that it needs to run as root.
+      securityContext:
+        runAsUser: 0
+{{ end }}

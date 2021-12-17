@@ -1,0 +1,3 @@
+{{ if .Values.extraRbac }}
+{{ .Values.extraRbac }}
+{{ end }}

@@ -1,0 +1,94 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kustomize
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    Updates image tag in the kustomize overlay of the app
+
+  resources:
+    inputs:
+      - name: kubernetes-repo
+        type: git
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: image
+      type: string
+      description: new image for the application
+
+    - name: kustomize_overlay_path
+      type: string
+      description: overlay path for kustomize call
+
+    - name: kubernetes_branch
+      default: "main"
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config
+
+  steps:
+    - name: git-set-user
+      image: {{ .Values.images.git | default "alpine/git:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
+        git config user.email "$DEVOPS_GROUP_EMAIL"
+        git config user.name "tekton-kustomize"
+
+    - name: update-image
+      image: {{ .Values.images.kustomize | default "k8s.gcr.io/kustomize/kustomize:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
+        app=$(params.application)
+        env=$(params.environment)
+        application=${app%-$env}
+        cd $(params.kustomize_overlay_path) && \
+          /app/kustomize edit set image $application=$(params.image)
+
+    - name: git-push
+      image: {{ .Values.images.git | default "alpine/git:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
+        set +x
+        git checkout $(params.kubernetes_branch)
+
+        # apply changes only if it exists, otherwise do nothing
+        if [ $(git status --porcelain | wc -l) -eq 0 ]; then
+          echo "There are no changes, nothing to commit"
+          exit
+        fi
+
+        # define retry delays appropriate for dash
+        set -- "0" "1" "3" "5"
+        for DELAY
+        do
+          if [ "$DELAY" != "0" ]; then
+            echo "retry in ${DELAY}s"
+          fi
+          sleep $DELAY
+
+          # check whether there are changes between local and remote
+          git fetch origin $(params.kubernetes_branch)
+          LOCAL_COMMIT=`git rev-parse @`
+          REMOTE_COMMIT=`git rev-parse origin/$(params.kubernetes_branch)`
+          if [ $LOCAL_COMMIT != $REMOTE_COMMIT ]; then
+            echo "Need to pull new changes"
+            git pull origin HEAD:$(params.kubernetes_branch)
+          fi
+
+          git commit -am "feat: $(params.environment) argocd deployment $(params.kustomize_overlay_path), new image: $(params.image)"
+          git push origin HEAD:$(params.kubernetes_branch) && break || true
+        done

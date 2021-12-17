@@ -1,0 +1,172 @@
+{{- define "task.buildpack" -}}
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: {{ .pipeline.buildTaskName }}
+  namespace: {{ .namespace }}
+spec:
+  description: |-
+    {{- .pipeline.description | default (printf "The Buildpacks %s task builds source into a container image and pushes it to a AWS ECR registry, using Cloud Native Buildpacks" (.pipeline.buildTaskName)) | nindent 4}}
+
+  workspaces:
+    - name: source
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+    outputs:
+      - name: image
+        type: image
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: branch
+      type: string
+      description: the git branch we build
+
+    - name: builder_image
+      type: string
+      description: the image on which builds will run (must include lifecycle and compatible buildpacks).
+
+    - name: run_image
+      type: string
+      description: reference to a run image to use
+      default: ""
+
+    - name: docker_registry
+      type: string
+      description: private docker registry address
+
+    - name: cache
+      type: string
+      description: the name of the persistent app cache volume.
+      default: empty-dir
+
+    - name: cache_image
+      type: string
+      description: the name of the persistent app cache image.
+      default: ""
+
+    - name: platform_dir
+      type: string
+      description: the name of the platform directory.
+
+    - name: user_id
+      type: string
+      description: the user id of the builder image user.
+      default: "1000"
+
+    - name: group_id
+      type: string
+      description: the group id of the builder image user.
+      default: "1000"
+
+    - name: process_type
+      type: string
+      description: the default process type to set on the image.
+      default: "web"
+
+    - name: source_subpath
+      type: string
+      description: a subpath within the `source` input where the source to build is located.
+      default: ""
+
+    - name: skip_restore
+      type: string
+      description: do not write layer metadata or restore cached layers
+      default: "false"
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+  stepTemplate:
+    env:
+      - name: CNB_PLATFORM_API
+        value: {{ .cnbPlatformAPI | default "0.4" | quote }}
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  steps:
+    - name: prepare
+      image: {{ .images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
+      script: |
+          #!/usr/bin/env bash
+          set -e
+          chown -R "$(params.user_id):$(params.group_id)" "/tekton/home" &&
+          chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
+          chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
+          chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+          chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+      volumeMounts:
+        - name: layers-dir
+          mountPath: /layers
+        - name: $(params.cache)
+          mountPath: /cache
+      securityContext:
+        privileged: true
+
+    # insert customized steps as defined in the values.yaml of the helm chart
+    {{- range .pipeline.buildTaskSteps }}
+    - name: {{ .name }}
+      image: {{ .image | quote }}
+      imagePullPolicy: {{ .imagePullPolicy }}
+      {{- if .workingDir }}
+      workingDir: {{ .workingDir }}
+      {{- end }}
+      script: |
+        {{- .script | nindent 8 }}
+    {{- end }}
+
+    # if you need to debug this step you can do:
+    # insert `sleep 3000` after the aws ecr get-login-password command and then get inside the container
+    # k exec -ti `k --no-headers=true get pods -l tekton.dev/task=buildpack | awk '{print $1}'` -c step-create bash
+    - name: build
+      image: $(params.builder_image)
+      imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
+      workingDir: $(resources.inputs.app.path)
+      script: |
+        #!/bin/bash
+
+        aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.docker_registry)
+
+        /cnb/lifecycle/creator \
+          -app=$(params.source_subpath) \
+          -project-metadata=project.toml \
+          -cache-dir=/cache \
+          -layers=/layers \
+          -platform=$(workspaces.source.path)/$(params.platform_dir) \
+          -report=/layers/report.toml \
+          -cache-image=$(params.cache_image) \
+          -uid=$(params.user_id) \
+          -gid=$(params.group_id) \
+          -process-type=$(params.process_type) \
+          -skip-restore=$(params.skip_restore) \
+          -previous-image=$(resources.outputs.image.url) \
+          -run-image=$(params.run_image) \
+          $(resources.outputs.image.url)
+
+      volumeMounts:
+        - name: layers-dir
+          mountPath: /layers
+        - name: $(params.cache)
+          mountPath: /cache
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+
+  volumes:
+    - name: empty-dir
+      emptyDir: {}
+    - name: layers-dir
+      emptyDir: {}
+---
+{{- end }}
