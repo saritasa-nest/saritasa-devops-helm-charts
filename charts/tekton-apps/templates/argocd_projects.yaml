@@ -1,0 +1,32 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{ if $project.argocd }}
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  labels:
+    {{- range $k, $v := $project.argocd.labels }}
+    {{ $k }}: {{ $v }}
+    {{- end }}
+  name: {{ $project.project }}
+  namespace: argo-cd
+  annotations:
+    argocd.argoproj.io/sync-wave: "200"
+spec:
+  destinations:
+  - namespace: {{ $project.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  - namespace: ci
+    server: https://kubernetes.default.svc
+  orphanedResources:
+    warn: true
+  sourceRepos: {{ range $project.argocd.sourceRepos }}
+    - {{ . }}
+    {{- end }}
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+---
+{{ end }}
+{{- end }}
+{{ end }}

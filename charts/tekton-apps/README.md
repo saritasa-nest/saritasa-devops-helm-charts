@@ -107,6 +107,16 @@ spec:
         apps:
           - project: vp
             enabled: true
+            argocd:
+              labels:
+                created-by: xxx
+                ops-main: xxx
+                ops-secondary: xxx
+                pm: xxx
+                tm: xxx
+              namespace: prod
+              sourceRepos: 
+                - git@github.com:org-name/xxx-kubernetes-aws.git
             mailList: vp@site.com
             devopsMailList: devops+vp@site.com
             jiraURL: https://site.atlassian.net/browse/vp
@@ -119,6 +129,16 @@ spec:
 
             components:
               - name: backend
+                argocd:
+                  appName: xxx-backend-prod
+                  syncWave: 210
+                  source:
+                    path: apps/backend/manifests/prod
+                    # if these below lines are simmilar to project's `kubernetesRepository`
+                    # settings - you can omit them and they would be automatically taken
+                    # from project.kubernetesRepository
+                    repoUrl: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+                    targetRevision: main
                 repository: vp-backend
                 pipeline: buildpack-django-build-pipeline
                 applicationURL: https://api.staging.site.com
@@ -133,6 +153,16 @@ spec:
                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/google/runner:v1
 
               - name: frontend
+                argocd:
+                  appName: xxx-frontend-prod
+                  syncWave: 210
+                  source:
+                    path: apps/frontend/manifests/prod
+                    # if these below lines are simmilar to project's `kubernetesRepository`
+                    # settings - you can omit them and they would be automatically taken
+                    # from project.kubernetesRepository
+                    repoUrl: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+                    targetRevision: main
                 repository: vp-frontend
                 pipeline: buildpack-frontend-build-pipeline
                 applicationURL: https://staging.site.com
@@ -221,6 +251,16 @@ spec:
           apps:
             - project: xxx
               enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: prod
+                sourceRepos: 
+                  - git@github.com:org-name/xxx-kubernetes-aws.git
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -233,6 +273,16 @@ spec:
 
               components:
                 - name: backend
+                  argocd:
+                    appName: xxx-backend-prod
+                    syncWave: 210
+                    source:
+                      path: apps/backend/manifests/prod
+                      # if these below lines are simmilar to project's `kubernetesRepository`
+                      # settings - you can omit them and they would be automatically taken
+                      # from project.kubernetesRepository
+                      repoUrl: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+                      targetRevision: main
                   repository: xxx-backend
                   pipeline: buildpack
                   applicationURL: https://api.site.com
@@ -249,6 +299,16 @@ spec:
                       value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
 
                 - name: frontend
+                  argocd:
+                    appName: xxx-frontend-prod
+                    syncWave: 210
+                    source:
+                      path: apps/frontend/manifests/prod
+                      # if these below lines are simmilar to project's `kubernetesRepository`
+                      # settings - you can omit them and they would be automatically taken
+                      # from project.kubernetesRepository
+                      repoUrl: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+                      targetRevision: main
                   repository: xxx-frontend
                   pipeline: buildpack
                   applicationURL: https://site.com

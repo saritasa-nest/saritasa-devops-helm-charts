@@ -1,0 +1,39 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+
+{{ if $project.components }}
+{{- range $component := $project.components }}
+
+{{ if and $component.argocd $project.argocd }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $component.argocd.appName }}
+  namespace: argo-cd
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $component.argocd.syncWave | quote }}
+spec:
+  destination:
+    namespace: {{ $project.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  project: {{ $project.project }}
+  {{ if $component.argocd.source }}
+  source:
+    path: {{ $component.argocd.source.path }}
+    repoURL: {{ if hasKey $component.argocd.source "repoUrl" }}{{ $component.argocd.source.repoUrl }}{{ else }}{{ $project.kubernetesRepository.url }}{{ end }}
+    targetRevision: {{ if hasKey $component.argocd.source "targetRevision" }}{{ $component.argocd.source.targetRevision }}{{ else }}{{ $project.kubernetesRepository.branch }}{{ end }}
+  {{ end }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+{{ end }}
+{{- end }}
+
+{{ end }}
+{{- end }}
+
+{{ end }}
