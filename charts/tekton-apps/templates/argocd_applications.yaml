@@ -15,7 +15,7 @@ metadata:
   name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $.Values.environment) }}
   namespace: argo-cd
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" }}
+    argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
 spec:
   destination:
     namespace: {{ $project.argocd.namespace }}
