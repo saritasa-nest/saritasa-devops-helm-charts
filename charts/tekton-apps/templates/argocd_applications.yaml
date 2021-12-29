@@ -1,28 +1,30 @@
 {{ if .Values.apps }}
 {{- range $project := .Values.apps }}
-
-{{ if $project.components }}
+{{- if and $project.enabled $project.argocd}}
 {{- range $component := $project.components }}
 
-{{ if and $component.argocd $project.argocd }}
+{{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
+{{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
+
+{{- /* initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict */}}
+{{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
+
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ $component.argocd.appName }}
+  name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $.Values.environment) }}
   namespace: argo-cd
   annotations:
-    argocd.argoproj.io/sync-wave: {{ $component.argocd.syncWave | quote }}
+    argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" }}
 spec:
   destination:
     namespace: {{ $project.argocd.namespace }}
     server: https://kubernetes.default.svc
   project: {{ $project.project }}
-  {{ if $component.argocd.source }}
   source:
-    path: {{ $component.argocd.source.path }}
-    repoURL: {{ if hasKey $component.argocd.source "repoUrl" }}{{ $component.argocd.source.repoUrl }}{{ else }}{{ $project.kubernetesRepository.url }}{{ end }}
-    targetRevision: {{ if hasKey $component.argocd.source "targetRevision" }}{{ $component.argocd.source.targetRevision }}{{ else }}{{ $project.kubernetesRepository.branch }}{{ end }}
-  {{ end }}
+    path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $.Values.environment) }}
+    repoURL: {{ $argocdSource.repoUrl | default $project.kubernetesRepository.url }}
+    targetRevision: {{ $argocdSource.targetRevision | default $project.kubernetesRepository.branch }}
   syncPolicy:
     automated:
       prune: true
@@ -30,10 +32,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
-{{ end }}
-{{- end }}
-
-{{ end }}
-{{- end }}
-
-{{ end }}
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled and project.argocd */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}
