@@ -1,0 +1,32 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if and $project.enabled $project.argocd }}
+
+{{- /* initialize `sourceRepos` variable with either `$project.argocd.sourceRepos` list
+    if it is set or create a new default list from `$project.kubernetesRepository.url` only */}}
+{{ $sourceRepos := ternary $project.argocd.sourceRepos (list $project.kubernetesRepository.url) (hasKey $project.argocd "sourceRepos") -}}
+
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  labels: {{- toYaml $project.argocd.labels | nindent 4 }}
+  name: {{ $project.project }}
+  namespace: argo-cd
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $project.argocd.syncWave | default "200" | quote }}
+spec:
+  destinations:
+  - namespace: {{ $project.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  - namespace: ci
+    server: https://kubernetes.default.svc
+  orphanedResources:
+    warn: true
+  sourceRepos: {{ toYaml $sourceRepos | nindent 4 }}
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+---
+{{- end }} {{- /* if project.enabled and project.argocd */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}
