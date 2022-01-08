@@ -1,0 +1,28 @@
+{{ if .Values.rbac.client.ingressNginx }}
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: {{ .Values.rbac.client.name }}-readonly-role
+ namespace: ingress-nginx
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Values.rbac.client.name }}:developers
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.rbac.client.name }}-readonly-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ .Values.rbac.client.name }}:view
+
+{{ end }}
