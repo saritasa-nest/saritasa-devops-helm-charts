@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.15](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -50,6 +50,8 @@ Implements:
 - configmaps for each app
 - triggerbindings for each app
 - kubernetes job to make sure the PVCs are bound and argocd marks the app as healthy
+- argocd project for each app
+- argocd application for each app component
 
 ## `example usage with argocd`
 
@@ -107,6 +109,14 @@ spec:
         apps:
           - project: vp
             enabled: true
+            argocd:
+              labels:
+                created-by: xxx
+                ops-main: xxx
+                ops-secondary: xxx
+                pm: xxx
+                tm: xxx
+              namespace: prod
             mailList: vp@site.com
             devopsMailList: devops+vp@site.com
             jiraURL: https://site.atlassian.net/browse/vp
@@ -221,6 +231,14 @@ spec:
           apps:
             - project: xxx
               enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: prod
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -286,6 +304,140 @@ spec:
 
   ```
 
+  This chart also has flexible implementation to generate ArgoCD Project and Application manifests. There are below additional
+  parameters, which allow you to override default helm chart generation behavior.
+
+  Project extra vars
+
+  - apps[PROJECT].argocd.syncWave - set custom Project sync wave (default: "200")
+  - apps[PROJECT].argocd.sourceRepos[] - set custom Project source repositories as list of strings
+    (default: [<apps[PROJECT].kubernetesRepository.url>])
+
+  Application extra vars
+
+  - apps[PROJECT].components[NAME].argocd.appName - set custom Application name for the component
+    (default: "<apps[PROJECT].project>-<apps[PROJECT].components[NAME].name>-<environment>")
+  - apps[PROJECT].components[NAME].argocd.syncWave - set custom Application sync wave (default: "210")
+  - apps[PROJECT].components[NAME].argocd.source.path - set custom Application source path
+    (default: "apps/<apps[PROJECT].components[NAME].name>/manifests/<environment>")
+  - apps[PROJECT].components[NAME].argocd.source.repoUrl - set custom Application source repository url
+    (default: "<apps[PROJECT].kubernetesRepository.url>")
+  - apps[PROJECT].components[NAME].argocd.source.targetRevision - set custom Application source
+    repository target revision - branch or tag (default: "<apps[PROJECT].kubernetesRepository.branch>")
+
+  Example of helm chart with all extra parameters in `apps` section:
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: staging
+          ...
+          apps:
+            - project: xxx
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: prod
+                syncWave: "200"
+                sourceRepos:
+                  - git@github.com:saritasa-nest/custom-repo-1.git
+                  - git@github.com:saritasa-nest/custom-repo-2.git
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.site.com/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  argocd:
+                    appName: custom-backend-app-name
+                    syncWave: "210"
+                    source:
+                      path: "custom/dir"
+                      repoUrl: git@github.com:saritasa-nest/custom-repo-1.git
+                      targetRevision: custom-v1
+                  repository: xxx-backend
+                  pipeline: buildpack
+                  applicationURL: https://api.site.com
+                  eventlistener:
+                    template: buildpack-backend-build-pipeline-trigger-template
+                  extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
+                    KEY: value
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend
+                    - name: buildpack_builder_image
+                      value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
+
+                - name: frontend
+                  argocd:
+                    appName: custom-frontend-app-name
+                    syncWave: "210"
+                    source:
+                      path: "custom/dir"
+                      repoUrl: git@github.com:saritasa-nest/custom-repo-1.git
+                      targetRevision: custom-v1
+                  repository: xxx-frontend
+                  pipeline: buildpack
+                  applicationURL: https://site.com
+                  eventlistener:
+                    enableWebhookSecret: false
+                    filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
+                    template: buildpack-frontend-build-pipeline-trigger-template
+                    extraOverlays: []
+                    # - key: truncated_sha
+                    #   expression: "body.head_commit.id.truncate(7)"
+                    eventTypes: ["pull_request", "push"]
+                  extraBuildConfigParams: {}
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend
+                    - name: buildpack_builder_image
+                      value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/builder:full
+                    - name: buildpack_runner_image
+                      value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
+                    - name: source_subpath
+                      value: dist/web
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.14"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
 ## `chart.valuesTable`
 
 | Key | Type | Default | Description |
@@ -299,7 +451,7 @@ spec:
 | eventlistener.enableWebhookSecret | bool | `true` | should we enable eventlistener for tekton triggers? |
 | eventlistener.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
-| runPostInstallMountPvcJob | bool | `false` |  |
+| runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
 | slack.imagesLocation | string | `"https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com"` | slack notification images (s3 bucket prefix) |
 | slack.prefix | string | `"client"` | channel prefix |
