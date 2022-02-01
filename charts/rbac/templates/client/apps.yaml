@@ -1,0 +1,42 @@
+{{ if .Values.rbac.client.apps }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: {{ .Values.rbac.client.name }}-readonly-role
+ namespace: {{ .Release.Namespace }}
+rules:
+  - apiGroups: [""]
+    resources:  ["services", "pods", "pods/log", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods/portforward", "services/portforward", "pods/exec"]
+    verbs: ["create"]
+  - apiGroups: ["extensions"]
+    resources:  ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources:  ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources:  ["*"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["tekton.dev"]
+    resources:  ["*"]
+    verbs:  ["taskruns", "pipelineruns", "pipelines", "tasks"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ .Values.rbac.client.name }}:developers
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.rbac.client.name }}-readonly-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: {{ .Values.rbac.client.name }}:view
+
+{{ end }}

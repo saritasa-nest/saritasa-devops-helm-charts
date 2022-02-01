@@ -31,7 +31,7 @@ saritasa-rbac
 
 ## `chart.version`
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -41,7 +41,8 @@ saritasa-rbac
 
 ## `chart.description`
 
-A Helm chart for Kubernetes implementing RBAC rules
+A Helm chart for Kubernetes implementing RBAC rules for saritasa developers, devops and
+client's team members
 
 You can see role bindings this way
 
@@ -86,6 +87,9 @@ spec:
     helm:
       values: |
         rbac:
+          client:
+            name: "producebox"
+            apps: true
           developers:
             ci: true
             ingressNginx: true
@@ -156,6 +160,13 @@ extraRbac: |
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | extraRbac | string | `""` | additional rbac to add (should become multiline string) |
+| rbac.client.apps | bool | `true` | should we add prod/staging etc namespace access to client team members |
+| rbac.client.ci | bool | `false` | should we add ci namespace access to client team members |
+| rbac.client.ingressNginx | bool | `true` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
+| rbac.client.mssql | bool | `false` | should we add mssql (cli tools, port-forwarder) namespace access to client team members |
+| rbac.client.mysql | bool | `false` | should we add mysql (cli tools, port-forwarder) namespace access to client team members |
+| rbac.client.name | string | `""` | client name (single word, no spaces, dashes, columns), will be used in RBAC group naming. |
+| rbac.client.postgres | bool | `false` | should we add postgres (cli tools, port-forwarder) namespace access to client team members |
 | rbac.developers.ci | bool | `false` | should we add ci namespace access to saritasa developers |
 | rbac.developers.ingressNginx | bool | `false` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
 | rbac.developers.mssql | bool | `false` | should we add mssql (cli tools, port-forwarder) namespace access to saritasa developers |
