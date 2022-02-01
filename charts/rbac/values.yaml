@@ -1,7 +1,7 @@
 rbac:
   client:
     # -- client name (single word, no spaces, dashes, columns), will be used in RBAC group naming.
-    name: "producebox"
+    name: ""
     # -- should we add prod/staging etc namespace access to client team members
     apps: true
     # -- should we add ci namespace access to client team members

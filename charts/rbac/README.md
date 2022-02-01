@@ -31,7 +31,7 @@ saritasa-rbac
 
 ## `chart.version`
 
-![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.3](https://img.shields.io/badge/Version-0.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -165,7 +165,7 @@ extraRbac: |
 | rbac.client.ingressNginx | bool | `true` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
 | rbac.client.mssql | bool | `false` | should we add mssql (cli tools, port-forwarder) namespace access to client team members |
 | rbac.client.mysql | bool | `false` | should we add mysql (cli tools, port-forwarder) namespace access to client team members |
-| rbac.client.name | string | `"producebox"` | client name (single word, no spaces, dashes, columns), will be used in RBAC group naming. |
+| rbac.client.name | string | `""` | client name (single word, no spaces, dashes, columns), will be used in RBAC group naming. |
 | rbac.client.postgres | bool | `false` | should we add postgres (cli tools, port-forwarder) namespace access to client team members |
 | rbac.developers.ci | bool | `false` | should we add ci namespace access to saritasa developers |
 | rbac.developers.ingressNginx | bool | `false` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
