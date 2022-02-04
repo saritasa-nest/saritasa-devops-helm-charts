@@ -60,13 +60,19 @@ buildpacks:
           resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
-            #!/bin/bash
-            [ -f package.json ] && (
-              echo "install node.js dependencies"
-              yes | npm install --silent;
-              npm run build:$(params.environment);
-              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null;
-              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath); ) || (echo "unable to build $(params.environment) env" && exit 1;)
+          #!/bin/bash
+          if [[ -f package.json ]]
+          then
+            (
+            echo "install node.js dependencies";
+            npm ci --silent &&\
+            npm run build:$(params.environment) &&\
+            cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null;
+            chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
+            ) || (echo "unable to build $(params.environment) env" && exit 1);
+          else
+            echo "no package.json"
+          fi
           securityContext:
             privileged: true
 
