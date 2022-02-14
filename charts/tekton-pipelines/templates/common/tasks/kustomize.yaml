@@ -70,7 +70,7 @@ spec:
           echo "There are no changes, nothing to commit"
           exit
         fi
-
+        git commit -am "feat: $(params.environment) argocd deployment $(params.kustomize_overlay_path), new image: $(params.image)"
         # define retry delays appropriate for dash
         set -- "0" "1" "3" "5"
         for DELAY
@@ -86,9 +86,7 @@ spec:
           REMOTE_COMMIT=`git rev-parse origin/$(params.kubernetes_branch)`
           if [ $LOCAL_COMMIT != $REMOTE_COMMIT ]; then
             echo "Need to pull new changes"
-            git pull origin HEAD:$(params.kubernetes_branch)
+            git pull --rebase origin $(params.kubernetes_branch)
           fi
-
-          git commit -am "feat: $(params.environment) argocd deployment $(params.kustomize_overlay_path), new image: $(params.image)"
-          git push origin HEAD:$(params.kubernetes_branch) && break || true
+          git push origin $(params.kubernetes_branch) && break || true
         done
