@@ -106,10 +106,11 @@ buildpacks:
           script: |
             #!/bin/bash
             set -e
-            [ -f package.json ] && (
-              yes | npm install --silent;
-              npm run build:$(params.environment) || echo "unable to build $(params.environment)";
-              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found"
+            [ -f package.json ] && {
+              npm ci --silent
+              npm run build:$(params.environment) || echo "unable to build $(params.environment)"
+              rm -rf node_modules && echo "remove node_modules dir"
+            } || echo "No package.json found"
           securityContext:
             privileged: true
 
