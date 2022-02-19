@@ -61,12 +61,17 @@ buildpacks:
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
-            [ -f package.json ] && (
+            set -Eeo pipefail
+            
+            [ -f package.json ] && {
               echo "install node.js dependencies"
-              yes | npm install --silent;
-              npm run build:$(params.environment);
-              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null;
-              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath); ) || (echo "unable to build $(params.environment) env" && exit 1;)
+              npm ci --silent
+              npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir" || echo "unable to build $(params.environment)" && exit 1
+              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null
+              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
+            } || echo "No package.json found"
+            
+            echo "done"
           securityContext:
             privileged: true
 
@@ -101,10 +106,11 @@ buildpacks:
           script: |
             #!/bin/bash
             set -e
-            [ -f package.json ] && (
-              yes | npm install --silent;
-              npm run build:$(params.environment) || echo "unable to build $(params.environment)";
-              rm -rf node_modules && echo "remove node_modules dir";) || echo "No package.json found"
+            [ -f package.json ] && {
+              npm ci --silent
+              npm run build:$(params.environment) || echo "unable to build $(params.environment)"
+              rm -rf node_modules && echo "remove node_modules dir"
+            } || echo "No package.json found"
           securityContext:
             privileged: true
 
