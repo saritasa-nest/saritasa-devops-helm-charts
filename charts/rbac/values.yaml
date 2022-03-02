@@ -3,7 +3,7 @@ rbac:
     # -- client name (single word, no spaces, dashes, columns), will be used in RBAC group naming.
     name: ""
     # -- should we add prod/staging etc namespace access to client team members
-    apps: true
+    apps: false
     # -- should we add ci namespace access to client team members
     ci: false
     # -- should we add ability to work with ingress-nginx pods in ingress-nginx ns
@@ -14,7 +14,11 @@ rbac:
     mssql: false
     # -- should we add postgres (cli tools, port-forwarder) namespace access to client team members
     postgres: false
+    # -- should we add mongodb (cli tools, port-forwarder) namespace access to client team members
+    mongodb: false
   developers:
+    # -- should we give access to all applications to saritasa developers
+    apps: false
     # -- should we add ci namespace access to saritasa developers
     ci: false
     # -- should we add ability to work with ingress-nginx pods in ingress-nginx ns
@@ -25,6 +29,8 @@ rbac:
     mssql: false
     # -- should we add postgres (cli tools, port-forwarder) namespace access to saritasa developers
     postgres: false
+    # -- should we add mongodb (cli tools, port-forwarder) namespace access to saritasa developers
+    mongodb: false
   # -- should we create cluster role/binding for devops team
   devops: false
 
