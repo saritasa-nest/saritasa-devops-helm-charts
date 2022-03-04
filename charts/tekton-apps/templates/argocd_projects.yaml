@@ -2,9 +2,12 @@
 {{- range $project := .Values.apps }}
 {{- if and $project.enabled $project.argocd }}
 
+{{- /* initialize `kubernetesRepository` variable with either `$project.kubernetesRepository` dict
+    if it is set or create a new default empty dict */}}
+{{ $kubernetesRepository := ternary $project.kubernetesRepository (dict) (hasKey $project "kubernetesRepository") -}}
 {{- /* initialize `sourceRepos` variable with either `$project.argocd.sourceRepos` list
     if it is set or create a new default list from `$project.kubernetesRepository.url` only */}}
-{{ $sourceRepos := ternary $project.argocd.sourceRepos (list $project.kubernetesRepository.url) (hasKey $project.argocd "sourceRepos") -}}
+{{ $sourceRepos := ternary $project.argocd.sourceRepos (list $kubernetesRepository.url) (hasKey $project.argocd "sourceRepos") -}}
 
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject

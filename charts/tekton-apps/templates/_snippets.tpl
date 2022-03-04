@@ -133,7 +133,7 @@ Create a name of the kubernetes secret containing project component's SSH deploy
 Create a name of the kubernetes secret containing project kubernetes repository SSH deploy key
 */}}
 {{- define "tekton-apps.kubernetes-repo-deploy-key" -}}
-{{- printf "%s-deploy-key" .project.kubernetesRepository.name }}
+{{- printf "%s-deploy-key" (.project.kubernetesRepository).name | default "" }}
 {{- end }}
 
 {{/*
