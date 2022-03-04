@@ -133,7 +133,15 @@ Create a name of the kubernetes secret containing project component's SSH deploy
 Create a name of the kubernetes secret containing project kubernetes repository SSH deploy key
 */}}
 {{- define "tekton-apps.kubernetes-repo-deploy-key" -}}
-{{- printf "%s-deploy-key" .project.kubernetesRepository.name }}
+{{- if and (.argocd.source).repoUrl (.argocd.source).name }}
+{{- printf "%s-deploy-key" .argocd.source.name }}
+{{- end }}
+{{- if and (.argocd.source).repoUrl (not (.argocd.source).name) }}
+{{- printf "%s-%s-deploy-key" .project.project .component.name }}
+{{- end }}
+{{- if and (not (.argocd.source).repoUrl) (hasKey .project "kubernetesRepository") }}
+{{- printf "%s-deploy-key" (.project.kubernetesRepository).name | default "" }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -201,3 +209,223 @@ the way you use it:
   value: {{ .default }}
 {{- end -}}
 {{- end -}}
+
+
+{{/*
+Create `helm.Values` element for ArgoCD wordpress application
+*/}}
+{{- define "tekton-apps.argocd.wordpress.helmValues" -}}
+wordpressSkipInstall: false
+image:
+  repository: bitnami/wordpress
+  tag: {{ .wordpress.imageTag | default "5.7.2" }}
+  debug: true
+
+{{- if hasKey .wordpress "resources" }}
+resources:
+  {{- toYaml .wordpress.resources | nindent 2 }}
+{{- else }}
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+{{- end }}
+
+{{- if hasKey .wordpress "commonLabels" }}
+commonLabels:
+  {{- toYaml .wordpress.commonLabels | nindent 2 }}
+{{- else }}
+commonLabels:
+  tech_stack: php
+  application: wordpress
+{{- end }}
+
+wordpressEmail: devops+{{ .project.project }}@saritasa.com
+wordpressBlogName: {{ .project.project }}
+wordpressScheme: https
+wordpressTablePrefix: {{ .wordpress.wordpressTablePrefix | default "wp_" }}
+allowEmptyPassword: false
+existingSecret: {{ .wordpress.existingSecret | default (printf "%s-%s-%s" .project.project .component.name .environment) }}
+
+{{- if hasKey .wordpress "updateStrategy" }}
+updateStrategy:
+  {{- toYaml .wordpress.updateStrategy | nindent 2 }}
+{{- else }}
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 0%
+    maxUnavailable: 100%
+{{- end }}
+
+replicaCount: 1
+
+{{- if hasKey .wordpress "smtp" }}
+smtpHost: {{ .wordpress.smtp.host }}
+smtpPort: {{ .wordpress.smtp.port }}
+smtpUser: {{ .wordpress.smtp.user }}
+smtpPassword: {{ .wordpress.smtp.password }}
+{{- else }}
+smtpHost: mailhog.mailhog.svc.cluster.local
+smtpPort: 1025
+smtpUser: {{ .project.project }}
+smtpPassword: anypassword
+{{- end }}
+
+{{ if hasKey .wordpress "nodeSelector" }}
+nodeSelector:
+  {{- range $k, $v := .wordpress.nodeSelector }}
+  {{ $k }}: {{ $v | quote}}
+  {{- end }}
+{{- else }}
+nodeSelector:
+  tech_stack: php
+  pvc: "true"
+{{- end }}
+
+{{ if hasKey .wordpress "podSecurityContext" }}
+podSecurityContext:
+  {{- range $k, $v := .wordpress.podSecurityContext }}
+  {{ $k }}: {{ $v }}
+  {{- end }}
+{{- else }}
+podSecurityContext:
+  enabled: true
+  fsGroup: 1000
+{{- end }}
+
+{{ if hasKey .wordpress "containerSecurityContext" }}
+containerSecurityContext:
+  {{- range $k, $v := .wordpress.containerSecurityContext }}
+  {{ $k }}: {{ $v }}
+  {{- end }}
+{{- else }}
+containerSecurityContext:
+  enabled: true
+  runAsUser: 1000
+{{- end }}
+
+{{ if ternary .wordpress.ci "true" (hasKey .wordpress "ci") }}
+initContainers:
+  - name: install
+    image: jnewland/git-and-stuff
+    imagePullPolicy: Always
+    command:
+      - bash
+      - -c
+      - |
+        git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ .wordpress.repository_ssh_url }} /tmp/wordpress
+        cp -Rf /tmp/wordpress/wp-content/* /bitnami/wordpress/wp-content/
+        cd /tmp/wordpress
+        git_branch=`git rev-parse --abbrev-ref HEAD`
+        git_log=`git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD`
+        msg="[$git_branch] $git_log"
+        printf "%0.s-" $(seq 1 ${#msg})
+        echo
+        echo "$msg"
+        printf "%0.s-" $(seq 1 ${#msg})
+        echo
+        ls -la /tmp/wordpress/wp-content
+        echo "Folder wp-content copied from git repo into bitnami/wodpress"
+        echo "Done INIT"
+    volumeMounts:
+    - mountPath: /bitnami/wordpress
+      name: wordpress-data
+      subPath: wordpress
+    - mountPath: /home/app/.ssh/id_rsa
+      name: ssh-key
+      subPath: ssh-privatekey
+    - mountPath: /home/app/.ssh/known_hosts
+      name: github-known-hosts
+      subPath: config.ssh
+{{- if .wordpress.extraInitContainers }}
+{{ toYaml .wordpress.extraInitContainers | indent 2 }}
+{{- end }}
+
+extraVolumes:
+- name: ssh-key
+  secret:
+    secretName: {{ .wordpress.extraVolumesSshKeySecret | default (printf "%s-%s-deploy-key" .project.project .component.name) }}
+- name: github-known-hosts
+  configMap:
+    name: github-known-hosts
+{{- if .wordpress.extraVolumes }}
+{{- toYaml .wordpress.extraVolumes | nindent 0 }}
+{{- end }}
+{{- end }}
+
+livenessProbe:
+  httpGet:
+    path: /wp-admin/install.php
+    port: 8080
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /wp-admin/install.php
+    port: 8080
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  certManager: true
+  hostname: {{ ((.wordpress).ingress).hostname | default (printf "%s.saritasa.rocks" .project.project) }}
+  {{- if ((.wordpress).ingress).annotations }}
+  annotations:
+    {{- range $k, $v := .wordpress.ingress.annotations }}
+    {{ $k }}: {{ $v | quote}}
+    {{- end }}
+  {{- else }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "300"
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: {{ ((.wordpress).ingress).authSecret | default (printf "%s-%s-%s-basic-auth" .project.project .component.name .environment) }}
+    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+    nginx.ingress.kubernetes.io/server-snippet: |-
+      add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+  {{- end }}
+
+  tls: true
+  {{- if ((.wordpress).ingress).extraHosts }}
+  extraHosts:
+    {{- range .wordpress.ingress.extraHosts }}
+    - name: {{ .name | quote }}
+      path: {{ default "/" .path }}
+      backend: {{ .backend | default dict }}
+    {{- end }}
+  {{- end }}
+
+persistence:
+  enabled: true
+  storageClass: gp2
+
+metrics:
+  enabled: true
+
+mariadb:
+  enabled: false
+
+externalDatabase:
+  host: {{ .wordpress.externalDatabase.host }}
+  user: {{ .wordpress.externalDatabase.user }}
+  existingSecret: {{ .wordpress.externalDatabase.existingSecret }}
+  database: {{ .wordpress.externalDatabase.database }}
+  port: {{ .wordpress.externalDatabase.port | default "3306" }}
+
+{{- if hasKey .wordpress "wordpressExtraConfigContent" }}
+wordpressExtraConfigContent:
+{{- toYaml .wordpress.wordpressExtraConfigContent | indent 2 }}
+{{- end }}
+
+{{- if hasKey .wordpress "extraEnvVars" }}
+  extraEnvVars:
+{{- toYaml .wordpress.extraEnvVars | indent 2 }}
+{{- end }}
+{{ end }}
