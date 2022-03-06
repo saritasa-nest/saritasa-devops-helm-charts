@@ -62,15 +62,15 @@ buildpacks:
           script: |
             #!/bin/bash
             set -Eeo pipefail
-            
+
             [ -f package.json ] && {
               echo "install node.js dependencies"
               npm ci --silent
-              npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir" || echo "unable to build $(params.environment)" && exit 1
+              (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
             } || echo "No package.json found"
-            
+
             echo "done"
           securityContext:
             privileged: true
