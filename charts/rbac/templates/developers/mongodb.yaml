@@ -1,10 +1,10 @@
-{{ if ((.Values.rbac).client).mysql }}
+{{ if .Values.rbac.developers.mongodb }}
 
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
- name: {{ .Values.rbac.client.name }}-readonly-role
- namespace: mysql
+ name: saritasa-developers-role
+ namespace: mongodb
 rules:
   - apiGroups: [""]
     resources: ["pods"]
@@ -17,15 +17,15 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ .Values.rbac.client.name }}:developers
-  namespace: mysql
+  name: saritasa:developers
+  namespace: mongodb
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ .Values.rbac.client.name }}-readonly-role
+  name: saritasa-developers-role
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
-  name: {{ .Values.rbac.client.name }}:view
+  name: saritasa:sso:developers
 
 {{ end }}

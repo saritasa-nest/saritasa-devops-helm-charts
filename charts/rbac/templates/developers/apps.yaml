@@ -1,4 +1,5 @@
-{{ if .Values.rbac.developers }}
+{{ if .Values.rbac.developers.apps }}
+
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -9,7 +10,7 @@ rules:
     resources:  ["services", "pods", "pods/log", "configmaps"]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
-    resources: ["pods/portforward", "services/portforward", "pods/exec"]
+    resources: ["pods/portforward", "services/portforward", "pods/exec", "jobs"]
     verbs: ["create"]
   - apiGroups: ["extensions"]
     resources:  ["*"]
