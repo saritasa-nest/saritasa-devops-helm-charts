@@ -219,6 +219,54 @@ buildpacks:
             chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
             echo "semantic version updated"
 
+        - name: build-static
+          image: node:14
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            set -Eeo pipefail
+
+            # let's parse the buildpack.yml file in the root of the repo that should contain the path to the 
+            # source of the project. In that internal folder we expect package.json file if it exists.
+            [ -f buildpack.yml ] && {
+              npm i -g js-yaml
+              package_path=$(js-yaml buildpack.yml | jq -r '."dotnet-build"."project-path"')
+              cd $package_path
+              pwd
+
+              [ -f package.json ] && {
+                echo "install node.js dependencies"
+                npm ci --silent                
+                (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)                                
+              } || echo "No package.json found"
+
+            } | echo "no buildpack.yml file found"
+            
+            
+            echo "done"
+          securityContext:
+            privileged: true
+
+          script: |
+            #!/bin/bash
+            set -e
+
+            
+            npm i -g js-yaml
+
+            [ -f package.json ] && {}
+
+
+            [ -f package.json ] && {
+              npm ci --silent
+              npm run build:$(params.environment) || echo "unable to build $(params.environment)"
+              rm -rf node_modules && echo "remove node_modules dir"
+            } || echo "No package.json found"
+          securityContext:
+            privileged: true
+
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │
 # │ Various Nodejs legacy projects                                                                                       │
