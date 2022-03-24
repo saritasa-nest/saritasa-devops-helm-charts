@@ -62,7 +62,7 @@ buildpacks:
           script: |
             #!/bin/bash
             set -Eeo pipefail
-            
+
             [ -f package.json ] && {
               echo "install node.js dependencies"
               npm ci --silent
@@ -70,7 +70,7 @@ buildpacks:
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
             } || echo "No package.json found"
-            
+
             echo "done"
           securityContext:
             privileged: true
@@ -228,21 +228,29 @@ buildpacks:
             #!/bin/bash
             set -Eeo pipefail
 
-            # let's parse the buildpack.yml file in the root of the repo that should contain the path to the 
-            # source of the project. In that internal folder we expect package.json file if it exists.
-            [ -f buildpack.yml ] && {
-              npm i -g js-yaml
-              package_path=$(js-yaml buildpack.yml | jq -r '."dotnet-build"."project-path"')
-              cd $package_path
-              pwd
+            if [ ! -f buildpack.yml ]; then
+              echo "no buildpack.yml file found"
+              exit 0
+            fi
 
-              [ -f package.json ] && {
-                echo "install node.js dependencies"
-                npm ci --silent
-                (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
-              } || echo "No package.json found"
+            # download jq
+            # install js-yaml, which converts yaml to json
+            npm i -g js-yaml
+            wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O ./jq
+            chmod +x jq
 
-            } | echo "no buildpack.yml file found"
+            package_path=$(js-yaml buildpack.yml | ./jq -r '."dotnet-build"."project-path"')
+
+            # the package.json is expected to be in that folder that we get from
+            # buildpack.yml file
+            cd "$package_path"
+
+            [ -f package.json ] && {
+              echo "install node.js dependencies"
+              npm ci --silent
+              (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
+            } || echo "No package.json found"
+
             echo "done"
           securityContext:
             privileged: true
