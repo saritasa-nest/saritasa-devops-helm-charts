@@ -1050,6 +1050,51 @@ entries:
   saritasa-tekton-pipelines:
   - apiVersion: v2
     appVersion: v0.28.2
+    created: "2022-03-24T22:46:49.286541769Z"
+    dependencies:
+    - condition: saritasa-tekton.enabled
+      name: saritasa-tekton
+      repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      version: ~0.1.x
+    description: 'A Helm chart for Tekton Pipelines  Implements: - common tekton tasks
+      - common tekton pipelines - common tekton trigger templates - common tekton
+      trigger bindings  Implemented pipelines include: - buildpack based pipelines
+      based on generator template (php, python, frontend, nodejs, ruby, go) - kaniko
+      pipeline - wordpress pipeline  ## `example usage with argocd`  Install the chart:  ```
+      helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      ```  then if you want to support only frontend and django pipelines based on
+      buildpack without any script modifications:  ```yaml apiVersion: argoproj.io/v1alpha1
+      kind: Application metadata:   name: tekton-pipelines   namespace: argo-cd   finalizers:   -
+      resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "60" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: ci   project: default   source:     chart:
+      saritasa-tekton-pipelines     helm:       values: |         buildpacks:           enabled:
+      true           generate:             buildpackFrontendBuildPipeline:               enabled:
+      true              buildpackDjangoBuildPipeline:               enabled: true      repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.4"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true ```  If you want to modify the behavior of the build step
+      you can easily do that by redefining steps you want to run prior to running
+      the `build` step of the associated buildpack pipeline. You can create multiple
+      versions of pipelines as a result. Just make sure to give them a different name  an
+      example:  ```yaml buildpacks:   enabled: true   generate:     buildpackFrontendBuildPipelineNew:       name:
+      buildpack-frontend-build-pipeline-new       enabled: false       buildTaskName:
+      buildpack-frontend-new       buildTaskSteps:         - name: hello1           image:
+      node:14           imagePullPolicy: IfNotPresent           workingDir: $(resources.inputs.app.path)           script:
+      |             #!/bin/bash             echo "hello world1"          - name: hello2           image:
+      node:15           imagePullPolicy: IfNotPresent           workingDir: $(resources.inputs.app.path)           script:
+      |             #!/bin/bash             echo "hello world2" ``` '
+    digest: b1152ec5d694a0e25e9ef1ad246c65b90d5ef271709f9b2b10cf15fb0df9028c
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-pipelines
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.13/saritasa-tekton-pipelines-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
+    appVersion: v0.28.2
     created: "2022-03-06T02:41:03.833313587Z"
     dependencies:
     - condition: saritasa-tekton.enabled
@@ -1520,4 +1565,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2022-03-06T02:41:03.833498489Z"
+generated: "2022-03-24T22:46:49.286734569Z"
