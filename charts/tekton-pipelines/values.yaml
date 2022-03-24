@@ -239,12 +239,12 @@ buildpacks:
             wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O ./jq
             chmod +x jq
 
-            package_path=$(js-yaml buildpack.yml | ./jq -r '."dotnet-build"."project-path"')
-
             # the package.json is expected to be in that folder that we get from
             # buildpack.yml file
+            package_path=$(js-yaml buildpack.yml | ./jq -r '."dotnet-build"."project-path"')
             cd "$package_path"
 
+            # if that folder has package.json then run build:ENV task
             [ -f package.json ] && {
               echo "install node.js dependencies"
               npm ci --silent
