@@ -33,6 +33,21 @@ entries:
     version: 0.0.1
   jitsi-meet:
   - apiVersion: v2
+    appVersion: stable-6865
+    created: "2022-03-25T05:38:50.271899356Z"
+    dependencies:
+    - condition: prosody.enabled
+      name: prosody
+      repository: ""
+      version: 1.2.2
+    description: A Helm chart for Kubernetes
+    digest: ca1951306580638b6fd48b2762748295d7a21eca37df14e3554e8cc987d10762
+    name: jitsi-meet
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/jitsi-meet-1.2.2/jitsi-meet-1.2.2.tgz
+    version: 1.2.2
+  - apiVersion: v2
     appVersion: stable-5963
     created: "2021-10-25T08:01:39.84945535Z"
     dependencies:
@@ -1655,4 +1670,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2022-03-25T00:25:51.087768154Z"
+generated: "2022-03-25T05:38:50.584002236Z"
