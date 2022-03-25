@@ -249,6 +249,8 @@ buildpacks:
               echo "install node.js dependencies"
               npm ci --silent
               (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
+              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+              chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
             } || echo "No package.json found"
 
             echo "done"
