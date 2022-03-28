@@ -358,12 +358,14 @@ livenessProbe:
   httpGet:
     path: /wp-admin/install.php
     port: 8080
+    scheme: HTTP
 
 readinessProbe:
   enabled: true
   httpGet:
     path: /wp-admin/install.php
     port: 8080
+    scheme: HTTP
 
 service:
   type: ClusterIP
