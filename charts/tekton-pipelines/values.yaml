@@ -62,7 +62,7 @@ buildpacks:
           script: |
             #!/bin/bash
             set -Eeo pipefail
-            
+
             [ -f package.json ] && {
               echo "install node.js dependencies"
               npm ci --silent
@@ -70,7 +70,7 @@ buildpacks:
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
             } || echo "No package.json found"
-            
+
             echo "done"
           securityContext:
             privileged: true
@@ -218,6 +218,44 @@ buildpacks:
             chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
             chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
             echo "semantic version updated"
+
+        - name: build-static
+          image: node:14
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            set -Eeo pipefail
+
+            if [ ! -f buildpack.yml ]; then
+              echo "no buildpack.yml file found"
+              exit 0
+            fi
+
+            # download jq
+            # install js-yaml, which converts yaml to json
+            npm i -g js-yaml
+            wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O ./jq
+            chmod +x jq
+
+            # the package.json is expected to be in that folder that we get from
+            # buildpack.yml file
+            package_path=$(js-yaml buildpack.yml | ./jq -r '."dotnet-build"."project-path"')
+            cd "$package_path"
+
+            # if that folder has package.json then run build:ENV task
+            [ -f package.json ] && {
+              echo "install node.js dependencies"
+              npm ci --silent
+              (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
+              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+              chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+            } || echo "No package.json found"
+
+            echo "done"
+          securityContext:
+            privileged: true
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │

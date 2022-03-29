@@ -44,7 +44,7 @@ saritasa-rbac
 A Helm chart for Kubernetes implementing RBAC rules for saritasa developers, devops and
 client's team members
 
-You can see role bindings this way
+You can see role bindings this way:
 
 ```sh
 ➜ k krew install rbac-lookup

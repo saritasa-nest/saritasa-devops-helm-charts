@@ -1,8 +1,3 @@
-# Deprecated!!!
-
-As of March 22 2022 this cart is deprecated. Official one should be used
-[https://github.com/jitsi-contrib/jitsi-helm](https://github.com/jitsi-contrib/jitsi-helm)
-
 # jitsi-meet
 
 ![Version: 0.2.4](https://img.shields.io/badge/Version-0.2.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: stable-5963](https://img.shields.io/badge/AppVersion-stable--5963-informational?style=flat-square)
