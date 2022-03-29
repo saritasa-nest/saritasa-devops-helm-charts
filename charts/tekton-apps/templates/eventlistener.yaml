@@ -15,6 +15,9 @@ spec:
   # {{ $project.project | upper }} PROJECT
   {{- range $component := $project.components }}
 
+  {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+  {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
   {{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
   {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
 
@@ -34,7 +37,7 @@ spec:
 
   {{- $data := dict "project"           $project
                     "component"         $component
-                    "environment"       $.Values.environment
+                    "environment"       $projectEnvironment
                     "eventlistener"     $.Values.eventlistener
                     "gitBranchPrefixes" $gitBranchPrefixes }}
   {{- include "tekton-apps.eventlistener.trigger" $data | nindent 4 }}

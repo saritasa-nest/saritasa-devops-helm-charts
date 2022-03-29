@@ -3,6 +3,9 @@
 {{- if and $project.enabled $project.argocd}}
 {{- range $component := $project.components }}
 
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
 {{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
 {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
 
@@ -18,13 +21,13 @@
 
 {{- $data := dict "project"     $project
                   "component"   $component
-                  "environment" $.Values.environment
+                  "environment" $projectEnvironment
                   "wordpress"   $wordpress }}
 
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $.Values.environment) }}
+  name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $projectEnvironment) }}
   namespace: argo-cd
   annotations:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
@@ -47,7 +50,7 @@ spec:
       values: |
         {{- include "tekton-apps.argocd.wordpress.helmValues" $data | nindent 8 }}
     {{ else }}
-    path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $.Values.environment) }}
+    path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) }}
     {{ end }}
     repoURL: {{ $argocdSource.repoUrl | default $kubernetesRepository.url }}
     targetRevision: {{ $argocdSource.targetRevision | default $kubernetesRepository.branch }}

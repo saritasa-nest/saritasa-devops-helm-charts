@@ -50,7 +50,44 @@ eventlistener:
 
 
 # -- list of projects and the project's apps to be triggered
-apps: []
+apps:
+
+    - project: saritasa-ar-conference-map
+      enabled: true
+      environment: prod
+      argocd:
+        labels:
+          created-by: DanilaKazakevich
+          ops-main: DanilaKazakevich
+          ops-secondary: RomanChubar
+          pm: RomanGorbil
+          tm: RomanGorbil
+        namespace: saritasa-ar-conference-map
+      mailList: saritasa-ar-conference-map@saritasa.com
+      devopsMailList: devops+saritasa-ar-conference-map@saritasa.com
+      jiraURL: https://saritasa.atlassian.net/browse/PC19
+      tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+      slack: client-saritasa-ar-conference-map-ci
+      kubernetesRepository:
+        name: saritasa-ar-conference-map-kubernetes-aws
+        branch: main
+        url: git@github.com:saritasa-nest/saritasa-ar-conference-map-kubernetes-aws.git
+
+      components:
+        - name: backend
+          repository: saritasa-ar-conference-map-backend
+          pipeline: buildpack-django-build-pipeline
+          applicationURL: https://backend.saritasa-ar-conference-map.saritasa.rocks
+          eventlistener:
+            template: buildpack-django-build-pipeline-trigger-template
+          triggerBinding:
+            - name: docker_registry_repository
+              value: 965067289393.dkr.ecr.us-west-2.amazonaws.com/saritasa-ar-conference-map/backend
+            - name: buildpack_builder_image
+              value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+            - name: buildpack_runner_image
+              value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+
   # - project: xxx
   #   enabled: true
   #   argocd:

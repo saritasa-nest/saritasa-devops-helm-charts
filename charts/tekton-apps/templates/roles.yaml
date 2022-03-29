@@ -4,6 +4,9 @@
 {{- if $project.enabled }}
 {{- range $component := $project.components }}
 
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
 {{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
 {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
 
@@ -12,7 +15,7 @@
 
 {{- $data := dict "project"           $project
                   "component"         $component
-                  "environment"       $.Values.environment }}
+                  "environment"       $projectEnvironment }}
 
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1

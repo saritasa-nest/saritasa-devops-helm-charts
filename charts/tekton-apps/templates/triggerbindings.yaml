@@ -3,15 +3,22 @@
 
 {{- if $project.enabled }}
 {{- range $component := $project.components }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
 {{- $data := dict "project"           $project
                   "component"         $component
-                  "environment"       $.Values.environment }}
+                  "environment"       $projectEnvironment }}
 
 
 {{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
 {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
 
 {{- /* initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict */}}
+{{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
+
+{{- /* initialize `component` variable with either `$argocd.source` dict if it exists or with empty dict */}}
 {{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
 
 # ========================================================================
@@ -26,7 +33,7 @@ spec:
   params:
   - name: application
     value: {{ include "tekton-apps.resourceName" $data }}
-  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $.Values.environment ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- if $.Values.defaultRegistry }}
   - name: docker_registry
     value: {{ $.Values.defaultRegistry }}
@@ -38,12 +45,12 @@ spec:
   - name: kubernetes_branch
     value: {{ $argocdSource.targetRevision | default "main" }}
   - name: kubernetes_repository_kustomize_path
-    value: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $.Values.environment) }}
+    value: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) }}
   {{- else }}
   - name: kubernetes_repository_ssh_url
     value: {{ $project.kubernetesRepository.url }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_branch" "default" "main" ) | nindent 2 }}
-  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_repository_kustomize_path" "default" (printf "apps/%s/manifests/%s" $component.name $.Values.environment) ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_repository_kustomize_path" "default" (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) ) | nindent 2 }}
   {{- end }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
 ---
