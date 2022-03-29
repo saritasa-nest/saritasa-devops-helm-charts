@@ -139,6 +139,8 @@ description: |
                     - name: source_subpath
                       value: dist/web
 
+                -
+
           # make sure PVCs are bound after the chart is synced
           # by temporarily mount them into short-live job.
           runPostInstallMountPvcJob: false
@@ -409,6 +411,88 @@ description: |
                         value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
                       - name: source_subpath
                         value: dist/web
+
+        repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+        targetRevision: "0.1.14"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+    ```
+
+    Example of `wordpress` argocd application:
+
+    ```yaml
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: tekton-apps
+      namespace: argo-cd
+      finalizers:
+      - resources-finalizer.argocd.argoproj.io
+      annotations:
+        argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+        argocd.argoproj.io/sync-wave: "41"
+    spec:
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: ci
+      project: default
+      source:
+        chart: saritasa-tekton-apps
+        helm:
+          values: |
+            environment: staging
+            ...
+            apps:
+              - project: xxx
+                enabled: true
+                argocd:
+                  labels:
+                    created-by: xxx
+                    ops-main: xxx
+                    ops-secondary: xxx
+                    pm: xxx
+                    tm: xxx
+                  namespace: staging
+                  sourceRepos:
+                    - https://charts.bitnami.com/bitnami
+                mailList: xxx@saritasa.com
+                devopsMailList: devops+xxx@saritasa.com
+                jiraURL: https://saritasa.atlassian.net/browse/xxx
+                tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+                slack: client-xxx-ci
+
+                components:
+                  - name: wordpress
+                    repository: xxx-wordpress
+                    pipeline: wordpress-build-pipeline
+                    applicationURL: https://xxx.saritasa.rocks
+                    argocd:
+                      source:
+                        repoUrl: https://charts.bitnami.com/bitnami
+                        targetRevision: 13.1.4
+                      wordpress:
+                        imageTag: "5.9.1"
+                        wordpressTablePrefix: "wp_4bf893a6b5_"
+                        wordpressExtraConfigContent: |
+                          @ini_set('WP_MEMORY_LIMIT', '512M');
+                          @ini_set('ALLOW_UNFILTERED_UPLOADS', true);
+                        repository_ssh_url: git@github.com:saritasa-nest/xxx-wordpress.git
+                        ingress:
+                          hostname: xxx.saritasa.rocks
+                        externalDatabase:
+                          host: saritasa-rocks-mysql.c0mmwx1lnh10.us-west-2.rds.amazonaws.com
+                          user: xxx-wp-user-dev
+                          existingSecret: xxx-wordpress-dev-externaldb
+                          database: xxx-wp-dev
+                    eventlistener:
+                      template: wordpress-build-pipeline-trigger-template
+                    triggerBinding:
+                      - name: kubernetes_namespace
+                        value: xxx
 
         repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
         targetRevision: "0.1.14"
