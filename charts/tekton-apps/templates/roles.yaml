@@ -7,12 +7,6 @@
 {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
-{{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
-{{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
-
-{{- /* initialize `wordpress` variable with either `$argocd.wordpress` dict if it exists or with empty dict */}}
-{{ $wordpress := ternary $argocd.wordpress dict (hasKey $argocd "wordpress") -}}
-
 {{- $data := dict "project"           $project
                   "component"         $component
                   "environment"       $projectEnvironment }}
@@ -32,26 +26,6 @@ rules:
   - apiGroups:  ["tekton.dev"]
     resources:  ["pipelineruns"]
     verbs:      ["get", "list", "create"]
-
-{{- /* wordpress projects needs a separate role to be able to stop old pod in project's namespace and start a new one */}}
-{{- if $wordpress }}
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
- name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role") }}
- namespace: {{ $project.argocd.namespace }}
-rules:
-  - apiGroups:  ["extensions", "apps", "batch", ""]
-    resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
-    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
-  - apiGroups:  [""]
-    resources:  ["pods/log"]
-    verbs:      ["get", "list", "watch"]
-  - apiGroups:  ["tekton.dev"]
-    resources:  ["pipelineruns"]
-    verbs:      ["get", "list", "create"]
-{{- end }}
 
 ---
 kind: Role
@@ -98,23 +72,6 @@ subjects:
   name: build-bot-sa
   namespace: {{ $.Release.Namespace }}
 
-{{- /* wordpress projects needs a separate role to be able to stop old pod in project's namespace and start a new one */}}
-{{- if $wordpress }}
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role-binding") }}
-  namespace: {{ $project.argocd.namespace }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role") }}
-subjects:
-- kind: ServiceAccount
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
-  namespace: {{ $.Release.Namespace }}
-{{- end }}
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -162,7 +119,7 @@ subjects:
 
 ---
 
-{{- end }} # range component
-{{- end }} # if project.enabled
-{{- end }} # range
-{{- end }} # if apps
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}

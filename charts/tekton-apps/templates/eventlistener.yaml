@@ -18,22 +18,12 @@ spec:
   {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
   {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
-  {{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
-  {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
-
-  {{- /* initialize `wordpress` variable with either `$argocd.wordpress` dict if it exists or with empty dict */}}
-  {{ $wordpress := ternary $argocd.wordpress dict (hasKey $argocd "wordpress") -}}
-
-  {{- /* if wordpress.ci is set to `true` or `nil` - it means that project uses wordpress deployment, otherwise - not */}}
-  {{ if ternary $wordpress.ci "true" (hasKey $wordpress "ci") }}
+  {{- /* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
+  {{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
 
   # ========================================================================
   # 🐤 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT
   # ========================================================================
-
-  {{- /* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches`
-  list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
-  {{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
 
   {{- $data := dict "project"           $project
                     "component"         $component
@@ -41,8 +31,8 @@ spec:
                     "eventlistener"     $.Values.eventlistener
                     "gitBranchPrefixes" $gitBranchPrefixes }}
   {{- include "tekton-apps.eventlistener.trigger" $data | nindent 4 }}
-  {{- end }} # range component
-  {{- end }} # if project.enabled
-  {{- end }} # if $wordpress.ci
-  {{- end }} # range
-  {{- end }} # if apps
+
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}

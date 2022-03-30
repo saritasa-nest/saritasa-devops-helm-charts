@@ -41,6 +41,6 @@ data:
   {{ end }}
 ---
 
-{{- end }} # range component
-{{- end }} # if project.enabled
-{{- end }} # range project
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}

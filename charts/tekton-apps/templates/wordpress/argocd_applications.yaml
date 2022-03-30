@@ -1,0 +1,267 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if and $project.enabled }}
+{{- range $component := $project.components }}
+{{- if hasKey $component "wordpress" }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+{{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
+{{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
+
+{{- /* initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict */}}
+{{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $projectEnvironment) }}
+  namespace: argo-cd
+  annotations:
+    argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
+spec:
+  destination:
+    namespace: {{ $project.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  ignoreDifferences:
+  - group: v1
+    jsonPointers:
+    - /metadata/labels
+    kind: secret
+  project: {{ $project.project }}
+  source:
+    chart: wordpress
+    helm:
+      values: |
+        wordpressSkipInstall: false
+        image:
+          repository: bitnami/wordpress
+          tag: {{ $component.wordpress.imageTag | default "5.7.2" }}
+          debug: true
+
+        {{- if hasKey $component.wordpress "resources" }}
+        resources:
+          {{- toYaml $component.wordpress.resources | nindent 10 }}
+        {{- else }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        {{- end }}
+
+        {{- if hasKey $component.wordpress "commonLabels" }}
+        commonLabels:
+          {{- toYaml $component.wordpress.commonLabels | nindent 10 }}
+        {{- else }}
+        commonLabels:
+          tech_stack: php
+          application: wordpress
+        {{- end }}
+
+        wordpressEmail: devops+{{ $project.project }}@saritasa.com
+        wordpressBlogName: {{ $project.project }}
+        wordpressScheme: https
+        wordpressTablePrefix: {{ $component.wordpress.wordpressTablePrefix | default "wp_" }}
+        allowEmptyPassword: false
+        existingSecret: {{ $component.wordpress.existingSecret | default (printf "%s-%s-%s" $project.project $component.name $projectEnvironment) }}
+
+        {{- if hasKey $component.wordpress "updateStrategy" }}
+        updateStrategy:
+          {{- toYaml $component.wordpress.updateStrategy | nindent 10 }}
+        {{- else }}
+        updateStrategy:
+          type: RollingUpdate
+          rollingUpdate:
+            maxSurge: 0%
+            maxUnavailable: 100%
+        {{- end }}
+
+        replicaCount: 1
+
+        {{- if hasKey $component.wordpress "smtp" }}
+        smtpHost: {{ $component.wordpress.smtp.host }}
+        smtpPort: {{ $component.wordpress.smtp.port }}
+        smtpUser: {{ $component.wordpress.smtp.user }}
+        smtpPassword: {{ $component.wordpress.smtp.password }}
+        {{- else }}
+        smtpHost: mailhog.mailhog.svc.cluster.local
+        smtpPort: 1025
+        smtpUser: {{ $project.project }}
+        smtpPassword: anypassword
+        {{- end }}
+
+        {{ if hasKey $component.wordpress "nodeSelector" }}
+        nodeSelector:
+          {{- range $k, $v := $component.wordpress.nodeSelector }}
+          {{ $k }}: {{ $v | quote}}
+          {{- end }}
+        {{- else }}
+        nodeSelector:
+          tech_stack: php
+          pvc: "true"
+        {{- end }}
+
+        {{ if hasKey $component.wordpress "podSecurityContext" }}
+        podSecurityContext:
+          {{- range $k, $v := $component.wordpress.podSecurityContext }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- else }}
+        podSecurityContext:
+          enabled: true
+          fsGroup: 1000
+        {{- end }}
+
+        {{ if hasKey $component.wordpress "containerSecurityContext" }}
+        containerSecurityContext:
+          {{- range $k, $v := $component.wordpress.containerSecurityContext }}
+          {{ $k }}: {{ $v }}
+          {{- end }}
+        {{- else }}
+        containerSecurityContext:
+          enabled: true
+          runAsUser: 1000
+        {{- end }}
+
+        {{ if ternary $component.wordpress.ci "true" (hasKey $component.wordpress "ci") }}
+        initContainers:
+          - name: install
+            image: jnewland/git-and-stuff
+            imagePullPolicy: Always
+            command:
+              - bash
+              - -c
+              - |
+                git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ $component.wordpress.repository_ssh_url }} /tmp/wordpress
+                cp -Rf /tmp/wordpress/wp-content/* /bitnami/wordpress/wp-content/
+                cd /tmp/wordpress
+                git_branch=`git rev-parse --abbrev-ref HEAD`
+                git_log=`git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD`
+                msg="[$git_branch] $git_log"
+                printf "%0.s-" $(seq 1 ${#msg})
+                echo
+                echo "$msg"
+                printf "%0.s-" $(seq 1 ${#msg})
+                echo
+                ls -la /tmp/wordpress/wp-content
+                echo "Folder wp-content copied from git repo into bitnami/wodpress"
+                echo "Done INIT"
+            volumeMounts:
+            - mountPath: /bitnami/wordpress
+              name: wordpress-data
+              subPath: wordpress
+            - mountPath: /home/app/.ssh/id_rsa
+              name: ssh-key
+              subPath: ssh-privatekey
+            - mountPath: /home/app/.ssh/known_hosts
+              name: github-known-hosts
+              subPath: config.ssh
+        {{- if hasKey $component.wordpress "extraInitContainers" }}
+        {{ toYaml $component.wordpress.extraInitContainers | nindent 10 }}
+        {{- end }}
+
+        extraVolumes:
+        - name: ssh-key
+          secret:
+            secretName: {{ $component.wordpress.extraVolumesSshKeySecret | default (printf "%s-%s-deploy-key" $project.project $component.name) }}
+        - name: github-known-hosts
+          configMap:
+            name: github-known-hosts
+        {{- if hasKey $component.wordpress "extraVolumes" }}
+        {{- toYaml $component.wordpress.extraVolumes | nindent 8 }}
+        {{- end }}
+        {{- end }}
+
+        livenessProbe:
+          httpGet:
+            path: /wp-admin/install.php
+            port: 8080
+            scheme: HTTP
+
+        readinessProbe:
+          enabled: true
+          httpGet:
+            path: /wp-admin/install.php
+            port: 8080
+            scheme: HTTP
+
+        service:
+          type: ClusterIP
+          port: 8080
+
+        ingress:
+          enabled: true
+          certManager: true
+          hostname: {{ (($component.wordpress).ingress).hostname | default (printf "%s.saritasa.rocks" $project.project) }}
+          {{- if (($component.wordpress).ingress).annotations }}
+          annotations:
+            {{- range $k, $v := $component.wordpress.ingress.annotations }}
+            {{ $k }}: {{ $v | quote}}
+            {{- end }}
+          {{- else }}
+          annotations:
+            kubernetes.io/ingress.class: "nginx"
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
+            nginx.ingress.kubernetes.io/proxy-body-size: 100m
+            nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+            nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "300"
+            nginx.ingress.kubernetes.io/auth-type: basic
+            nginx.ingress.kubernetes.io/auth-secret: {{ (($component.wordpress).ingress).authSecret | default (printf "%s-%s-%s-basic-auth" $project.project $component.name $projectEnvironment) }}
+            nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+            nginx.ingress.kubernetes.io/server-snippet: |-
+              add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+          {{- end }}
+
+          tls: true
+          {{- if (($component.wordpress).ingress).extraHosts }}
+          extraHosts:
+            {{- range $component.wordpress.ingress.extraHosts }}
+            - name: {{ .name | quote }}
+              path: {{ default "/" .path }}
+              backend: {{ .backend | default dict }}
+            {{- end }}
+          {{- end }}
+
+        persistence:
+          enabled: true
+          storageClass: gp2
+
+        metrics:
+          enabled: true
+
+        mariadb:
+          enabled: false
+
+        externalDatabase:
+          host: {{ $component.wordpress.externalDatabase.host }}
+          user: {{ $component.wordpress.externalDatabase.user }}
+          existingSecret: {{ $component.wordpress.externalDatabase.existingSecret }}
+          database: {{ $component.wordpress.externalDatabase.database }}
+          port: {{ $component.wordpress.externalDatabase.port | default "3306" }}
+
+        {{- if hasKey $component.wordpress "wordpressExtraConfigContent" }}
+        wordpressExtraConfigContent:
+        {{- toYaml $component.wordpress.wordpressExtraConfigContent | nindent 10 }}
+        {{- end }}
+
+        {{- if hasKey $component.wordpress "extraEnvVars" }}
+        extraEnvVars:
+        {{- toYaml $component.wordpress.extraEnvVars | nindent 10 }}
+        {{- end }}
+    repoURL: {{ $argocdSource.repoUrl | default "https://charts.bitnami.com/bitnami" }}
+    targetRevision: {{ $argocdSource.targetRevision | default "11.0.14" }}
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+
+{{- end }} {{- /* if component.wordpress */}}
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled and project.argocd */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}

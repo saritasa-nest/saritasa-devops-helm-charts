@@ -1,7 +1,8 @@
 {{ if .Values.apps }}
 {{- range $project := .Values.apps }}
-{{- if and $project.enabled $project.argocd}}
+{{- if and $project.enabled }}
 {{- range $component := $project.components }}
+{{- if not (hasKey $component "wordpress") }}
 
 {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
@@ -11,18 +12,6 @@
 
 {{- /* initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict */}}
 {{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
-
-{{- /* initialize `kubernetesRepository` variable with either `$project.kubernetesRepository` dict
-    if it is set or create a new default empty dict */}}
-{{ $kubernetesRepository := ternary $project.kubernetesRepository (dict) (hasKey $project "kubernetesRepository") -}}
-
-{{- /* initialize `wordpress` variable with either `$argocd.wordpress` dict if it exists or with empty dict */}}
-{{ $wordpress := ternary $argocd.wordpress dict (hasKey $argocd "wordpress") -}}
-
-{{- $data := dict "project"     $project
-                  "component"   $component
-                  "environment" $projectEnvironment
-                  "wordpress"   $wordpress }}
 
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -35,25 +24,11 @@ spec:
   destination:
     namespace: {{ $project.argocd.namespace }}
     server: https://kubernetes.default.svc
-  {{- if $wordpress }}
-  ignoreDifferences:
-  - group: v1
-    jsonPointers:
-    - /metadata/labels
-    kind: secret
-  {{- end }}
   project: {{ $project.project }}
   source:
-    {{ if $wordpress }}
-    chart: wordpress
-    helm:
-      values: |
-        {{- include "tekton-apps.argocd.wordpress.helmValues" $data | nindent 8 }}
-    {{ else }}
     path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) }}
-    {{ end }}
-    repoURL: {{ $argocdSource.repoUrl | default $kubernetesRepository.url }}
-    targetRevision: {{ $argocdSource.targetRevision | default $kubernetesRepository.branch }}
+    repoURL: {{ $argocdSource.repoUrl | default ($project.kubernetesRepository).url }}
+    targetRevision: {{ $argocdSource.targetRevision | default ($project.kubernetesRepository).branch }}
 
   syncPolicy:
     automated:
@@ -62,6 +37,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
+{{- end }} {{- /* if not component.wordpress */}}
 {{- end }} {{- /* range component */}}
 {{- end }} {{- /* if project.enabled and project.argocd */}}
 {{- end }} {{- /* range project */}}
