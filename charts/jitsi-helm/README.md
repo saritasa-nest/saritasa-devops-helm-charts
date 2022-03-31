@@ -1,6 +1,8 @@
 # jitsi-meet
 
-![Version: 0.2.4](https://img.shields.io/badge/Version-0.2.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: stable-5963](https://img.shields.io/badge/AppVersion-stable--5963-informational?style=flat-square)
+**Repo may become deprecated when https://github.com/jitsi-contrib/jitsi-helm/issues/50 will be fixed**
+
+![Version: 1.2.2](https://img.shields.io/badge/Version-1.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: stable-6865](https://img.shields.io/badge/AppVersion-stable--6865-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,7 +10,7 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-|  | prosody | 0.2.3 |
+|  | prosody | 1.2.2 |
 
 ## Values
 
@@ -22,6 +24,24 @@ A Helm chart for Kubernetes
 | global.podLabels | object | `{}` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | imagePullSecrets | list | `[]` |  |
+| jibri.breweryMuc | string | `"jibribrewery"` |  |
+| jibri.enabled | bool | `false` |  |
+| jibri.extraEnvs | object | `{}` |  |
+| jibri.image.repository | string | `"jitsi/jibri"` |  |
+| jibri.livenessProbe.exec.command[0] | string | `"pgrep"` |  |
+| jibri.livenessProbe.exec.command[1] | string | `"java"` |  |
+| jibri.persistence.enabled | bool | `false` |  |
+| jibri.persistence.existingClaim | string | `nil` |  |
+| jibri.persistence.size | string | `"4Gi"` |  |
+| jibri.persistence.storageClassName | string | `nil` |  |
+| jibri.readinessProbe.exec.command[0] | string | `"pgrep"` |  |
+| jibri.readinessProbe.exec.command[1] | string | `"java"` |  |
+| jibri.recorder.password | string | `nil` |  |
+| jibri.recorder.user | string | `"recorder"` |  |
+| jibri.shm.enabled | bool | `false` |  |
+| jibri.timeout | int | `90` |  |
+| jibri.xmpp.password | string | `nil` |  |
+| jibri.xmpp.user | string | `"jibri"` |  |
 | jicofo.affinity | object | `{}` |  |
 | jicofo.extraEnvs | object | `{}` |  |
 | jicofo.image.repository | string | `"jitsi/jicofo"` |  |
@@ -36,14 +56,11 @@ A Helm chart for Kubernetes
 | jicofo.securityContext | object | `{}` |  |
 | jicofo.tolerations | list | `[]` |  |
 | jicofo.xmpp.componentSecret | string | `nil` |  |
-| jicofo.xmpp.existingSecret | string | `nil` |  |
 | jicofo.xmpp.password | string | `nil` |  |
 | jicofo.xmpp.user | string | `"focus"` |  |
-| jvb.TCPPort | int | `4443` |  |
 | jvb.UDPPort | int | `10000` |  |
 | jvb.affinity | object | `{}` |  |
 | jvb.breweryMuc | string | `"jvbbrewery"` |  |
-| jvb.enableTCP | bool | `false` |  |
 | jvb.extraEnvs | object | `{}` |  |
 | jvb.image.repository | string | `"jitsi/jvb"` |  |
 | jvb.livenessProbe.httpGet.path | string | `"/about/health"` |  |
@@ -51,7 +68,8 @@ A Helm chart for Kubernetes
 | jvb.metrics.enabled | bool | `false` |  |
 | jvb.metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
 | jvb.metrics.image.repository | string | `"docker.io/systemli/prometheus-jitsi-meet-exporter"` |  |
-| jvb.metrics.image.tag | string | `"1.1.6"` |  |
+| jvb.metrics.image.tag | string | `"1.1.9"` |  |
+| jvb.metrics.prometheusAnnotations | bool | `false` |  |
 | jvb.metrics.resources.limits.cpu | string | `"20m"` |  |
 | jvb.metrics.resources.limits.memory | string | `"32Mi"` |  |
 | jvb.metrics.resources.requests.cpu | string | `"10m"` |  |
@@ -75,16 +93,18 @@ A Helm chart for Kubernetes
 | jvb.stunServers | string | `"meet-jit-si-turnrelay.jitsi.net:443"` |  |
 | jvb.tolerations | list | `[]` |  |
 | jvb.useHostPort | bool | `false` |  |
-| jvb.xmpp.existingSecret | string | `nil` |  |
+| jvb.websockets.enabled | bool | `false` |  |
+| jvb.websockets.isMixedProtocolLBServiceEnabled | bool | `true` |  |
 | jvb.xmpp.password | string | `nil` |  |
 | jvb.xmpp.user | string | `"jvb"` |  |
 | nameOverride | string | `""` |  |
+| octo.enabled | bool | `false` |  |
 | prosody.enabled | bool | `true` |  |
 | prosody.extraEnvFrom[0].secretRef.name | string | `"{{ include \"prosody.fullname\" . }}-jicofo"` |  |
 | prosody.extraEnvFrom[1].secretRef.name | string | `"{{ include \"prosody.fullname\" . }}-jvb"` |  |
 | prosody.extraEnvFrom[2].configMapRef.name | string | `"{{ include \"prosody.fullname\" . }}-common"` |  |
 | prosody.image.repository | string | `"jitsi/prosody"` |  |
-| prosody.image.tag | string | `"stable-5963"` |  |
+| prosody.image.tag | string | `"stable-6865"` |  |
 | prosody.server | string | `nil` |  |
 | publicURL | string | `""` |  |
 | serviceAccount.annotations | object | `{}` |  |
