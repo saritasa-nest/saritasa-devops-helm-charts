@@ -3,9 +3,13 @@
 
 {{- if $project.enabled }}
 {{- range $component := $project.components }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
 {{- $data := dict "project"           $project
                   "component"         $component
-                  "environment"       $.Values.environment }}
+                  "environment"       $projectEnvironment }}
 
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
@@ -14,7 +18,7 @@ metadata:
  namespace: {{ $.Release.Namespace }}
 rules:
   - apiGroups:  ["extensions", "apps", "batch", ""]
-    resources:  ["services", "deployments", "pods", "jobs"]
+    resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
     verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
   - apiGroups:  [""]
     resources:  ["pods/log"]
@@ -115,7 +119,7 @@ subjects:
 
 ---
 
-{{- end }} # range component
-{{- end }} # if project.enabled
-{{- end }} # range
-{{- end }} # if apps
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}

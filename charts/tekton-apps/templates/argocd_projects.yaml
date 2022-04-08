@@ -1,10 +1,18 @@
 {{ if .Values.apps }}
 {{- range $project := .Values.apps }}
-{{- if and $project.enabled $project.argocd }}
+{{- if and $project.enabled }}
+
+{{- /* initialize `kubernetesRepository` variable with either `$project.kubernetesRepository` dict
+    if it is set or create a new default empty dict */}}
+{{ $kubernetesRepository := ternary $project.kubernetesRepository (dict) (hasKey $project "kubernetesRepository") -}}
 
 {{- /* initialize `sourceRepos` variable with either `$project.argocd.sourceRepos` list
     if it is set or create a new default list from `$project.kubernetesRepository.url` only */}}
-{{ $sourceRepos := ternary $project.argocd.sourceRepos (list $project.kubernetesRepository.url) (hasKey $project.argocd "sourceRepos") -}}
+{{ $sourceRepos := ternary $project.argocd.sourceRepos (list $kubernetesRepository.url) (hasKey $project.argocd "sourceRepos") -}}
+
+{{- /* initialize `extraDestinationNamespaces` variable with either `$project.argocd.extraDestinationNamespaces` list
+    if it is set or create a new default empty list */}}
+{{ $extraDestinationNamespaces := ternary $project.argocd.extraDestinationNamespaces (list) (hasKey $project.argocd "extraDestinationNamespaces") -}}
 
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -20,6 +28,10 @@ spec:
     server: https://kubernetes.default.svc
   - namespace: ci
     server: https://kubernetes.default.svc
+  {{- range $namespace := $extraDestinationNamespaces }}
+  - namespace: {{ $namespace }}
+    server: https://kubernetes.default.svc
+  {{- end }}
   orphanedResources:
     warn: true
   sourceRepos: {{ toYaml $sourceRepos | nindent 4 }}
@@ -27,6 +39,6 @@ spec:
   - group: '*'
     kind: '*'
 ---
-{{- end }} {{- /* if project.enabled and project.argocd */}}
+{{- end }} {{- /* if project.enabled */}}
 {{- end }} {{- /* range project */}}
 {{- end }} {{- /* if apps */}}

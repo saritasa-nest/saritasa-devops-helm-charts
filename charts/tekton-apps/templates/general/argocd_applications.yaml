@@ -1,7 +1,11 @@
 {{ if .Values.apps }}
 {{- range $project := .Values.apps }}
-{{- if and $project.enabled $project.argocd}}
+{{- if and $project.enabled }}
 {{- range $component := $project.components }}
+{{- if not (hasKey $component "wordpress") }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
 {{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
 {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
@@ -12,7 +16,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $.Values.environment) }}
+  name: {{ $argocd.appName | default (printf "%s-%s-%s" $project.project $component.name $projectEnvironment) }}
   namespace: argo-cd
   annotations:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
@@ -22,9 +26,10 @@ spec:
     server: https://kubernetes.default.svc
   project: {{ $project.project }}
   source:
-    path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $.Values.environment) }}
-    repoURL: {{ $argocdSource.repoUrl | default $project.kubernetesRepository.url }}
-    targetRevision: {{ $argocdSource.targetRevision | default $project.kubernetesRepository.branch }}
+    path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) }}
+    repoURL: {{ $argocdSource.repoUrl | default ($project.kubernetesRepository).url }}
+    targetRevision: {{ $argocdSource.targetRevision | default ($project.kubernetesRepository).branch }}
+
   syncPolicy:
     automated:
       prune: true
@@ -32,6 +37,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
+{{- end }} {{- /* if not component.wordpress */}}
 {{- end }} {{- /* range component */}}
 {{- end }} {{- /* if project.enabled and project.argocd */}}
 {{- end }} {{- /* range project */}}

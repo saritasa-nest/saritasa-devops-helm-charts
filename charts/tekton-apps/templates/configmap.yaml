@@ -2,6 +2,10 @@
 
 {{ if $project.enabled }}
 {{- range $component := $project.components }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
 {{ $data := dict "project"     $project
                  "awsConf"     $.Values.aws
                  "slackConf"   $.Values.slack
@@ -13,7 +17,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-%s-%s-build-pipeline-config" $project.project $component.name $.Values.environment }}
+  name: {{ printf "%s-%s-%s-build-pipeline-config" $project.project $component.name $projectEnvironment }}
   namespace: {{ $.Release.Namespace }}
   labels: {{ include "tekton-apps.labels" $ | nindent 4 }}
 
@@ -37,6 +41,6 @@ data:
   {{ end }}
 ---
 
-{{- end }} # range component
-{{- end }} # if project.enabled
-{{- end }} # range project
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}

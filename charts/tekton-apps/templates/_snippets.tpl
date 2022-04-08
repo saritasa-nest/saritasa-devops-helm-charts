@@ -74,6 +74,7 @@ Create an element for eventlistener trigger array items
 {{- define "tekton-apps.eventlistener.trigger" -}}
 {{ $filter := ternary .component.eventlistener.filter (include "tekton-apps.eventlistener.filter" .gitBranchPrefixes)
               (hasKey .component.eventlistener "filter") -}}
+{{- if and (.component).repository ((.component).eventlistener).template  }}
 - name: {{ include "tekton-apps.resourceName" (set $ "suffix" "listener") }}
   serviceAccountName: {{ include "tekton-apps.resourceName" (set $ "suffix" "trigger-sa") }}
   interceptors:
@@ -83,7 +84,7 @@ Create an element for eventlistener trigger array items
       - name: "filter"
         value: {{ $filter }} &&
                body.head_commit.author.name != "tekton-kustomize" &&
-               body.repository.name == {{ .component.repository | required (printf "apps[%s].components[%s].repository is required" .project.project .component.name) | quote }}
+               body.repository.name == {{ .component.repository | quote }}
       - name: "overlays"
         value:
         - key: truncated_sha
@@ -118,7 +119,8 @@ Create an element for eventlistener trigger array items
   - ref: {{ include "tekton-apps.resourceName" (set $ "suffix" "env") }}
   - ref: github-trigger-binding
   template:
-    ref: {{ .component.eventlistener.template | required (printf "apps[%s].components[%s].eventlistener.template is required" .project.project .component.name) }}
+    ref: {{ .component.eventlistener.template }}
+{{- end }}
 {{ end }}
 
 
@@ -133,7 +135,7 @@ Create a name of the kubernetes secret containing project component's SSH deploy
 Create a name of the kubernetes secret containing project kubernetes repository SSH deploy key
 */}}
 {{- define "tekton-apps.kubernetes-repo-deploy-key" -}}
-{{- printf "%s-deploy-key" .project.kubernetesRepository.name }}
+{{ ternary .component.tektonKubernetesRepoDeployKeyName (printf "%s-deploy-key" (or (.project.kubernetesRepository).name "") ) (hasKey .component "tektonKubernetesRepoDeployKeyName") }}
 {{- end }}
 
 {{/*

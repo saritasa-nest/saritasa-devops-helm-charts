@@ -1,0 +1,52 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+{{- if hasKey $component "wordpress" }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment }}
+
+{{- /* wordpress projects needs extra permissions in addition to common ones to be able to stop current application pod in project's namespace and start a new one */}}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role") }}
+ namespace: {{ $project.argocd.namespace }}
+rules:
+  - apiGroups:  ["extensions", "apps", "batch", ""]
+    resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
+    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups:  [""]
+    resources:  ["pods/log"]
+    verbs:      ["get", "list", "watch"]
+  - apiGroups:  ["tekton.dev"]
+    resources:  ["pipelineruns"]
+    verbs:      ["get", "list", "create"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role-binding") }}
+  namespace: {{ $project.argocd.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role") }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
+  namespace: {{ $.Release.Namespace }}
+
+---
+
+{{- end }} {{- /* if component.wordpress */}}
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}

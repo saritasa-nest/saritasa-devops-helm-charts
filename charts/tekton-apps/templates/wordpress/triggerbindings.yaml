@@ -1,0 +1,41 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+{{- if hasKey $component "wordpress" }}
+
+{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment }}
+
+# ========================================================================
+# 🌱 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT TRIGGER BINDING
+# ========================================================================
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name:  {{ include "tekton-apps.resourceName" $data }}-env
+  namespace: {{ $.Release.Namespace }}
+spec:
+  params:
+  - name: application
+    value: {{ include "tekton-apps.resourceName" $data }}
+  - name: project
+    value: {{ $project.project }}
+  - name: component
+    value: {{ $component.name }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_namespace" "default" $project.argocd.namespace ) | nindent 2 }}
+  {{- if hasKey $component "triggerBinding" }}
+  {{- toYaml $component.triggerBinding | nindent 2 }}
+  {{- end }}
+---
+
+{{- end }} {{- /* if component.wordpress */}}
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}

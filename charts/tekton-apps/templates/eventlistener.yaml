@@ -14,16 +14,25 @@ spec:
   # ========================================================================
   # {{ $project.project | upper }} PROJECT
   {{- range $component := $project.components }}
+
+  {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+  {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+  {{- /* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
+  {{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
+
   # ========================================================================
   # 🐤 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT
   # ========================================================================
+
   {{- $data := dict "project"           $project
                     "component"         $component
-                    "environment"       $.Values.environment
+                    "environment"       $projectEnvironment
                     "eventlistener"     $.Values.eventlistener
-                    "gitBranchPrefixes" $.Values.gitBranchPrefixes }}
+                    "gitBranchPrefixes" $gitBranchPrefixes }}
   {{- include "tekton-apps.eventlistener.trigger" $data | nindent 4 }}
-  {{- end }} # range component
-  {{- end }} # if project.enabled
-  {{- end }} # range
-  {{- end }} # if apps
+
+{{- end }} {{- /* range component */}}
+{{- end }} {{- /* if project.enabled */}}
+{{- end }} {{- /* range project */}}
+{{- end }} {{- /* if apps */}}
