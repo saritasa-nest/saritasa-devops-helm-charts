@@ -31,6 +31,8 @@ spec:
     value: {{ include "tekton-apps.resourceName" $data }}
   - name: project
     value: {{ $project.project }}
+  - name: component
+    value: {{ $component.name }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- if $.Values.defaultRegistry }}
   - name: docker_registry
