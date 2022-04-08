@@ -1,7 +1,5 @@
 # jitsi-meet
 
-**Repo may become deprecated when https://github.com/jitsi-contrib/jitsi-helm/issues/50 will be fixed**
-
 ![Version: 1.2.2](https://img.shields.io/badge/Version-1.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: stable-6865](https://img.shields.io/badge/AppVersion-stable--6865-informational?style=flat-square)
 
 A Helm chart for Kubernetes

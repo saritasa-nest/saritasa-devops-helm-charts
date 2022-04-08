@@ -79,6 +79,12 @@
 - name: environment
   description: environment name of the app being built, i.e. dev/staging/prod
 
+- name: project
+  description: name of the project, which component is deployed
+
+- name: component
+  description: name of the application component, which is deployed
+
 - name: branch
   description: git branch
 {{- end}}
