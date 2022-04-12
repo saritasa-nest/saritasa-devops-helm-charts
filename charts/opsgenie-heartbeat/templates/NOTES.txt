@@ -1,0 +1,1 @@
+{{- include "opsgenie-heartbeat.validateValues" . }}
