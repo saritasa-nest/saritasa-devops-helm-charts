@@ -122,6 +122,24 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/jitsi-meet-0.2.0/jitsi-meet-0.2.0.tgz
     version: 0.2.0
+  opsgenie-heartbeat:
+  - apiVersion: v2
+    created: "2022-04-12T21:48:07.147637368Z"
+    description: 'Chart that installs our solution to send heartbeat pings via OpsGenie
+      API automatically  You will need to create the secret containing opsgenie APIKEY
+      first:  ```sh kubectl -n opsgenie create secret generic opsgenie-apikey-secret
+      \   --from-literal=apikey=YOUR_APIKEY ```  Keep in mind that the name of your
+      heartbeat in opsgenie should be the exact name of your kubernetes cluster '
+    digest: b9fa616f4fcea6f1f5852c4c4c780a10d30c1535538dad9b7c8f408059c2096f
+    maintainers:
+    - email: nospam@saritasa.com
+      name: Saritasa
+      url: https://www.saritasa.com/
+    name: opsgenie-heartbeat
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/opsgenie-heartbeat-0.0.1/opsgenie-heartbeat-0.0.1.tgz
+    version: 0.0.1
   saritasa-rbac:
   - apiVersion: v2
     created: "2022-02-28T10:21:18.995187393Z"
@@ -1715,4 +1733,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2022-04-08T04:16:10.333491813Z"
+generated: "2022-04-12T21:48:07.14787727Z"
