@@ -50,6 +50,8 @@ kubectl -n opsgenie create secret generic opsgenie-apikey-secret \
   --from-literal=apikey=YOUR_APIKEY
 ```
 
+Keep in mind that the name of your heartbeat in opsgenie should be the exact name of your kubernetes cluster
+
 ## `chart.valuesTable`
 
 | Key | Type | Default | Description |
