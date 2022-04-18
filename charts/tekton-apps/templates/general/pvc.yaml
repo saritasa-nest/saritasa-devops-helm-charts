@@ -4,7 +4,7 @@
 {{- range $component := $project.components }}
 {{- if not (hasKey $component "wordpress") }}
 
-{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
 {{- $data := dict "project"           $project
@@ -20,8 +20,8 @@
 {{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "buildpacks-cache-pvc") "storage" "5Gi") }}
 {{- end }}
 
-{{- end }} {{- /* if not component.wordpress */}}
-{{- end }} {{- /* range component */}}
-{{- end }} {{- /* if project.enabled */}}
-{{- end }} {{- /* range */}}
-{{- end }} {{- /* if apps */}}
+{{- end }} # if not component.wordpress
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range
+{{- end }} # if apps

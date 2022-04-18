@@ -3,7 +3,7 @@
 {{ if $project.enabled }}
 {{- range $component := $project.components }}
 
-{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
 {{ $data := dict "project"     $project
@@ -41,6 +41,6 @@ data:
   {{ end }}
 ---
 
-{{- end }} {{- /* range component */}}
-{{- end }} {{- /* if project.enabled */}}
-{{- end }} {{- /* range project */}}
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range project

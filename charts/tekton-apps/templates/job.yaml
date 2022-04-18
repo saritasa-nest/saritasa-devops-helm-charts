@@ -23,7 +23,7 @@ spec:
           volumeMounts:
           {{- range $project := .Values.apps }}
           {{- range $component := $project.components }}
-          {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+          # initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
           {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
           {{- $data := dict "project"           $project
                             "component"         $component
@@ -42,7 +42,7 @@ spec:
       volumes:
       {{- range $project := .Values.apps }}
       {{- range $component := $project.components }}
-      {{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+      # initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
       {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
       {{- $data := dict "project"           $project
                         "component"         $component
