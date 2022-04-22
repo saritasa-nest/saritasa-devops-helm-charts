@@ -31,7 +31,7 @@ saritasa-tekton
 
 ## `chart.version`
 
-![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.5](https://img.shields.io/badge/Version-0.1.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -212,6 +212,7 @@ Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries f
 | engine.config | object | `{}` | tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm |
 | engine.controller | object | use args multiline string to set additional launch arguments for the tekton controller | controller launch arguments |
 | engine.enabled | bool | `true` | if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc) |
+| engine.namespace | string | `"tekton-pipelines"` | namespace in which all `tekton` engine resources should be created |
 | imagePullSecrets | list | `[]` | list of docker registry secrets to pull images |
 | nodeSelector | object | `{}` | what node to run tekton related pods |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |

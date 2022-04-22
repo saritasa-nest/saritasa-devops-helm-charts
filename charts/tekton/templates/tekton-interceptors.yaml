@@ -17,7 +17,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tekton-triggers-core-interceptors
-  namespace: tekton-pipelines
+  namespace: {{ .Values.engine.namespace }}
   labels:
     app.kubernetes.io/name: core-interceptors
     app.kubernetes.io/component: interceptors
@@ -105,7 +105,7 @@ metadata:
     app: tekton-triggers-core-interceptors
     version: "v0.16.0"
   name: tekton-triggers-core-interceptors
-  namespace: tekton-pipelines
+  namespace: {{ .Values.engine.namespace }}
 spec:
   ports:
     - name: "http"
@@ -140,7 +140,7 @@ spec:
   clientConfig:
     service:
       name: tekton-triggers-core-interceptors
-      namespace: tekton-pipelines
+      namespace: {{ .Values.engine.namespace }}
       path: "cel"
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -151,7 +151,7 @@ spec:
   clientConfig:
     service:
       name: tekton-triggers-core-interceptors
-      namespace: tekton-pipelines
+      namespace: {{ .Values.engine.namespace }}
       path: "bitbucket"
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -162,7 +162,7 @@ spec:
   clientConfig:
     service:
       name: tekton-triggers-core-interceptors
-      namespace: tekton-pipelines
+      namespace: {{ .Values.engine.namespace }}
       path: "github"
 ---
 apiVersion: triggers.tekton.dev/v1alpha1
@@ -173,7 +173,7 @@ spec:
   clientConfig:
     service:
       name: tekton-triggers-core-interceptors
-      namespace: tekton-pipelines
+      namespace: {{ .Values.engine.namespace }}
       path: "gitlab"
 
 ---

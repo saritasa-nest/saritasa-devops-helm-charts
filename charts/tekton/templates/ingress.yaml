@@ -15,7 +15,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: tekton-dashboard
-  namespace: tekton-pipelines
+  namespace: {{ .Values.engine.namespace }}
   labels:
     {{- include "tekton.labels" . | nindent 4 }}
   {{- with .Values.dashboard.ingress.annotations }}

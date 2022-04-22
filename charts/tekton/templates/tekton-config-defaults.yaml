@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: config-defaults
-  namespace: tekton-pipelines
+  namespace: {{ .Values.engine.namespace }}
 data:
   default-service-account: {{ $config.defaultServiceAccount | default "build-bot-sa" | quote }}
   default-timeout-minutes: {{ $config.defaultTimeoutMinutes | default "60" | quote }}

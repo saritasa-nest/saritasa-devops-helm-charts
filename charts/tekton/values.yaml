@@ -20,6 +20,8 @@ domainZone: "site.com"
 engine:
   # -- if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc)
   enabled: true
+  # -- namespace in which all `tekton` engine resources should be created
+  namespace: "tekton-pipelines"
   # -- tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm
   config: {}
     # defaultServiceAccount: "build-bot-sa"
