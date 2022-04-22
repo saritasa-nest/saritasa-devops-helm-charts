@@ -4,14 +4,14 @@
 {{- range $component := $project.components }}
 {{- if hasKey $component "wordpress" }}
 
-{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
 {{- $data := dict "project"           $project
                   "component"         $component
                   "environment"       $projectEnvironment }}
 
-{{- /* wordpress projects needs extra permissions in addition to common ones to be able to stop current application pod in project's namespace and start a new one */}}
+# wordpress projects needs extra permissions in addition to common ones to be able to stop current application pod in project's namespace and start a new one
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -45,8 +45,8 @@ subjects:
 
 ---
 
-{{- end }} {{- /* if component.wordpress */}}
-{{- end }} {{- /* range component */}}
-{{- end }} {{- /* if project.enabled */}}
-{{- end }} {{- /* range project */}}
-{{- end }} {{- /* if apps */}}
+{{- end }} # if component.wordpress
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range project
+{{- end }} # if apps

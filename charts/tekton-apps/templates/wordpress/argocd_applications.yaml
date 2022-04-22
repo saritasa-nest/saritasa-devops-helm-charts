@@ -4,13 +4,13 @@
 {{- range $component := $project.components }}
 {{- if hasKey $component "wordpress" }}
 
-{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
-{{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
+# initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict
 {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
 
-{{- /* initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict */}}
+# initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict
 {{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
 
 apiVersion: argoproj.io/v1alpha1
@@ -260,8 +260,8 @@ spec:
       - CreateNamespace=true
 ---
 
-{{- end }} {{- /* if component.wordpress */}}
-{{- end }} {{- /* range component */}}
-{{- end }} {{- /* if project.enabled and project.argocd */}}
-{{- end }} {{- /* range project */}}
-{{- end }} {{- /* if apps */}}
+{{- end }} # if component.wordpress
+{{- end }} # range component
+{{- end }} # if project.enabled and project.argocd
+{{- end }} # range project
+{{- end }} # if apps

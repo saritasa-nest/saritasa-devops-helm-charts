@@ -4,17 +4,17 @@
 {{- range $component := $project.components }}
 {{- if not (hasKey $component "wordpress") }}
 
-{{- /* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
 {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
 
 {{- $data := dict "project"           $project
                   "component"         $component
                   "environment"       $projectEnvironment }}
 
-{{- /* initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict */}}
+# initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict
 {{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
 
-{{- /* initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict */}}
+# initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict
 {{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
 
 # ========================================================================
@@ -48,8 +48,8 @@ spec:
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
 ---
 
-{{- end }} {{- /* if not component.wordpress */}}
-{{- end }} {{- /* range component */}}
-{{- end }} {{- /* if project.enabled */}}
-{{- end }} {{- /* range */}}
-{{- end }} {{- /* if apps */}}
+{{- end }} # if not component.wordpress
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range
+{{- end }} # if apps

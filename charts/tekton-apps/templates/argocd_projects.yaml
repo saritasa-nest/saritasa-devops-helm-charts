@@ -2,16 +2,16 @@
 {{- range $project := .Values.apps }}
 {{- if and $project.enabled }}
 
-{{- /* initialize `kubernetesRepository` variable with either `$project.kubernetesRepository` dict
-    if it is set or create a new default empty dict */}}
+# initialize `kubernetesRepository` variable with either `$project.kubernetesRepository` dict
+# if it is set or create a new default empty dict
 {{ $kubernetesRepository := ternary $project.kubernetesRepository (dict) (hasKey $project "kubernetesRepository") -}}
 
-{{- /* initialize `sourceRepos` variable with either `$project.argocd.sourceRepos` list
-    if it is set or create a new default list from `$project.kubernetesRepository.url` only */}}
+# initialize `sourceRepos` variable with either `$project.argocd.sourceRepos` list
+# if it is set or create a new default list from `$project.kubernetesRepository.url` only
 {{ $sourceRepos := ternary $project.argocd.sourceRepos (list $kubernetesRepository.url) (hasKey $project.argocd "sourceRepos") -}}
 
-{{- /* initialize `extraDestinationNamespaces` variable with either `$project.argocd.extraDestinationNamespaces` list
-    if it is set or create a new default empty list */}}
+# initialize `extraDestinationNamespaces` variable with either `$project.argocd.extraDestinationNamespaces` list
+# if it is set or create a new default empty list
 {{ $extraDestinationNamespaces := ternary $project.argocd.extraDestinationNamespaces (list) (hasKey $project.argocd "extraDestinationNamespaces") -}}
 
 apiVersion: argoproj.io/v1alpha1
@@ -39,6 +39,6 @@ spec:
   - group: '*'
     kind: '*'
 ---
-{{- end }} {{- /* if project.enabled */}}
-{{- end }} {{- /* range project */}}
-{{- end }} {{- /* if apps */}}
+{{- end }} # if project.enabled
+{{- end }} # range project
+{{- end }} # if apps
