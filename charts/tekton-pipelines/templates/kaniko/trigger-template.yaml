@@ -15,6 +15,11 @@ spec:
     - name: kubernetes_repository_ssh_url
       description: git repository ssh url for kubernetes manifests repo
 
+    {{ if .Values.kaniko.baseDockerImage }}
+    - name: base_docker_image
+      default: {{ .Values.kaniko.baseDockerImage }}
+      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
+    {{ end }}
     - name: docker_file
       default: Dockerfile
       description: location of the dockerfile, should be Dockerfile if it is in the root of the repository

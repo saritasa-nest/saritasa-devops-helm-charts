@@ -300,6 +300,8 @@ buildpacks:
 kaniko:
   # -- should we enable the kaniko pipeline
   enabled: false
+  # If not null Kaniko Pipeline will pass --build-arg BASE_IMAGE=<baseDockerImage> to Dockerfile
+  baseDockerImage: ""
 
 wordpress:
   # -- should we enable the wordpress pipeline

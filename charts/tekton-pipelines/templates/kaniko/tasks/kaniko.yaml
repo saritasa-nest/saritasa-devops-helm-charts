@@ -26,6 +26,11 @@ spec:
       type: string
       description: name of the argocd application we're going to deploy/sync
 
+    {{ if .Values.kaniko.baseDockerImage }}
+    - name: base_docker_image
+      type: string
+      description: docker image that application extends
+    {{ end }}
     - name: docker_registry
       type: string
       description: aws private ecr registry address
@@ -81,6 +86,9 @@ spec:
       args:
         - $(params.extra_args[*])
         - --build-arg=ENVIRONMENT=$(params.environment)
+        {{ if .Values.kaniko.baseDockerImage }}
+        - --build-arg=BASE_IMAGE=$(params.base_docker_image)
+        {{ end }}
         - --dockerfile=$(resources.inputs.app.path)/$(params.docker_file)
         - --context=$(resources.inputs.app.path)/$(params.docker_context)
         - --destination=$(resources.outputs.image.url)

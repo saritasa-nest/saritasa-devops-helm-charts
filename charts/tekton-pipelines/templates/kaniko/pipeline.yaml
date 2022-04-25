@@ -53,6 +53,10 @@ spec:
           value: $(params.docker_registry)
         - name: environment
           value: "$(params.environment)"
+        {{ if .Values.kaniko.baseDockerImage }}
+        - name: base_docker_image
+          value: "$(params.base_docker_image)"
+        {{ end }}
         - name: docker_file
           value: "$(params.docker_file)"
         - name: docker_context
