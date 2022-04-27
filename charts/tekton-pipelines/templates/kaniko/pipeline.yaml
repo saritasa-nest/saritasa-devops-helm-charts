@@ -23,6 +23,10 @@ spec:
       default: "."
       description: dockerfile context path
 
+    - name: kaniko_extra_args
+      type: array
+      description: extra args to be passed into kaniko builder
+      default: []
 
   workspaces:
     - name: source
@@ -57,6 +61,8 @@ spec:
           value: "$(params.docker_file)"
         - name: docker_context
           value: "$(params.docker_context)"
+        - name: extra_args
+          value: $(params.kaniko_extra_args)
       workspaces:
         - name: source
           workspace: source
