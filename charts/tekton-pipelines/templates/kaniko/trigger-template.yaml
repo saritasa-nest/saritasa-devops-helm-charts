@@ -23,6 +23,10 @@ spec:
       default: "."
       description: dockerfile context path
 
+    - name: kaniko_extra_args
+      default: ''
+      description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -46,6 +50,8 @@ spec:
           value: "$(tt.params.docker_file)"
         - name: docker_context
           value: "$(tt.params.docker_context)"
+        - name: kaniko_extra_args
+          value: "$(tt.params.kaniko_extra_args)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
