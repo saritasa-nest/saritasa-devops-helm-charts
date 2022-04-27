@@ -62,7 +62,8 @@ spec:
         - name: docker_context
           value: "$(params.docker_context)"
         - name: extra_args
-          value: $(params.kaniko_extra_args)
+          value:
+            - $(params.kaniko_extra_args)
       workspaces:
         - name: source
           workspace: source
