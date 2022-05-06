@@ -75,7 +75,7 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
-{{/* Validate value of foo */}}
+{{/* Validate value of existingSecret */}}
 {{- define "opsgenie-heartbeat.validateValues.existingSecret" -}}
 {{- if not (and .Values.existingSecret (kindIs "string" .Values.existingSecret)) -}}
 opsgenie-heartbeat: existingSecret
@@ -83,7 +83,7 @@ opsgenie-heartbeat: existingSecret
 {{- end -}}
 {{- end -}}
 
-{{/* Validate the value of bar */}}
+{{/* Validate the value of heartbeatName */}}
 {{- define "opsgenie-heartbeat.validateValues.heartbeatName" -}}
 {{- if not (and .Values.heartbeatName (kindIs "string" .Values.heartbeatName)) -}}
 opsgenie-heartbeat: heartbeatName

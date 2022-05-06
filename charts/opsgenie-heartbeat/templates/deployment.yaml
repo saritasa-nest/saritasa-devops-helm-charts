@@ -32,15 +32,15 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          {{- if .Values.existingSecret }}
           - name: OPSGENIE_APIKEY
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.existingSecret }}
                 key: "apikey"
-          {{- end }}
           - name: OPSGENIE_HEARTBEAT_NAME
             value: {{ .Values.heartbeatName }}
+          - name: OPSGENIE_LIVE_REPLY
+            value: {{ .Values.liveReply | default "1h" | quote }}
           ports:
             - name: http
               containerPort: 8080
