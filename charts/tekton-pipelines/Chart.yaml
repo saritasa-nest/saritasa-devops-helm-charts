@@ -119,3 +119,11 @@ description: |
               #!/bin/bash
               echo "hello world2"
   ```
+
+  If you want to modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to `kaniko-pipeline`.
+  For example, if you want to pass `BASE_IMAGE` build argument value to be used in Dockerfile you can add following line
+  to specific project trigger-binding:
+  ```yaml
+  - name: kaniko_extra_args
+    value: --build-arg=BASE_IMAGE=965067289393.dkr.ecr.us-west-2.amazonaws.com/saritasa/legacy/php:php71-smart-screen-base
+  ```
