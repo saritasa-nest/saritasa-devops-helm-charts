@@ -39,13 +39,26 @@ spec:
     value: {{ $.Values.defaultRegistry }}
   {{- end }}
   {{- toYaml $component.triggerBinding | nindent 2 }}
+
+  {{- if $argocdSource }}
+  # ! OLD WAY:
+  # If you see this message - pls transfer kubernetes manifests into dedicated kubernetes git repo
+  # if we want to support old ways when our kubernetes manifests where specifically declared inside
+  # actual backend or frontend repos. In new approach we have isolated kubernetes repository with manifests
   - name: kubernetes_repository_ssh_url
     value: {{ $argocdSource.repoUrl | default ($project.kubernetesRepository).url }}
   - name: kubernetes_branch
     value: {{ $argocdSource.targetRevision | default ($project.kubernetesRepository).branch }}
   - name: kubernetes_repository_kustomize_path
     value: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) }}
+  {{- else }}
+  # defaults
+  - name: kubernetes_repository_ssh_url
+    value: {{ $project.kubernetesRepository.url }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_branch" "default" ($project.kubernetesRepository).branch ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_repository_kustomize_path" "default" (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
+  {{- end}}
 ---
 
 {{- end }} # if not component.wordpress
