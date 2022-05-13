@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.4
+version: 0.1.5
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -25,7 +25,7 @@ description: |
   ➜ k rbac-lookup --kind group G saritasa
     saritasa:sso:developers    ci                 Role/saritasa-developers-role
     saritasa:sso:developers    ingress-nginx      Role/saritasa-developers-role
-    saritasa:sso:developers    postgres           Role/saritasa-developers-role
+    saritasa:sso:developers    utils              Role/saritasa-developers-role
     saritasa:sso:developers    prod               Role/saritasa-developers-readonly-role
     saritasa:sso:developers    cluster-wide       ClusterRole/saritasa-developers-readonly-clusterrole
   ````
