@@ -159,6 +159,47 @@ entries:
     version: 0.0.1
   saritasa-rbac:
   - apiVersion: v2
+    created: "2022-05-18T14:01:10.647190724Z"
+    description: 'A Helm chart for Kubernetes implementing RBAC rules for saritasa
+      developers, devops and client''s team members  You can see role bindings this
+      way:   ```sh ➜ k krew install rbac-lookup ➜ k rbac-lookup --kind group G saritasa   saritasa:sso:developers    ci                 Role/saritasa-developers-role   saritasa:sso:developers    ingress-nginx      Role/saritasa-developers-role   saritasa:sso:developers    utils              Role/saritasa-developers-role   saritasa:sso:developers    prod               Role/saritasa-developers-readonly-role   saritasa:sso:developers    cluster-wide       ClusterRole/saritasa-developers-readonly-clusterrole
+      ````  ## `example usage with agocd`  Install the chart:  ``` helm repo add saritasa
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/ ```  Make the argocd
+      manifest  ```yaml apiVersion: argoproj.io/v1alpha1 kind: Application metadata:   name:
+      rbac   namespace: argo-cd   finalizers:   - resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "1000" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: prod   project: default   source:     chart:
+      saritasa-rbac     helm:       values: |         rbac:           client:             name:
+      "producebox"             apps: true           developers:             ci: true             ingressNginx:
+      true             postgres: true           devops: true     repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.0"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true ````  You can also add any ad-hoc RBAC role/bindings via
+      .Values.extraRbac multiline string  For example:  ```yaml extraRbac: |   kind:
+      Role   apiVersion: rbac.authorization.k8s.io/v1   metadata:    name: cheesecake-users-readonly-role    namespace:
+      {{ .Release.Namespace }}   rules:     - apiGroups: [""]       resources:  ["services",
+      "pods", "pods/log", "configmaps"]       verbs: ["get", "list", "watch"]     -
+      apiGroups: [""]       resources:  ["pods"]       verbs: ["delete"]     - apiGroups:
+      [""]       resources: ["pods/portforward", "services/portforward", "pods/exec"]       verbs:
+      ["create"]     - apiGroups: ["extensions"]       resources:  ["*"]       verbs:
+      ["get", "list", "watch"]     - apiGroups: ["batch"]       resources:  ["*"]       verbs:
+      ["get", "list", "watch"]     - apiGroups: ["apps"]       resources:  ["*"]       verbs:
+      ["get", "list", "watch"]     - apiGroups: ["tekton.dev"]       resources:  ["*"]       verbs:  ["taskruns",
+      "pipelineruns", "pipelines", "tasks"]    ---   kind: RoleBinding   apiVersion:
+      rbac.authorization.k8s.io/v1   metadata:     name: cheesecake:users     namespace:
+      {{ .Release.Namespace }}   roleRef:     apiGroup: rbac.authorization.k8s.io     kind:
+      Role     name: cheesecake-users-readonly-role   subjects:   - apiGroup: rbac.authorization.k8s.io     kind:
+      Group     name: cheesecake:users ```` '
+    digest: 90064964e4eb279a81b16348778e55c5657e1907c01f7772bdc6b8e165ff93a3
+    maintainers:
+    - email: nospam@saritasa.com
+      name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-rbac
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-rbac-0.1.5/saritasa-rbac-0.1.5.tgz
+    version: 0.1.5
+  - apiVersion: v2
     created: "2022-02-28T10:21:18.995187393Z"
     description: 'A Helm chart for Kubernetes implementing RBAC rules for saritasa
       developers, devops and client''s team members  You can see role bindings this
@@ -2641,4 +2682,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2022-05-06T02:11:53.796044965Z"
+generated: "2022-05-18T14:01:11.016365299Z"
