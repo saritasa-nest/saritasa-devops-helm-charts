@@ -8,14 +8,8 @@ rbac:
     ci: false
     # -- should we add ability to work with ingress-nginx pods in ingress-nginx ns
     ingressNginx: true
-    # -- should we add mysql (cli tools, port-forwarder) namespace access to client team members
-    mysql: false
-    # -- should we add mssql (cli tools, port-forwarder) namespace access to client team members
-    mssql: false
-    # -- should we add postgres (cli tools, port-forwarder) namespace access to client team members
-    postgres: false
-    # -- should we add mongodb (cli tools, port-forwarder) namespace access to client team members
-    mongodb: false
+    # -- should we add utils (cli tools, port-forwarder for dbs) namespace access to client team members
+    utils: false
   developers:
     # -- should we give access to all applications to saritasa developers
     apps: false
@@ -23,14 +17,8 @@ rbac:
     ci: false
     # -- should we add ability to work with ingress-nginx pods in ingress-nginx ns
     ingressNginx: false
-    # -- should we add mysql (cli tools, port-forwarder) namespace access to saritasa developers
-    mysql: false
-    # -- should we add mssql (cli tools, port-forwarder) namespace access to saritasa developers
-    mssql: false
-    # -- should we add postgres (cli tools, port-forwarder) namespace access to saritasa developers
-    postgres: false
-    # -- should we add mongodb (cli tools, port-forwarder) namespace access to saritasa developers
-    mongodb: false
+    # -- should we add utils (cli tools, port-forwarder for dbs) namespace access to client team members
+    utils: false
   # -- should we create cluster role/binding for devops team
   devops: false
 
