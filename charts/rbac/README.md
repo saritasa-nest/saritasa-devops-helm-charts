@@ -31,7 +31,7 @@ saritasa-rbac
 
 ## `chart.version`
 
-![Version: 0.1.4](https://img.shields.io/badge/Version-0.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.6](https://img.shields.io/badge/Version-0.1.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -51,7 +51,7 @@ You can see role bindings this way:
 ➜ k rbac-lookup --kind group G saritasa
   saritasa:sso:developers    ci                 Role/saritasa-developers-role
   saritasa:sso:developers    ingress-nginx      Role/saritasa-developers-role
-  saritasa:sso:developers    postgres           Role/saritasa-developers-role
+  saritasa:sso:developers    utils              Role/saritasa-developers-role
   saritasa:sso:developers    prod               Role/saritasa-developers-readonly-role
   saritasa:sso:developers    cluster-wide       ClusterRole/saritasa-developers-readonly-clusterrole
 ````
@@ -163,18 +163,12 @@ extraRbac: |
 | rbac.client.apps | bool | `false` | should we add prod/staging etc namespace access to client team members |
 | rbac.client.ci | bool | `false` | should we add ci namespace access to client team members |
 | rbac.client.ingressNginx | bool | `true` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
-| rbac.client.mongodb | bool | `false` | should we add mongodb (cli tools, port-forwarder) namespace access to client team members |
-| rbac.client.mssql | bool | `false` | should we add mssql (cli tools, port-forwarder) namespace access to client team members |
-| rbac.client.mysql | bool | `false` | should we add mysql (cli tools, port-forwarder) namespace access to client team members |
 | rbac.client.name | string | `""` | client name (single word, no spaces, dashes, columns), will be used in RBAC group naming. |
-| rbac.client.postgres | bool | `false` | should we add postgres (cli tools, port-forwarder) namespace access to client team members |
+| rbac.client.utils | bool | `false` | should we add utils (cli tools, port-forwarder for dbs) namespace access to client team members |
 | rbac.developers.apps | bool | `false` | should we give access to all applications to saritasa developers |
 | rbac.developers.ci | bool | `false` | should we add ci namespace access to saritasa developers |
 | rbac.developers.ingressNginx | bool | `false` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
-| rbac.developers.mongodb | bool | `false` | should we add mongodb (cli tools, port-forwarder) namespace access to saritasa developers |
-| rbac.developers.mssql | bool | `false` | should we add mssql (cli tools, port-forwarder) namespace access to saritasa developers |
-| rbac.developers.mysql | bool | `false` | should we add mysql (cli tools, port-forwarder) namespace access to saritasa developers |
-| rbac.developers.postgres | bool | `false` | should we add postgres (cli tools, port-forwarder) namespace access to saritasa developers |
+| rbac.developers.utils | bool | `false` | should we add utils (cli tools, port-forwarder for dbs) namespace access to client team members |
 | rbac.devops | bool | `false` | should we create cluster role/binding for devops team |
 
 ----------------------------------------------
