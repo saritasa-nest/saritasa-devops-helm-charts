@@ -179,7 +179,7 @@ to specific project trigger-binding:
 | images.argocd | string | `"argoproj/argocd:v2.3.4"` | argocd cli image (used in argocd-deploy task) |
 | images.awscli | string | `"docker.io/amazon/aws-cli:2.7.4"` | aws cli image (used for aws ecr auth) |
 | images.bash | string | `"docker.io/library/bash:5.1.8"` | bash image (used for various ops in steps) |
-| images.git | string | `"alpine/git:v2.34.2"` | git image |
+| images.git | string | `"alpine/git:v2.32.0"` | git image |
 | images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650"` | kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022 |
 | images.kubectl | string | `"bitnami/kubectl:1.22.10"` | kubectl cli |
 | images.kustomize | string | `"k8s.gcr.io/kustomize/kustomize:v4.5.4"` | kustomize cli |

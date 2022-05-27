@@ -14,7 +14,7 @@ images:
   # -- kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022
   kaniko:    gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650
   # -- git image
-  git:       alpine/git:v2.34.2
+  git:       alpine/git:v2.32.0
   # -- kustomize cli
   kustomize: k8s.gcr.io/kustomize/kustomize:v4.5.4 # https://github.com/kubernetes/k8s.io/blob/main/k8s.gcr.io/images/k8s-staging-kustomize/images.yaml
   # -- kubectl cli
@@ -176,7 +176,7 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: git-fetch-tags
-          image: alpine/git:v2.34.2
+          image: alpine/git:v2.32.0
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
