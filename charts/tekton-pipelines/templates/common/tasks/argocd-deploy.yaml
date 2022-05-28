@@ -30,7 +30,8 @@ spec:
           --grpc-web \
           --grpc-web-root-path $ARGOCD_ROOT_PATH \
           --username $ARGOCD_USERNAME \
-          --password $ARGOCD_PASSWORD
+          --password $ARGOCD_PASSWORD \
+          --http-retry-max 3
 
         argocd app sync $(params.application) \
           --grpc-web \
