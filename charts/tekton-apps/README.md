@@ -205,6 +205,7 @@ spec:
   - apps[PROJECT].components[NAME].argocd.source.targetRevision - tag or branch in the repository for ArgoCD Application (default: kubernetes branch for basic projects
     "<apps[PROJECT].kubernetesRepository.branch>" or "11.0.14" for wordpress projects)
   - apps[PROJECT].components[NAME].applicationURL - url that should be used in tekton build ConfigMap `APPLICATION_URL` param
+  - apps[PROJECT].components[NAME].ignoreDeploymentReplicasDiff - flag whether this exact ArgoCD application should ignore `Replicas` count differences for deployments. It may be needed for `staging` and `prod` environments which use HPA (default: false)
   - apps[PROJECT].components[NAME].tektonKubernetesRepoDeployKeyName - name of existing in kubernetes cluster secret with SSH key to kubernetes repository, used in `kustomize` deployment
     step (i.e. addon-backend-deploy-key). This param sets by default to `<project>-kubernetes-aws-deploy-key` if project has `kubernetesRepository` param in values (actual only for basic
     components, not wordpress)
@@ -601,6 +602,82 @@ spec:
                   repository: xxx-backend
                   pipeline: buildpack-django-build-pipeline
                   applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/backend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.16"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
+  If you want to enable ignoring deployment replicas count differences in ArgoCD application of your component add `apps[PROJECT].components[NAME].ignoreDeploymentReplicasDiff: true` flag like in the below example (it may be needed for `staging` and `prod` envs, where you have horizontal pod autoscheduling - HPA):
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: staging
+          ...
+          apps:
+            - project: xxx-dev
+              environment: dev
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: xxx-dev
+                extraDestinationNamespaces:
+                  - argo-cd
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  repository: xxx-backend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  ignoreDeploymentReplicasDiff: true
                   eventlistener:
                     template: buildpack-django-build-pipeline-trigger-template
                     gitWebhookBranches:
