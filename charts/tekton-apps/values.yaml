@@ -76,6 +76,7 @@ apps: []
   #       repository: xxx-backend
   #       pipeline: buildpack
   #       applicationURL: https://api.site.com
+  #       ignoreDeploymentReplicasDiff: false
   #       eventlistener:
   #         template: buildpack-backend-build-pipeline-trigger-template
   #       extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
@@ -92,6 +93,7 @@ apps: []
   #       repository: xxx-frontend
   #       pipeline: buildpack
   #       applicationURL: https://site.com
+  #       ignoreDeploymentReplicasDiff: false
   #       eventlistener:
   #         enableWebhookSecret: false
   #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
