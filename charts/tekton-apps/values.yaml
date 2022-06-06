@@ -74,9 +74,10 @@ apps: []
   #   components:
   #     - name: backend
   #       repository: xxx-backend
+  #       argocd:
+  #         ignoreDeploymentReplicasDiff: true
   #       pipeline: buildpack
   #       applicationURL: https://api.site.com
-  #       ignoreDeploymentReplicasDiff: false
   #       eventlistener:
   #         template: buildpack-backend-build-pipeline-trigger-template
   #       extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
@@ -91,9 +92,10 @@ apps: []
   #
   #     - name: frontend
   #       repository: xxx-frontend
+  #       argocd:
+  #         ignoreDeploymentReplicasDiff: true
   #       pipeline: buildpack
   #       applicationURL: https://site.com
-  #       ignoreDeploymentReplicasDiff: false
   #       eventlistener:
   #         enableWebhookSecret: false
   #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
