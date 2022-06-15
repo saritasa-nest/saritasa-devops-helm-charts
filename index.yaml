@@ -2450,6 +2450,55 @@ entries:
     version: 0.1.0
   saritasa-tekton-pipelines:
   - apiVersion: v2
+    created: "2022-06-15T23:07:41.896939869Z"
+    dependencies:
+    - condition: saritasa-tekton.enabled
+      name: saritasa-tekton
+      repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      version: ~0.1.x
+    description: 'A Helm chart for Tekton Pipelines  Implements: - common tekton tasks
+      - common tekton pipelines - common tekton trigger templates - common tekton
+      trigger bindings  Implemented pipelines include: - buildpack based pipelines
+      based on generator template (php, python, frontend, nodejs, ruby, go) - kaniko
+      pipeline - wordpress pipeline  ## `example usage with argocd`  Install the chart:  ```
+      helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      ```  then if you want to support only frontend and django pipelines based on
+      buildpack without any script modifications:  ```yaml apiVersion: argoproj.io/v1alpha1
+      kind: Application metadata:   name: tekton-pipelines   namespace: argo-cd   finalizers:   -
+      resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "60" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: ci   project: default   source:     chart:
+      saritasa-tekton-pipelines     helm:       values: |         buildpacks:           enabled:
+      true           generate:             buildpackFrontendBuildPipeline:               enabled:
+      true              buildpackDjangoBuildPipeline:               enabled: true      repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.4"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true ```  If you want to modify the behavior of the build step
+      you can easily do that by redefining steps you want to run prior to running
+      the `build` step of the associated buildpack pipeline. You can create multiple
+      versions of pipelines as a result. Just make sure to give them a different name  an
+      example:  ```yaml buildpacks:   enabled: true   generate:     buildpackFrontendBuildPipelineNew:       name:
+      buildpack-frontend-build-pipeline-new       enabled: false       buildTaskName:
+      buildpack-frontend-new       buildTaskSteps:         - name: hello1           image:
+      node:16           imagePullPolicy: IfNotPresent           workingDir: $(resources.inputs.app.path)           script:
+      |             #!/bin/bash             echo "hello world1"          - name: hello2           image:
+      node:16           imagePullPolicy: IfNotPresent           workingDir: $(resources.inputs.app.path)           script:
+      |             #!/bin/bash             echo "hello world2" ```  If you want to
+      modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to
+      `kaniko-pipeline`. For example, if you want to pass `BASE_IMAGE` build argument
+      value to be used in Dockerfile you can add following line to specific project
+      trigger-binding: ```yaml - name: kaniko_extra_args   value: --build-arg=BASE_IMAGE=965067289393.dkr.ecr.us-west-2.amazonaws.com/saritasa/legacy/php:php71-smart-screen-base
+      ``` '
+    digest: f5b288e30fbed4e9bded13698e0c9b7f177935badb0b264d7c82a65aef73b7b3
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-pipelines
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.22/saritasa-tekton-pipelines-0.1.22.tgz
+    version: 0.1.22
+  - apiVersion: v2
     created: "2022-06-15T02:39:41.813570987Z"
     dependencies:
     - condition: saritasa-tekton.enabled
@@ -3395,4 +3444,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2022-06-15T02:39:41.813906704Z"
+generated: "2022-06-15T23:07:41.897631314Z"
