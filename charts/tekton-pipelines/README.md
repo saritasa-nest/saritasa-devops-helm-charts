@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.20](https://img.shields.io/badge/Version-0.1.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.21](https://img.shields.io/badge/Version-0.1.21-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -118,7 +118,7 @@ buildpacks:
       buildTaskName: buildpack-frontend-new
       buildTaskSteps:
         - name: hello1
-          image: node:14
+          image: node:16
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
@@ -126,7 +126,7 @@ buildpacks:
             echo "hello world1"
 
         - name: hello2
-          image: node:15
+          image: node:16
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
