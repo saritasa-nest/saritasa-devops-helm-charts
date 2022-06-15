@@ -58,6 +58,19 @@ spec:
         - name: source
           workspace: source
 
+    - name: detect-nodejs-version
+      taskRef:
+        name: detect-nodejs-version
+      resources:
+        inputs:
+          - name: app
+            resource: app
+      params:
+        - name: default_version
+          value: "14"
+      runAfter:
+        - set-env-vars
+
     - name: {{ .pipeline.buildTaskName }}
       taskRef:
         name: {{ .pipeline.buildTaskName }}
@@ -85,13 +98,15 @@ spec:
           value: "$(params.source_subpath)"
         - name: platform_dir
           value: "$(params.platform_dir)"
+        - name: node_version
+          value: "$(tasks.detect-nodejs-version.results.node-version)"
         - name: environment
           value: "$(params.environment)"
       workspaces:
         - name: source
           workspace: source
       runAfter:
-        - set-env-vars
+        - detect-nodejs-version
 
     - name: kustomize
       taskRef:

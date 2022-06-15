@@ -1,0 +1,102 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: debug-backend-pipeline
+  namespace: ci
+spec:
+  params:
+  - name: application
+    value: vp-backend-staging
+  - name: project
+    value: backend
+  - name: sha
+    value: 7454d6e
+  - name: head_commit
+    value: 7454d6e5c218817d89e9c43b3c8b67140a35bc8d
+  - name: head_commit_message
+    value: Trigger Build
+  - name: pusher_name
+    value: Kseniya Shaydurova
+  - name: pusher_email
+    value: kseniya.shaydurova@saritasa.com
+  - name: pusher_avatar
+    value: https://avatars.githubusercontent.com/u/26448672?v=4
+  - name: pusher_url
+    value: https://github.com/kseniyashaydurova
+  - name: repository_url
+    value: https://github.com/saritasa-nest/vp-backend
+  - name: repository_ssh_url
+    value: git@github.com:saritasa-nest/vp-backend.git
+  - name: environment
+    value: staging
+  - name: branch
+    value: refs/heads/main
+  - name: docker_registry
+    value: 332927762005.dkr.ecr.us-west-2.amazonaws.com
+  - name: docker_registry_repository
+    value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/staging/backend
+  - name: buildpack_builder_image
+    value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/google/builder:v1
+  - name: buildpack_runner_image
+    value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/google/runner:v1
+  - name: source_subpath
+    value: .
+  - name: kubernetes_repository_kustomize_path
+    value: apps/backend/manifests/staging
+  - name: kubernetes_branch
+    value: main
+  pipelineRef:
+    name: buildpack-django-build-pipeline
+  podTemplate:
+    nodeSelector:
+      ci: "true"
+    tolerations:
+    - effect: NoSchedule
+      key: ci
+      operator: Equal
+      value: "true"
+    volumes:
+    - name: vp-backend-staging-buildpacks-cache
+      persistentVolumeClaim:
+        claimName: vp-backend-staging-buildpacks-cache-pvc
+    - downwardAPI:
+        items:
+        - fieldRef:
+            fieldPath: metadata.labels
+          path: labels
+        - fieldRef:
+            fieldPath: metadata.annotations
+          path: annotations
+      name: podinfo
+  resources:
+  - name: app
+    resourceSpec:
+      params:
+      - name: url
+        value: git@github.com:saritasa-nest/vp-backend.git
+      - name: revision
+        value: 7454d6e5c218817d89e9c43b3c8b67140a35bc8d
+      type: git
+  - name: kubernetes-repo
+    resourceSpec:
+      params:
+      - name: url
+        value: git@github.com:saritasa-nest/vp-kubernetes-aws.git
+      - name: revision
+        value: main
+      type: git
+  - name: image
+    resourceSpec:
+      params:
+      - name: url
+        value: 332927762005.dkr.ecr.us-west-2.amazonaws.com/vp/staging/backend:staging-7454d6e
+      type: image
+  serviceAccountName: vp-backend-staging-build-pipeline-sa
+  serviceAccountNames:
+  - serviceAccountName: vp-backend-staging-build-pipeline-kustomize-sa
+    taskName: kustomize
+  timeout: 30m0s
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: vp-backend-staging-workspace-pvc
