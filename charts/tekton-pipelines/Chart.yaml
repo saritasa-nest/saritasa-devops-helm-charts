@@ -3,18 +3,10 @@ name: saritasa-tekton-pipelines
 
 type: application
 
-# This is the version number of the tekton engine application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
-appVersion: "v0.28.2"
-dashboardVersion: "v0.21.0"
-triggersVersions: "v0.16.0"
-
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.20
+version: 0.1.21
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -104,7 +96,7 @@ description: |
         buildTaskName: buildpack-frontend-new
         buildTaskSteps:
           - name: hello1
-            image: node:14
+            image: node:16
             imagePullPolicy: IfNotPresent
             workingDir: $(resources.inputs.app.path)
             script: |
@@ -112,7 +104,7 @@ description: |
               echo "hello world1"
 
           - name: hello2
-            image: node:15
+            image: node:16
             imagePullPolicy: IfNotPresent
             workingDir: $(resources.inputs.app.path)
             script: |

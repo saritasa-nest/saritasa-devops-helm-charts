@@ -56,7 +56,7 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: build-static
-          image: node:14
+          image: node:16
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
@@ -100,7 +100,7 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: build-static
-          image: node:14
+          image: node:16
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
@@ -221,7 +221,7 @@ buildpacks:
             echo "semantic version updated"
 
         - name: build-static
-          image: node:14
+          image: node:16
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
