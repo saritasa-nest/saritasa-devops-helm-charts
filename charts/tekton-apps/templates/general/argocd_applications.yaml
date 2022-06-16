@@ -29,7 +29,13 @@ spec:
     path: {{ $argocdSource.path | default (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) }}
     repoURL: {{ $argocdSource.repoUrl | default ($project.kubernetesRepository).url }}
     targetRevision: {{ $argocdSource.targetRevision | default ($project.kubernetesRepository).branch }}
-
+  {{ if (ternary $argocd.ignoreDeploymentReplicasDiff false (hasKey $argocd "ignoreDeploymentReplicasDiff")) }}
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas
+  {{- end }}
   syncPolicy:
     automated:
       prune: true
