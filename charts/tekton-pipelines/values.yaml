@@ -69,7 +69,7 @@ buildpacks:
 
               # set cache
               npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci --silent
+              npm ci
 
               (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null
@@ -116,7 +116,7 @@ buildpacks:
 
               # set cache
               npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci --silent
+              npm ci
 
               npm run build:$(params.environment) || echo "unable to build $(params.environment)"
               rm -rf node_modules && echo "remove node_modules dir"
@@ -260,7 +260,7 @@ buildpacks:
 
               # set cache
               npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci --silent
+              npm ci
 
               (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
               chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
