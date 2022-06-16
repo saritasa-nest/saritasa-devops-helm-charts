@@ -14,6 +14,10 @@ gitBranchPrefixes:
 # -- storage class for PVCs associated with the apps
 storageClassName: gp2
 
+# -- node selector for event listener pod
+nodeSelector: ""
+#  ops: 'true'
+
 # -- aws configuration
 aws: {}
   # region: "us-west-2"

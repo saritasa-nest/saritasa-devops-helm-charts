@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.1.19](https://img.shields.io/badge/Version-0.1.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.20](https://img.shields.io/badge/Version-0.1.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -90,7 +90,9 @@ spec:
         environment: staging
         gitBranchPrefixes:
           - staging
-        storageClassName: gp2
+        storageClassName: gp3
+        nodeSelector:
+          ops: 'true'
         aws:
           region: "us-west-2"
           dns: staging.site.com
@@ -1024,6 +1026,7 @@ spec:
 | eventlistener.enableWebhookSecret | bool | `true` | should we enable eventlistener for tekton triggers? |
 | eventlistener.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
+| nodeSelector | string | `""` | node selector for event listener pod |
 | runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
 | slack.imagesLocation | string | `"https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com"` | slack notification images (s3 bucket prefix) |

@@ -8,6 +8,16 @@ metadata:
     argocd.argoproj.io/sync-wave: "10"
 spec:
   serviceAccountName: {{ .Values.serviceAccount.name }}
+  {{- if .Values.nodeSelector }}
+  resources:
+    kubernetesResource:
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              {{- toYaml .Values.nodeSelector | nindent 14 }}
+  {{- end }}
+
   triggers:
   {{- range $project := .Values.apps }}
   {{- if $project.enabled }}
