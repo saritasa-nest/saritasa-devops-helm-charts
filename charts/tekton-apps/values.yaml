@@ -74,6 +74,8 @@ apps: []
   #   components:
   #     - name: backend
   #       repository: xxx-backend
+  #       argocd:
+  #         ignoreDeploymentReplicasDiff: true
   #       pipeline: buildpack
   #       applicationURL: https://api.site.com
   #       eventlistener:
@@ -90,6 +92,8 @@ apps: []
   #
   #     - name: frontend
   #       repository: xxx-frontend
+  #       argocd:
+  #         ignoreDeploymentReplicasDiff: true
   #       pipeline: buildpack
   #       applicationURL: https://site.com
   #       eventlistener:
