@@ -22,30 +22,32 @@ spec:
           name: $(params.application)-argocd-secret  # used for authentication (username/password or auth token)
   steps:
     - name: deploy
-      image: {{ .Values.images.argocd | default "argoproj/argocd:latest" }}
+      image: cfmanteiga/alpine-bash-curl-jq
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
-        #!/bin/bash
-        argocd login $ARGOCD_SERVER \
+        #!/usr/bin/env bash
+        set +x
+        curl --silent -o /usr/local/bin/argocd {{ .Values.images.argocd_cli }}
+
+        # connect to private service
+        # instead of connecting through a public ingress
+        echo "login to argocd"
+        yes | argocd login \
+          --insecure argo-cd-argocd-server.argo-cd \
           --grpc-web \
           --grpc-web-root-path $ARGOCD_ROOT_PATH \
           --username $ARGOCD_USERNAME \
           --password $ARGOCD_PASSWORD \
           --http-retry-max 3
 
-        argocd app sync $(params.application) \
-          --grpc-web \
-          --grpc-web-root-path $ARGOCD_ROOT_PATH \
-          --server $ARGOCD_SERVER
+        echo "app sync $(params.application)"
+        argocd app sync $(params.application)
 
         argocd app wait $(params.application) \
           --health=true \
-          --operation=true \
-          --grpc-web \
-          --grpc-web-root-path $ARGOCD_ROOT_PATH \
-          --server $ARGOCD_SERVER
+          --operation=true
 
-        synced=`argocd app get $(params.application) | grep "Sync Status:" | awk '{print tolower($3)}'`
-        healthy=`argocd app get $(params.application) | grep "Health Status:" | awk '{print tolower($3)}'`
-        [[ "$synced" == "synced" ]] && [[ "$healthy" == "healthy" ]] \
-           && echo "Sync completed succcessfully. App is healthy!" || (echo "Sync failed" && exit 1)
+        synced=`argocd app get $(params.application) -o json | jq -r '.status.sync.status' | awk '{print tolower($1)}'`
+        healthy=`argocd app get $(params.application) -o json | jq -r '.status.health.status' | awk '{print tolower($1)}'`
+
+        [[ "$synced" == "synced" ]] && [[ "$healthy" == "healthy" ]] && echo "Sync completed succcessfully. App is healthy!" || (echo "Sync failed" && exit 1)

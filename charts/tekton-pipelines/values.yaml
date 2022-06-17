@@ -5,8 +5,10 @@
 # -- default images used in our solution
 # @default -- See below
 images:
-  # -- argocd cli image (used in argocd-deploy task)
+  # -- argocd image (used in argocd-deploy task)
   argocd:    argoproj/argocd:v2.3.4
+  # -- argocd cli downdload URL
+  argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64
   # -- bash image (used for various ops in steps)
   bash:      docker.io/library/bash:5.1.8
   # -- aws cli image (used for aws ecr auth)
