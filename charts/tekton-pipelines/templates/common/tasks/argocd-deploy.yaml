@@ -27,27 +27,28 @@ spec:
       script: |
         #!/usr/bin/env bash
         set +x
-        curl --silent -o /usr/local/bin/argocd {{ .Values.images.argocd_cli }}
+        curl --silent --location -o /usr/local/bin/argocd {{ .Values.images.argocd_cli }}
+        chmod +x /usr/local/bin/argocd
 
         # connect to private service
         # instead of connecting through a public ingress
-        echo "login to argocd"
-        yes | argocd login \
-          --insecure argo-cd-argocd-server.argo-cd \
+        yes | argocd login argo-cd-argocd-server.argo-cd \
+          --insecure \
           --grpc-web \
           --grpc-web-root-path $ARGOCD_ROOT_PATH \
           --username $ARGOCD_USERNAME \
           --password $ARGOCD_PASSWORD \
           --http-retry-max 3
 
-        echo "app sync $(params.application)"
-        argocd app sync $(params.application)
+        argocd app sync $(params.application) \
+          --server=argo-cd-argocd-server.argo-cd
 
         argocd app wait $(params.application) \
+          --server=argo-cd-argocd-server.argo-cd \
           --health=true \
           --operation=true
 
-        synced=`argocd app get $(params.application) -o json | jq -r '.status.sync.status' | awk '{print tolower($1)}'`
-        healthy=`argocd app get $(params.application) -o json | jq -r '.status.health.status' | awk '{print tolower($1)}'`
+        synced=`argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | jq -r '.status.sync.status' | awk '{print tolower($1)}'`
+        healthy=`argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | jq -r '.status.health.status' | awk '{print tolower($1)}'`
 
         [[ "$synced" == "synced" ]] && [[ "$healthy" == "healthy" ]] && echo "Sync completed succcessfully. App is healthy!" || (echo "Sync failed" && exit 1)
