@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.25](https://img.shields.io/badge/Version-0.1.25-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.26](https://img.shields.io/badge/Version-0.1.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -176,7 +176,6 @@ to specific project trigger-binding:
 | buildpacks.generate.buildpackRubyBuildPipeline.name | string | `"buildpack-ruby-build-pipeline"` | the name of the generated pipeline |
 | imagePullPolicy | string | `"IfNotPresent"` | default imagePullPolicy to be used for images pulled in tekton task steps |
 | images | object | See below | default images used in our solution |
-| images.argocd | string | `"argoproj/argocd:v2.3.4"` | argocd image (used in argocd-deploy task) |
 | images.argocd_cli | string | `"https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64"` | argocd cli downdload URL |
 | images.awscli | string | `"docker.io/amazon/aws-cli:2.7.4"` | aws cli image (used for aws ecr auth) |
 | images.bash | string | `"docker.io/library/bash:5.1.8"` | bash image (used for various ops in steps) |
