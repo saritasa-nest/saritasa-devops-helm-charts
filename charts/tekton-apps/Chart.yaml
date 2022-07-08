@@ -13,7 +13,7 @@ triggersVersions: "v0.16.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.19
+version: 0.1.20
 
 
 maintainers:
@@ -71,7 +71,9 @@ description: |
           environment: staging
           gitBranchPrefixes:
             - staging
-          storageClassName: gp2
+          storageClassName: gp3
+          nodeSelector:
+            ops: 'true'
           aws:
             region: "us-west-2"
             dns: staging.site.com
