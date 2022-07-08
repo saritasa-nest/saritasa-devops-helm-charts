@@ -22,11 +22,18 @@ spec:
           name: $(params.application)-argocd-secret  # used for authentication (username/password or auth token)
   steps:
     - name: deploy
-      image: {{ .Values.images.argocd | default "argoproj/argocd:latest" }}
+      image: cfmanteiga/alpine-bash-curl-jq
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
-        #!/bin/bash
-        argocd login $ARGOCD_SERVER \
+        #!/usr/bin/env bash
+        set +x
+        curl --silent --location -o /usr/local/bin/argocd {{ .Values.images.argocd_cli }}
+        chmod +x /usr/local/bin/argocd
+
+        # connect to private service
+        # instead of connecting through a public ingress
+        yes | argocd login argo-cd-argocd-server.argo-cd \
+          --insecure \
           --grpc-web \
           --grpc-web-root-path $ARGOCD_ROOT_PATH \
           --username $ARGOCD_USERNAME \
@@ -34,18 +41,14 @@ spec:
           --http-retry-max 3
 
         argocd app sync $(params.application) \
-          --grpc-web \
-          --grpc-web-root-path $ARGOCD_ROOT_PATH \
-          --server $ARGOCD_SERVER
+          --server=argo-cd-argocd-server.argo-cd
 
         argocd app wait $(params.application) \
+          --server=argo-cd-argocd-server.argo-cd \
           --health=true \
-          --operation=true \
-          --grpc-web \
-          --grpc-web-root-path $ARGOCD_ROOT_PATH \
-          --server $ARGOCD_SERVER
+          --operation=true
 
-        synced=`argocd app get $(params.application) | grep "Sync Status:" | awk '{print tolower($3)}'`
-        healthy=`argocd app get $(params.application) | grep "Health Status:" | awk '{print tolower($3)}'`
-        [[ "$synced" == "synced" ]] && [[ "$healthy" == "healthy" ]] \
-           && echo "Sync completed succcessfully. App is healthy!" || (echo "Sync failed" && exit 1)
+        synced=`argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | jq -r '.status.sync.status' | awk '{print tolower($1)}'`
+        healthy=`argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | jq -r '.status.health.status' | awk '{print tolower($1)}'`
+
+        [[ "$synced" == "synced" ]] && [[ "$healthy" == "healthy" ]] && echo "Sync completed succcessfully. App is healthy!" || (echo "Sync failed" && exit 1)
