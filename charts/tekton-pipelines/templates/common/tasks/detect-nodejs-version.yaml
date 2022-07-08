@@ -1,0 +1,46 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: detect-nodejs-version
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    Nodejs version detected from package.json
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+
+  params:
+    - name: default_version
+      type: string
+      description: nodejs default version to be used if not detected in package.json
+
+  results:
+    - name: node-version
+      description: Nodejs version detected from package.json
+
+  steps:
+    - name: get-nodejs-version
+      image: cfmanteiga/alpine-bash-curl-jq
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.app.path)
+      script: |
+        #!/usr/bin/env bash
+        set -Eeo pipefail
+
+        if [ ! -f package.json ]; then
+          echo "no package.json file found"
+          echo -n "$(params.default_version)" > $(results.node-version.path)
+          exit 0
+        fi
+
+        # if no engine is defined we use node:14 as the default image
+        node_ver=$(cat package.json | jq -r ".engines.node // 14" | sed 's/[\^>~=]//g')
+
+        # store in the results
+        # which we will use as the image:"node:version" in build task
+        # later in the pipeline
+        echo -n "$node_ver" > $(results.node-version.path)
+        echo "detected node version: $node_ver"

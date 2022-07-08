@@ -51,6 +51,11 @@ spec:
       description: the name of the persistent app cache image.
       default: ""
 
+    - name: node_version
+      type: string
+      description: nodejs version of the image used to build static
+      default: "14"
+
     - name: platform_dir
       type: string
       description: the name of the platform directory.
