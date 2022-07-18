@@ -62,7 +62,7 @@ description: |
         values: |
           rbac:
             client:
-              name: "producebox"
+              name: "example"
               apps: true
             developers:
               ci: true
@@ -81,14 +81,14 @@ description: |
 
   You can also add any ad-hoc RBAC role/bindings via .Values.extraRbac multiline string
 
-  For example:
+  For `example` client:
 
   ```yaml
   extraRbac: |
     kind: Role
     apiVersion: rbac.authorization.k8s.io/v1
     metadata:
-     name: cheesecake-users-readonly-role
+     name: example-users-readonly-role
      namespace: {{ .Release.Namespace }}
     rules:
       - apiGroups: [""]
@@ -117,14 +117,14 @@ description: |
     kind: RoleBinding
     apiVersion: rbac.authorization.k8s.io/v1
     metadata:
-      name: cheesecake:users
+      name: example:users
       namespace: {{ .Release.Namespace }}
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: Role
-      name: cheesecake-users-readonly-role
+      name: example-users-readonly-role
     subjects:
     - apiGroup: rbac.authorization.k8s.io
       kind: Group
-      name: cheesecake:users
+      name: example:users
   ````
