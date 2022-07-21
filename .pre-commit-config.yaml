@@ -1,4 +1,17 @@
 repos:
+- repo: https://github.com/norwoodj/helm-docs
+  rev: v1.2.0
+  hooks:
+    - id: helm-docs
+      args:
+        # Make the tool search for charts only under the `example-charts` directory
+        - --chart-search-root=charts
+        # The `./` makes it relative to the chart-search-root set above
+        - --template-files=charts/_templates.gotmpl
+        # Repeating the flag adds this to the list, now [./_templates.gotmpl, README.md.gotmpl]
+        # A base filename makes it relative to each chart directory found
+        - --template-files=README.md.gotmpl
+
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v4.2.0
   hooks:
@@ -12,22 +25,8 @@ repos:
       args: [--fix=auto]
 
     # Common errors
-    - id: end-of-file-fixer
     - id: trailing-whitespace
       args: [--markdown-linebreak-ext=md]
 
     # Cross platform
     - id: check-case-conflict
-
-- repo: https://github.com/norwoodj/helm-docs
-  rev: v1.2.0
-  hooks:
-    - id: helm-docs
-      args:
-        # Make the tool search for charts only under the `example-charts` directory
-        - --chart-search-root=charts
-        # The `./` makes it relative to the chart-search-root set above
-        - --template-files=charts/_templates.gotmpl
-        # Repeating the flag adds this to the list, now [./_templates.gotmpl, README.md.gotmpl]
-        # A base filename makes it relative to each chart directory found
-        - --template-files=README.md.gotmpl
