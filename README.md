@@ -103,9 +103,3 @@ If you want to see the result of the build (packaged HELM chart) you can do:
 ```sh
 helm pull --version 0.0.4 --repo https://saritasa-nest.github.io/saritasa-devops-helm-charts/ demo
 ```
-
-an example:
-
-```sh
-git checkout -b feature/update-readme
-```
