@@ -103,3 +103,9 @@ If you want to see the result of the build (packaged HELM chart) you can do:
 ```sh
 helm pull --version 0.0.4 --repo https://saritasa-nest.github.io/saritasa-devops-helm-charts/ demo
 ```
+
+### remove the release
+
+If you made a release by accident and want to remove it you will need to:
+- remove remote tag, for example: `git tag -d demo-0.0.3 && git push origin :refs/tags/demo-0.0.3`
+- optionally remove `fix` or `feature` branch if you decided to cancel the change completely
