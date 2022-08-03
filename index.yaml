@@ -142,6 +142,21 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/jitsi-meet-0.2.0/jitsi-meet-0.2.0.tgz
     version: 0.2.0
+  maintenance-page:
+  - apiVersion: v2
+    created: "2022-08-03T21:37:29.869821938Z"
+    description: 'A Helm chart for Kubernetes to display a simple maintenance page.
+      By default it displays the following content: [https://codepen.io/dmitry-mightydevops/pen/poLaZqO](https://codepen.io/dmitry-mightydevops/pen/poLaZqO) '
+    digest: 3a0d294e1654bd8df227bdbe1b45ab907e0cbf91ef4eae49af53e69d333a85d2
+    maintainers:
+    - email: nospam@saritasa.com
+      name: Saritasa
+      url: https://www.saritasa.com/
+    name: maintenance-page
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/maintenance-page-0.0.1/maintenance-page-0.0.1.tgz
+    version: 0.0.1
   opsgenie-heartbeat:
   - apiVersion: v2
     created: "2022-05-06T00:38:15.366225237Z"
@@ -4215,4 +4230,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-0.1.0/saritasa-tekton-pipelines-0.1.0.tgz
     version: 0.1.0
-generated: "2022-07-21T21:13:14.704309325Z"
+generated: "2022-08-03T21:37:29.870164839Z"
