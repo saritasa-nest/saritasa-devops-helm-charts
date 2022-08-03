@@ -45,6 +45,27 @@ A Helm chart for Kubernetes to display a simple maintenance page.
 By default it displays the following content:
 [https://codepen.io/dmitry-mightydevops/pen/poLaZqO](https://codepen.io/dmitry-mightydevops/pen/poLaZqO)
 
+You can adjust the look by setting up the following values in the values.yaml file:
+
+```yaml
+message:
+  backgroundColor: "#d6433b"
+  textColor: "#fff"
+  title: "Site Maintenance"
+  header: "We&rsquo;ll be back soon!"
+  body: |
+    <p>Sorry for the inconvenience. We&rsquo;re performing some maintenance at the moment. We&rsquo;ll be back up shortly!</p>
+  footer: |
+    <p>&mdash; The DevOps Team</p>
+```
+
+or by supplying an entire HTML for the maintenance page via
+
+```yaml
+html: |
+  hello, the maintenance page HTML + CSS code is here
+```
+
 ## `chart.valuesTable`
 
 | Key | Type | Default | Description |
@@ -54,7 +75,7 @@ By default it displays the following content:
 | fullnameOverride | string | `""` |  |
 | html | string | `""` | html for the maintenance page. If you need a totally custom HTML design, then keep message config above empty and put here a full HTML (CSS+HTML). You can test the page here: https://codepen.io/dmitry-mightydevops/pen/poLaZqO |
 | image.pullPolicy | string | `"IfNotPresent"` | pull policy |
-| image.repository | string | `"saritasallc/kubernetes-maintenance-page"` | container repository |
+| image.repository | string | `"saritasallc/kubernetes-maintenance-page"` | container repository, adjust in https://github.com/saritasa-nest/saritasa-devops-docker-images/pull/29 |
 | image.tag | string | `"0.1"` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | credentials for docker login |
 | message | object | `{}` | message configuration in the maintenance page. |

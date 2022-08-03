@@ -6,7 +6,7 @@
 replicaCount: 1
 
 image:
-  # -- container repository
+  # -- container repository, adjust in https://github.com/saritasa-nest/saritasa-devops-docker-images/pull/29
   repository: saritasallc/kubernetes-maintenance-page
   # -- pull policy
   pullPolicy: IfNotPresent
