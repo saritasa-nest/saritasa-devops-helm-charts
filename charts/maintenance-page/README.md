@@ -50,7 +50,7 @@ By default it displays the following content:
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| environment | string | `"staging"` | name of the environment you're placing the maintenance page for like dev, prod, staging |
+| environment | string | `""` | name of the environment you're placing the maintenance page for like dev, prod, staging |
 | fullnameOverride | string | `""` |  |
 | html | string | `""` | html for the maintenance page. If you need a totally custom HTML design, then keep message config above empty and put here a full HTML (CSS+HTML). You can test the page here: https://codepen.io/dmitry-mightydevops/pen/poLaZqO |
 | image.pullPolicy | string | `"IfNotPresent"` | pull policy |

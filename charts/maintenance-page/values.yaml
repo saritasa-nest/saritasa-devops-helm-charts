@@ -14,7 +14,7 @@ image:
   tag: "0.1"
 
 # -- name of the environment you're placing the maintenance page for like dev, prod, staging
-environment: "staging"
+environment: ""
 # -- message configuration in the maintenance page.
 message: {}
   # backgroundColor: "#d6433b"
