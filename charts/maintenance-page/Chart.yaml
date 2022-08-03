@@ -1,0 +1,19 @@
+apiVersion: v2
+name: maintenance-page
+
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1
+
+maintainers:
+  - url: https://www.saritasa.com/
+    name: Saritasa
+    email: nospam@saritasa.com
+
+description: |
+  A Helm chart for Kubernetes to display a simple maintenance page.
+  By default it displays the following content:
+  [https://codepen.io/dmitry-mightydevops/pen/poLaZqO](https://codepen.io/dmitry-mightydevops/pen/poLaZqO)

@@ -1,0 +1,71 @@
+# Default values for maintenance-page.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# -- how many replicas (pods) to run
+replicaCount: 1
+
+image:
+  # -- container repository
+  repository: saritasallc/kubernetes-maintenance-page
+  # -- pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: "0.1"
+
+# -- name of the environment you're placing the maintenance page for like dev, prod, staging
+environment: "staging"
+# -- message configuration in the maintenance page.
+message: {}
+  # backgroundColor: "#d6433b"
+  # textColor: "#fff"
+  # title: "Site Maintenance"
+  # header: "We&rsquo;ll be back soon!"
+  # body: |
+  #   <p>Sorry for the inconvenience. We&rsquo;re performing some maintenance at the moment. We&rsquo;ll be back up shortly!</p>
+  # footer: |
+  #   <p>&mdash; The DevOps Team</p>
+
+# -- html for the maintenance page. If you need a totally custom HTML design, then keep message config above empty and put here a full HTML (CSS+HTML). You can test the page here: https://codepen.io/dmitry-mightydevops/pen/poLaZqO
+html: |
+
+# -- credentials for docker login
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext:
+  # -- run the container as non-root user
+  runAsNonRoot: true
+  # -- run under non-root user, 101 - is nginx user defined in the docker container
+  runAsUser: 101
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 50Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
