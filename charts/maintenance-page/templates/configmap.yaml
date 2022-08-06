@@ -5,7 +5,7 @@ metadata:
 data:
   index.html: |
     {{- if .Values.html }}
-    {{ .Values.html }}
+    {{- .Values.html | nindent 4 }}
     {{- else }}
     <!doctype html>
     <title>{{ .Values.message.title  | default "Site Maintenance" }}</title>
