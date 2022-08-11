@@ -21,6 +21,10 @@ rules:
   - apiGroups: ["apps"]
     resources:  ["*"]
     verbs: ["get", "list", "watch"]
+  # for rollout deployment restart
+  - apiGroups: ["apps", "extensions"]
+    resources:  ["deployments"]
+    verbs: ["get", "patch"]
   - apiGroups: ["tekton.dev"]
     resources:  ["*"]
     verbs:  ["taskruns", "pipelineruns", "pipelines", "tasks"]
