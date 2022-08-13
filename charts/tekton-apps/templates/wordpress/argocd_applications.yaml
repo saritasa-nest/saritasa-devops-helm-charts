@@ -250,7 +250,7 @@ spec:
         {{- toYaml $component.wordpress.extraEnvVars | nindent 10 }}
         {{- end }}
     repoURL: {{ $argocdSource.repoUrl | default "https://charts.bitnami.com/bitnami" }}
-    targetRevision: {{ $argocdSource.targetRevision | default "11.0.14" }}
+    targetRevision: {{ $argocdSource.targetRevision | default "15.0.16" }}
 
   syncPolicy:
     automated:
