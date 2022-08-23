@@ -190,7 +190,7 @@ buildpacks:
           resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
-            git fetch --tags
+            git fetch --tags --unshallow
           securityContext:
             privileged: true
             runAsUser: 0
