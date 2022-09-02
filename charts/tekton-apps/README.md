@@ -1013,6 +1013,44 @@ spec:
         - CreateNamespace=true
   ```
 
+## enable extraApps
+
+if you want to install additional packages for the project you can use `extraApps` as shown below:
+
+```
+apps:
+  - project: nmbl
+    enabled: true
+    argocd:
+      labels:
+        created-by: DmitrySemenov
+        ops-main: DmitrySemenov
+        ops-secondary: KseniyaShaydurova
+        pm: VadikKuznetsov
+        tm: AlekseyBashirov
+      namespace: staging
+      syncWave: 200
+    mailList: nmbl@saritasa.com
+    devopsMailList: devops+nmbl@saritasa.com
+    jiraURL: https://saritasa.atlassian.net/browse/NMBLCLD
+    tektonURL: https://tekton.proxylegalstaging.com/#/namespaces/ci/pipelineruns
+    slack: client-nmbl-ci
+    kubernetesRepository:
+      name: nmbl-kubernetes-aws
+      branch: feature/add-staging
+      url: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+
+    extraApps:
+      - name: nmbl-extra-apps
+        path: dev/argocd/apps
+        repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+        targetRevision: feature/sync-boilerplate
+
+    components:
+      - name: backend
+        repository: nmbl-backend
+```
+
 ## `chart.valuesTable`
 
 | Key | Type | Default | Description |
@@ -1033,4 +1071,3 @@ spec:
 | slack.prefix | string | `"client"` | channel prefix |
 | slack.suffix | string | `"ci"` | channel suffix |
 | storageClassName | string | `"gp2"` | storage class for PVCs associated with the apps |
-
