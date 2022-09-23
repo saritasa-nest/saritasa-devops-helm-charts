@@ -17,6 +17,10 @@ spec:
 
     - name: repository_ssh_url
       description: git repository ssh url
+    
+    - name: repository_submodules
+      description: defines whether repository should be initialized with submodules
+      default: "true"
 
     - name: kubernetes_repository_ssh_url
       description: git repository ssh url for kubernetes manifests repo
@@ -57,6 +61,8 @@ spec:
           value: "$(tt.params.buildpack_runner_image)"
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
+        - name: repository_submodules
+          value: "$(tt.params.repository_submodules)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}

@@ -229,6 +229,17 @@ buildpacks:
             chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
             echo "semantic version updated"
 
+        - name: remove-dcproj-files
+          workingDir: $(resources.inputs.app.path)
+          image: "docker.io/library/bash:latest"
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+            # clean `.dcproj` related files related to local development docker .NET project
+            cd $(resources.inputs.app.path)
+            find . -name '*.dcproj' -type f -delete
+
         - name: build-static
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
