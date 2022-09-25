@@ -13,7 +13,7 @@ triggersVersions: "v0.16.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.22
+version: 0.1.23
 
 
 maintainers:
@@ -733,6 +733,10 @@ description: |
                     repository: xxx-wordpress
                     pipeline: wordpress-build-pipeline
                     applicationURL: https://xxx.site.url
+                    argocd:
+                      ignoreDeploymentReplicasDiff: true
+                      source:
+                        targetRevision: 15.0.16
                     wordpress:
                       repository_ssh_url: git@github.com:saritasa-nest/xxx-wordpress.git
                       externalDatabase:
