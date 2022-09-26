@@ -1,0 +1,55 @@
+# -- target namespace for non-argocd deployment
+namespace: ""
+# -- part of resources name
+client: saritasa
+# -- part of resources name
+environment: rocks
+# -- rbac settings for role binding resources
+rbac:
+# -- client:view group
+  client: false
+# -- saritasa:sso:developers group
+  developers: false
+# -- deployments settings
+deployments:
+# -- default settings for deployments
+  defaults:
+    resources:
+      requests:
+        memory: 0Mi
+        cpu: 0m
+      limits:
+        memory: 256Mi
+        cpu: 200m
+# -- settings for aws-cli container which part of any of deployment with common /work-dir folder
+  awscli:
+    resources:
+      requests:
+        memory: 0Mi
+        cpu: 0m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+# -- list of deployments to created
+# example:
+# - name: mongodb
+#   image: docker.io/bitnami/mongodb:4.4.7-debian-10-r0
+  entities: []
+# -- portforward settings
+portforwards:
+# -- default settings for portforwards
+  defaults:
+    resources:
+      requests:
+        memory: 0Mi
+        cpu: 0m
+      limits:
+        memory: 512Mi
+        cpu: 200m
+# -- list of external resources to portforward
+# example:
+# - name: mongodb
+#   host: mongodb.mongodb.svc.cluster.local
+#   port: '27017'
+  entities: []
+

@@ -1,0 +1,59 @@
+{{ if .Values.deployments.entities }}
+{{ $prefix := printf "%s-%s" $.Values.client $.Values.environment }}
+{{- range $deployment := .Values.deployments.entities }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $prefix }}-{{ $deployment.name }}-client
+  {{- if $.Values.namespace }}
+  namespace: {{ $.Values.namespace }}
+  {{- end }}
+  labels:
+    app: {{ $prefix }}-{{ $deployment.name }}-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $prefix }}-{{ $deployment.name }}-client
+  template:
+    metadata:
+      labels:
+        app: {{ $prefix }}-{{ $deployment.name }}-client
+    spec:
+      nodeSelector:
+        databases: 'true'
+      securityContext:
+        runAsUser: 999
+      containers:
+        - name: {{ $deployment.name }}-client
+          image: {{ $deployment.image }}
+          command:
+            - /bin/bash
+            - -c
+            - sleep infinity & wait
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - NET_RAW
+                - CHOWN
+          resources: {{- toYaml (coalesce $deployment.resources $.Values.deployments.defaults.resources) | nindent 12 }}
+          volumeMounts:
+            - name: workdir
+              mountPath: /work-dir
+        - name: aws
+          image: bitnami/aws-cli
+          command:
+            - /bin/bash
+            - -c
+            - sleep infinity & wait
+          resources: {{- toYaml $.Values.deployments.awscli.resources | nindent 12 }}
+          volumeMounts:
+            - name: workdir
+              mountPath: /work-dir
+      volumes:
+        - name: workdir
+          emptyDir: {}
+{{- end }}
+{{- end }}

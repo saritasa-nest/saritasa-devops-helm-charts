@@ -1,0 +1,54 @@
+{{ if .Values.portforwards.entities }}
+{{- range $portforward := .Values.portforwards.entities }}
+{{ $prefix := printf "%s-%s" $.Values.client $.Values.environment }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $prefix }}-{{ $portforward.name }}
+  {{- if $.Values.namespace }}
+  namespace: {{ $.Values.namespace }}
+  {{- end }}
+spec:
+  type: ExternalName
+  externalName: {{ $portforward.host }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $prefix }}-{{ $portforward.name }}-port-forward
+  {{- if $.Values.namespace }}
+  namespace: {{ $.Values.namespace }}
+  {{- end }}
+  labels:
+    app: {{ $prefix}}-{{ $portforward.name }}-port-forward
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ $prefix }}-{{ $portforward.name }}-port-forward
+  template:
+    metadata:
+      labels:
+        app: {{ $prefix }}-{{ $portforward.name }}-port-forward
+    spec:
+      nodeSelector:
+        databases: 'true'
+      containers:
+        - name: {{ $portforward.name }}-port-forward
+          image: marcnuri/port-forward
+          imagePullPolicy: Always
+          env:
+            - name: REMOTE_HOST
+              value: {{ $portforward.host }}
+            - name: REMOTE_PORT
+              value: {{ $portforward.port }}
+            - name: LOCAL_PORT
+              value: {{ $portforward.port }}
+          ports:
+            - containerPort: 27017
+              protocol: TCP
+          resources: {{- toYaml $.Values.portforwards.defaults.resources | nindent 12 }}
+
+{{- end }} # range portforward
+{{- end }} # if portforwards

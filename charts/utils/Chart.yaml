@@ -1,0 +1,76 @@
+apiVersion: v2
+name: saritasa-utils
+
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1
+
+maintainers:
+  - url: https://www.saritasa.com/
+    name: Saritasa
+    email: nospam@saritasa.com
+
+description: |
+  A Helm chart for utils resources.
+
+  Implements:
+  - port-forward deployments for external resources
+  - utils deployments (db clients/network/etc) with extended network capabilities
+  - RBAC
+
+  ## `example usage with argocd`
+
+  Install the chart:
+
+  ```
+  helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+  ```
+
+  Make the argocd manifest
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: utils
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "1000"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: utils
+    project: default
+    source:
+      chart: saritasa-utils
+      helm:
+        values: |
+          client: saritasa
+          environment: rocks
+          rbac:
+            developers: true
+          deployments:
+            entities:
+              - name: mssql
+                image: mcr.microsoft.com/mssql/server:2019-latest
+          portforwards:
+            entities:
+              - name: mssql
+                host: saritasa-rocks-mssql.c0mmwx1lnh10.us-west-2.rds.amazonaws.com
+                port: '27017'
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.0.1"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ````
