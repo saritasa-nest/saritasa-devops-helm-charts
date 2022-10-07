@@ -231,7 +231,7 @@ buildpacks:
 
         - name: remove-dcproj-files
           workingDir: $(resources.inputs.app.path)
-          image: "docker.io/library/bash:latest"
+          image: "docker.io/library/bash:5.1.8"
           imagePullPolicy: IfNotPresent
           resources: {}
           script: |

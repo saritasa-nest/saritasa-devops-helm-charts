@@ -13,7 +13,7 @@ spec:
       description: git repository ssh url
 
     - name: repository_submodules
-      description: defines whether repository should be initialized with submodules
+      description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
 
     - name: kubernetes_repository_ssh_url
