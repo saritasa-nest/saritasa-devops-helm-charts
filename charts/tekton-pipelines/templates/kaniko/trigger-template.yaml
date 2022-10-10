@@ -12,6 +12,10 @@ spec:
     - name: repository_ssh_url
       description: git repository ssh url
 
+    - name: repository_submodules
+      description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
+      default: "true"
+
     - name: kubernetes_repository_ssh_url
       description: git repository ssh url for kubernetes manifests repo
 
@@ -52,6 +56,8 @@ spec:
           value: "$(tt.params.docker_context)"
         - name: kaniko_extra_args
           value: "$(tt.params.kaniko_extra_args)"
+        - name: repository_submodules
+          value: "$(tt.params.repository_submodules)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
