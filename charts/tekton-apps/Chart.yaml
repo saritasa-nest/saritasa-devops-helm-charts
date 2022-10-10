@@ -13,8 +13,7 @@ triggersVersions: "v0.16.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.23
-
+version: 0.1.24
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -205,9 +204,25 @@ description: |
     into the generated triggerbinding associated with your app. However the chart renders some default values based on the values
     in this values.yaml file:
 
-      - application, project, environment, docker_registry, kubernetes_repository_ssh_url, kubernetes_branch, kubernetes_repository_kustomize_path, source_subpath (for basic components)
+      - application, project, environment, docker_registry, kubernetes_repository_ssh_url, kubernetes_branch, kubernetes_repository_kustomize_path, source_subpath, repository_submodules (for basic components)
       - application, project, environment, namespace (for wordpress components)
 
+    Note: sometimes github repository may contain another github repositories as submodules. These github `submodules` may be public or private. In case of private submodules usage there is a necessity to add 
+    separate submodules private repos `deploy-keys` to be able to pull them within Tekton build. Currently this feature to pull private github submodules during build doesn't work. So there is added workaround
+    for this problem - you can pass `repository_submodules: false` value and it will omit github submodules upload during build process (default value for `repository_submodules` is true, so we try to load 
+    repo submodules by default). Example:
+
+    ```yaml
+    apps:
+      - project: xxx
+        ... 
+        components:
+          - name: backend
+            ...
+            triggerBinding:
+              - name: repository_submodules
+                value: false
+    ```
 
     # fill below parameters block only for `wordpress` components
 

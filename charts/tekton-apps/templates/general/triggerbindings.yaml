@@ -33,6 +33,8 @@ spec:
     value: {{ $project.project }}
   - name: component
     value: {{ $component.name }}
+  - name: repository_submodules
+    value: "{{ $component.repository_submodules | default true }}"
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- if $.Values.defaultRegistry }}
   - name: docker_registry

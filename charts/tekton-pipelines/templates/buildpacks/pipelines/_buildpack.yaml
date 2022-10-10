@@ -12,6 +12,10 @@ spec:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
     {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
 
+    - name: repository_submodules
+      description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
+      default: "true"
+
     - name: buildpack_builder_image
       type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
