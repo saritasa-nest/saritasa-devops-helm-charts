@@ -15,7 +15,6 @@ triggersVersions: "v0.16.0"
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 0.1.24
 
-
 maintainers:
   - url: https://www.saritasa.com/
     name: Saritasa
@@ -749,6 +748,10 @@ description: |
                     repository: xxx-wordpress
                     pipeline: wordpress-build-pipeline
                     applicationURL: https://xxx.site.url
+                    argocd:
+                      ignoreDeploymentReplicasDiff: true
+                      source:
+                        targetRevision: 15.0.16
                     wordpress:
                       repository_ssh_url: git@github.com:saritasa-nest/xxx-wordpress.git
                       externalDatabase:

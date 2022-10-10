@@ -39,6 +39,8 @@ spec:
           {{- end }}
           {{ end }}
       restartPolicy: Never
+      nodeSelector:
+        {{ toYaml .Values.nodeSelector | nindent 8 }}
       volumes:
       {{- range $project := .Values.apps }}
       {{- range $component := $project.components }}
