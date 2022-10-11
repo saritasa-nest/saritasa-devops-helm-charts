@@ -64,6 +64,13 @@ body.ref.startsWith('refs/heads/{{- $prefix -}}'),
 {{- end -}}
 {{- end }}
 
+{{/*
+Create the name for eventlistener
+*/}}
+{{- define "tekton-apps.eventlistenerName" -}}
+{{ printf "build-pipeline-event-listener-%s" . }}
+{{ end -}}
+
 {{- define "tekton-apps.eventlistener.filter" -}}
 ({{ (join " || " (compact (splitList "," (include "tekton-apps.eventlistener._filter" $ )))) }})
 {{- end }}

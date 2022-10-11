@@ -45,6 +45,8 @@ argocd:
 eventlistener:
   # -- should we enable eventlistener for tekton triggers?
   enableWebhookSecret: true
+  # -- unique suffix (in case there are several eventlisteners in the cluster)
+  suffix: ""
   # -- should we add additional overlays for each app running under trigger?
   extraOverlays: []
     #   - key: truncated_sha
@@ -126,3 +128,5 @@ runPostInstallMountPvcJob: false
 serviceAccount:
   # The name of the service account to use.
   name: "build-bot-sa"
+  # If we create several tekton-apps in the cluster we don't want to recreate the service account.
+  create: 'true'
