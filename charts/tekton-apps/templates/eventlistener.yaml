@@ -2,7 +2,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: {{ include "tekton-apps.eventlistenerName" (set "suffix" .Values.eventlistener.suffix }}
+  {{- template "tekton-apps.eventlistenerName" .Values.eventlistener.suffix -}}
   namespace: {{ .Release.Namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "10"
