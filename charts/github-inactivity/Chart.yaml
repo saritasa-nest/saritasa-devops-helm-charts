@@ -1,0 +1,77 @@
+apiVersion: v2
+name: github-inactivity
+
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1
+
+maintainers:
+  - url: https://www.saritasa.com/
+    name: Saritasa
+    email: nospam@saritasa.com
+
+description: |
+  A Helm chart for Kubernetes to perform check for github inactive repos. It
+  creates CronJob, which scans github organization repos, checks whether they
+  were inactive for some period and send github notifications to corresponding
+  slack channels and emails about found inactive repos.
+
+  Algorithm:
+
+    1. Search in <github-org> using <github-token> for github teams, which
+    have only not archived repos inactive for <inactive-days-count> of days
+    (repos which had no pushes during this period).
+
+    2. Connect to K8S cluster with <kubeconfig-path> and search for
+    namespaces, which <k8s-ns-github-team-label-name> label value corresponds
+    to github teams with inactive repos.
+
+    3. Extract notifications info from found on the previous step namespaces.
+    This info is located in namespace annotations: slack channels ->
+    <k8s-ns-slack-channels-notify-annotation-name>, emails ->
+    <k8s-ns-emails-notify-annotation-name>.
+
+    4. For each github team, which has corresponding info in namespace in
+    K8S cluster, send `github-inactivity` message to slack channels and
+    emails defined in namespace annotations + send slack message to
+    <default-inactivity-slack-channels> + send email to
+    <default-inactivity-emails>.
+
+    5. There could be left some repos, which have no resources in K8S cluster,
+    but have mot archived inactive repos. Send info about these repos also
+    to <default-inactivity-slack-channels> and <default-inactivity-emails>.
+
+  You can adjust script configuration with below params:
+
+
+  ```yaml
+
+  githubOrg: "saritasa-nest" # required
+  fromEmail: "no-reply@saritasa.com" # required
+
+  # secret, which should contain `GITHUB_TOKEN`, `SLACK_BOT_TOKEN`,
+  # `SENDGRID_API_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` data
+  githubInactivitySecret: "<your-github-inactivity-secret-name>"
+
+  # config map which should contain kubeconfig to connect to correct EKS
+  kubeconfigConfigMap: "<your-kubeconfig-config-map-name>"
+
+  # extra ENV vars needed for required script execution
+  githubInactivityExtraEnvVars:
+    INACTIVE_DAYS_COUNT: 190
+    DEFAULT_INACTIVITY_EMAILS: "devops@saritasa.com"
+    DEFAULT_INACTIVITY_SLACK_CHANNELS: "client-inactive-projects"
+    ERRORS_EMAILS: "devops@saritasa.com"
+    K8S_NS_GITHUB_TEAM_LABEL_NAME: "github.com/saritasa-nest.team"
+    K8S_NS_SLACK_CHANNELS_NOTIFY_ANNOTATION_NAME: "saritasa.com/slack.channels.notify"
+    K8S_NS_EMAILS_NOTIFY_ANNOTATION_NAME: "saritasa.com/emails.notify"
+
+  githubOrg: "saritasa-nest"
+  fromEmail: "no-reply@saritasa.com"
+  kubeconfigMountPath: "<your-kubeconfig-mount-path>"
+  kubeconfigSubPath: "<your-kubeconfig-sub-path>"
+
+  ```

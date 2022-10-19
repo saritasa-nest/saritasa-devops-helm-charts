@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "github-inactivity.fullname" . }}
+data:
+  GITHUB_ORG: {{ include ("github-inactivity.required") (dict "field_name" "githubOrg" "field_value" .Values.githubOrg) }}
+  FROM_EMAIL: {{ include ("github-inactivity.required") (dict "field_name" "fromEmail" "field_value" .Values.fromEmail) }}
+  KUBECONFIG_PATH: {{ .Values.kubeconfigMountPath }}
+  {{- range $key, $value := .Values.githubInactivityExtraEnvs }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}

@@ -1,0 +1,74 @@
+# Default values for github-inactivity.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  # -- container repository, adjust in https://github.com/saritasa-nest/saritasa-devops-docker-images/pull/29
+  repository: public.ecr.aws/saritasa/github-inactivity
+  # -- pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: "0.1"
+
+# -- name of the environment you're placing the github-inactivity for like dev, prod, staging
+environment: ""
+
+# -- not allow concurrent job builds
+concurrencyPolicy: "Forbid"
+
+# -- run job in the 1st day of the month
+schedule: "0 0 1 * *"
+
+successfulJobsHistoryLimit: 5
+failedJobsHistoryLimit: 5
+
+# -- credentials for docker login
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+cronJobSecurityContext: {}
+
+securityContext: {}
+
+nodeSelector: {}
+
+restartPolicy: "Never"
+
+# -- name of github-organization in which inactive repos should be found
+githubOrg: ""
+
+# -- sender email for inactive repos notifications
+fromEmail: ""
+
+# -- extra ENV vars needed for required script execution (default values are show below, you can change them if it is needed)
+#
+# INACTIVE_DAYS_COUNT: 190
+# DEFAULT_INACTIVITY_EMAILS: ""
+# DEFAULT_INACTIVITY_SLACK_CHANNELS: ""
+# ERRORS_EMAILS: ""
+# K8S_NS_GITHUB_TEAM_LABEL_NAME: "github.com/saritasa-nest.team"
+# K8S_NS_SLACK_CHANNELS_NOTIFY_ANNOTATION_NAME: "saritasa.com/slack.channels.notify"
+# K8S_NS_EMAILS_NOTIFY_ANNOTATION_NAME: "saritasa.com/emails.notify"
+githubInactivityExtraEnvs: {}
+
+# secret, which should contain `GITHUB_TOKEN`, `SLACK_BOT_TOKEN`,
+# `SENDGRID_API_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` data
+githubInactivitySecret: "github-inactivity-secret"
+
+# config map which should contain kubeconfig to connect to correct EKS
+kubeconfigConfigMap: "github-inactivity-kubeconfig-cm"
+
+# mount path where kubeconfig file should be stored
+kubeconfigMountPath: "/workspace/kubeconfig/eks-config"
+
+# sub path where kubeconfig file should be stored
+kubeconfigSubPath: "eks-config"

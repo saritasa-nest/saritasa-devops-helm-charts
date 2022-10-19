@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "github-inactivity.fullname" . }}
+  labels:
+    {{- include "github-inactivity.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: {{ .Values.concurrencyPolicy }}
+  schedule: {{ .Values.schedule }}
+  successfulJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "github-inactivity.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.cronJobSecurityContext | nindent 12 }}
+          restartPolicy: {{ .Values.restartPolicy }}
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: {{ .Chart.Name }}
+              securityContext:
+                {{- toYaml .Values.securityContext | nindent 16 }}
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+              envFrom:
+                - configMapRef:
+                    name: {{ include "github-inactivity.fullname" . }}
+                - secretRef:
+                    name: {{ .Values.githubInactivitySecret }}
+              volumeMounts:
+                - name: kubeconfig
+                  mountPath: {{ .Values.kubeconfigMountPath }}
+                  subPath: {{ .Values.kubeconfigSubPath }}
+          volumes:
+            - name: kubeconfig
+              configMap:
+                name: {{ .Values.kubeconfigConfigMap }}
