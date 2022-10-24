@@ -34,6 +34,17 @@ spec:
       description: name of the platform directory. for buildpack /cnb/lifecycle/creator
       default: "platform"
 
+    - name: buildpack_config_filename
+      type: string
+      description: The name of the buildpack.yml file which should be used for build
+      default: "buildpack.yml"
+
+    - name: project_config_filename
+      type: string
+      description: The name of the project.toml file which should be used for build
+      default: "project.toml"
+
+
   workspaces:
     - name: source
 
@@ -46,9 +57,9 @@ spec:
       type: image
 
   tasks:
-    - name: set-env-vars
+    - name: prepare-build
       taskRef:
-        name: buildpack-set-env-vars
+        name: buildpack-prepare-build
       resources:
         inputs:
           - name: app
@@ -58,6 +69,10 @@ spec:
           value: "$(params.application)"
         - name: platform_dir
           value: "$(params.platform_dir)"
+        - name: buildpack_config_filename
+          value: "$(params.buildpack_config_filename)"
+        - name: project_config_filename
+          value: "$(params.project_config_filename)"
       workspaces:
         - name: source
           workspace: source
@@ -73,7 +88,7 @@ spec:
         - name: default_version
           value: "14"
       runAfter:
-        - set-env-vars
+        - prepare-build
 
     - name: {{ .pipeline.buildTaskName }}
       taskRef:
@@ -102,6 +117,10 @@ spec:
           value: "$(params.source_subpath)"
         - name: platform_dir
           value: "$(params.platform_dir)"
+        - name: buildpack_config_filename
+          value: "$(params.buildpack_config_filename)"
+        - name: project_config_filename
+          value: "$(params.project_config_filename)"
         - name: node_version
           value: "$(tasks.detect-nodejs-version.results.node-version)"
         - name: environment

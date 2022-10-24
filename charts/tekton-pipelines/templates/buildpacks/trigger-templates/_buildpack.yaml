@@ -17,7 +17,7 @@ spec:
 
     - name: repository_ssh_url
       description: git repository ssh url
-    
+
     - name: repository_submodules
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
@@ -34,6 +34,14 @@ spec:
     - name: source_subpath
       description: a subpath within the `source` input where the source to build is located.
       default: ""
+
+    - name: buildpack_config_filename
+      description: The name of the buildpack.yml file which should be used for build
+      default: "buildpack.yml"
+
+    - name: project_config_filename
+      description: The name of the project.toml file which should be used for build
+      default: "project.toml"
 
 
   resourcetemplates:
@@ -63,6 +71,10 @@ spec:
           value: "$(tt.params.source_subpath)"
         - name: repository_submodules
           value: "$(tt.params.repository_submodules)"
+        - name: buildpack_config_filename
+          value: "$(tt.params.buildpack_config_filename)"
+        - name: project_config_filename
+          value: "$(tt.params.project_config_filename)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
