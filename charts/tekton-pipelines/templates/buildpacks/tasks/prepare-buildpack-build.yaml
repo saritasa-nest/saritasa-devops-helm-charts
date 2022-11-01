@@ -1,10 +1,22 @@
 {{ if .Values.buildpacks.enabled }}
 
-# I dislike this hack
+# TODO:
+#
+# 1. Try to remove `set` step in `buildpack-prepare-build` task once below
+# issues would be fixed or Tekton engine upgrade will allow us to do that in a
+# better way:
+#
 # https://github.com/tektoncd/catalog/blob/main/task/buildpacks/0.3/buildpacks.yaml#L68-L113
+#
 # but we should use it until this is resolved:
 # - https://github.com/buildpacks/tekton-integration/issues/33
 # - https://github.com/buildpacks/tekton-integration/issues/32
+#
+# 2. Try to remove `prepare` step in `buildpack-prepare-build` task and logics
+# to pass different file names for `buildpack.yml` and `project.toml` with
+# `buildpack_config_filename` and `project_config_filename` vars once Tekton
+# engine would be upgraded. If `cnb lifecycle` won't allow to do that even after
+# Tekton upgrade, we can try to build projects with `pack` instead.
 
 apiVersion: tekton.dev/v1beta1
 kind: Task
