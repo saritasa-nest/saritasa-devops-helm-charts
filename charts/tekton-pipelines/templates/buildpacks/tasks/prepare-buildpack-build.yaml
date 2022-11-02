@@ -1,20 +1,35 @@
 {{ if .Values.buildpacks.enabled }}
 
-# I dislike this hack
+# TODO:
+#
+# 1. Try to remove `set` step in `buildpack-prepare-build` task once below
+# issues would be fixed or Tekton engine upgrade will allow us to do that in a
+# better way:
+#
 # https://github.com/tektoncd/catalog/blob/main/task/buildpacks/0.3/buildpacks.yaml#L68-L113
+#
 # but we should use it until this is resolved:
 # - https://github.com/buildpacks/tekton-integration/issues/33
 # - https://github.com/buildpacks/tekton-integration/issues/32
+#
+# 2. Try to remove `prepare` step in `buildpack-prepare-build` task and logics
+# to pass different file names for `buildpack.yml` and `project.toml` with
+# `buildpack_config_filename` and `project_config_filename` vars once Tekton
+# engine would be upgraded. If `cnb lifecycle` won't allow to do that even after
+# Tekton upgrade, we can try to build projects with `pack` instead.
 
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: buildpack-set-env-vars
+  name: buildpack-prepare-build
   namespace: {{ .Release.Namespace }}
 spec:
   description: >-
-    The task parses project.toml file and stores its environment variables
-    values to platform dir for further processing by buildpack task.
+    This task prepares project contents to build process:
+      - determines which `project.toml` and `buildpack.yaml` files should be
+        used for a build
+      - parses project.toml file and stores its environment variables values to
+        platform dir for further processing by buildpack task.
 
   workspaces:
     - name: source
@@ -33,7 +48,37 @@ spec:
       type: string
       description: The name of the platform directory.
 
+    - name: buildpack_config_filename
+      type: string
+      description: The name of the buildpack.yml file which should be used for build
+
+    - name: project_config_filename
+      type: string
+      description: The name of the project.toml file which should be used for build
+
   steps:
+
+    - name: prepare
+      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env bash
+
+        path=$(resources.inputs.app.path)
+
+        # rename `buildpack_config_filename` file to `buildpack.yml` and
+        # `project_config_filename` to `project.toml` if they are not equal to
+        # defaults (buildpack.yml, project.toml)
+        if [[ $(params.buildpack_config_filename) != "buildpack.yml" ]]; then
+          mv $path/$(params.buildpack_config_filename) $path/buildpack.yml
+          echo "Rename $path/$(params.buildpack_config_filename) to $path/buildpack.yml"
+        fi
+
+        if [[ $(params.project_config_filename) != "project.toml" ]]; then
+          mv $path/$(params.project_config_filename) $path/project.toml
+          echo "Rename $path/$(params.project_config_filename) to $path/project.toml"
+        fi
+
     - name: clean
       image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}

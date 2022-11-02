@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.1.23](https://img.shields.io/badge/Version-0.1.23-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.26-dev](https://img.shields.io/badge/Version-0.1.26--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -224,8 +224,25 @@ spec:
   into the generated triggerbinding associated with your app. However the chart renders some default values based on the values
   in this values.yaml file:
 
-    - application, project, environment, docker_registry, kubernetes_repository_ssh_url, kubernetes_branch, kubernetes_repository_kustomize_path, source_subpath (for basic components)
+    - application, project, environment, docker_registry, kubernetes_repository_ssh_url, kubernetes_branch, kubernetes_repository_kustomize_path, source_subpath, repository_submodules (for basic components)
     - application, project, environment, namespace (for wordpress components)
+
+  Note: sometimes github repository may contain another github repositories as submodules. These github `submodules` may be public or private. In case of private submodules usage there is a necessity to add
+  separate submodules private repos `deploy-keys` to be able to pull them within Tekton build. Currently this feature to pull private github submodules during build doesn't work. So there is added workaround
+  for this problem - you can pass `repository_submodules: false` value and it will omit github submodules upload during build process (default value for `repository_submodules` is true, so we try to load
+  repo submodules by default). Example:
+
+  ```yaml
+  apps:
+    - project: xxx
+      ...
+      components:
+        - name: backend
+          ...
+          triggerBinding:
+            - name: repository_submodules
+              value: false
+  ```
 
   # fill below parameters block only for `wordpress` components
 
@@ -703,6 +720,83 @@ spec:
         - CreateNamespace=true
   ```
 
+  If you want use to some other file instead of original `project.toml` or `buildpack.yml` files (i.e. ovio-api-project.toml, ovio-api-buildpack.yml)
+  you will need to add `buildpack_config_filename` and `project_config_filename` Trigger Binding params as in example below:
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: staging
+          ...
+          apps:
+            - project: xxx-dev
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: xxx-dev
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  repository: xxx-backend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/backend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+                    - name: buildpack_config_filename
+                      value: ovio-api-buildpack.yml
+                    - name: project_config_filename
+                      value: ovio-api-project.toml
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.16"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
   Simple wordpress application example filled by default:
 
   ```yaml
@@ -1029,12 +1123,16 @@ spec:
 | environment | string | `""` | environment these apps are handling possible values: dev, staging, prod |
 | eventlistener.enableWebhookSecret | bool | `true` | should we enable eventlistener for tekton triggers? |
 | eventlistener.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
+| eventlistener.suffix | string | `""` | unique suffix (in case there are several eventlisteners in the cluster) |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
 | nodeSelector | string | `""` | node selector for event listener pod |
 | runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
+| serviceAccount.create | string | `"true"` |  |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
 | slack.imagesLocation | string | `"https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com"` | slack notification images (s3 bucket prefix) |
 | slack.prefix | string | `"client"` | channel prefix |
 | slack.suffix | string | `"ci"` | channel suffix |
 | storageClassName | string | `"gp2"` | storage class for PVCs associated with the apps |
 
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

@@ -60,6 +60,8 @@ spec:
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_branch" "default" ($project.kubernetesRepository).branch ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_repository_kustomize_path" "default" (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "buildpack_config_filename" "default" "buildpack.yml" ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "project_config_filename" "default" "project.toml" ) | nindent 2 }}
   {{- end}}
 ---
 
