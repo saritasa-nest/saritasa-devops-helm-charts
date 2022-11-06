@@ -83,7 +83,9 @@ spec:
         - --build-arg=ENVIRONMENT=$(params.environment)
         - --dockerfile=$(resources.inputs.app.path)/$(params.docker_file)
         - --context=$(resources.inputs.app.path)/$(params.docker_context)
-        - --destination=$(resources.outputs.image.url)
+        - --destination=$(resources.outputs.image.url
+        # https://github.com/GoogleContainerTools/kaniko/issues/733
+        - --destination=$(resources.outputs.image.url):latest
         # - --verbosity=debug
 
       # kaniko assumes it is running as root, which means this example fails on platforms

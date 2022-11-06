@@ -36,6 +36,7 @@ buildpacks:
   # -- cnb (cloud native buildpacks) platform API to support
   # see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md)
   cnbPlatformAPI: "0.4"
+
   generate:
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: FRONTEND                                                                                                  │
@@ -50,6 +51,7 @@ buildpacks:
       name: buildpack-frontend-build-pipeline
       # -- should we enable the frontend buildpack pipeline
       enabled: false
+      buildOnly: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-frontend
       # -- steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI
@@ -179,6 +181,114 @@ buildpacks:
       name: buildpack-dotnet-build-pipeline
       # -- should we enable the dotnet buildpack pipeline
       enabled: false
+      # -- should we build and push image without kustomize and deploy steps?
+      buildOnly: false
+      # -- the generated name of the tekton task implementing the "build" step
+      buildTaskName: buildpack-dotnet
+      # -- steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI
+      # @default -- see values.yaml for the default values of it
+      buildTaskSteps:
+        - name: git-fetch-tags
+          image: alpine/git:v2.32.0
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            git fetch --tags --unshallow
+          securityContext:
+            privileged: true
+            runAsUser: 0
+
+        - name: get-semantic-version
+          workingDir: $(resources.inputs.app.path)
+          image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          script: |
+            #!/usr/bin/env ash
+            # so we are making a hack, that if we try to merge hotfix branch into main we should
+            [ -e GitVersion-hotfix.yml ] && /tools/dotnet-gitversion | grep hotfix 1>/dev/null && (echo "hotfix"; rm -rf GitVersion.yml; cp GitVersion-hotfix.yml GitVersion.yml)
+
+            BRANCH=$(params.branch)
+
+            # since this is a busybox we can't use bash regexp here
+            if echo $BRANCH | grep -E '^refs/heads/(main|release/[0-9.]+)$' > /dev/null;
+            then
+              local_tags=$(git tag --points-at HEAD)
+              echo "remove local head tags"
+              echo $local_tags
+              git tag -d $local_tags
+            fi
+
+            pure_branch=`echo $BRANCH | sed 's/refs\/heads\///'`
+            echo "PURE BRANCH:" $pure_branch
+
+            # make sure we're not in detached head status
+            git symbolic-ref -q HEAD || git checkout $pure_branch
+            git branch
+
+            /tools/dotnet-gitversion /updateprojectfiles
+            git status
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+            chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+            echo "semantic version updated"
+
+        - name: build-static
+          image: node:$(params.node_version)
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            set -Eeo pipefail
+
+            if [ ! -f buildpack.yml ]; then
+              echo "no buildpack.yml file found"
+              exit 0
+            fi
+
+            # download jq
+            # install js-yaml, which converts yaml to json
+            npm i -g js-yaml
+            wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O ./jq
+            chmod +x jq
+
+            # the package.json is expected to be in that folder that we get from
+            # buildpack.yml file
+            package_path=$(js-yaml buildpack.yml | ./jq -r '."dotnet-build"."project-path"')
+            cd "$package_path"
+
+            # if that folder has package.json then run build:ENV task
+            [ -f package.json ] && {
+              echo "install node.js dependencies"
+
+              # set cache
+              npm config set cache $(workspaces.source.path)/.npm --global
+              npm ci
+
+              (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
+              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+              chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+            } || echo "No package.json found"
+
+            echo "done"
+          securityContext:
+            privileged: true
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: DOTNET                                                                                                    │
+# │ This generated buildpack pipeline is used by our dotnet team and has a custom step that is used to obtain semantic   │
+# │ version based on git tags of the repository utilizing GitVersion cli. It updates dotnet related source files with    │
+# │ semantic version that is then displayed in API calls, like this https://api.site.com/api/meta/version                │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    buildpackDotnetOnlyBuildPipeline:
+      # -- the name of the generated pipeline
+      name: buildpack-dotnet-onlybuild-pipeline
+      # -- should we enable the dotnet buildpack pipeline
+      enabled: false
+      # -- should we build and push image without kustomize and deploy steps?
+      buildOnly: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-dotnet
       # -- steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI
@@ -281,6 +391,8 @@ buildpacks:
       name: buildpack-nodejs-build-pipeline
       # -- should we enable the nodejs buildpack pipeline
       enabled: false
+      # -- should we build and push image without kustomize and deploy steps?
+      buildOnly: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-nodejs
 
@@ -294,6 +406,8 @@ buildpacks:
       name: buildpack-go-build-pipeline
       # -- should we enable the GO buildpack pipeline
       enabled: false
+      # -- should we build and push image without kustomize and deploy steps?
+      buildOnly: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-go
 
@@ -307,6 +421,8 @@ buildpacks:
       name: buildpack-ruby-build-pipeline
       # -- should we enable the ruby buildpack pipeline
       enabled: false
+      # -- should we build and push image without kustomize and deploy steps?
+      buildOnly: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-ruby
 

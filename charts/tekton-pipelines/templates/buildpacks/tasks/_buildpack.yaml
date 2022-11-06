@@ -157,6 +157,7 @@ spec:
           -skip-restore=$(params.skip_restore) \
           -previous-image=$(resources.outputs.image.url) \
           -run-image=$(params.run_image) \
+          -tag=latest \ # Additional tag to apply to exported image
           $(resources.outputs.image.url)
 
       volumeMounts:

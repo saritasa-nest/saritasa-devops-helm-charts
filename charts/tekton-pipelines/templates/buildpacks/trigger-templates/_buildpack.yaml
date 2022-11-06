@@ -2,7 +2,12 @@
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
-  name: {{ .pipeline.name }}-trigger-template
+  {{- if .buildOnly}}
+  name: {{ .pipeline.name }}-buildonly-trigger-template
+  {{- else}}
+  name: {{.pipeline.name}}-trigger-template
+  {{- end}}
+  
   namespace: {{ .namespace }}
 spec:
 
@@ -36,7 +41,12 @@ spec:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
     metadata:
+      {{- if .buildOnly}}
+      generateName: $(tt.params.application)-build-pipeline-run-buildonly-
+      {{- end}}
+      {{- if not .buildOnly}}
       generateName: $(tt.params.application)-build-pipeline-run-
+      {{- end}}
       labels:
         app: $(tt.params.application)
         project: $(tt.params.project)
@@ -48,7 +58,12 @@ spec:
         - taskName: kustomize
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
-        name: {{ .pipeline.name }}
+        {{- if .buildOnly}}
+        name: {{.pipeline.name}}-buildonly
+        {{- end}}
+        {{- if not .buildOnly}}
+        name: {{.pipeline.name}}
+        {{- end}}
       params:
         {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
         - name: buildpack_builder_image

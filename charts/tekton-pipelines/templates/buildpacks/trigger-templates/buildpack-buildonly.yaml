@@ -2,7 +2,7 @@
 {{$data := dict "pipeline"    $pipeline
                 "namespace"   $.Release.Namespace
                 "podTemplate" $.Values.podTemplate 
-                "buildOnly" false }}
+                "buildOnly" true}}
 {{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
 {{ include "trigger-template.buildpack" $data }}
 {{ end }}

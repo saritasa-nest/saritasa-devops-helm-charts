@@ -12,7 +12,8 @@
 
 # initialize `argocdSource` variable with either `$argocd.source` dict if it exists or with empty dict
 {{ $argocdSource := ternary $argocd.source dict (hasKey $argocd "source") -}}
-
+# For BuildOnly pipllines 
+{{- if hasKey $component "argocd" }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -43,6 +44,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
+{{- end }} # if component.argocd
 {{- end }} # if not component.wordpress
 {{- end }} # range component
 {{- end }} # if project.enabled and project.argocd

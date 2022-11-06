@@ -1,0 +1,22 @@
+buildpacks:
+  enabled: true
+  generate:
+    buildpackFrontendBuildPipeline:
+      enabled: false
+    buildpackDjangoBuildPipeline:
+      enabled: false
+    buildpackPhpBuildPipeline:
+      enabled: false
+    buildpackDotnetBuildPipeline:
+      enabled: true
+    buildpackNodejsBuildPipeline:
+      enabled: false
+    buildpackGoBuildPipeline:
+      enabled: false
+    buildpackRubyBuildPipeline:
+      enabled: false
+kaniko:
+  enabled: false
+
+wordpress:
+  enabled: false

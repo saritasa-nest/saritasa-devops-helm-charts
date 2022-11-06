@@ -2,7 +2,11 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: {{ .pipeline.name }}
+  {{- if .buildOnly}}
+  name: {{.pipeline.name}}-buildonly
+  {{- else }}
+  name: {{.pipeline.name}}
+  {{- end}}
   namespace: {{.namespace }}
 spec:
   description: |-
@@ -108,6 +112,7 @@ spec:
       runAfter:
         - detect-nodejs-version
 
+  {{ if not .buildOnly}}
     - name: kustomize
       taskRef:
         name: kustomize
@@ -138,6 +143,14 @@ spec:
       runAfter:
         - kustomize
 
-  {{ include "task.finalNotification" . | nindent 2 }}
+    {{ include "task.finalNotification" . | nindent 2 }}
+  {{- end }}
+
+  {{- if .buildOnly }}
+    {{ include "task.finalNotification" .pipeline.buildTaskName | nindent 2 }}
+
+  
+  {{- end }}
+
 ---
 {{- end }}
