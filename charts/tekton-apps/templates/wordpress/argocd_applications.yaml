@@ -29,6 +29,12 @@ spec:
     jsonPointers:
     - /metadata/labels
     kind: secret
+  {{ if (ternary $argocd.ignoreDeploymentReplicasDiff false (hasKey $argocd "ignoreDeploymentReplicasDiff")) }}
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas
+  {{- end }}
   project: {{ $project.project }}
   source:
     chart: wordpress

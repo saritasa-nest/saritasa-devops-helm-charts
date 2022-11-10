@@ -43,6 +43,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
 ---
 {{- end }} # if component.argocd
 {{- end }} # if not component.wordpress

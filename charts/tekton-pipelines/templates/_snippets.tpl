@@ -192,6 +192,8 @@
         value: $(tt.params.repository_ssh_url)
       - name: revision
         value: $(tt.params.head_commit)
+      - name: submodules
+        value: $(tt.params.repository_submodules)
 - name: kubernetes-repo
   resourceSpec:
     type: git

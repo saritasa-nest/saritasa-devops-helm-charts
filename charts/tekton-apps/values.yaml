@@ -45,6 +45,8 @@ argocd:
 eventlistener:
   # -- should we enable eventlistener for tekton triggers?
   enableWebhookSecret: true
+  # -- unique suffix (in case there are several eventlisteners in the cluster)
+  suffix: ""
   # -- should we add additional overlays for each app running under trigger?
   extraOverlays: []
     #   - key: truncated_sha
@@ -92,7 +94,11 @@ apps: []
   #         - name: buildpack_builder_image
   #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1
   #         - name: buildpack_runner_image
-  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
+  #         - name: buildpack_config_filename
+  #           value: buildpack1.yml
+  #         - name: project_config_filename
+  #           value: project1.toml
   #
   #     - name: frontend
   #       repository: xxx-frontend
@@ -118,6 +124,11 @@ apps: []
   #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
   #         - name: source_subpath
   #           value: dist/web
+  #         - name: buildpack_config_filename
+  #           value: buildpack2.yml
+  #         - name: project_config_filename
+  #           value: project2.toml
+
 
 
 # -- run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy"
@@ -126,3 +137,5 @@ runPostInstallMountPvcJob: false
 serviceAccount:
   # The name of the service account to use.
   name: "build-bot-sa"
+  # If we create several tekton-apps in the cluster we don't want to recreate the service account.
+  create: 'true'

@@ -1,0 +1,42 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+{{- range $extraApp := $project.extraApps }}
+
+
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $extraApp.appName | default (printf "%s-%s-%s" $project.project "extra" $projectEnvironment) }}
+  namespace: argo-cd
+  annotations:
+    argocd.argoproj.io/sync-wave: "210"
+spec:
+  destination:
+    namespace: {{ $project.argocd.namespace }}
+    server: https://kubernetes.default.svc
+  project: {{ $project.project }}
+  source:
+    path: {{ $extraApp.path }}
+    repoURL: {{ $extraApp.repoUrl | default ($project.kubernetesRepository).url }}
+    targetRevision: {{ $extraApp.targetRevision | default ($project.kubernetesRepository).branch }}
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    jsonPointers:
+    - /spec/replicas
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+---
+{{- end }} # range extraApp
+{{- end }} # if project.enabled
+{{- end }} # range project
+{{- end }} # if apps
