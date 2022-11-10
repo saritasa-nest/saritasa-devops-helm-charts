@@ -143,13 +143,11 @@ spec:
       runAfter:
         - kustomize
 
-    {{ include "task.finalNotification" . | nindent 2 }}
+  {{- include "task.finalNotification" . | nindent 2 }}
   {{- end }}
 
   {{- if .buildOnly }}
-    {{ include "task.finalNotification" .pipeline.buildTaskName | nindent 2 }}
-
-  
+    {{- include "task.finalNotification" (dict "taskName" .pipeline.buildTaskName) | nindent 2 }}  
   {{- end }}
 
 ---
