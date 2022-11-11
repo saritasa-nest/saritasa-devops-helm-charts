@@ -129,6 +129,8 @@ spec:
           value: "$(tasks.detect-nodejs-version.results.node-version)"
         - name: environment
           value: "$(params.environment)"
+        - name: docker_registry_repository
+          value: "$(params.docker_registry_repository)"
       workspaces:
         - name: source
           workspace: source

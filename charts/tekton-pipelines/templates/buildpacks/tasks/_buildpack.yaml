@@ -60,6 +60,10 @@ spec:
       type: string
       description: the name of the platform directory.
 
+    - name: docker_registry_repository  
+      type: string
+      description: private docker registry repository address
+
     - name: buildpack_config_filename
       type: string
       description: The name of the buildpack.yml file which should be used for build
@@ -94,7 +98,7 @@ spec:
       type: string
       description: do not write layer metadata or restore cached layers
       default: "false"
-
+    
     - name: environment
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
@@ -165,9 +169,8 @@ spec:
           -gid=$(params.group_id) \
           -process-type=$(params.process_type) \
           -skip-restore=$(params.skip_restore) \
-          -previous-image=$(resources.outputs.image.url) \
-          -run-image=$(params.run_image) \
-          -tag=latest \ # Additional tag to apply to exported image
+          -previous-image=$(params.docker_registry_repository):latest \
+          -tag=$(params.docker_registry_repository):latest \
           $(resources.outputs.image.url)
 
       volumeMounts:
