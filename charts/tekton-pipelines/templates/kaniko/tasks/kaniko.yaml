@@ -30,6 +30,10 @@ spec:
       type: string
       description: aws private ecr registry address
 
+    - name: docker_registry_repository  
+      type: string
+      description: private docker registry repository address
+
     - name: docker_file
       type: string
       description: name of the dockerfile
@@ -83,8 +87,8 @@ spec:
         - --build-arg=ENVIRONMENT=$(params.environment)
         - --dockerfile=$(resources.inputs.app.path)/$(params.docker_file)
         - --context=$(resources.inputs.app.path)/$(params.docker_context)
-        - --destination=$(resources.outputs.image.url
-        - --destination=$(resources.outputs.image.url):latest
+        - --destination=$(resources.outputs.image.url)
+        - --destination=$(params.docker_registry_repository):latest
         # - --verbosity=debug
 
       # kaniko assumes it is running as root, which means this example fails on platforms

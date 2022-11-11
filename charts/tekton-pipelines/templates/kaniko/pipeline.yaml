@@ -61,6 +61,8 @@ spec:
           value: "$(params.docker_file)"
         - name: docker_context
           value: "$(params.docker_context)"
+        - name: docker_registry_repository  
+          value: $(params.docker_registry_repository)
         - name: extra_args
           value:
             - $(params.kaniko_extra_args)
