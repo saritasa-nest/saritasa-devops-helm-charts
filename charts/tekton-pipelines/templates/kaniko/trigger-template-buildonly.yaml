@@ -1,0 +1,81 @@
+{{ if .Values.kaniko.enabled }}
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: kaniko-build-pipeline-buildonly-trigger-template
+  namespace: {{ .Release.Namespace }}
+spec:
+  params:
+    {{ include "trigger-template.defaultParams" . | nindent 4 }}
+    {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
+
+    - name: repository_ssh_url
+      description: git repository ssh url
+
+    - name: repository_submodules
+      description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
+      default: "true"
+
+    - name: kubernetes_repository_ssh_url
+      description: git repository ssh url for kubernetes manifests repo
+
+    - name: docker_file
+      default: Dockerfile
+      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
+
+    - name: docker_context
+      default: "."
+      description: dockerfile context path
+
+    - name: kaniko_extra_args
+      default: ''
+      description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
+
+  resourcetemplates:
+  - kind: PipelineRun
+    apiVersion: tekton.dev/v1beta1
+    metadata:
+      generateName: $(tt.params.application)-kaniko-build-pipeline-buildonly-run-
+      labels:
+        app: $(tt.params.application)
+        project: $(tt.params.project)
+        environment: $(tt.params.environment)
+        component: $(tt.params.component)
+    spec:
+      serviceAccountName: $(tt.params.application)-build-pipeline-sa
+      pipelineRef:
+        name: kaniko-build-pipeline-buildonly
+      params:
+        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
+        - name: docker_file
+          value: "$(tt.params.docker_file)"
+        - name: docker_context
+          value: "$(tt.params.docker_context)"
+        - name: kaniko_extra_args
+          value: "$(tt.params.kaniko_extra_args)"
+        - name: repository_submodules
+          value: "$(tt.params.repository_submodules)"
+
+      resources:
+        {{- include "pipeline.defaultResources" . | nindent 8 }}
+
+      workspaces:
+        {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
+
+      podTemplate:
+        volumes:
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "labels"
+                fieldRef:
+                  fieldPath: metadata.labels
+              - path: "annotations"
+                fieldRef:
+                  fieldPath: metadata.annotations
+
+        {{- if .Values.podTemplate }}
+        {{ toYaml .Values.podTemplate | nindent  8 }}
+        {{end }}
+
+{{ end }}
