@@ -170,6 +170,7 @@ spec:
           -process-type=$(params.process_type) \
           -skip-restore=$(params.skip_restore) \
           -previous-image=$(params.docker_registry_repository):latest \
+          -run-image=$(params.run_image) \
           -tag=$(params.docker_registry_repository):latest \
           $(resources.outputs.image.url)
 
