@@ -28,7 +28,6 @@ data:
   JIRA_PROJECT_URL: {{ include "tekton-apps.jiraProjectURL" $data }}
   ARGOCD_SERVER: {{ $.Values.argocd.server }}
   ARGOCD_ROOT_PATH: {{ $.Values.argocd.rootPath | default "/" }}
-  AWS_REGION: {{ $.Values.aws.region }}
   SLACK_CHANNEL: {{ include "tekton-apps.slackChannel" $data }}
   SLACK_FAILURE_ICON_URL: {{ $.Values.slack.imagesLocation | default "https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com" }}/argocd-robot-sad.png
   SLACK_SUCCESS_ICON_URL: {{ $.Values.slack.imagesLocation | default "https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com" }}/argocd-robot.png
@@ -36,6 +35,9 @@ data:
   SLACK_FOOTER: Tekton
   TEKTON_PIPELINE_NAME: {{ $component.pipeline }}
   TEKTON_URL: {{ include "tekton-apps.tektonURL" $data }}
+  {{- if $.Values.aws }}
+  AWS_REGION: {{ $.Values.aws.region }}
+  {{ end }}
   {{- if $component.extraBuildConfigParams }}
   {{- toYaml $component.extraBuildConfigParams | nindent 2}}
   {{ end }}
