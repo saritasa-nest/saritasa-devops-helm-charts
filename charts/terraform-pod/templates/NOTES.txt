@@ -1,1 +1,15 @@
 {{- include "terraform-pod.validateValues" . }}
+
+To see logs:
+===========================================
+kubectl logs -n terraform  $(kgpo -l app.kubernetes.io/name=terraform-pod --no-headers -o="custom-columns=NAME:.metadata.name") --all-containers
+
+To get inside the container
+===========================================
+kubectl exec -n terraform -ti $(kgpo -l app.kubernetes.io/name=terraform-pod --no-headers -o="custom-columns=NAME:.metadata.name") -c terraform -- bash
+
+Exectute make targets
+===========================================
+Once you're inside the pod's terraform container, simply call any Makefile target
+
+make _dev apply
