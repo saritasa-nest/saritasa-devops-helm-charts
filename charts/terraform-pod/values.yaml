@@ -1,0 +1,134 @@
+# Default values for terraform-pod.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  # -- default docker registry
+  repository: public.ecr.aws/saritasa/terraform
+  # -- pull policy
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: "1.3.5"
+
+github:
+  # -- github app auth pem file used for terraform github provider authentication
+  appAuthSecret: terraform-cicd-app.2022-11-18.private-key.pem
+  # -- github gh cli secret containing token for authentication of the github CLI
+  tokenSecret: github-cli-token
+  # -- github repository containing terraform infra-dev-aws code
+  repository: "" # org/infra-dev-aws
+  # -- github branch to clone inside terraform pod
+  branch: "" # feature/branch
+  # -- github username (who runs this terraform code)
+  username: ""
+  # -- github email (who runs this terraform code)
+  email: ""
+
+# -- content of the git-crypt-key encoded in base64 format
+gitCryptKey: ""
+
+terraform:
+  # -- terraform org
+  organization: saritasa-team
+  # -- terraform client name (used to decide what workspace in the org to use)
+  client: fbmm
+  # -- terraform team API token name
+  tokenSecret: terraform-cli-token-saritasa-team
+  # -- makefile target in the Makefile of  the repository to run during initialization phase (can be any valid bash one-liner if you want to skip the makefile targets of the repository)
+  initCommand: make _dev init
+
+# -- where to obtain database credentials to be used
+databases:
+  # -- rocks mysql
+  mysql:
+      # -- secret with "password" value
+      secret: saritasa-rocks-mysql
+      # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
+      terraformEnvVarName: TF_VAR_rds_mysql_password
+  # -- rocks postgres
+  postgres:
+      # -- secret with "password" value
+      secret: saritasa-rocks-postgres
+      # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
+      terraformEnvVarName: TF_VAR_rds_postgress_password
+
+# -- where to obtain argo-cd credentials to be used
+argocd:
+  rocks:
+    # -- secret with "username/password" values
+    secret: saritasa-rocks-argocd
+    terraformEnvVarName: TF_VAR_rocks_argocd_password
+  cloud:
+    # -- secret with "username/password" values
+    secret: saritasa-cloud-argocd
+    terraformEnvVarName: TF_VAR_cloud_argocd_password
+
+# -- aws configuration
+aws:
+  # -- default aws region
+  region: us-west-2
+  # -- default aws output of CLI
+  output: json
+  # -- aws iam user (for older terraform infra-dev-aws solutions)
+  iamCredentialsSecret: terraform-user-infra-v2-iam-credentials
+
+# -- slack configuration
+slack:
+  # -- secret containing slack webhook url
+  urlSecret: slack-alarm-webhook
+
+# -- extra volumes
+extraVolumes: []
+# -- extra volume mounts
+extraVolumeMounts: []
+# -- evta env vars
+extraEnvVars: []
+
+# -- docker pull secret
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# -- service account details
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# -- pod annotations
+podAnnotations: {}
+
+# -- security options for the running pod
+podSecurityContext:
+  fsGroup: 1000
+
+# -- security options for the running container
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+
+# -- resources allocated for the terraform podu
+resources:
+  requests:
+    memory: 64Mi
+    cpu: 250m
+  limits:
+    memory: 4Gi
+    cpu: 1000m
+
+# -- node selector
+nodeSelector: {}
+
+# -- tolerations
+tolerations: []
+
+# -- affinity
+affinity: {}

@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "terraform-pod.scripts" . }}
+  labels:
+    {{- include "terraform-pod.labels" . | nindent 4 }}
+data:
+  {{ $root := . }}
+  {{ range $path, $bytes:= .Files.Glob "scripts/**.sh" }}
+  {{ $path | regexFind "[^/]+$"}}: |
+  {{ $root.Files.Get $path | nindent 4 }}
+  {{ end }}
