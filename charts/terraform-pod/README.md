@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.3.5](https://img.shields.io/badge/AppVersion-1.3.5-informational?style=flat-square)
+![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.3.5](https://img.shields.io/badge/AppVersion-1.3.5-informational?style=flat-square)
 
 ## Maintainers
 
@@ -125,7 +125,7 @@ helm delete CLIENT
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | slack | object | `{"urlSecret":"slack-alarm-webhook"}` | slack configuration |
 | slack.urlSecret | string | `"slack-alarm-webhook"` | secret containing slack webhook url |
-| terraform.client | string | `"fbmm"` | terraform client name (used to decide what workspace in the org to use) |
+| terraform.client | string | `""` | terraform client name (used to decide what workspace in the org to use) |
 | terraform.initCommand | string | `"make _dev init"` | makefile target in the Makefile of  the repository to run during initialization phase (can be any valid bash one-liner if you want to skip the makefile targets of the repository) |
 | terraform.organization | string | `"saritasa-team"` | terraform org |
 | terraform.tokenSecret | string | `"terraform-cli-token-saritasa-team"` | terraform team API token name |

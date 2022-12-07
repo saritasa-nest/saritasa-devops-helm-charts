@@ -31,7 +31,7 @@ terraform:
   # -- terraform org
   organization: saritasa-team
   # -- terraform client name (used to decide what workspace in the org to use)
-  client: fbmm
+  client: ""
   # -- terraform team API token name
   tokenSecret: terraform-cli-token-saritasa-team
   # -- makefile target in the Makefile of  the repository to run during initialization phase (can be any valid bash one-liner if you want to skip the makefile targets of the repository)
