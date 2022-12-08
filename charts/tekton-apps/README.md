@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.1.26-dev](https://img.shields.io/badge/Version-0.1.26--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.27-dev-wp-pvc](https://img.shields.io/badge/Version-0.1.27--dev--wp--pvc-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -283,6 +283,9 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.externalDatabase.port - wordpress DB port (default: 3306)
   - apps[PROJECT].components[NAME].wordpress.wordpressExtraConfigContent - wordpress extra configs if needed (default: null)
   - apps[PROJECT].components[NAME].wordpress.extraEnvVars - wordpress extra env vars if needed (default: null)
+  - apps[PROJECT].components[NAME].wordpress.persistence.* - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
+  - apps[PROJECT].components[NAME].wordpress.persistence.size - wordpress PVC size (default: 10Gb)
+  - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (default: gp2)
 
   Example of values with extra `eventlistener` and `extraBuildConfigParams` in component:
 
