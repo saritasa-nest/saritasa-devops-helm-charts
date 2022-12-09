@@ -393,7 +393,6 @@ spec:
         selfHeal: true
       syncOptions:
         - CreateNamespace=true
-
   ```
 
   Example of old application from `saritasa-clients` repo, which has no separate `kubernetes` repository. Here we replace `apps[PROJECT].kubernetesRepository` block with
@@ -940,7 +939,8 @@ spec:
         - CreateNamespace=true
   ```
 
-  More difficult example of project containing `wordpress` and `frontend` component. Also defined for example all extra wordpress params that could be set:
+  More complicated example of project containing `wordpress` and `frontend` component.
+  Also defined sample of all extra wordpress params that could be set:
 
   ```yaml
   apiVersion: argoproj.io/v1alpha1
@@ -1085,6 +1085,9 @@ spec:
                       @ini_set('ALLOW_UNFILTERED_UPLOADS', true);
                     extraEnvVars:
                       KEY: VALUE
+                    persistence:
+                      size: 5Gi
+                      storageClass: gp3
                   eventlistener:
                     template: wordpress-build-pipeline-trigger-template
 
