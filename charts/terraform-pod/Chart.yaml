@@ -49,7 +49,7 @@ description: |
   ### Passing aws-vault short-term credentials (infra-aws)
 
   For infra-aws repos you may want to pass short-term TTL AWS credentials from the aws-vault
-
+  ```sh
   (
     unset AWS_VAULT && creds=$(aws-vault exec saritasa/v2/administrators --json) && \
     helm upgrade --install CLIENT saritasa/terraform-pod \
@@ -70,6 +70,7 @@ description: |
       --wait && \
     unset creds
   )
+  ```
 
   Run command as shown in `()`` so that creds are not exported in your local shell.
 
