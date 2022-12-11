@@ -32,7 +32,7 @@ _get_git_info() {
 	# Obtain various repo information
 	#
 	export GITHUB_REPO_NAME=$(echo $_view | jq -r ".nameWithOwner")
-	export GITHUB_BRANCH_URL=$(echo $_viewl | jq -r ".url")/tree/${GITHUB_BRANCH}
+	export GITHUB_BRANCH_URL=$(echo $_view | jq -r ".url")/tree/${GITHUB_BRANCH}
 	export GITHUB_BRANCH=$(git branch --show-current)
 	export GITHUB_PR_URL=$(echo $_status | jq -r ".currentBranch.url // false")
 

@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.3.5](https://img.shields.io/badge/AppVersion-1.3.5-informational?style=flat-square)
+![Version: 0.0.6](https://img.shields.io/badge/Version-0.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.3.5](https://img.shields.io/badge/AppVersion-1.3.5-informational?style=flat-square)
 
 ## Maintainers
 
@@ -68,10 +68,12 @@ helm upgrade --install CLIENT saritasa/terraform-pod \
   --wait
 ```
 
-### Passing aws-vault short-term credentials
+### Passing aws-vault short-term credentials (infra-aws)
+
+For infra-aws repos you may want to pass short-term TTL AWS credentials from the aws-vault
 
 (
-  creds=aws-vault exec saritasa/v2/administrators --json && \
+  unset AWS_VAULT && creds=$(aws-vault exec saritasa/v2/administrators --json) && \
   helm upgrade --install CLIENT saritasa/terraform-pod \
     --namespace terraform \
     --set terraform.client=CLIENT \
@@ -80,10 +82,12 @@ helm upgrade --install CLIENT saritasa/terraform-pod \
     --set github.branch=feature/branch \
     --set github.username=YOUR-GITHUB-USERNAME \
     --set github.email=YOUR-GITHUB-EMAIL \
-    --set gitCryptKey=$(base64 -w 0 git-crypt-key) \
+    --set gitCryptKey=$(base64 -w 0 path/to/git-crypt-key) \
     --set terraform.token=xxx \
-    --set aws.accessKeyId=YOUR_IAM_ACCESS_KEY \
-    --set aws.secretAccessKey=YOUR_IAM_SECRET_KEY \
+    --set aws.accessKeyId=$(echo $creds | jq -r ".AccessKeyId") \
+    --set aws.secretAccessKey=$(echo $creds | jq -r ".SecretAccessKey") \
+    --set aws.sessionToken="$(echo $creds | jq -r ".SessionToken")" \
+    --set infracost.enabled=true \
     --set terraform.initCommand="make _staging init" \
     --wait && \
   unset creds
@@ -91,19 +95,37 @@ helm upgrade --install CLIENT saritasa/terraform-pod \
 
 Run command as shown in `()`` so that creds are not exported in your local shell.
 
-## Get in the pod
-
-```sh
-k exec -ti $(kgpo -l app.kubernetes.io/name=terraform-pod --no-headers -o="custom-columns=NAME:.metadata.name") -c terraform -- bash
-klo $(kgpo -l app.kubernetes.io/name=terraform-pod --no-headers -o="custom-columns=NAME:.metadata.name") --all-containers
-make _dev apply
-```
-
 ## Terminate
 
 ```sh
 helm delete CLIENT
 ````
+
+## Debug
+
+If you want to debug the helm chart (after the improvements) you can perform the following
+
+```sh
+(
+unset AWS_VAULT && creds=$(aws-vault exec saritasa/v2/administrators --json) && \
+helm template --release-name debug-tfpod \
+    --namespace terraform \
+    --set terraform.client=saritasa \
+    --set image.tag=1.3.5 \
+    --set github.repository=saritasa-nest/some-repo-infra-aws \
+    --set github.branch=feature/branch-name \
+    --set github.username=your-username \
+    --set github.email=your-email \
+    --set gitCryptKey=$(base64 -w 0 git-crypt-key) \
+    --set aws.accessKeyId="$(echo $creds | jq -r ".AccessKeyId")" \
+    --set aws.secretAccessKey="$(echo $creds | jq -r ".SecretAccessKey")" \
+    --set aws.sessionToken="$(echo $creds | jq -r ".SessionToken")" \
+    --set infracost.enabled=true \
+    --set terraform.initCommand="make _staging init" \
+    . | k apply -f- && \
+unset creds
+)
+```
 
 ## `chart.valuesTable`
 
