@@ -29,19 +29,45 @@ description: |
   helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
   ```
 
-  ## Run the chart
+  ## Use
+
+  ### Simple case (infra-dev-aws)
 
   ```sh
   helm upgrade --install CLIENT saritasa/terraform-pod \
     --namespace terraform \
+    --set terraform.client=CLIENT \
     --set image.tag=1.3.5 \
     --set github.repository=saritasa-nest/CLIENT-infra-dev-aws \
     --set github.branch=feature/branch \
     --set github.username=YOUR-GITHUB-USERNAME \
     --set github.email=YOUR-GITHUB-EMAIL \
-    --set gitCryptKey=$(base64 git-crypt-key | tr -d \\n) \
+    --set gitCryptKey=$(base64 -w 0 git-crypt-key) \
     --wait
   ```
+
+  ### Passing aws-vault short-term credentials
+
+  (
+    creds=aws-vault exec saritasa/v2/administrators --json && \
+    helm upgrade --install CLIENT saritasa/terraform-pod \
+      --namespace terraform \
+      --set terraform.client=CLIENT \
+      --set image.tag=1.3.5 \
+      --set github.repository=saritasa-nest/CLIENT-infra-aws \
+      --set github.branch=feature/branch \
+      --set github.username=YOUR-GITHUB-USERNAME \
+      --set github.email=YOUR-GITHUB-EMAIL \
+      --set gitCryptKey=$(base64 -w 0 git-crypt-key) \
+      --set terraform.token=xxx \
+      --set aws.accessKeyId=YOUR_IAM_ACCESS_KEY \
+      --set aws.secretAccessKey=YOUR_IAM_SECRET_KEY \
+      --set terraform.initCommand="make _staging init" \
+      --wait && \
+    unset creds
+  )
+
+  Run command as shown in `()`` so that creds are not exported in your local shell.
 
   ## Get in the pod
 

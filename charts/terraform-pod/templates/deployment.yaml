@@ -30,16 +30,16 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - /bin/ash
+            - /bin/bash
             - -c
             - |
               source ../scripts/github.sh
+              source ../scripts/slack.sh
               gh repo clone {{ .Values.github.repository }} ~/workspace
               git checkout {{ .Values.github.branch }}
               cp -r ../git-crypt-key git-crypt-key
               git-crypt unlock git-crypt-key
               pre-commit install
-              source ../scripts/slack.sh
               slack_notificaton
 
           securityContext:
@@ -63,16 +63,18 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
-            - /bin/ash
+            - /bin/bash
             - -c
             - |
               source ../scripts/github.sh
+              source ../scripts/slack.sh
               {{ .Values.terraform.initCommand }}
+              slack_notificaton_ready
 
               printf %140s |tr " " "="
               echo ""
               echo "kubectl exec -ti \$(kgpo -l app.kubernetes.io/name=terraform-pod --no-headers -o="custom-columns=NAME:.metadata.name") -c terraform -- bash"
-              echo "Please run [make _dev apply] once you get in the pod"
+              echo "Please run [make _env apply] once you get in the pod"
               echo "healthy" > /tmp/healthy
               printf %140s |tr " " "="
               sleep infinity
@@ -84,6 +86,9 @@ spec:
             {{ include "terraform-pod.default-env-vars" . | nindent 12 }}
             {{ include "terraform-pod.terraform-env-vars" . | nindent 12 }}
             {{ include "terraform-pod.aws-env-vars" . | nindent 12 }}
+            {{- if .Values.infracost.enabled }}
+            {{ include "terraform-pod.infracost-env-vars" . | nindent 12 }}
+            {{- end }}
             {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -158,7 +163,3 @@ spec:
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-
-
-
-
