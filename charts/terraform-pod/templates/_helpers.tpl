@@ -138,7 +138,7 @@ Define env vars containing argocd access to be passed as TF_VAR value into terra
 */}}
 {{- define "terraform-pod.terraform-env-argocd-vars" -}}
 # terraform argocd credentials
-{{- range $db, $conf := .Values.argocd }}
+{{- range $cluster, $conf := .Values.argocd }}
 - name: {{ $conf.terraformEnvVarName}}
   valueFrom:
     secretKeyRef:
