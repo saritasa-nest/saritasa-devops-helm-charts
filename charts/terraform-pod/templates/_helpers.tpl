@@ -100,7 +100,7 @@ Define default ENV variables for the deployment
 {{- end }}
 
 {{/*
-Define default ENV variables for the deployment
+Define default infracost ENV variables for the deployment
 */}}
 {{- define "terraform-pod.infracost-env-vars" -}}
 {{- $hasCustomApiKey := gt (len .Values.infracost.apiKey) 0 -}}
