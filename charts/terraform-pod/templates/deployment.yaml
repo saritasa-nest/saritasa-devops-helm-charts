@@ -33,11 +33,11 @@ spec:
             - /bin/bash
             - -c
             - |
-              source ../scripts/github.sh
-              source ../scripts/slack.sh
+              source ~/scripts/github.sh
+              source ~/scripts/slack.sh
               gh repo clone {{ .Values.github.repository }} ~/workspace
               git checkout {{ .Values.github.branch }}
-              cp -r ../git-crypt-key git-crypt-key
+              cp -r ~/git-crypt-key git-crypt-key
               git-crypt unlock git-crypt-key
               pre-commit install
               slack_notificaton
@@ -66,8 +66,8 @@ spec:
             - /bin/bash
             - -c
             - |
-              source ../scripts/github.sh
-              source ../scripts/slack.sh
+              source ~/scripts/github.sh
+              source ~/scripts/slack.sh
               {{ .Values.terraform.initCommand }}
               slack_notificaton_ready
 

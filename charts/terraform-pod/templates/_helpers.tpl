@@ -280,7 +280,6 @@ github.username:
 github.email:
     `email` is required and should be a non-empty string. It should contain your github user' email
 {{- end -}}
-
 {{- end -}}
 
 {{/* Validate the value of gitCryptKey */}}
