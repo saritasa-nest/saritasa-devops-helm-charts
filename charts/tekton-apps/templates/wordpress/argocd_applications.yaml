@@ -232,10 +232,6 @@ spec:
         persistence:
         {{- if ($component.wordpress).persistence }}
         {{- toYaml $component.wordpress.persistence | nindent 10 }}
-        {{- else }}
-        {{- /* For compatibility with versions priorior to 0.1.27 */}}
-          enabled: true
-          storageClass: gp2
         {{- end }}
 
         metrics:

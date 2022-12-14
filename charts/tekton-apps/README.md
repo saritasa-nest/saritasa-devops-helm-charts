@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.1.27-dev-wp-pvc](https://img.shields.io/badge/Version-0.1.27--dev--wp--pvc-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.2.0-dev](https://img.shields.io/badge/Version-0.2.0--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -285,7 +285,7 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.extraEnvVars - wordpress extra env vars if needed (default: null)
   - apps[PROJECT].components[NAME].wordpress.persistence.* - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
   - apps[PROJECT].components[NAME].wordpress.persistence.size - wordpress PVC size (default: 10Gb)
-  - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (default: gp2)
+  - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (required)
 
   Example of values with extra `eventlistener` and `extraBuildConfigParams` in component:
 
@@ -858,6 +858,8 @@ spec:
                       user: xxx-wordpress-user-dev
                       existingSecret: xxx-wordpress-dev-externaldb
                       database: xxx-wordpress-dev
+                    persistence:
+                      storageClass: gp3
                   eventlistener:
                     template: wordpress-build-pipeline-trigger-template
 
@@ -926,6 +928,8 @@ spec:
                       user: xxx-wordpress-user-dev
                       existingSecret: xxx-wordpress-dev-externaldb
                       database: xxx-wordpress-dev
+                    persistence:
+                      storageClass: gp3
                   eventlistener:
                     template: wordpress-build-pipeline-trigger-template
 

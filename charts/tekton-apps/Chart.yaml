@@ -13,7 +13,7 @@ triggersVersions: "v0.16.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.27-dev-wp-pvc
+version: 0.2.0-dev
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -265,7 +265,7 @@ description: |
     - apps[PROJECT].components[NAME].wordpress.extraEnvVars - wordpress extra env vars if needed (default: null)
     - apps[PROJECT].components[NAME].wordpress.persistence.* - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
     - apps[PROJECT].components[NAME].wordpress.persistence.size - wordpress PVC size (default: 10Gb)
-    - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (default: gp2)
+    - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (required)
 
     Example of values with extra `eventlistener` and `extraBuildConfigParams` in component:
 
@@ -838,6 +838,8 @@ description: |
                         user: xxx-wordpress-user-dev
                         existingSecret: xxx-wordpress-dev-externaldb
                         database: xxx-wordpress-dev
+                      persistence:
+                        storageClass: gp3
                     eventlistener:
                       template: wordpress-build-pipeline-trigger-template
 
@@ -906,6 +908,8 @@ description: |
                         user: xxx-wordpress-user-dev
                         existingSecret: xxx-wordpress-dev-externaldb
                         database: xxx-wordpress-dev
+                      persistence:
+                        storageClass: gp3
                     eventlistener:
                       template: wordpress-build-pipeline-trigger-template
 
