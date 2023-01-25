@@ -140,7 +140,7 @@ spec:
               - -c
               - |
                 git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ $component.wordpress.repository_ssh_url }} /tmp/wordpress
-                cp -Rf /tmp/wordpress/wp-content/* /bitnami/wordpress/wp-content/
+                cp -rf /tmp/wordpress/wp-content /tmp/wordpress/wp-config.php /bitnami/wordpress/
                 cd /tmp/wordpress
                 git_branch=`git rev-parse --abbrev-ref HEAD`
                 git_log=`git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD`
