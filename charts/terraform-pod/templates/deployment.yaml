@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "terraform-pod.fullname" . }}
+  labels:
+    {{- include "terraform-pod.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "terraform-pod.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "terraform-pod.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "terraform-pod.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: git-clone
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              source ~/scripts/github.sh
+              source ~/scripts/slack.sh
+              gh repo clone {{ .Values.github.repository }} ~/workspace
+              git checkout {{ .Values.github.branch }}
+              cp -r ~/git-crypt-key git-crypt-key
+              git-crypt unlock git-crypt-key
+              pre-commit install
+              slack_notificaton
+
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            {{ include "terraform-pod.default-env-vars" . | nindent 12 }}
+          volumeMounts:
+            - mountPath: /home/terraform/workspace
+              name: workspace
+            - mountPath: /home/terraform/scripts
+              name: scripts
+            - mountPath: /home/terraform/git-crypt-key
+              name: git-crypt-key
+              subPath: git-crypt-key
+              readOnly: true
+            - name: github-token
+              mountPath: /home/terraform/.github/token
+              subPath: token
+      containers:
+        - name: terraform
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/bash
+            - -c
+            - |
+              source ~/scripts/github.sh
+              source ~/scripts/slack.sh
+              {{ .Values.terraform.initCommand }}
+              slack_notificaton_ready
+
+              printf %140s |tr " " "="
+              echo ""
+              echo "kubectl exec -ti \$(kgpo -l app.kubernetes.io/name=terraform-pod --no-headers -o="custom-columns=NAME:.metadata.name") -c terraform -- bash"
+              echo "Please run [make _env apply] once you get in the pod"
+              echo "healthy" > /tmp/healthy
+              printf %140s |tr " " "="
+              sleep infinity
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{ include "terraform-pod.default-env-vars" . | nindent 12 }}
+            {{ include "terraform-pod.terraform-env-vars" . | nindent 12 }}
+            {{ include "terraform-pod.aws-env-vars" . | nindent 12 }}
+            {{- if .Values.infracost.enabled }}
+            {{ include "terraform-pod.infracost-env-vars" . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            exec:
+              command:
+              - cat
+              - /tmp/healthy
+            initialDelaySeconds: 30
+            periodSeconds: 5
+          volumeMounts:
+            - name: workspace
+              mountPath: /home/terraform/workspace
+            - name: scripts
+              mountPath: /home/terraform/scripts
+            - name: github-terraform-cicd-app-private-key
+              mountPath: /keys
+            - name: saritasa-terraform-modules-deploy-key
+              mountPath: /home/terraform/.ssh/id_rsa
+              subPath: ssh-privatekey
+            - name: github-known-hosts
+              mountPath: /home/terraform/.ssh/known_hosts
+              subPath: config.ssh
+            - name: github-token
+              mountPath: /home/terraform/.github/token
+              subPath: token
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: workspace
+          emptyDir:
+            sizeLimit: 2Gi
+        - name: github-terraform-cicd-app-private-key
+          secret:
+            secretName: "{{ .Values.github.appAuthSecret }}"
+            optional: false
+        - name: saritasa-terraform-modules-deploy-key
+          secret:
+            secretName: saritasa-terraform-modules-deploy-key
+            defaultMode: 0600
+        - name: scripts
+          configMap:
+            name: {{ include "terraform-pod.fullname" . }}-scripts
+            defaultMode: 0777
+        - name: git-crypt-key
+          secret:
+            secretName: {{ include "terraform-pod.git-crypt-key" . }}
+            defaultMode: 0600
+        - name: github-known-hosts
+          configMap:
+            name: {{ include "terraform-pod.github-known-hosts" . }}
+        - name: github-token
+          secret:
+            secretName: {{ .Values.github.tokenSecret }}
+            defaultMode: 0600
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
