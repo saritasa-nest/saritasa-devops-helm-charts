@@ -229,8 +229,8 @@ spec:
             {{- end }}
           {{- end }}
 
-        persistence:
         {{- if ($component.wordpress).persistence }}
+        persistence:
         {{- toYaml $component.wordpress.persistence | nindent 10 }}
         {{- end }}
 
