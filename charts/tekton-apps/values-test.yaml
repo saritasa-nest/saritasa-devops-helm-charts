@@ -1,7 +1,7 @@
 
 # -- environment these apps are handling
 # possible values: dev, staging, prod
-environment: "test"
+environment: "glbenv"
 
 # or main, staging (for fixed merges into staging) or like release (if we use gitflow and semantic versioning)
 # you can overwrite it in apps[project].components[component].eventlistener.filter
@@ -58,6 +58,7 @@ eventlistener:
 # -- list of projects and the project's apps to be triggered
 apps:
   - project: xxx
+    environment: prjenv
     enabled: true
     argocd:
       labels:
@@ -136,7 +137,7 @@ apps:
         argocd:
           # ignoreDeploymentReplicasDiff: true
           source: 
-            targetRevision: 15.2.4
+            targetRevision: 15.2.5
         wordpress:
           imageTag: 6.0.2
           resources:
@@ -146,6 +147,10 @@ apps:
             limits:
               cpu: 1000m
               memory: 1G
+          commonLabels:
+            testLabel: true
+          updateStrategy:
+            type: CustomStrategy
           nodeSelector:
             apps: 'true'
           podSecurityContext:
