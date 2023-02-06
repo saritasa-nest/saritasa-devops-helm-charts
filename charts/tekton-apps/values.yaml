@@ -1,7 +1,7 @@
 
 # -- environment these apps are handling
 # possible values: dev, staging, prod
-environment: "test"
+environment: ""
 
 # or main, staging (for fixed merges into staging) or like release (if we use gitflow and semantic versioning)
 # you can overwrite it in apps[project].components[component].eventlistener.filter

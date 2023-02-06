@@ -7,7 +7,7 @@
 # or with `$.Values.environment` otherwise
 {{- $projectEnvironment := $project.environment | default $.Values.environment  -}}
 # initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict
-{{- $argocd := $component.argocd | default dict -}}
+{{- $argocd := $component.argocd | default dict }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -108,7 +108,7 @@ spec:
               - |
                 git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ .repositorySshUrl | required ".wordpress.repositorySshUrl is required." }} /tmp/wordpress
                 cd /tmp/wordpress
-                {{- if .repositoryRevision }}git checkout {{.repositoryRevision }}{{ end }}
+                {{ if .repositoryRevision }}git checkout {{.repositoryRevision }}{{ end }}
                 cp -rf wp-content wp-config.php /bitnami/wordpress/
                 git_branch=`git rev-parse --abbrev-ref HEAD`
                 git_log=`git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD`
