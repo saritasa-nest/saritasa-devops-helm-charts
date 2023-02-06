@@ -17,7 +17,7 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
 spec:
   destination:
-    namespace: {{ $project.argocd.namespace }}
+    namespace: {{ $project.argocd.namespace | required ".argocd.names is required in project settings"}}
     server: https://kubernetes.default.svc
   ignoreDifferences:
     - group: v1
@@ -97,7 +97,7 @@ spec:
               - all
         {{- end }}
 
-        {{ if or (.ci).enabled (not (hasKey .ci "enabled")) -}}
+        {{ if or .ci (not (hasKey . "ci")) -}}
         initContainers:
           - name: install
             image: jnewland/git-and-stuff
@@ -106,9 +106,9 @@ spec:
               - bash
               - -c
               - |
-                git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ .ci.repository_ssh_url }} /tmp/wordpress
+                git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ .repositorySshUrl | required ".wordpress.repositorySshUrl is required." }} /tmp/wordpress
                 cd /tmp/wordpress
-                {{- if .ci.revision }}git checkout {{.ci.revision }}{{ end }}
+                {{- if .repositoryRevision }}git checkout {{.repositoryRevision }}{{ end }}
                 cp -rf wp-content wp-config.php /bitnami/wordpress/
                 git_branch=`git rev-parse --abbrev-ref HEAD`
                 git_log=`git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD`
@@ -131,14 +131,18 @@ spec:
             - mountPath: /home/app/.ssh/known_hosts
               name: github-known-hosts
               subPath: config.ssh
-        {{- if (.ci).extraInitContainers }}
-          {{- toYaml (.ci).extraInitContainers | nindent 10 }}
+        {{- if .initContainers }}
+          {{- .initContainers | toYaml | nindent 8 }}
+        {{- end }}
+        {{- else if .initContainers}}
+        initContainers:
+          {{- toYaml .initContainers | nindent 8 }}
         {{- end }}
 
         extraVolumes:
           - name: ssh-key
             secret:
-              secretName: {{ (.ci).deployKey | default (printf "%s-%s-deploy-key" $project.project $component.name) }}
+              secretName: {{ .repositoryDeployKey | default (printf "%s-%s-deploy-key" $project.project $component.name) }}
           - name: github-known-hosts
             configMap:
               name: github-known-hosts
@@ -147,8 +151,8 @@ spec:
           {{- end }}
         {{ if .extraVolumeMounts }}
         extraVolumeMounts:
-          {{- toYaml .extraVolumeMounts | nindent 10 }}
-          {{- end }}
+        {{- toYaml .extraVolumeMounts | nindent 10 }}
+        {{- end }}
         {{ if .extraEnvVars }}
         extraEnvVars:
         {{- toYaml .extraEnvVars | nindent 10 }}
@@ -241,7 +245,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
 ---
-{{- end }}
 {{- end }} # with component.wordpress
 {{- end }} # range component
 {{- end }} # if project.enabled and project.argocd
