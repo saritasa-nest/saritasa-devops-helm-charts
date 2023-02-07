@@ -116,9 +116,9 @@ spec:
                     echo "git:x:$(id -g):" >"$NSS_WRAPPER_GROUP"
                 fi
                 # clone wordpress distribution from repo
-                git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone --branch staging git@github.com:saritasa-nest/premierfoodsafety-wordpress.git /tmp/wordpress
+                git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone {{ .repositorySshUrl | required "Missed .wordpress.repositorySshUrl option"}} /tmp/wordpress
                 cd /tmp/wordpress
-                {{ if .repositoryRevision }}git checkout {{.repositoryRevision }}{{ end }}
+                {{ if .repositoryRevision }}git checkout {{ .repositoryRevision }}{{ end }}
                 git_branch=$(git rev-parse --abbrev-ref HEAD)
                 git_log=$(git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD)
                 msg="[$git_branch] $git_log"
@@ -128,7 +128,10 @@ spec:
                 printf "%0.s-" $(seq 1 ${#msg})
                 echo
                 ls -lan /tmp/wordpress/
-                cp -Rf /tmp/wordpress/wp-content /tmp/wordpress/wp-config.php /bitnami/wordpress/
+                cp -Rf /tmp/wordpress/wp-content /bitnami/wordpress/
+                {{- if .repositoryUseWPConfig }}
+                cp -Rf  /tmp/wordpress/wp-config.php
+                {{- end }}
                 ls -lan /bitnami/wordpress /bitnami/wordpress/wp-content
                 echo "Folder wp-content copied from git repo into bitnami/wordpress"
                 echo "Done INIT"
@@ -222,8 +225,9 @@ spec:
 
         metrics:
           enabled: true
-
+        {{- if .repositoryUseWPConfig}}
         overrideDatabaseSettings: true
+        {{- end }}
 
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
         wordpressEmail: {{ .wordpressEmail | default (printf "devops+%s@saritasa.com" $project.project) }}
