@@ -57,6 +57,13 @@ spec:
         cd $(params.kustomize_overlay_path) && \
           /app/kustomize edit set image $application=$(params.image)
 
+    - name: yamlfix
+      image: {{ .Values.images.yamlfix | default "otherguy/yamlfix:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
+        find apps -iname "*.yaml" -exec yamlfix {} \;
+
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
