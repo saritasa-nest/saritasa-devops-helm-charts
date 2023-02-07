@@ -17,7 +17,7 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
 spec:
   destination:
-    namespace: {{ $project.argocd.namespace | required ".argocd.names is required in project settings"}}
+    namespace: {{ $project.argocd.namespace | required ".argocd.namespace is required in project settings"}}
     server: https://kubernetes.default.svc
   ignoreDifferences:
     - group: v1
@@ -77,58 +77,69 @@ spec:
           pvc: "true"
         {{- end }}
 
-        podSecurityContext:
         {{- if .podSecurityContext }}
+        podSecurityContext:
           {{- toYaml .podSecurityContext | nindent 10 }}
-        {{- else }}
-          runAsNonRoot: true
-          runAsUser: 1000
-          runAsGroup: 1000
         {{- end }}
 
-        containerSecurityContext:
         {{- if .containerSecurityContext }}
+        containerSecurityContext:
           {{- toYaml .containerSecurityContext | nindent 10 }}
-        {{- else }}
-          allowPrivilegeEscalation: false
-          privileged: false
-          capabilities:
-            drop:
-              - all
         {{- end }}
 
         {{ if or .ci (not (hasKey . "ci")) -}}
         initContainers:
           - name: install
-            image: jnewland/git-and-stuff
+            image: bitnami/git
             imagePullPolicy: Always
+            securityContext:
+              runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
+            env:
+              - name: HOME
+                value: /home/git
             command:
               - bash
               - -c
               - |
-                git -c core.sshCommand="ssh -i ~/.ssh/id_rsa" clone {{ .repositorySshUrl | required ".wordpress.repositorySshUrl is required." }} /tmp/wordpress
+                set -o errexit
+                set -o nounset
+                set -o pipefail
+                #set -o xtrace
+                #setup runAsUser user settings
+                if ! getent passwd "$(id -u)" &>/dev/null && [ -e "$NSS_WRAPPER_LIB" ]; then
+                    export LD_PRELOAD="$NSS_WRAPPER_LIB"
+                    # shellcheck disable=SC2155
+                    export NSS_WRAPPER_PASSWD="$(mktemp)"
+                    # shellcheck disable=SC2155
+                    export NSS_WRAPPER_GROUP="$(mktemp)"
+                    echo "git:x:$(id -u):$(id -g):Git:${HOME}:/bin/false" >"$NSS_WRAPPER_PASSWD"
+                    echo "git:x:$(id -g):" >"$NSS_WRAPPER_GROUP"
+                fi
+                # clone wordpress distribution from repo
+                git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone --branch staging git@github.com:saritasa-nest/premierfoodsafety-wordpress.git /tmp/wordpress
                 cd /tmp/wordpress
                 {{ if .repositoryRevision }}git checkout {{.repositoryRevision }}{{ end }}
-                cp -rf wp-content wp-config.php /bitnami/wordpress/
-                git_branch=`git rev-parse --abbrev-ref HEAD`
-                git_log=`git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD`
+                git_branch=$(git rev-parse --abbrev-ref HEAD)
+                git_log=$(git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD)
                 msg="[$git_branch] $git_log"
                 printf "%0.s-" $(seq 1 ${#msg})
                 echo
                 echo "$msg"
                 printf "%0.s-" $(seq 1 ${#msg})
                 echo
-                ls -la /tmp/wordpress/wp-content
-                echo "Folder wp-content copied from git repo into bitnami/wodpress"
+                ls -lan /tmp/wordpress/
+                cp -Rf /tmp/wordpress/wp-content /tmp/wordpress/wp-config.php /bitnami/wordpress/
+                ls -lan /bitnami/wordpress /bitnami/wordpress/wp-content
+                echo "Folder wp-content copied from git repo into bitnami/wordpress"
                 echo "Done INIT"
             volumeMounts:
             - mountPath: /bitnami/wordpress
               name: wordpress-data
               subPath: wordpress
-            - mountPath: /home/app/.ssh/id_rsa
+            - mountPath: /home/git/.ssh/id_rsa
               name: ssh-key
               subPath: ssh-privatekey
-            - mountPath: /home/app/.ssh/known_hosts
+            - mountPath: /home/git/.ssh/known_hosts
               name: github-known-hosts
               subPath: config.ssh
         {{- if .initContainers }}
@@ -211,6 +222,8 @@ spec:
 
         metrics:
           enabled: true
+
+        overrideDatabaseSettings: true
 
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
         wordpressEmail: {{ .wordpressEmail | default (printf "devops+%s@saritasa.com" $project.project) }}
