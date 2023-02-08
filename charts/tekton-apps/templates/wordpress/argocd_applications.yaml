@@ -233,7 +233,7 @@ spec:
         {{- end }}
 
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
-        existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default string }}
+        existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default "" }}
         wordpressEmail: {{ .wordpressEmail | default (printf "devops+%s@saritasa.com" $project.project) }}
         wordpressBlogName: {{ .wordpressBlogName | default $project.project }}
         wordpressScheme: {{ .wordpressScheme | default "https" }}
