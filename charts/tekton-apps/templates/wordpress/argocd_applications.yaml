@@ -130,7 +130,7 @@ spec:
                 ls -lan /tmp/wordpress/
                 cp -Rf /tmp/wordpress/wp-content /bitnami/wordpress/
                 {{- if .repositoryUseWPConfig }}
-                cp -Rf  /tmp/wordpress/wp-config.php
+                cp -Rf  /tmp/wordpress/wp-config.php /bitnami/wordpress/
                 {{- end }}
                 ls -lan /bitnami/wordpress /bitnami/wordpress/wp-content
                 echo "Folder wp-content copied from git repo into bitnami/wordpress"
@@ -170,6 +170,9 @@ spec:
         {{ if .extraEnvVars }}
         extraEnvVars:
         {{- toYaml .extraEnvVars | nindent 10 }}
+        {{- end }}
+        {{ if .extraEnvVarsSecret }}
+        extraEnvVarsSecret: {{ .extraEnvVarsSecret }}
         {{- end }}
 
         livenessProbe:
@@ -230,6 +233,7 @@ spec:
         {{- end }}
 
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
+        existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default string }}
         wordpressEmail: {{ .wordpressEmail | default (printf "devops+%s@saritasa.com" $project.project) }}
         wordpressBlogName: {{ .wordpressBlogName | default $project.project }}
         wordpressScheme: {{ .wordpressScheme | default "https" }}
