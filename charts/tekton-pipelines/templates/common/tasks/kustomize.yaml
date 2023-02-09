@@ -62,7 +62,12 @@ spec:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.kubernetes-repo.path)
       script: |
-        find apps -iname "*.yaml" -exec yamlfix {} \;
+        CONFIG=/workdir/yamlfix.toml
+        if [ -f .yamlfix.toml ]; then
+          CONFIG=$(realpath .yamlfix.toml)
+        fi
+
+        find apps -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
 
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
