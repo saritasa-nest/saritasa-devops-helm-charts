@@ -237,10 +237,9 @@ spec:
 
         metrics:
           enabled: true
-        {{- if .repositoryUseWPConfig}}
-        overrideDatabaseSettings: true
-        {{- end }}
-
+        
+        overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
+        
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
         existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default "" }}
         wordpressEmail: {{ .wordpressEmail | default (printf "devops+%s@saritasa.com" $project.project) }}
