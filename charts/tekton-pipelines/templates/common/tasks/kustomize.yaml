@@ -58,7 +58,7 @@ spec:
           /app/kustomize edit set image $application=$(params.image)
 
     - name: yamlfix
-      image: {{ .Values.images.yamlfix | default "otherguy/yamlfix:latest"}}
+      image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.kubernetes-repo.path)
       script: |
