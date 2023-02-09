@@ -321,6 +321,18 @@ buildpacks:
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-ruby
 
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: JAVA                                                                                                      │
+# │ Various Java apps                                                                                                    │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    buildpackJavaBuildPipeline:
+      # -- the name of the generated pipeline
+      name: buildpack-java-build-pipeline
+      # -- should we enable the java buildpack pipeline
+      enabled: false
+      # -- the generated name of the tekton task implementing the "build" step
+      buildTaskName: buildpack-java
 
 kaniko:
   # -- should we enable the kaniko pipeline
