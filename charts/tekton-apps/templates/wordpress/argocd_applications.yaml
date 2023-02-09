@@ -109,10 +109,13 @@ spec:
                 COPY_WP_CONF="{{ .repositoryUseWPConfig | default "false"}}"
                 URL="{{ .repositorySshUrl | required "Missed .wordpress.repositorySshUrl option"}}"
                 REVISION="{{ .repositoryRevision | default "" }}"
+                #--------------------------------------------------------------------
+                # chart does not start wp setup if WP_ROOT is not empty
                 if [[ ! -d $WP_ROOT/wp-content && $COPY_WP_CONF == "false" ]]; then
                   echo "WP not initialized, skipping"
                 else
-                  #setup git user with runAsUser id
+                #--------------------------------------------------------------------
+                #setup git user with runAsUser id
                   if ! getent passwd "$(id -u)" &>/dev/null && [ -e "$NSS_WRAPPER_LIB" ]; then
                       export LD_PRELOAD="$NSS_WRAPPER_LIB"
                       # shellcheck disable=SC2155
@@ -122,9 +125,11 @@ spec:
                       echo "git:x:$(id -u):$(id -g):Git:${HOME}:/bin/false" >"$NSS_WRAPPER_PASSWD"
                       echo "git:x:$(id -g):" >"$NSS_WRAPPER_GROUP"
                   fi
+                  #-------------------------------------------------------------------
                   # clone wordpress distribution from repo
-                  git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone $REVISION $URL /tmp/wordpress
+                  git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone $URL /tmp/wordpress
                   cd /tmp/wordpress
+                  [[ -n $REVISION ]] && git checkout $REVISION
                   git_branch=$(git rev-parse --abbrev-ref HEAD)
                   git_log=$(git log --format="%h - by %an - %ae - %s" HEAD~1..HEAD)
                   msg="[$git_branch] $git_log"
@@ -134,7 +139,7 @@ spec:
                   printf "%0.s-" $(seq 1 ${#msg})
                   echo
                   cp -Rf /tmp/wordpress/wp-content $WP_ROOT/
-                  if [[ $COPY_WP_CONF == "true" ]]; then cp -Rf  /tmp/wordpress/wp-config.php $WP_ROOT/; fi
+                  [[ $COPY_WP_CONF == "true" ]] && cp -Rf  /tmp/wordpress/wp-config.php $WP_ROOT/
                   ls -lan $WP_ROOT $WP_ROOT/wp-content
                   echo "Folder wp-content copied from git repo into bitnami/wordpress"
                   echo "Done INIT"
