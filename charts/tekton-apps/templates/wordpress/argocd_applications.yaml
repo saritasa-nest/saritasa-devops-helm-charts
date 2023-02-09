@@ -106,7 +106,7 @@ spec:
                 set -o pipefail
                 #set -o xtrace
                 WP_ROOT=/bitnami/wordpress
-                COPY_WP_CONF="{{ .repositoryUseWPConfig | default "false"}}"
+                COPY_WP_CONF="{{ and .repositoryUseWPConfig (not .existingWordPressConfigurationSecret) | default "false"}}"
                 URL="{{ .repositorySshUrl | required "Missed .wordpress.repositorySshUrl option"}}"
                 REVISION="{{ .repositoryRevision | default "" }}"
                 #--------------------------------------------------------------------
@@ -139,7 +139,7 @@ spec:
                   printf "%0.s-" $(seq 1 ${#msg})
                   echo
                   cp -Rf /tmp/wordpress/wp-content $WP_ROOT/
-                  [[ $COPY_WP_CONF == "true" ]] && cp -Rf  /tmp/wordpress/wp-config.php $WP_ROOT/
+                  [[ $COPY_WP_CONF == "true" ]] && cp -Rf  /tmp/wordpress/wp-config.php $WP_ROOT/ || echo "COPY_WP_CONF=$COPY_WP_CONF, ignoring"
                   ls -lan $WP_ROOT $WP_ROOT/wp-content
                   echo "Folder wp-content copied from git repo into bitnami/wordpress"
                   echo "Done INIT"
