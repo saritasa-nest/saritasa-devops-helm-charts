@@ -37,7 +37,7 @@ spec:
       values: |
         image:
           repository: bitnami/wordpress
-          tag: {{ (.image).tag | default "5.7.2" }}
+          tag: {{ (.image).tag | default "6.1.1" }}
           debug: {{ (.image).debug | default "true" }}
 
         resources:
@@ -104,17 +104,20 @@ spec:
                 set -o errexit
                 set -o nounset
                 set -o pipefail
-                #set -o xtrace
+                # persistent volume for wordpress files
                 WP_ROOT=/bitnami/wordpress
+                # condition to replace wp-config in persistent install
                 COPY_WP_CONF="{{ and .repositoryUseWPConfig (not .existingWordPressConfigurationSecret) | default "false"}}"
+                # wp repository for wp-config and wp-content
                 URL="{{ .repositorySshUrl | required "Missed .wordpress.repositorySshUrl option"}}"
+                # target wp repository revision (branch/tag), revision "" skips checkout from default repo branch
                 REVISION="{{ .repositoryRevision | default "" }}"
                 #--------------------------------------------------------------------
                 # chart does not start wp setup if WP_ROOT is not empty
                 if [[ ! -d $WP_ROOT/wp-content && $COPY_WP_CONF == "false" ]]; then
                   echo "WP not initialized, skipping"
-                else
                 #--------------------------------------------------------------------
+                else
                 #setup git user with runAsUser id
                   if ! getent passwd "$(id -u)" &>/dev/null && [ -e "$NSS_WRAPPER_LIB" ]; then
                       export LD_PRELOAD="$NSS_WRAPPER_LIB"
@@ -237,9 +240,9 @@ spec:
 
         metrics:
           enabled: true
-        
+
         overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
-        
+
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
         existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default "" }}
         wordpressEmail: {{ .wordpressEmail | default (printf "devops+%s@saritasa.com" $project.project) }}
@@ -265,7 +268,7 @@ spec:
 
 
     repoURL: {{ $argocd.source.repoUrl | default "https://charts.bitnami.com/bitnami" }}
-    targetRevision: {{ $argocd.source.targetRevision | default "15.0.16" }}
+    targetRevision: {{ $argocd.source.targetRevision | default "15.2.40" }}
 
   syncPolicy:
     automated:
