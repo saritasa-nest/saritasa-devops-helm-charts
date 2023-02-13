@@ -57,6 +57,18 @@ spec:
         cd $(params.kustomize_overlay_path) && \
           /app/kustomize edit set image $application=$(params.image)
 
+    - name: yamlfix
+      image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
+        CONFIG=/workdir/yamlfix.toml
+        if [ -f .yamlfix.toml ]; then
+          CONFIG=$(realpath .yamlfix.toml)
+        fi
+
+        find apps -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
+
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
