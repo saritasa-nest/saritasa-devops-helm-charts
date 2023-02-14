@@ -23,6 +23,8 @@ images:
   slack:     cloudposse/slack-notifier:0.4.0
   # -- python image
   python:    saritasallc/python3:0.4 # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
+  # -- yamlfix image - format yaml files
+  yamlfix:   public.ecr.aws/saritasa/yamlfix:1.8.0 # https://lyz-code.github.io/yamlfix/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -321,6 +323,18 @@ buildpacks:
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-ruby
 
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ BUILDPACK: JAVA                                                                                                      │
+# │ Various Java apps                                                                                                    │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+    buildpackJavaBuildPipeline:
+      # -- the name of the generated pipeline
+      name: buildpack-java-build-pipeline
+      # -- should we enable the java buildpack pipeline
+      enabled: false
+      # -- the generated name of the tekton task implementing the "build" step
+      buildTaskName: buildpack-java
 
 kaniko:
   # -- should we enable the kaniko pipeline
