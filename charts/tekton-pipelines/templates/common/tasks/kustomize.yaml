@@ -74,7 +74,7 @@ spec:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.kubernetes-repo.path)
       script: |
-        KUBEVAL_SCHEMA_LOCATION=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
+        export KUBEVAL_SCHEMA_LOCATION=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
         kustomize build $(params.kustomize_overlay_path) | kubeval -f -
 
     - name: git-push
