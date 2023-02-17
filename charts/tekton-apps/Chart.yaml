@@ -8,12 +8,11 @@ type: application
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "v0.28.2"
-triggersVersions: "v0.16.0"
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.1
+version: 0.2.1-new
 
 maintainers:
   - url: https://www.saritasa.com/
