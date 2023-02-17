@@ -1,0 +1,94 @@
+environment: staging
+
+gitBranchPrefixes:
+  - staging
+  - release
+
+storageClassName: "gp2"
+
+aws:
+  region: "us-east-2"
+  dns: proxylegalstaging.com
+
+defaultRegistry: 833737135757.dkr.ecr.us-east-2.amazonaws.com
+
+argocd:
+  server: deploy.proxylegalstaging.com
+
+eventlistener:
+  enableWebhookSecret: true
+
+apps:
+  - project: nmbl
+    enabled: true
+    argocd:
+      labels:
+        created-by: DmitrySemenov
+        ops-main: DmitrySemenov
+        ops-secondary: KseniyaShaydurova
+        pm: VadikKuznetsov
+        tm: AlekseyBashirov
+      namespace: staging
+      syncWave: 200
+    mailList: nmbl@saritasa.com
+    devopsMailList: devops+nmbl@saritasa.com
+    jiraURL: https://saritasa.atlassian.net/browse/NMBLCLD
+    tektonURL: https://tekton.proxylegalstaging.com/#/namespaces/ci/pipelineruns
+    slack: client-nmbl-ci
+    kubernetesRepository:
+      name: nmbl-kubernetes-aws
+      branch: feature/add-staging
+      url: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+
+    extraApps:
+      - name: nmbl-extra-apps
+        path: dev/argocd/apps
+        repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+        targetRevision: feature/sync-boilerplate
+
+    components:
+      - name: backend
+        repository: nmbl-backend
+        pipeline: buildpack-django-build-pipeline
+        applicationURL: https://api.proxylegalstaging.com
+        argocd:
+          syncWave: 210
+        eventlistener:
+          template: buildpack-django-build-pipeline-trigger-template
+        triggerBinding:
+          - name: docker_registry_repository
+            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/backend
+          - name: buildpack_builder_image
+            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/google/builder:latest
+          - name: buildpack_runner_image
+            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/google/runner:latest
+          - name: kubernetes_branch
+            value: feature/add-staging
+
+      - name: frontend
+        repository: nmbl-frontend
+        pipeline: buildpack-frontend-build-pipeline
+        applicationURL: https://proxylegalstaging.com
+        argocd:
+          syncWave: 220
+        eventlistener:
+          template: buildpack-frontend-build-pipeline-trigger-template
+          # TODO: Ksusha - pls fix once you finalize the PR
+          # https://github.com/saritasa-nest/nmbl-frontend/pull/1#pullrequestreview-962791245
+          gitWebhookBranches:
+            - feature/add-ci-cd
+        triggerBinding:
+          - name: docker_registry_repository
+            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/frontend
+          - name: buildpack_builder_image
+            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/paketo/builder:latest
+          - name: buildpack_runner_image
+            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/paketo/runner:latest
+          - name: source_subpath
+            value: dist
+          - name: kubernetes_branch
+            value: feature/add-staging
+
+# make sure PVCs are bound after the chart is synced
+# by temporarily mount them into short-live job.
+runPostInstallMountPvcJob: true
