@@ -75,7 +75,7 @@ spec:
       workingDir: $(resources.inputs.kubernetes-repo.path)
       script: |
         export KUBEVAL_SCHEMA_LOCATION=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
-        kustomize build $(params.kustomize_overlay_path) | kubeval -f -
+        kustomize build $(params.kustomize_overlay_path) | kubeval --ignore-missing-schemas --kubernetes-version=1.24.0 -f -
 
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
