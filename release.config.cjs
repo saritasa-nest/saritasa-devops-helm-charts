@@ -22,14 +22,14 @@ const RELEASE_NOTES_GENERATOR = [
 const CHANGELOG = [
     '@semantic-release/changelog',
     {
-        changelogFile: 'microservices/CHANGELOG.md'
+      changelogFile: 'charts/CHANGELOG.md'
     }
 ]
 
 const HELM = [
     'semantic-release-helm3',
     {
-        chartPath: 'microservices',
+      chartPath: 'charts',
         onlyUpdateVersion: true
     }
 ]
@@ -39,7 +39,8 @@ module.exports = {
     branches: [
         '+([0-9])?(.{+([0-9]),x}).x',
         'main',
-        { name: 'next', prerelease: true }
+    { name: 'beta', prerelease: true },
+    { name: 'alpha', prerelease: true }
     ],
     plugins: [
         COMMIT_ANALYZER,

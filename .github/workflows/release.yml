@@ -50,6 +50,8 @@ jobs:
         with:
           config: cr.yaml
           charts_dir: charts
-          skip_existing: true
+          # uncomment when this PR is merged
+          # https://github.com/helm/chart-releaser-action/pull/134/
+          # skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
