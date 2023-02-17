@@ -13,7 +13,7 @@ triggersVersions: "v0.16.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.28
+version: 0.2.1-dev.12
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -263,6 +263,9 @@ description: |
     - apps[PROJECT].components[NAME].wordpress.externalDatabase.port - wordpress DB port (default: 3306)
     - apps[PROJECT].components[NAME].wordpress.wordpressExtraConfigContent - wordpress extra configs if needed (default: null)
     - apps[PROJECT].components[NAME].wordpress.extraEnvVars - wordpress extra env vars if needed (default: null)
+    - apps[PROJECT].components[NAME].wordpress.persistence.* - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
+    - apps[PROJECT].components[NAME].wordpress.persistence.size - wordpress PVC size (default: 10Gb)
+    - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (required)
 
     Example of values with extra `eventlistener` and `extraBuildConfigParams` in component:
 
@@ -370,7 +373,6 @@ description: |
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-
     ```
 
     Example of old application from `saritasa-clients` repo, which has no separate `kubernetes` repository. Here we replace `apps[PROJECT].kubernetesRepository` block with
@@ -836,6 +838,8 @@ description: |
                         user: xxx-wordpress-user-dev
                         existingSecret: xxx-wordpress-dev-externaldb
                         database: xxx-wordpress-dev
+                      persistence:
+                        storageClass: gp3
                     eventlistener:
                       template: wordpress-build-pipeline-trigger-template
 
@@ -904,6 +908,8 @@ description: |
                         user: xxx-wordpress-user-dev
                         existingSecret: xxx-wordpress-dev-externaldb
                         database: xxx-wordpress-dev
+                      persistence:
+                        storageClass: gp3
                     eventlistener:
                       template: wordpress-build-pipeline-trigger-template
 
@@ -917,7 +923,8 @@ description: |
           - CreateNamespace=true
     ```
 
-    More difficult example of project containing `wordpress` and `frontend` component. Also defined for example all extra wordpress params that could be set:
+    More complicated example of project containing `wordpress` and `frontend` component.
+    Also defined sample of all extra wordpress params that could be set:
 
     ```yaml
     apiVersion: argoproj.io/v1alpha1
@@ -1062,6 +1069,9 @@ description: |
                         @ini_set('ALLOW_UNFILTERED_UPLOADS', true);
                       extraEnvVars:
                         KEY: VALUE
+                      persistence:
+                        size: 5Gi
+                        storageClass: gp3
                     eventlistener:
                       template: wordpress-build-pipeline-trigger-template
 

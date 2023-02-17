@@ -66,7 +66,7 @@ apps: []
   #       ops-secondary: xxx
   #       pm: xxx
   #       tm: xxx
-  #     namespace: prod
+  #     namespace: test
   #   mailList: xxx@saritasa.com
   #   devopsMailList: devops+xxx@saritasa.com
   #   jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -76,7 +76,7 @@ apps: []
   #     name: xxx-kubernetes-aws
   #     branch: main
   #     url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
-  #
+
   #   components:
   #     - name: backend
   #       repository: xxx-backend
@@ -99,7 +99,7 @@ apps: []
   #           value: buildpack1.yml
   #         - name: project_config_filename
   #           value: project1.toml
-  #
+
   #     - name: frontend
   #       repository: xxx-frontend
   #       argocd:
@@ -128,6 +128,48 @@ apps: []
   #           value: buildpack2.yml
   #         - name: project_config_filename
   #           value: project2.toml
+
+  #     - name: wordpress
+  #       repository: xxx-wordpress
+  #       pipeline: wordpress-build-pipeline
+  #       applicationURL: https://site.com
+  #       argocd:
+  #         # ignoreDeploymentReplicasDiff: true
+  #         source:
+  #           targetRevision: 15.2.4
+  #       wordpress:
+  #         imageTag: 6.0.2
+  #         resources:
+  #           requests:
+  #             cpu: 100m
+  #             memory: 128Mi
+  #           limits:
+  #             cpu: 1000m
+  #             memory: 1G
+  #         nodeSelector:
+  #           apps: 'true'
+  #         podSecurityContext:
+  #           enabled: false
+  #           fsGroup: 101
+  #         ci:
+  #           enabled: false
+  #           repository_ssh_url: --branch environment git@github.com:saritasa-nest/xxx-wordpress.git
+  #           branch: environment
+  #         externalDatabase:
+  #           host: xxx.rds.amazonaws.com
+  #           user: xxx-environment-userwp
+  #           existingSecret: xxx-wordpress-environment-externaldb
+  #           database: xxx-environment-wp
+  #       eventlistener:
+  #         enableWebhookSecret: false
+  #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
+  #         template: wordpress-build-pipeline-trigger-template
+  #         extraOverlays: []
+  #         # - key: truncated_sha
+  #         #   expression: "body.head_commit.id.truncate(7)"
+  #         eventTypes: ["pull_request", "push"]
+
+
 
 
 
