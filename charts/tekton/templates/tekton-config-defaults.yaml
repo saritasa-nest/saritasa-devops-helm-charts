@@ -1,4 +1,17 @@
 {{- if .Values.engine.enabled }}
+# Copyright 2019 The Tekton Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 {{ $config := .Values.engine.config  | default dict -}}
 apiVersion: v1
 kind: ConfigMap
@@ -6,11 +19,56 @@ metadata:
   name: config-defaults
   namespace: tekton-pipelines
 data:
+  # default-service-account contains the default service account name
+  # to use for TaskRun and PipelineRun, if none is specified.
   default-service-account: {{ $config.defaultServiceAccount | default "build-bot-sa" | quote }}
+  # default-timeout-minutes contains the default number of
+  # minutes to use for TaskRun and PipelineRun, if none is specified.
   default-timeout-minutes: {{ $config.defaultTimeoutMinutes | default "60" | quote }}
-  {{ if hasKey .Values.engine.config "defaultPodTemplate" -}}
+  # default-managed-by-label-value contains the default value given to the
+  # "app.kubernetes.io/managed-by" label applied to all Pods created for
+  # TaskRuns. If a user's requested TaskRun specifies another value for this
+  # label, the user's request supercedes.
+  default-managed-by-label-value: "tekton-pipelines"
+
+  {{ if hasKey $config "defaultPodTemplate" -}}
+  # default-pod-template contains the default pod template to use for
+  # TaskRun and PipelineRun. If a pod template is specified on the
+  # PipelineRun, the default-pod-template is merged with that one.
   default-pod-template: |
-    {{- .Values.engine.config.defaultPodTemplate | nindent 4 }}
-  {{end}}
+    {{- $config.defaultPodTemplate | nindent 4 }}
+  {{ end }}
+
+  {{ if hasKey $config "defaultAffinityAssistantPodTemplate" -}}
+  # default-affinity-assistant-pod-template contains the default pod template
+  # to use for affinity assistant pods. If a pod template is specified on the
+  # PipelineRun, the default-affinity-assistant-pod-template is merged with
+  # that one.
+  default-affinity-assistant-pod-template: |
+    {{- $config.defaultAffinityAssistantPodTemplate | nindent 4 }}
+  {{ end }}
+
+  # default-cloud-events-sink contains the default CloudEvents sink to be
+  # used for TaskRun and PipelineRun, when no sink is specified.
+  # Note that right now it is still not possible to set a PipelineRun or
+  # TaskRun specific sink, so the default is the only option available.
+  # If no sink is specified, no CloudEvent is generated
+  # ? see: https://tekton.dev/docs/pipelines/install/#configuring-cloudevents-notifications
+  default-cloud-events-sink: {{ $config.defaultCloudEventsSinkUrl }}
+
+  # default-task-run-workspace-binding contains the default workspace
+  # configuration provided for any Workspaces that a Task declares
+  # but that a TaskRun does not explicitly provide.
+  default-task-run-workspace-binding: |
+    {{- $config.defaultTaskRunWorkspaceBinding | default "emptyDir: {}" | nindent 4 }}
+
+  # default-max-matrix-combinations-count contains the default maximum number
+  # of combinations from a Matrix, if none is specified.
+  # ? see: https://tekton.dev/docs/pipelines/matrix/
+  default-max-matrix-combinations-count: {{ $config.defaultMaxMatrixCombinationsCount| default "256" }}
+
+  # default-forbidden-env contains comma seperated environment variables that cannot be
+  # overridden by podTemplate.
+  default-forbidden-env:
 
 {{ end }}

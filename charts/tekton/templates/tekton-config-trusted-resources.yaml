@@ -1,5 +1,5 @@
 {{- if .Values.engine.enabled }}
-# Copyright 2019 The Tekton Authors
+# Copyright 2022 The Tekton Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,31 +12,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-{{ $metrics := .Values.engine.metrics | default dict -}}
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config-observability
+  name: config-trusted-resources
   namespace: tekton-pipelines
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
-  {{ toYaml $metrics | nindent 2 }}
+  # These sample configuration options may be copied out of
+  # this example block and unindented to be in the data block
+  # to actually change the configuration.
 
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: config-observability
-  namespace: tekton-pipelines-resolvers
-  labels:
-    app.kubernetes.io/component: resolvers
-    app.kubernetes.io/instance: default
-    app.kubernetes.io/part-of: tekton-pipelines
-data:
-  {{ toYaml $metrics | nindent 2 }}
-
+  # publickeys specifies the list of public keys, the paths are separated by comma
+  # publickeys: "/etc/verification-secrets/cosign.pub,
+  # gcpkms://projects/tekton/locations/us/keyRings/trusted-resources/cryptoKeys/trusted-resources"
 
 {{ end }}

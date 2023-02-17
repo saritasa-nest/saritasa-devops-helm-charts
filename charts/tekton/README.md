@@ -31,7 +31,7 @@ saritasa-tekton
 
 ## `chart.version`
 
-![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.1.7](https://img.shields.io/badge/Version-0.1.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.44.0](https://img.shields.io/badge/AppVersion-v0.44.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -206,20 +206,20 @@ Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries f
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | default is to avoid running tekton pods on windows nodes. | affinity for tekton-related pods |
-| dashboard.enabled | bool | `false` | enable tekton dashboard |
-| dashboard.ingress | object | `{}` | tekton ingress configuration |
+| dashboard | string | `nil` |  |
 | domainZone | string | `"site.com"` | This is required name of the hosted zone. All public services would be created under this hosted zone |
-| engine.config | object | `{}` | tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm |
+| engine.config | object | `{"defaultServiceAccount":"build-bot-sa","defaultTimeoutMinutes":"60"}` | tekton-defaults configuration which will be added into tekton-pipelines/config-defaults configmap |
 | engine.controller | object | use args multiline string to set additional launch arguments for the tekton controller | controller launch arguments |
-| engine.enabled | bool | `true` | if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc) |
+| engine.enabled | bool | `true` |  |
+| engine.featureFlags | object | `{"await-sidecar-readiness":"true","custom-task-version":"v1beta1","disable-affinity-assistant":"false","disable-creds-init":"false","embedded-status":"minimal","enable-api-fields":"stable","enable-provenance-in-status":"false","enable-tekton-oci-bundles":"false","require-git-ssh-secret-known-hosts":"false","resource-verification-mode":"skip","running-in-environment-with-injected-sidecars":"true","send-cloudevents-for-runs":"false"}` | tekton enabled feature flags |
+| engine.metrics | object | `{"metrics.allow-stackdriver-custom-metrics":"false","metrics.backend-destination":"prometheus","metrics.pipelinerun.duration-type":"histogram","metrics.pipelinerun.level":"pipeline","metrics.request-metrics-backend-destination":"prometheus","metrics.taskrun.duration-type":"histogram","metrics.taskrun.level":"task"}` | tekton prometheus metrics observability configuration |
+| engine.storage | object | `{"defaultPVCSize":"5Gi","storageClassName":"gp3"}` | tekton config-artifact-pvc configuration |
 | imagePullSecrets | list | `[]` | list of docker registry secrets to pull images |
 | nodeSelector | object | `{}` | what node to run tekton related pods |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `"build-bot-sa"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` | tolerations for tekton related pods |
-| triggers.enabled | bool | `true` | enable tekton triggers |
-| webhook.enabled | bool | `true` | enable tekton eventlistener webhook (github trigger) |
-| webhook.ingress | object | `{}` | webhook ingress configuration |
+| triggers | string | `nil` |  |
 | webhook.namespace | string | `"ci"` | namespace where this webhook should be installed |
 

@@ -172,7 +172,7 @@ unset creds
 | nodeSelector | object | `{}` | node selector |
 | podAnnotations | object | `{}` | pod annotations |
 | podSecurityContext | object | `{"fsGroup":1000}` | security options for the running pod |
-| resources | object | `{"limits":{"cpu":"1000m","memory":"4Gi"},"requests":{"cpu":"250m","memory":"64Mi"}}` | resources allocated for the terraform podu |
+| resources | object | `{"limits":{"cpu":"1000m","memory":"4Gi"},"requests":{"cpu":"250m","memory":"64Mi"}}` | resources allocated for the terraform pod |
 | securityContext | object | `{"capabilities":{"drop":["ALL"]},"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1000}` | security options for the running container |
 | serviceAccount | object | `{"annotations":{},"create":true,"name":""}` | service account details |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |

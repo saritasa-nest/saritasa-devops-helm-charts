@@ -1,5 +1,5 @@
 {{- if .Values.engine.enabled }}
-# Copyright 2019 The Tekton Authors
+# Copyright 2021 The Tekton Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,31 +12,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-{{ $metrics := .Values.engine.metrics | default dict -}}
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config-observability
+  name: pipelines-info
   namespace: tekton-pipelines
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
-  {{ toYaml $metrics | nindent 2 }}
-
----
-
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: config-observability
-  namespace: tekton-pipelines-resolvers
-  labels:
-    app.kubernetes.io/component: resolvers
-    app.kubernetes.io/instance: default
-    app.kubernetes.io/part-of: tekton-pipelines
-data:
-  {{ toYaml $metrics | nindent 2 }}
-
+  # Contains pipelines version which can be queried by external
+  # tools such as CLI. Elevated permissions are already given to
+  # this ConfigMap such that even if we don't have access to
+  # other resources in the namespace we still can have access to
+  # this ConfigMap.
+  version: {{ .Chart.AppVersion | quote }}
 
 {{ end }}

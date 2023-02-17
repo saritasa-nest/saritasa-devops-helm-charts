@@ -7,7 +7,7 @@ type: application
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "v0.28.2"
+appVersion: "v0.44.0"
 dashboardVersion: "v0.21.0"
 triggersVersions: "v0.16.0"
 

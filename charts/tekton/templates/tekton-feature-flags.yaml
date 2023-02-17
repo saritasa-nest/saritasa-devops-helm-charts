@@ -12,31 +12,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-{{ $metrics := .Values.engine.metrics | default dict -}}
+{{ $features := .Values.engine.featureFlags | default dict -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config-observability
+  name: feature-flags
   namespace: tekton-pipelines
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
-  {{ toYaml $metrics | nindent 2 }}
+  {{ toYaml $features | nindent 2 }}
 
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config-observability
+  name: resolvers-feature-flags
   namespace: tekton-pipelines-resolvers
   labels:
     app.kubernetes.io/component: resolvers
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
-  {{ toYaml $metrics | nindent 2 }}
-
+  # Setting this flag to "true" enables remote resolution of Tekton OCI bundles.
+  enable-bundles-resolver: "true"
+  # Setting this flag to "true" enables remote resolution of tasks and pipelines via the Tekton Hub.
+  enable-hub-resolver: "true"
+  # Setting this flag to "true" enables remote resolution of tasks and pipelines from Git repositories.
+  enable-git-resolver: "true"
+  # Setting this flag to "true" enables remote resolution of tasks and pipelines from other namespaces within the cluster.
+  enable-cluster-resolver: "true"
 
 {{ end }}
