@@ -1,4 +1,4 @@
 pages-branch: main
-pages-index-path: /docs/index.yaml
+# pages-index-path: /docs/index.yaml
 release-name-template: "{{ .Name }}-{{ .Version }}"
 release-notes-file: CHANGELOG.md
