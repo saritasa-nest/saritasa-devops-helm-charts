@@ -1100,3 +1100,12 @@ description: |
         syncOptions:
           - CreateNamespace=true
     ```
+
+  If you want to bypass authentication for Wordpress (and other legacy projects) for certain list of IPs
+  (ex. in office network or inside VPN), you can specify list of whitelist IP masks (in [Nginx format](https://nginx.org/en/docs/http/ngx_http_access_module.html))
+
+  ```yaml
+  whitelistIP: |
+    35.85.92.224/32,
+    35.82.81.78/32
+  ```
