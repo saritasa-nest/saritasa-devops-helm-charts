@@ -90,7 +90,7 @@ spec:
         {{ if or .ci (not (hasKey . "ci")) -}}
         initContainers:
           - name: install
-            image: jnewland/git-and-stuff
+            image: bitnami/git
             imagePullPolicy: Always
             securityContext:
               runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
@@ -120,6 +120,15 @@ spec:
                 #--------------------------------------------------------------------
                 else
                 #setup git user with runAsUser id
+                  if ! getent passwd "$(id -u)" &>/dev/null && [ -e "$NSS_WRAPPER_LIB" ]; then
+                      export LD_PRELOAD="$NSS_WRAPPER_LIB"
+                      # shellcheck disable=SC2155
+                      export NSS_WRAPPER_PASSWD="$(mktemp)"
+                      # shellcheck disable=SC2155
+                      export NSS_WRAPPER_GROUP="$(mktemp)"
+                      echo "git:x:$(id -u):$(id -g):Git:${HOME}:/bin/false" >"$NSS_WRAPPER_PASSWD"
+                      echo "git:x:$(id -g):" >"$NSS_WRAPPER_GROUP"
+                  fi
                   # clone wordpress distribution from repo
                   git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone $URL /tmp/wordpress
                   cd /tmp/wordpress
@@ -142,10 +151,10 @@ spec:
             - mountPath: /bitnami/wordpress
               name: wordpress-data
               subPath: wordpress
-            - mountPath: /home/app/.ssh/id_rsa
+            - mountPath: /home/git/.ssh/id_rsa
               name: ssh-key
               subPath: ssh-privatekey
-            - mountPath: /home/app/.ssh/known_hosts
+            - mountPath: /home/git/.ssh/known_hosts
               name: github-known-hosts
               subPath: config.ssh
         {{- if .initContainers }}
