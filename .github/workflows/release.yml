@@ -29,7 +29,6 @@ jobs:
         uses: tj-actions/changed-files@v35
         with:
           dir_names: true
-          separator: "\n"
           files: |
             charts/**/*.yaml
             charts/**/*.yml
@@ -39,7 +38,7 @@ jobs:
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
-          changed=$( echo ${{ steps.helm-changed-charts.outputs.all_changed_files }} | wc -l )
+          changed=$( echo ${{ steps.helm-changed-charts.outputs.all_changed_files }} | wc -w )
           if [ "$changed" -gt 1 ]; then
             echo "multiple helm charts changed, you can only change and release one chart at a time"
             exit 1
