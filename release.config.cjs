@@ -41,12 +41,12 @@ module.exports = {
   branches: [
     '+([0-9])?(.{+([0-9]),x}).x',
     'main',
-    { name: 'feature/new2-chart-release-implementation', prerelease: true },
     { name: 'beta', prerelease: true },
     { name: 'alpha', prerelease: true }
   ],
   plugins: [
     COMMIT_ANALYZER,
+    RELEASE_NOTES_GENERATOR,
     CHANGELOG,
     HELM
   ]
