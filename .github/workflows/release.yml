@@ -38,7 +38,7 @@ jobs:
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
-          changed=echo ${{ steps.helm-changed-charts.outputs.all_changed_files }} | wc
+          changed=$(echo ${{ steps.helm-changed-charts.outputs.all_changed_files }} | wc)
           echo $changed
           echo "test"
 
