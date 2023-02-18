@@ -38,27 +38,25 @@ jobs:
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
 
-      - name: Display changed charts
-        if: steps.helm-changed-charts.outputs.any_changed == 'false'
-        run: |
-          echo "No helm charts were modified"
-          exit 1
-
       - name: Configure Git
+        if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
+        if: steps.helm-changed-charts.outputs.any_changed == 'true'
         uses: azure/setup-helm@v3.5
 
       - name: Add saritasa repository dependency
+        if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
           helm repo update
 
       - name: Semantic Release
         id: semantic-release
+        if: steps.helm-changed-charts.outputs.any_changed == 'true'
         uses: cycjimmy/semantic-release-action@v3.2.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +68,9 @@ jobs:
             semantic-release-helm3@2.3.4
 
       - name: Do something when a new release published
-        if: steps.semantic-release.outputs.new_release_published == 'true'
+        if: |
+          steps.semantic-release.outputs.new_release_published == 'true' &&
+          steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           echo ${{ steps.semantic-release.outputs.new_release_version }}
           echo ${{ steps.semantic-release.outputs.new_release_major_version }}
@@ -78,6 +78,7 @@ jobs:
           echo ${{ steps.semantic-release.outputs.new_release_patch_version }}
 
       - name: Run chart-releaser
+        if: steps.helm-changed-charts.outputs.any_changed == 'true'
         uses: helm/chart-releaser-action@v1.5.0
         with:
           config: cr.yaml
