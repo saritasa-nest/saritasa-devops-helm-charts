@@ -8,6 +8,8 @@ type: application
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 version: 0.0.2
 
+
+
 maintainers:
   - url: https://www.saritasa.com/
     name: Saritasa

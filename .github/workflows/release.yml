@@ -36,7 +36,11 @@ jobs:
 
       - name: Display changed charts
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
-        run: echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
+        run: |
+          echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
+          changed=echo ${{ steps.helm-changed-charts.outputs.all_changed_files }} | wc
+          echo $changed
+          echo "test"
 
       - name: Configure Git
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
