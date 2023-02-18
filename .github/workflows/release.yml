@@ -40,7 +40,7 @@ jobs:
           echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
           changed=$( echo ${{ steps.helm-changed-charts.outputs.all_changed_files }} | wc -w )
           if [ "$changed" -gt 1 ]; then
-            echo "multiple helm charts changed, you can only change and release one chart at a time"
+            echo "::error::multiple [$changed] helm charts changed: ${{ steps.helm-changed-charts.outputs.all_changed_files }}, you can only change and release one chart at a time"
             exit 1
           fi
 
