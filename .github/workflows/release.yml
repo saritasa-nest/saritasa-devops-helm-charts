@@ -23,6 +23,27 @@ jobs:
         with:
           fetch-depth: 0
 
+      # https://github.com/marketplace/actions/changed-files
+      - name: Get changed charts
+        id: helm-changed-charts
+        uses: tj-actions/changed-files@v35
+        with:
+          dir_names: true
+          files: |
+            charts/**/*.yaml
+            charts/**/*.yml
+            charts/**/NOTES.txt
+
+      - name: Display changed charts
+        if: steps.helm-changed-charts.outputs.any_changed == 'true'
+        run: echo ${{ steps.helm-changed-charts.outputs.all_changed_files }}
+
+      - name: Display changed charts
+        if: steps.helm-changed-charts.outputs.any_changed == 'false'
+        run: |
+          echo "No helm charts were modified"
+          exit 1
+
       - name: Configure Git
         run: |
           git config user.name "$GITHUB_ACTOR"
@@ -43,9 +64,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           semantic_version: 19.0.5
+          working_directory: charts/tekton-apps
           extra_plugins: |
-            conventional-changelog-eslint@3.0.9
-            semantic-release-helm3@2.3.3
+            conventional-changelog-angular@5.0.13
+            semantic-release-helm3@2.3.4
 
       - name: Do something when a new release published
         if: steps.semantic-release.outputs.new_release_published == 'true'

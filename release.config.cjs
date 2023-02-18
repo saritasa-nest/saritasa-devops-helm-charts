@@ -24,14 +24,14 @@ const RELEASE_NOTES_GENERATOR = [
 const CHANGELOG = [
   '@semantic-release/changelog',
   {
-    changelogFile: 'charts/CHANGELOG.md'
+    changelogFile: 'charts/__CHART__/CHANGELOG.md'
   }
 ]
 
 const HELM = [
   'semantic-release-helm3',
   {
-    chartPath: 'charts',
+    chartPath: 'charts/__CHART__',
     onlyUpdateVersion: true
   }
 ]
