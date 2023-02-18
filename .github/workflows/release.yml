@@ -29,6 +29,7 @@ jobs:
         uses: tj-actions/changed-files@v35
         with:
           dir_names: true
+          separator: "\n"
           files: |
             charts/**/*.yaml
             charts/**/*.yml
