@@ -1,9 +1,10 @@
 const COMMIT_ANALYZER = [
   '@semantic-release/commit-analyzer',
   {
-    preset: 'eslint',
+    preset: 'angular',
     releaseRules: [
       { tag: 'Breaking', release: 'major' },
+      { tag: 'Feature', release: 'minor' },
       { tag: 'Feature', release: 'minor' },
       { tag: 'New', release: 'minor' },
       { tag: 'Update', release: 'minor' },
@@ -16,7 +17,7 @@ const COMMIT_ANALYZER = [
 const RELEASE_NOTES_GENERATOR = [
   '@semantic-release/release-notes-generator',
   {
-    preset: 'eslint'
+    preset: 'angular'
   }
 ];
 
@@ -40,13 +41,12 @@ module.exports = {
   branches: [
     '+([0-9])?(.{+([0-9]),x}).x',
     'main',
-    { name: 'feature/*', prerelease: true },
+    { name: 'feature/new2-chart-release-implementation', prerelease: true },
     { name: 'beta', prerelease: true },
     { name: 'alpha', prerelease: true }
   ],
   plugins: [
     COMMIT_ANALYZER,
-    RELEASE_NOTES_GENERATOR,
     CHANGELOG,
     HELM
   ]
