@@ -1,30 +1,28 @@
-name: Release Charts
+name: release charts
 
 on:
   push:
     branches:
-      - main
-      - beta
-      - alpha
-      # - feature/*
-      # - fix/*
+      - main    # client polished chanrts
+      - beta    # can be used in saritasa clusters (values.yaml should become polished)
+      - alpha   # can be used inside rocks cluster (breaking changes possible)
 
 jobs:
   release:
-    name: Semantic Release
+    name: semantic release
     # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
-    # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
+    # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-GITHUB_TOKEN
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       # https://github.com/marketplace/actions/changed-files
-      - name: Get changed charts
+      - name: get changed charts
         id: helm-changed-charts
         uses: tj-actions/changed-files@v35
         with:
@@ -34,7 +32,7 @@ jobs:
             charts/**/*.yml
             charts/**/NOTES.txt
 
-      - name: Identify Changed Charts
+      - name: identify changed charts
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         id: get-chart
         run: |
@@ -46,24 +44,24 @@ jobs:
           fi
           echo "path=${{ steps.helm-changed-charts.outputs.all_changed_files }}" >> $GITHUB_OUTPUT
 
-      - name: Configure Git
+      - name: configure git
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
           echo ${{ steps.get-chart.outputs.path }}
 
-      - name: Install Helm
+      - name: install helm
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         uses: azure/setup-helm@v3.5
 
-      - name: Add saritasa repository dependency
+      - name: add saritasa repository dependency
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
           helm repo update
 
-      - name: Prepare Semantic Release Config
+      - name: prepare semantic release config
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         run: |
           rm -rf ${{ steps.get-chart.outputs.path }}/release.config.cjs
@@ -71,7 +69,7 @@ jobs:
           sed -i 's!__CHART__!${{ steps.get-chart.outputs.path }}!g' ${{ steps.get-chart.outputs.path }}/release.config.cjs
           cat ${{ steps.get-chart.outputs.path }}/release.config.cjs
 
-      - name: Semantic Release
+      - name: semantic release
         id: semantic-release
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         uses: cycjimmy/semantic-release-action@v3.2.0
@@ -84,7 +82,7 @@ jobs:
             conventional-changelog-angular@5.0.13
             semantic-release-helm3@2.3.4
 
-      - name: Do something when a new release published
+      - name: do something when a new release published
         if: |
           steps.semantic-release.outputs.new_release_published == 'true' &&
           steps.helm-changed-charts.outputs.any_changed == 'true'
@@ -94,12 +92,12 @@ jobs:
           echo ${{ steps.semantic-release.outputs.new_release_minor_version }}
           echo ${{ steps.semantic-release.outputs.new_release_patch_version }}
 
-      - name: Run chart-releaser
+      - name: run chart-releaser
         if: steps.helm-changed-charts.outputs.any_changed == 'true'
         uses: helm/chart-releaser-action@v1.5.0
         with:
           config: cr.yaml
-          charts_dir: charts
+          charts_dir: ${{ steps.get-chart.outputs.path }}
           # uncomment when this PR is merged
           # https://github.com/helm/chart-releaser-action/pull/134/
           # skip_existing: true
