@@ -1,4 +1,4 @@
-
+target-branch: main
 validate-maintainers: false
 chart-dirs:
   - charts

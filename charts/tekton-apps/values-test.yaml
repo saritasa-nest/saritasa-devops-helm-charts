@@ -53,6 +53,7 @@ apps:
         applicationURL: https://api.proxylegalstaging.com
         argocd:
           syncWave: 210
+
         eventlistener:
           template: buildpack-django-build-pipeline-trigger-template
         triggerBinding:
@@ -71,6 +72,9 @@ apps:
         applicationURL: https://proxylegalstaging.com
         argocd:
           syncWave: 220
+        tekton:
+          workspacePVC: 15Gi
+          buildpacksPVC: 25Gi
         eventlistener:
           template: buildpack-frontend-build-pipeline-trigger-template
           # TODO: Ksusha - pls fix once you finalize the PR

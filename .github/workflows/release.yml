@@ -9,7 +9,6 @@ on:
 
 jobs:
   release:
-    name: Semantic Release
     # depending on default permission settings for your org (contents being read-only or read-write for workloads), you will have to add permissions
     # see: https://docs.github.com/en/actions/security-guides/automatic-token-authentication#modifying-the-permissions-for-the-github_token
     permissions:
@@ -32,26 +31,6 @@ jobs:
       - name: Add saritasa repository dependency
         run: |
           helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-          helm repo update
-
-      - name: Semantic Release
-        id: semantic-release
-        uses: cycjimmy/semantic-release-action@v3.2.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          semantic_version: 19.0.5
-          extra_plugins: |
-            conventional-changelog-eslint@3.0.9
-            semantic-release-helm3@2.3.3
-
-      - name: Do something when a new release published
-        if: steps.semantic-release.outputs.new_release_published == 'true'
-        run: |
-          echo ${{ steps.semantic-release.outputs.new_release_version }}
-          echo ${{ steps.semantic-release.outputs.new_release_major_version }}
-          echo ${{ steps.semantic-release.outputs.new_release_minor_version }}
-          echo ${{ steps.semantic-release.outputs.new_release_patch_version }}
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
