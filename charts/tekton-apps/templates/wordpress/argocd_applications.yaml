@@ -90,7 +90,7 @@ spec:
         {{ if or .ci (not (hasKey . "ci")) -}}
         initContainers:
           - name: install
-            image: jnewland/git-and-stuff:0.1.2
+            image: jnewland/git-and-stuff:v0.1.2
             imagePullPolicy: Always
             # securityContext:
             #   runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
