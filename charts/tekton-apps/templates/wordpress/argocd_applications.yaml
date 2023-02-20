@@ -90,13 +90,13 @@ spec:
         {{ if or .ci (not (hasKey . "ci")) -}}
         initContainers:
           - name: install
-            image: jnewland/git-and-stuff
+            image: jnewland/git-and-stuff:1.2.0
             imagePullPolicy: Always
             # securityContext:
             #   runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
             env:
               - name: HOME
-                value: /home/git
+                value: /home/app
             command:
               - bash
               - -c
@@ -148,11 +148,11 @@ spec:
               name: github-known-hosts
               subPath: config.ssh
         {{- if .initContainers }}
-          {{- .initContainers | toYaml | nindent 8 }}
+          {{- .initContainers | toYaml | nindent 10 }}
         {{- end }}
         {{- else if .initContainers}}
         initContainers:
-          {{- toYaml .initContainers | nindent 8 }}
+          {{- toYaml .initContainers | nindent 10 }}
         {{- end }}
 
         extraVolumes:
