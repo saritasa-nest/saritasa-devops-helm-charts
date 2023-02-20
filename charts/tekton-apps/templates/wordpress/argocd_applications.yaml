@@ -92,8 +92,8 @@ spec:
           - name: install
             image: jnewland/git-and-stuff
             imagePullPolicy: Always
-            securityContext:
-              runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
+            # securityContext:
+            #   runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
             env:
               - name: HOME
                 value: /home/git
@@ -119,7 +119,6 @@ spec:
                   echo "WP not initialized, skipping"
                 #--------------------------------------------------------------------
                 else
-                #setup git user with runAsUser id
                   # clone wordpress distribution from repo
                   git -c core.sshCommand="ssh -i $HOME/.ssh/id_rsa" clone $URL /tmp/wordpress
                   cd /tmp/wordpress
