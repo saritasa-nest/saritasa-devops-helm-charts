@@ -147,8 +147,8 @@ spec:
             - mountPath: /home/app/.ssh/known_hosts
               name: github-known-hosts
               subPath: config.ssh
-        {{- if .initContainers }}
-          {{- .initContainers | toYaml | nindent 10 }}
+        {{- if .extraInitContainers }}
+          {{- .extraInitContainers | toYaml | nindent 10 }}
         {{- end }}
         {{- else if .initContainers}}
         initContainers:
