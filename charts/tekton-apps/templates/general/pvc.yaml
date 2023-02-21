@@ -16,8 +16,6 @@
 {{ $pvc := $component.tekton }}
 
 # workspace pvc contains git repo cloned for the component by tekton
-# ($component.tekton).workspacePVC, aaa
-# {{ $pvc }}
 {{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "workspace-pvc")        "storage" ($pvc.workspacePVC | default "10Gi")) }}
 {{ if contains "buildpack" $component.pipeline }}
 # buildpacks cache pvc contains cache layers used by buildpacks

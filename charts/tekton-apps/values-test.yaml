@@ -93,6 +93,55 @@ apps:
           - name: kubernetes_branch
             value: feature/add-staging
 
+      - name: wordpress
+        repository: xxx-wordpress
+        pipeline: wordpress-build-pipeline
+        applicationURL: https://site.com
+        argocd:
+          # ignoreDeploymentReplicasDiff: true
+          source:
+            targetRevision: 15.2.4
+        wordpress:
+          imageTag: 6.0.2
+          repositorySshUrl: ssh://
+          initContainers:
+            - name: install2
+              image: fuck
+          extraInitContainers:
+            - name: another
+              image: fuck2
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 1G
+          nodeSelector:
+            apps: 'true'
+          podSecurityContext:
+            enabled: false
+            fsGroup: 101
+          ci:
+            enabled: false
+            repository_ssh_url: --branch environment git@github.com:saritasa-nest/xxx-wordpress.git
+            branch: environment
+          externalDatabase:
+            host: xxx.rds.amazonaws.com
+            user: xxx-environment-userwp
+            existingSecret: xxx-wordpress-environment-externaldb
+            database: xxx-environment-wp
+        eventlistener:
+          enableWebhookSecret: false
+          filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
+          template: wordpress-build-pipeline-trigger-template
+          extraOverlays: []
+          # - key: truncated_sha
+          #   expression: "body.head_commit.id.truncate(7)"
+          eventTypes: ["pull_request", "push"]
+
+
 # make sure PVCs are bound after the chart is synced
 # by temporarily mount them into short-live job.
 runPostInstallMountPvcJob: true

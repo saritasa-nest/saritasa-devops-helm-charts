@@ -87,16 +87,11 @@ spec:
           {{- toYaml .containerSecurityContext | nindent 10 }}
         {{- end }}
 
-        {{- if .initContainers}}
-        initContainers:
-          {{- toYaml .initContainers | nindent 10 }}
-        {{- else if not (kindIs "slice" .initContainers) }}
+        {{- if not .initContainers }}
         initContainers:
           - name: install
             image: jnewland/git-and-stuff:v0.1.2
             imagePullPolicy: Always
-            # securityContext:
-            #   runAsUser: {{ (.containerSecurityContext).runAsUser | default 1001 }}
             env:
               - name: HOME
                 value: /home/app
@@ -150,9 +145,15 @@ spec:
             - mountPath: /home/app/.ssh/known_hosts
               name: github-known-hosts
               subPath: config.ssh
-        {{- if .extraInitContainers }}
-          {{- .extraInitContainers | toYaml | nindent 10 }}
-        {{- end }}
+          {{- with .extraInitContainers }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+        {{- else }}
+        initContainers:
+          {{- toYaml .initContainers | nindent 10 }}
+          {{- with .extraInitContainers }}
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
         {{- end }}
 
 
