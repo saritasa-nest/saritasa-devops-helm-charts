@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.2.2-alpha.8](https://img.shields.io/badge/Version-0.2.2--alpha.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -127,6 +127,11 @@ spec:
                 repository: vp-backend
                 pipeline: buildpack-django-build-pipeline
                 applicationURL: https://api.staging.site.com
+                argocd:
+                  syncWave: 220
+                tekton:
+                  workspacePVC: 15Gi
+                  buildpacksPVC: 25Gi
                 eventlistener:
                   template: buildpack-django-build-pipeline-trigger-template
                 triggerBinding:
@@ -140,6 +145,11 @@ spec:
                 repository: vp-frontend
                 pipeline: buildpack-frontend-build-pipeline
                 applicationURL: https://staging.site.com
+                argocd:
+                  syncWave: 220
+                tekton:
+                  workspacePVC: 15Gi
+                  buildpacksPVC: 25Gi
                 eventlistener:
                   template: buildpack-frontend-build-pipeline-trigger-template
                 triggerBinding:

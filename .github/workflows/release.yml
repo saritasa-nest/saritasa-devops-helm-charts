@@ -35,6 +35,10 @@ jobs:
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.5.0
         with:
+          config: cr.yaml
           charts_dir: charts
+          # uncomment when this PR is merged
+          # https://github.com/helm/chart-releaser-action/pull/134/
+          # skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

@@ -8,12 +8,11 @@ type: application
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "v0.28.2"
-triggersVersions: "v0.16.0"
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.1
+version: 0.2.2-alpha.8
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -107,6 +106,11 @@ description: |
                   repository: vp-backend
                   pipeline: buildpack-django-build-pipeline
                   applicationURL: https://api.staging.site.com
+                  argocd:
+                    syncWave: 220
+                  tekton:
+                    workspacePVC: 15Gi
+                    buildpacksPVC: 25Gi
                   eventlistener:
                     template: buildpack-django-build-pipeline-trigger-template
                   triggerBinding:
@@ -120,6 +124,11 @@ description: |
                   repository: vp-frontend
                   pipeline: buildpack-frontend-build-pipeline
                   applicationURL: https://staging.site.com
+                  argocd:
+                    syncWave: 220
+                  tekton:
+                    workspacePVC: 15Gi
+                    buildpacksPVC: 25Gi
                   eventlistener:
                     template: buildpack-frontend-build-pipeline-trigger-template
                   triggerBinding:

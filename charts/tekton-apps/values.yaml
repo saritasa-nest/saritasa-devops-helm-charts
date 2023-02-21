@@ -1,4 +1,3 @@
-
 # -- environment these apps are handling
 # possible values: dev, staging, prod
 environment: ""
@@ -9,7 +8,7 @@ environment: ""
 # filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release'))
 # this is used to filter branches in git getting push events before starting the pipelinerun
 gitBranchPrefixes:
- - develop
+  - develop
 
 # -- storage class for PVCs associated with the apps
 storageClassName: gp2
@@ -33,7 +32,7 @@ slack:
   # -- channel suffix
   suffix: ci
   # -- slack notification images (s3 bucket prefix)
-  imagesLocation: https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com # this is s3 bucket with public images that we upload through terraform code (!!! NO SLASH at the end pls)
+  imagesLocation: https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com  # this is s3 bucket with public images that we upload through terraform code (!!! NO SLASH at the end pls)
 
 
 argocd:
@@ -168,10 +167,6 @@ apps: []
   #         # - key: truncated_sha
   #         #   expression: "body.head_commit.id.truncate(7)"
   #         eventTypes: ["pull_request", "push"]
-
-
-
-
 
 # -- run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy"
 runPostInstallMountPvcJob: false

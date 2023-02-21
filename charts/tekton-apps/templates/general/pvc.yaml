@@ -13,11 +13,13 @@
                   "namespace"         $.Release.Namespace
                   "storageClassName"  $.Values.storageClassName }}
 
+{{ $pvc := $component.tekton }}
+
 # workspace pvc contains git repo cloned for the component by tekton
-{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "workspace-pvc")        "storage" "10Gi") }}
+{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "workspace-pvc")        "storage" ($pvc.workspacePVC | default "10Gi")) }}
 {{ if contains "buildpack" $component.pipeline }}
 # buildpacks cache pvc contains cache layers used by buildpacks
-{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "buildpacks-cache-pvc") "storage" "5Gi") }}
+{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "buildpacks-cache-pvc") "storage" ($pvc.buildpacksPVC | default "5Gi")) }}
 {{- end }}
 
 {{- end }} # if not component.wordpress

@@ -4,13 +4,13 @@
 ❯ helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
 
 ❯ helm search repo saritasa
-NAME                              	CHART VERSION	APP VERSION	DESCRIPTION  
+NAME                              	CHART VERSION	APP VERSION	DESCRIPTION
 saritasa/saritasa-rbac            	0.1.9        	           	A Helm chart for Kubernetes implementing RBAC r...
 saritasa/saritasa-tekton          	0.1.7        	v0.28.2    	A Helm chart for Tekton.  Implements: - tekton ...
 saritasa/saritasa-tekton-apps     	0.1.20       	v0.28.2    	A Helm chart for tekton apps (rbac, eventlisten...
 saritasa/saritasa-tekton-pipelines	0.1.26       	           	A Helm chart for Tekton Pipelines  Implements: ...
-saritasa/demo                     	0.0.5        	1.16.0     	A Helm chart for Kubernetes  
-saritasa/jitsi-meet               	1.2.2        	stable-6865	A Helm chart for Kubernetes  
+saritasa/demo                     	0.0.5        	1.16.0     	A Helm chart for Kubernetes
+saritasa/jitsi-meet               	1.2.2        	stable-6865	A Helm chart for Kubernetes
 saritasa/opsgenie-heartbeat       	0.0.2        	           	Chart that installs our solution to send heartb...
 ```
 
@@ -109,3 +109,14 @@ helm pull --version 0.0.4 --repo https://saritasa-nest.github.io/saritasa-devops
 If you made a release by accident and want to remove it you will need to:
 - remove remote tag, for example: `git tag -d demo-0.0.3 && git push origin :refs/tags/demo-0.0.3`
 - optionally remove `fix` or `feature` branch if you decided to cancel the change completely
+
+
+### lint the release
+
+install the following tools:
+- [ct](https://github.com/helm/chart-testing)
+- [yamale](https://github.com/23andMe/Yamale)
+
+```sh
+ct lint --chart-yaml-schema .ct/chart_schema.yaml --lint-conf .ct/lintconf.yaml --all
+```
