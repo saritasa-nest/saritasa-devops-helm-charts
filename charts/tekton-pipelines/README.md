@@ -189,7 +189,7 @@ to specific project trigger-binding:
 | images.kustomize | string | `"k8s.gcr.io/kustomize/kustomize:v4.5.4"` | kustomize cli |
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
-| images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:latest"` | yamlfix image - format yaml files |
+| images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
