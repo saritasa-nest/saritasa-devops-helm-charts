@@ -67,7 +67,22 @@ spec:
           CONFIG=$(realpath .yamlfix.toml)
         fi
 
-        find apps -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
+        find $(params.kustomize_overlay_path) -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
+
+    - name: kubeval
+      image: {{ .Values.images.kubeval | default "public.ecr.aws/saritasa/kubeval:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.kubernetes-repo.path)
+      script: |
+        APISERVER=https://kubernetes.default.svc
+        SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
+        TOKEN=$(cat ${SERVICEACCOUNT}/token)
+        CACERT=${SERVICEACCOUNT}/ca.crt
+        KUBERNETES_INFO=$(curl --cacert ${CACERT} --header "Authorization: Bearer ${TOKEN}" -X GET ${APISERVER}/version)
+        KUBERNETES_VERSION=$(echo $KUBERNETES_INFO | jq -r ".gitVersion" | grep -oE '\d\d?\.\d\d?\.\d\d?')
+
+        export KUBEVAL_SCHEMA_LOCATION=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
+        kustomize build $(params.kustomize_overlay_path) | kubeval --ignore-missing-schemas --kubernetes-version=$KUBERNETES_VERSION -f -
 
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
