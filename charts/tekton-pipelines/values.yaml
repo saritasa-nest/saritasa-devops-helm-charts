@@ -24,7 +24,7 @@ images:
   # -- python image
   python:    saritasallc/python3:0.4 # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
   # -- yamlfix image - format yaml files
-  yamlfix:   public.ecr.aws/saritasa/yamlfix:latest # https://lyz-code.github.io/yamlfix/
+  yamlfix:   public.ecr.aws/saritasa/yamlfix:1.8.1 # https://lyz-code.github.io/yamlfix/
   # -- kubeval image - validate Kubernetes manifests
   kubeval:   public.ecr.aws/saritasa/kubeval:0.16.1 # https://kubeval.instrumenta.dev/
 

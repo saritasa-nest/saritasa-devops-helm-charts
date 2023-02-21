@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.32-dev](https://img.shields.io/badge/Version-0.1.32--dev-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.32](https://img.shields.io/badge/Version-0.1.32-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -189,7 +189,7 @@ to specific project trigger-binding:
 | images.kustomize | string | `"k8s.gcr.io/kustomize/kustomize:v4.5.4"` | kustomize cli |
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
-| images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.1.0"` | yamlfix image - format yaml files |
+| images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:latest"` | yamlfix image - format yaml files |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
