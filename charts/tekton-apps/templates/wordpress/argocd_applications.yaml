@@ -87,7 +87,10 @@ spec:
           {{- toYaml .containerSecurityContext | nindent 10 }}
         {{- end }}
 
-        {{ if or .ci (not (hasKey . "ci")) -}}
+        {{- if .initContainers}}
+        initContainers:
+          {{- toYaml .initContainers | nindent 10 }}
+        {{- else if not (kindIs "slice" .initContainers) }}
         initContainers:
           - name: install
             image: jnewland/git-and-stuff:v0.1.2
@@ -150,10 +153,8 @@ spec:
         {{- if .extraInitContainers }}
           {{- .extraInitContainers | toYaml | nindent 10 }}
         {{- end }}
-        {{- else if .initContainers}}
-        initContainers:
-          {{- toYaml .initContainers | nindent 10 }}
         {{- end }}
+
 
         extraVolumes:
           - name: ssh-key
