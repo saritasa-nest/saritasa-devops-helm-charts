@@ -141,7 +141,7 @@ securityContext:
 # -- resources allocated for the terraform pod
 resources:
   requests:
-    memory: 64Mi
+    memory: 128Mi
     cpu: 250m
   limits:
     memory: 4Gi
