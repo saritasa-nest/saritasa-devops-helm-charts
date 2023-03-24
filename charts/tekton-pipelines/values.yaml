@@ -8,25 +8,25 @@ images:
   # -- argocd cli downdload URL
   argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64
   # -- bash image (used for various ops in steps)
-  bash:      docker.io/library/bash:5.1.8
+  bash: docker.io/library/bash:5.1.8
   # -- aws cli image (used for aws ecr auth)
-  awscli:    docker.io/amazon/aws-cli:2.7.4
+  awscli: docker.io/amazon/aws-cli:2.7.4
   # -- kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022
-  kaniko:    gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650
+  kaniko: gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650
   # -- git image
-  git:       alpine/git:v2.32.0
+  git: alpine/git:v2.32.0
   # -- kustomize cli
-  kustomize: k8s.gcr.io/kustomize/kustomize:v4.5.4 # https://github.com/kubernetes/k8s.io/blob/main/k8s.gcr.io/images/k8s-staging-kustomize/images.yaml
+  kustomize: k8s.gcr.io/kustomize/kustomize:v4.5.4  # https://github.com/kubernetes/k8s.io/blob/main/k8s.gcr.io/images/k8s-staging-kustomize/images.yaml
   # -- kubectl cli
-  kubectl:   bitnami/kubectl:1.22.10
+  kubectl: bitnami/kubectl:1.22.10
   # -- slack notifier
-  slack:     cloudposse/slack-notifier:0.4.0
+  slack: cloudposse/slack-notifier:0.4.0
   # -- python image
-  python:    saritasallc/python3:0.4 # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
+  python: saritasallc/python3:0.4     # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
   # -- yamlfix image - format yaml files
-  yamlfix:   public.ecr.aws/saritasa/yamlfix:1.8.1 # https://lyz-code.github.io/yamlfix/
+  yamlfix: public.ecr.aws/saritasa/yamlfix:1.8.1    # https://lyz-code.github.io/yamlfix/
   # -- kubeval image - validate Kubernetes manifests
-  kubeval:   public.ecr.aws/saritasa/kubeval:0.16.1 # https://kubeval.instrumenta.dev/
+  kubeval: public.ecr.aws/saritasa/kubeval:0.16.1    # https://kubeval.instrumenta.dev/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -39,7 +39,7 @@ buildpacks:
   enabled: false
   # -- cnb (cloud native buildpacks) platform API to support
   # see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md)
-  cnbPlatformAPI: "0.4"
+  cnbPlatformAPI: '0.4'
   generate:
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: FRONTEND                                                                                                  │
@@ -76,7 +76,7 @@ buildpacks:
               npm ci
 
               (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment) exit_code: $?" && exit 1)
-              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d} $(params.source_subpath)  2>/dev/null
+              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d,Procfile} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
             } || echo "No package.json found"
 
@@ -235,7 +235,7 @@ buildpacks:
 
         - name: remove-dcproj-files
           workingDir: $(resources.inputs.app.path)
-          image: "docker.io/library/bash:5.1.8"
+          image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
           resources: {}
           script: |
@@ -355,13 +355,13 @@ imagePullPolicy: IfNotPresent
 podTemplate:
   # -- node selector for pods spawned by tekton
   nodeSelector:
-    ci: "true"
+    ci: 'true'
   # -- tolerations
   tolerations:
-    - key: "ci"
-      operator: "Equal"
-      value: "true"
-      effect: "NoSchedule"
+    - key: ci
+      operator: Equal
+      value: 'true'
+      effect: NoSchedule
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
