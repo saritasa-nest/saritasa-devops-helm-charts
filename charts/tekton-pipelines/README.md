@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.33](https://img.shields.io/badge/Version-0.1.33-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.34-dev.1](https://img.shields.io/badge/Version-0.1.34--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -186,7 +186,7 @@ to specific project trigger-binding:
 | images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650"` | kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022 |
 | images.kubectl | string | `"bitnami/kubectl:1.22.10"` | kubectl cli |
 | images.kubeval | string | `"public.ecr.aws/saritasa/kubeval:0.16.1"` | kubeval image - validate Kubernetes manifests |
-| images.kustomize | string | `"k8s.gcr.io/kustomize/kustomize:v4.5.4"` | kustomize cli |
+| images.kustomize | string | `"registry.k8s.io/kustomize/kustomize:v5.0.0"` | kustomize cli |
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |

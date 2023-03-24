@@ -16,7 +16,7 @@ images:
   # -- git image
   git: alpine/git:v2.32.0
   # -- kustomize cli
-  kustomize: k8s.gcr.io/kustomize/kustomize:v4.5.4  # https://github.com/kubernetes/k8s.io/blob/main/k8s.gcr.io/images/k8s-staging-kustomize/images.yaml
+  kustomize: registry.k8s.io/kustomize/kustomize:v5.0.0  # https://kubectl.docs.kubernetes.io/installation/kustomize/docker/
   # -- kubectl cli
   kubectl: bitnami/kubectl:1.22.10
   # -- slack notifier
