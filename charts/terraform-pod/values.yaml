@@ -16,9 +16,9 @@ github:
   # -- github gh cli secret containing token for authentication of the github CLI
   tokenSecret: github-cli-token
   # -- github repository containing terraform infra-dev-aws code
-  repository: "" # org/infra-dev-aws
+  repository: ""  # org/infra-dev-aws
   # -- github branch to clone inside terraform pod
-  branch: "" # feature/branch
+  branch: ""  # feature/branch
   # -- github username (who runs this terraform code)
   username: ""
   # -- github email (who runs this terraform code)
@@ -51,16 +51,16 @@ infracost:
 databases:
   # -- rocks mysql
   mysql:
-      # -- secret with "password" value
-      secret: saritasa-rocks-mysql
-      # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
-      terraformEnvVarName: TF_VAR_rds_mysql_password
+    # -- secret with "password" value
+    secret: saritasa-rocks-mysql
+    # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
+    terraformEnvVarName: TF_VAR_rds_mysql_password
   # -- rocks postgres
   postgres:
-      # -- secret with "password" value
-      secret: saritasa-rocks-postgres
-      # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
-      terraformEnvVarName: TF_VAR_rds_postgress_password
+    # -- secret with "password" value
+    secret: saritasa-rocks-postgres
+    # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
+    terraformEnvVarName: TF_VAR_rds_postgress_password
 
 # -- where to obtain argo-cd credentials to be used
 argocd:
