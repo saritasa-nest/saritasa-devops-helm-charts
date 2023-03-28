@@ -47,7 +47,7 @@ spec:
         git config user.name "tekton-kustomize"
 
     - name: update-image
-      image: {{ .Values.images.kustomize | default "k8s.gcr.io/kustomize/kustomize:latest"}}
+      image: {{ .Values.images.kustomize | default "registry.k8s.io/kustomize/kustomize:v5.0.0"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.kubernetes-repo.path)
       script: |
