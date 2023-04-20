@@ -169,6 +169,7 @@ Define env vars for terraform
       key: token
 {{ include "terraform-pod.terraform-env-database-vars" . }}
 {{ include "terraform-pod.terraform-env-argocd-vars" . }}
+{{ include "terraform-pod.terraform-env-sentry-vars" . }}
 {{- end }}
 
 {{/*
@@ -201,6 +202,19 @@ Define env vars containing AWS access
       name: {{ printf "%s" $secretName }}
       key: aws_session_token
 {{- end }}
+{{- end }}
+
+{{/*
+Define env vars containing Sentry Auth token to be passed as TF_VAR value into terraform
+*/}}
+{{- define "terraform-pod.terraform-env-sentry-vars" -}}
+# terraform Sentry API credentials
+{{- $conf := .Values.sentry }}
+- name: {{ $conf.terraformEnvVarName}}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $conf.secret }}
+      key: token
 {{- end }}
 
 {{/*

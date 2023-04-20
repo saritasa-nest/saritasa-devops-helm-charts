@@ -100,6 +100,13 @@ slack:
   # -- secret containing slack webhook url
   urlSecret: slack-alarm-webhook
 
+# -- sentry configuration
+sentry:
+  # -- secret with "token" value
+  secret: saritasa-rocks-sentry
+  # -- name of the TF_VAR env variable to be used by the terraform as the token for sentry
+  terraformEnvVarName: TF_VAR_sentry_auth_token
+
 # -- extra volumes
 extraVolumes: []
 # -- extra volume mounts
