@@ -35,8 +35,8 @@ metadata:
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-apiVersion: policy/v1
+{{- if .Capabilities.APIVersions.Has "policy/v1beta1/PodSecurityPolicy" }}
+apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: tekton-pipelines
@@ -67,7 +67,7 @@ spec:
     ranges:
       - min: 1
         max: 65535
-
+{{- end }}
 ---
 # Copyright 2020 The Tekton Authors
 #
