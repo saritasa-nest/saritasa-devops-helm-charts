@@ -129,16 +129,9 @@ spec:
         privileged: true
 
     # insert customized steps as defined in the values.yaml of the helm chart
-    {{- range .pipeline.buildTaskSteps }}
-    - name: {{ .name }}
-      image: {{ .image | quote }}
-      imagePullPolicy: {{ .imagePullPolicy }}
-      {{- if .workingDir }}
-      workingDir: {{ .workingDir }}
-      {{- end }}
-      script: |
-        {{- .script | nindent 8 }}
-    {{- end }}
+    {{- if .pipeline.buildTaskSteps }}
+    {{- .pipeline.buildTaskSteps | toYaml | nindent 4}}
+    {{ end }}
 
     # if you need to debug this step you can do:
     # insert `sleep 3000` after the aws ecr get-login-password command and then get inside the container
