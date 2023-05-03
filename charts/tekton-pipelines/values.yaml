@@ -65,22 +65,36 @@ buildpacks:
           resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
-            #!/bin/bash
+            #!/usr/bin/env bash
             set -Eeo pipefail
 
-            [ -f package.json ] && {
-              echo "install node.js dependencies"
-
+            if [[ ! -f package.json ]]; then
+              echo "No package.json found, stepping out"
+            else
+              echo "Installing node.js dependencies"
               # set cache
               npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci
-
-              (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment) exit_code: $?" && exit 1)
+              if ! npm ci; then
+                EXIT_CODE=$?
+                echo "unable to install dependencies, "
+                if [[ $EXIT_CODE == 143 ]]; then
+                  echo "oom kill detected"
+                else
+                  echo "exit_code: $EXIT_CODE"
+                fi
+                exit 1
+              fi
+              echo "Building $(params.environment) target"
+              if ! npm run build:$(params.environment); then
+                echo "unable to build $(params.environment) exit_code: $?"
+                exit 1
+              fi
+              echo "Cleaning up"
+              rm -rf node_modules
+              echo "Preparing for buildpack build"
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d,Procfile} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
-            } || echo "No package.json found"
-
-            echo "done"
+            fi
           securityContext:
             privileged: true
 
