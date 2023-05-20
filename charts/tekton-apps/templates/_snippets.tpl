@@ -86,6 +86,7 @@ Create an element for eventlistener trigger array items
   serviceAccountName: {{ include "tekton-apps.resourceName" (set $ "suffix" "trigger-sa") }}
   interceptors:
   - ref:
+      kind: ClusterInterceptor
       name: "cel"
     params:
       - name: "filter"
@@ -105,6 +106,7 @@ Create an element for eventlistener trigger array items
         {{- toYaml .component.eventlistener.extraOverlays | nindent 8 }}
         {{ end }}
   - ref:
+      kind: ClusterInterceptor
       name: "github"
     params:
       {{- if hasKey .component.eventlistener "enableWebhookSecret" | ternary .component.eventlistener.enableWebhookSecret .eventlistener.enableWebhookSecret }}
@@ -121,10 +123,13 @@ Create an element for eventlistener trigger array items
         - "push"
       {{- end }}
   bindings:
-  - name: sha
+  - kind: TriggerBinding
+    name: sha
     value: $(extensions.truncated_sha)
-  - ref: {{ include "tekton-apps.resourceName" (set $ "suffix" "env") }}
-  - ref: github-trigger-binding
+  - kind: TriggerBinding
+    ref: {{ include "tekton-apps.resourceName" (set $ "suffix" "env") }}
+  - kind: TriggerBinding
+    ref: github-trigger-binding
   template:
     ref: {{ .component.eventlistener.template }}
 {{- end }}
