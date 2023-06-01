@@ -29,6 +29,9 @@ apps:
         pm: VadikKuznetsov
         tm: AlekseyBashirov
       namespace: staging
+      notifications:
+        annotations:
+          notifications.argoproj.io/subscribe.on-health-degraded.slack: "-xxxxx"
       syncWave: 200
     mailList: nmbl@saritasa.com
     devopsMailList: devops+nmbl@saritasa.com
