@@ -15,7 +15,9 @@ metadata:
   namespace: argo-cd
   annotations:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
+    {{- if $project.argocd.notifications }}
     jiraURL: {{ $project.jiraURL }}
+    {{- end }}
 spec:
   destination:
     namespace: {{ $project.argocd.namespace | required ".argocd.namespace is required in project settings"}}
