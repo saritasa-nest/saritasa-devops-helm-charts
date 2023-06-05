@@ -52,6 +52,7 @@ Implements:
 - kubernetes job to make sure the PVCs are bound and argocd marks the app as healthy
 - argocd project for each app
 - argocd application for each app component
+- argocd notifications for each app project
 
 ## `example usage with argocd`
 
@@ -112,6 +113,12 @@ spec:
                 pm: xxx
                 tm: xxx
               namespace: prod
+              notifications:
+                annotations:
+                  notifications.argoproj.io/subscribe.on-health-degraded.slack: project-vp; project-vp-ci; project-vp-alarms
+                  notifications.argoproj.io/subscribe.on-sync-failed.slack: project-vp; project-vp-ci; project-vp-alarms
+                  notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-vp; project-vp-ci; project-vp-alarms
+                  notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-vp; project-vp-ci; project-vp-alarms
             mailList: vp@site.com
             devopsMailList: devops+vp@site.com
             jiraURL: https://site.atlassian.net/browse/vp
@@ -179,6 +186,7 @@ spec:
 
   Above helm chart creates a new ArgoCD project for each project in values, for each component in project's components there is created a separate ArgoCD
   application and required for Tekton ci/cd resources (triggerbindings, roles, configmaps, jobs, serviceaccounts, pvcs and etc).
+  For each Argocd project, notifications to multiple slack channels with different types of triggers are added.
 
   # fill below parameters for each `project` block
 
@@ -187,6 +195,7 @@ spec:
   - apps[PROJECT].enabled - boolean value to define whether the project enabled or not (required)
   - apps[PROJECT].argocd.labels - labels which are added to ArgoCD project (required)
   - apps[PROJECT].argocd.namespace - allowed for ArgoCD project namespace (required)
+  - apps[PROJECT].argocd.notifications.annotations[] - list of slack channels subscriptions, each with a different trigger
   - apps[PROJECT].argocd.syncWave - ArgoCD project sync wave, i.e. sequence in which project should be synced (not required, default: "200")
   - apps[PROJECT].argocd.sourceRepos[] - source repositories added to ArgoCD project (not required, default: [<apps[PROJECT].kubernetesRepository.url>])
   - apps[PROJECT].argocd.extraDestinationNamespaces[] - adds extra destination namespaces for ArgoCD project to be able to create custom apps within project's kubernetes repo (not required, default: null)
@@ -341,6 +350,9 @@ spec:
                   ops-secondary: xxx
                   pm: xxx
                   tm: xxx
+                notifications:
+                  annotations:
+                    notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-ci; project-xxx-alarms
                 namespace: prod
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
@@ -441,6 +453,9 @@ spec:
                   ops-secondary: xxx
                   pm: xxx
                   tm: xxx
+                notifications:
+                  annotations:
+                    notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-ci; project-xxx-alarms
                 namespace: xxx
                 sourceRepos:
                   - git@github.com:saritasa-nest/xxx-backend.git
