@@ -217,7 +217,7 @@ spec:
             nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "300"
             nginx.ingress.kubernetes.io/server-snippet: |-
               add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-            {{- if $.Values.whitelistIP }}
+            {{- if ne .whitelistAccess false }}
             nginx.ingress.kubernetes.io/satisfy: "any"
             nginx.ingress.kubernetes.io/whitelist-source-range: |
               {{- index $.Values.whitelistIP | nindent 14 }}
