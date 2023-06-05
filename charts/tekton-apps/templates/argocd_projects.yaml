@@ -22,6 +22,7 @@ metadata:
   namespace: argo-cd
   annotations:
     argocd.argoproj.io/sync-wave: {{ $project.argocd.syncWave | default "200" | quote }}
+    jiraURL: {{ $project.jiraURL }}
     {{- if $project.argocd.notifications }}
     {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
     {{- end }}

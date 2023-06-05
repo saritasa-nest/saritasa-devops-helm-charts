@@ -20,6 +20,7 @@ metadata:
   namespace: argo-cd
   annotations:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
+    jiraURL: {{ $project.jiraURL }}
 spec:
   destination:
     namespace: {{ $project.argocd.namespace }}
