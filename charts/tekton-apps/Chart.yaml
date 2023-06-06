@@ -12,7 +12,7 @@ appVersion: "v0.28.2"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.6-dev.2
+version: 0.2.6-dev.3
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -235,46 +235,55 @@ description: |
 
     # fill below parameters block only for `wordpress` components
 
-    - apps[PROJECT].components[NAME].wordpress.imageTag - tag of the wordpress image (default: "5.7.2")
-    - apps[PROJECT].components[NAME].wordpress.repository_ssh_url - project's wordpress repository SSH url (default: null, may be absent if project has no wordpress repo)
+    - apps[PROJECT].components[NAME].wordpress.image.tag - tag of the wordpress image (default: "6.1.1")
+    - apps[PROJECT].components[NAME].wordpress.image.debug - Bitnami debug mode, exposes credentials (default: "true")
     - apps[PROJECT].components[NAME].wordpress.resources - wordpress pod resources params (default: requests.cpu: 100m, requests.memory: 128Mi)
     - apps[PROJECT].components[NAME].wordpress.commonLabels - wordpress pod common labels (default: commonLabels.tech_stack: php, commonLabels.application: wordpress)
-    - apps[PROJECT].components[NAME].wordpress.wordpressTablePrefix - wordpress DB tables prefix (default: wp_)
-    - apps[PROJECT].components[NAME].wordpress.existingSecret - name of existing in kubernetes secret with wp admin auth info (default: "<project_name>-<component_name>-<env>",
-      i.e. "taco-wordpress-dev")
     - apps[PROJECT].components[NAME].wordpress.updateStrategy - strategy that should be used for wordpress pod update (default: updateStrategy.type: RollingUpdate,
       updateStrategy.rollingUpdate.maxSurge: 0%, updateStrategy.rollingUpdate.maxUnavailable: 100%, i.e. stop old pod and then create a new one)
-    - apps[PROJECT].components[NAME].wordpress.smtp.host - SMTP host for sending emails (default: mailhog.mailhog.svc.cluster.local)
-    - apps[PROJECT].components[NAME].wordpress.smtp.port - SMTP port for sending emails (default: 1025)
-    - apps[PROJECT].components[NAME].wordpress.smtp.user - SMTP user for sending emails (default: <project_name>, i.e. taco)
-    - apps[PROJECT].components[NAME].wordpress.smtp.password - SMTP password for sending emails (default: anypassword)
+    - apps[PROJECT].components[NAME].wordpress.replica_count - wordpress deployment replica count (default: 1)
     - apps[PROJECT].components[NAME].wordpress.nodeSelector - wordpress pod node selector params (default: nodeSelector.tech_stack: php, nodeSelector.pvc: "true")
-    - apps[PROJECT].components[NAME].wordpress.podSecurityContext - wordpress pod's security context params (default: podSecurityContext.enabled: true, podSecurityContext.fsGroup: 1000)
-    - apps[PROJECT].components[NAME].wordpress.containerSecurityContext - wordpress pod container's security context params (default: containerSecurityContext.enabled: true,
-      containerSecurityContext.runAsUser: 1000)
-    - apps[PROJECT].components[NAME].wordpress.ci - boolean flag which defines whether wordpress project has ci/cd or not (default: true)
-    - apps[PROJECT].components[NAME].wordpress.extraInitContainers - extra ci/cd init containers if needed, enabled only if wordpress component has `ci` flag enabled (default: null)
-    - apps[PROJECT].components[NAME].wordpress.extraVolumesSshKeySecret - name of a secret with wordpress repository SSH url (default: "<project_name>-<component_name>-deploy-key",
-      i.e. "taco-wordpress-deploy-key")
+    - apps[PROJECT].components[NAME].wordpress.podSecurityContext - wordpress pod's security context params (default: bitnami chart defaults)
+    - apps[PROJECT].components[NAME].wordpress.containerSecurityContext - wordpress pod container's security context params (default: bitnami chart defaults)
+    - apps[PROJECT].components[NAME].wordpress.initContainers - init containers (default: init container for ci/cd purposes)
+    - apps[PROJECT].components[NAME].wordpress.extraInitContainers - extra init containers if needed (default: null)
+    - apps[PROJECT].components[NAME].wordpress.repositorySshUrl - project's wordpress repository SSH url
+    - apps[PROJECT].components[NAME].wordpress.repositoryDeployKey - name of a secret with wordpress repository SSH url (default: "<project_name>-<component_name>-deploy-key")
+    - apps[PROJECT].components[NAME].wordpress.repositoryRevision - project's wordpress repository revision/branch (default: null, default branch from repo will be used)
+    - apps[PROJECT].components[NAME].wordpress.repositoryUseWPConfig - project's wordpress wp-config.php usage from repository (default: null)
     - apps[PROJECT].components[NAME].wordpress.extraVolumes - extra volumes that might be needed to wordpress pod (default: null)
+    - apps[PROJECT].components[NAME].wordpress.extraVolumesMounts - extra volumes mounts that might be needed to wordpress pod (default: null)
+    - apps[PROJECT].components[NAME].wordpress.extraEnvVars - extra env variables that might be needed to wordpress pod (default: null)
+    - apps[PROJECT].components[NAME].wordpress.extraEnvVarsSecret - secret with extra env variables that might be needed to wordpress pod (default: null)
+
     - apps[PROJECT].components[NAME].wordpress.ingress.hostname - wordpress ingress hostname (default: "<project_name>.saritasa.rocks", i.e. "taco.saritasa.rocks")
-    - apps[PROJECT].components[NAME].wordpress.ingress.annotations - wordpress ingress annotations (default: kubernetes.io/ingress.class: "nginx", cert-manager.io/cluster-issuer: "letsencrypt-prod",
-      nginx.ingress.kubernetes.io/proxy-body-size: 100m, nginx.ingress.kubernetes.io/proxy-connect-timeout: "300", nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "300",
-      nginx.ingress.kubernetes.io/auth-type: basic, nginx.ingress.kubernetes.io/auth-secret: <ingress.authSecret>, nginx.ingress.kubernetes.io/auth-realm: "Authentication Required",
-      nginx.ingress.kubernetes.io/server-snippet: |-,   add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive")
-    - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth (default: "<project_name>-<compinent_name>-<env>-basic-auth",
+    - apps[PROJECT].components[NAME].wordpress.ingress.annotations - extra wordpress ingress annotations (default: null)
+      - apps[PROJECT].components[NAME].wordpress.ingress.basicAuth - basic auth usage flag for wordpress ingress (default: null)
+    - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<compinent_name>-<env>-basic-auth",
       i.e. "taco-wordpress-dev-basic-auth")
+    - apps[PROJECT].components[NAME].wordpress.ingress.restrictAccessByIp - whitelist usage flag for wordpress ingress, enabled for any value except 'false' (default: null)
     - apps[PROJECT].components[NAME].wordpress.ingress.extraHosts - list of extra hosts that may be defined in ingress (default: null)
+    - apps[PROJECT].components[NAME].wordpress.persistence - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
+    - apps[PROJECT].components[NAME].wordpress.overrideDatabaseSettings - flag for initial Bitnami script that overrides  settings in DB with values from wp_config.php (default: false)
+    - apps[PROJECT].components[NAME].wordpress.externalDatabase - map with settings for wordpress DB host (required)
     - apps[PROJECT].components[NAME].wordpress.externalDatabase.host - wordpress DB host (required)
     - apps[PROJECT].components[NAME].wordpress.externalDatabase.user - wordpress DB user (required)
     - apps[PROJECT].components[NAME].wordpress.externalDatabase.existingSecret - name of existing in kubernetes secret with DB user password (required)
     - apps[PROJECT].components[NAME].wordpress.externalDatabase.database - wordpress DB name (required)
-    - apps[PROJECT].components[NAME].wordpress.externalDatabase.port - wordpress DB port (default: 3306)
+    - apps[PROJECT].components[NAME].wordpress.externalDatabase.port - wordpress DB port (required)
+    - apps[PROJECT].components[NAME].wordpress.wordpressSkipInstall - flag to skip bitnami wp init on pod start (default: false)
+    - apps[PROJECT].components[NAME].wordpress.existingWordPressConfigurationSecret - secret with wp-config.php (default: "")
     - apps[PROJECT].components[NAME].wordpress.wordpressExtraConfigContent - wordpress extra configs if needed (default: null)
-    - apps[PROJECT].components[NAME].wordpress.extraEnvVars - wordpress extra env vars if needed (default: null)
-    - apps[PROJECT].components[NAME].wordpress.persistence.* - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
-    - apps[PROJECT].components[NAME].wordpress.persistence.size - wordpress PVC size (default: 10Gb)
-    - apps[PROJECT].components[NAME].wordpress.persistence.storageClass - wordpress PVC storage class (required)
+    - apps[PROJECT].components[NAME].wordpress.wordpressBlogName - wordpress blog name (default: <project-name>)
+    - apps[PROJECT].components[NAME].wordpress.wordpressTablePrefix - wordpress DB tables prefix (default: wp_)
+    - apps[PROJECT].components[NAME].wordpress.wordpressScheme - wordpress access scheme (default: "https")
+    - apps[PROJECT].components[NAME].wordpress.wordpressEmail - target for sending emails (default: devops+<client-name>@saritasa.com)
+    - apps[PROJECT].components[NAME].wordpress.existingSecret - name of existing in kubernetes secret with wp admin auth info (default: "<project_name>-<component_name>-<env>",
+      i.e. "taco-wordpress-dev")
+    - apps[PROJECT].components[NAME].wordpress.smtpHost - SMTP host for sending emails (default: mailhog.mailhog.svc.cluster.local)
+    - apps[PROJECT].components[NAME].wordpress.smtpPort - SMTP port for sending emails (default: 1025)
+    - apps[PROJECT].components[NAME].wordpress.smtpUser - SMTP user for sending emails (default: <project_name>, i.e. taco)
+    - apps[PROJECT].components[NAME].wordpress.smtpPassword - SMTP password for sending emails (default: anypassword)
 
     Example of values with extra `eventlistener` and `extraBuildConfigParams` in component:
 
