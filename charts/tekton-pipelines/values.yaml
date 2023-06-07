@@ -66,7 +66,7 @@ buildpacks:
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/usr/bin/env bash
-            set -Eeo pipefail
+            set -o pipefail
 
             if [[ ! -f package.json ]]; then
               echo "No package.json found, stepping out"
@@ -74,18 +74,14 @@ buildpacks:
               echo "Installing node.js dependencies"
               # set cache
               npm config set cache $(workspaces.source.path)/.npm --global
-              if ! npm ci; then
-                EXIT_CODE=$?
-                echo "unable to install dependencies, "
-                if [[ $EXIT_CODE == 143 ]]; then
-                  echo "oom kill detected"
-                else
-                  echo "exit_code: $EXIT_CODE"
-                fi
+              npm ci
+              if [[ $? -ne 0]]; then
+                echo "unable to install dependencies, exit_code: $?"
                 exit 1
               fi
               echo "Building $(params.environment) target"
-              if ! npm run build:$(params.environment); then
+              npm run build:$(params.environment)
+              if [[ $? -ne 0 ]]  then
                 echo "unable to build $(params.environment) exit_code: $?"
                 exit 1
               fi
