@@ -75,13 +75,13 @@ buildpacks:
               # set cache
               npm config set cache $(workspaces.source.path)/.npm --global
               npm ci
-              if [[ $? -ne 0]]; then
+              if [[ $? -ne 0 ]]; then
                 echo "unable to install dependencies, exit_code: $?"
                 exit 1
               fi
               echo "Building $(params.environment) target"
               npm run build:$(params.environment)
-              if [[ $? -ne 0 ]]  then
+              if [[ $? -ne 0 ]];  then
                 echo "unable to build $(params.environment) exit_code: $?"
                 exit 1
               fi
