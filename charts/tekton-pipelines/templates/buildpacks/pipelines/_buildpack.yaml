@@ -162,6 +162,17 @@ spec:
       runAfter:
         - kustomize
 
+    - name: post-build-job
+      taskRef:
+        name: post-build-job
+      params:
+        - name : application
+          value: "$(params.application)"
+        - name : project
+          value: "$(params.project)"
+      runAfter:
+        - deploy
+
   {{ include "task.finalNotification" . | nindent 2 }}
 ---
 {{- end }}
