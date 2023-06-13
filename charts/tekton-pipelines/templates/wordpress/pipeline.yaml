@@ -12,12 +12,17 @@ spec:
   params:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
 
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
     - name: kubernetes_namespace
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
 
   tasks:
+
     - name: deploy
       taskRef:
         name: redeploy
@@ -26,6 +31,17 @@ spec:
           value: "$(params.application)"
         - name: kubernetes_namespace
           value: "$(params.kubernetes_namespace)"
+
+    - name: post-build-job
+      taskRef:
+        name: post-build-job
+      params:
+        - name : application
+          value: "$(params.application)"
+        - name : project
+          value: "$(params.project)"
+      runAfter:
+        - deploy
 
   {{ include "task.finalNotification" . | nindent 2 }}
 

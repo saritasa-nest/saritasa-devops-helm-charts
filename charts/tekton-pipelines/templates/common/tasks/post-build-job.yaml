@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: post-build-job
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  description: >-
+    Run any custom post build job after successful deployment (i.e. may be needed
+    to initiate selenium tests after deploy).
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config
+
+  steps:
+    - name: run-job
+      image: {{ .Values.images.kubectl | default "bitnami/kubectl:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/bin/sh
+
+        if [ -z ${POST_BUILD_JOB_NAME} ]; then
+          echo "No post build job configured (undefined 'POST_BUILD_JOB_NAME' env var)";
+          exit 0;
+        fi
+
+        uid=$(openssl rand -hex 6)
+        kubectl create job --from=job/${POST_BUILD_JOB_NAME} ${POST_BUILD_JOB_NAME}-${uid} -n $(params.project)
+        kubectl wait --for=condition=complete ${POST_BUILD_JOB_NAME}-${uid} -n $(params.project)
+
+        status=$(kubectl get job ${POST_BUILD_JOB_NAME} -o json -n $(params.project) | jq '.status.succeeded')
+        if [ status != 1 ]; then
+          echo "Post build '${POST_BUILD_JOB_NAME}' job in '$(params.project)' namespace has failed" >&2;
+          exit 1;
+        fi

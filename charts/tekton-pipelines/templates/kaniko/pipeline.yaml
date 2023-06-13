@@ -13,6 +13,10 @@ spec:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
     {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
 
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
     - name: docker_file
       type: string
       default: Dockerfile
@@ -97,6 +101,17 @@ spec:
           value: "$(params.application)"
       runAfter:
         - kustomize
+
+    - name: post-build-job
+      taskRef:
+        name: post-build-job
+      params:
+        - name : application
+          value: "$(params.application)"
+        - name : project
+          value: "$(params.project)"
+      runAfter:
+        - deploy
 
   {{ include "task.finalNotification" . | nindent 2 }}
 

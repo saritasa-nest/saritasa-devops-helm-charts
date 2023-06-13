@@ -27,6 +27,8 @@ spec:
         name: wordpress-build-pipeline
       params:
         {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
+        - name: project
+          value: $(tt.params.project)
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
       podTemplate:
