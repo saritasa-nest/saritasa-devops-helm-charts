@@ -46,6 +46,7 @@
 - name: branch
   type: string
   description: git branch
+
 {{- end}}
 
 {{- define "trigger-template.defaultParams" -}}
@@ -255,4 +256,31 @@ finally:
         value: "$(params.environment)"
       - name: status
         value: "$(tasks.deploy.status)"
+{{- end }}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Sentry release reusable snippet in various pipelines                         │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "task.sentryRelease" -}}
+- name: sentry-release
+  taskRef:
+    name:  sentry-release
+  resources:
+    inputs:
+      - name: app
+        resource: app
+  params:
+    - name: project
+      value: "$(params.project)"
+    - name: environment
+      value: "$(params.environment)"
+    - name: component
+      value: "$(params.component)"
+    - name: source_subpath
+      value: "$(params.source_subpath)"
+    - name: pipeline_name
+      value: "$(context.pipeline.name)"
+  runAfter:
+    - deploy
 {{- end }}

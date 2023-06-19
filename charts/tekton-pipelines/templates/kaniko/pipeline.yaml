@@ -28,6 +28,19 @@ spec:
       description: extra args to be passed into kaniko builder
       default: ''
 
+    - name: source_subpath
+      type: string
+      description: a subpath within the `source` input where the source to build is located.
+      default: ""
+
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: component
+      type: string
+      description: name of the application component, which is deployed
+
   workspaces:
     - name: source
 
@@ -97,6 +110,10 @@ spec:
           value: "$(params.application)"
       runAfter:
         - kustomize
+
+  {{ if .Values.sentry.enabled }}
+    {{ include "task.sentryRelease" . | nindent 4 }}
+  {{ end }}
 
   {{ include "task.finalNotification" . | nindent 2 }}
 

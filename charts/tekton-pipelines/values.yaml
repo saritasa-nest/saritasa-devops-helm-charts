@@ -27,6 +27,8 @@ images:
   yamlfix: public.ecr.aws/saritasa/yamlfix:1.8.1    # https://lyz-code.github.io/yamlfix/
   # -- kubeval image - validate Kubernetes manifests
   kubeval: public.ecr.aws/saritasa/kubeval:0.16.1    # https://kubeval.instrumenta.dev/
+  # -- sentry cli image - needs to prepare Sentry releases
+  sentry_cli: getsentry/sentry-cli:2.19.1    # https://github.com/getsentry/sentry-cli/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -381,3 +383,15 @@ podTemplate:
 saritasa-tekton:
   # -- should we configure dependency chart here.
   enabled: false
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ Sentry                                                                                                               │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+sentry:
+  enabled: false
+  authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API
+  authTokenSecretKey: "auth-token"
+  org: "saritasa"
+  url: https://sentry.saritasa.rocks/

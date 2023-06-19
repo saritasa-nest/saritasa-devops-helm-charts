@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.35
+version: 0.1.36-dev.2
 
 
 maintainers:
@@ -120,3 +120,18 @@ description: |
   - name: kaniko_extra_args
     value: --build-arg=BASE_IMAGE=965067289393.dkr.ecr.us-west-2.amazonaws.com/saritasa/legacy/php:php71-smart-screen-base
   ```
+
+  Chart has possibility to perform `Sentry` releases if it is needed, you can configure it by updating below settings
+  in values.yaml:
+
+  ```yaml
+  sentry:
+    enabled: true
+    authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API (change it if you have custom value)
+    authTokenSecretKey: "auth-token"      # key for auth token in `authTokenSecret` secret (change it if you have custom value)
+    org: "saritasa"                       # name of your Sentry organization (change it if you have custom value)
+    url: https://sentry.saritasa.rocks/   # Sentry url (change it if you have custom value)
+  ```
+
+  After configuring these values, you will have an extra step `sentry-release` after `argocd-deploy` one for buildpacks and kaniko
+  builds.

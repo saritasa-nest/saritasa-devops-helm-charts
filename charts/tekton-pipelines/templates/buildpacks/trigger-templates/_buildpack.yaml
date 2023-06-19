@@ -75,6 +75,10 @@ spec:
           value: "$(tt.params.buildpack_config_filename)"
         - name: project_config_filename
           value: "$(tt.params.project_config_filename)"
+        - name: project
+          value: "$(tt.params.project)"
+        - name: component
+          value: "$(tt.params.component)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}

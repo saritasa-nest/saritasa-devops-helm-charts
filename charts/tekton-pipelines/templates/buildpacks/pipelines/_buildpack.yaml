@@ -13,7 +13,7 @@ spec:
     {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
 
     - name: repository_submodules
-      type: "string"
+      type: string
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
 
@@ -45,6 +45,13 @@ spec:
       description: The name of the project.toml file which should be used for build
       default: "project.toml"
 
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: component
+      type: string
+      description: name of the application component, which is deployed
 
   workspaces:
     - name: source
@@ -161,6 +168,10 @@ spec:
           value: "$(params.application)"
       runAfter:
         - kustomize
+
+  {{ if .sentry.enabled }}
+    {{ include "task.sentryRelease" . | nindent 4 }}
+  {{ end }}
 
   {{ include "task.finalNotification" . | nindent 2 }}
 ---

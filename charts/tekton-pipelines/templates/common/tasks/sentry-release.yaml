@@ -1,0 +1,79 @@
+{{ if .Values.sentry.enabled }}
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: sentry-release
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  description: >-
+    The task prepares and deploys sentry release for projects, which exist in Sentry.
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+
+  params:
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+    - name: component
+      type: string
+      description: name of the application component, which is deployed
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+    - name: source_subpath
+      type: string
+      description: a subpath within the `source` input where the source to build is located
+    - name: pipeline_name
+      type: string
+      description: the name of the executed pipeline
+
+  stepTemplate:
+    env:
+      - name: SENTRY_AUTH_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: {{ .Values.sentry.authTokenSecret }}
+            key: {{ .Values.sentry.authTokenSecretKey }}
+      - name: SENTRY_ORG
+        value: {{ .Values.sentry.org }}
+      - name: SENTRY_URL
+        value: {{ .Values.sentry.url }}
+
+  steps:
+    - name: release
+      image: {{ .Values.images.sentry_cli }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(resources.inputs.app.path)
+      script: |
+        #!/usr/bin/env sh
+        set +x
+
+        PROJECT_NAME="$(params.project)-$(params.component)"
+
+        PROJECT=$(sentry-cli projects list | awk -v col=4 '{print $col}' | grep ^${PROJECT_NAME}$)
+        if [[ -z "${PROJECT}" ]]; then
+          echo "Didn't find '${PROJECT_NAME}' project in Sentry. Skip this step."
+          exit 0
+        else
+          echo "Found '${PROJECT_NAME}' project in Sentry, proceed with release."
+        fi
+
+        VERSION=$(sentry-cli releases propose-version)
+        sentry-cli releases new -p ${PROJECT_NAME} ${VERSION}
+        sentry-cli releases set-commits --auto --ignore-missing -p ${PROJECT_NAME} ${VERSION}
+
+        # needs to upload source maps for frontend projects
+        if [[ "$(params.pipeline_name)" = "{{ .Values.buildpacks.generate.buildpackFrontendBuildPipeline.name }}" ]]; then
+          echo "Upload source maps for 'frontend' project"
+          sentry-cli releases files -p ${PROJECT_NAME} ${VERSION} upload-sourcemaps $(params.source_subpath)
+        else
+          echo "That is not 'frontend' project, no source maps should be uploaded"
+        fi
+
+        sentry-cli releases deploys -p ${PROJECT_NAME} ${VERSION} new -e $(params.environment)
+        sentry-cli releases finalize -p ${PROJECT_NAME} ${VERSION}
+{{ end }}
