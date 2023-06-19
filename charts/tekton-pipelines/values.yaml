@@ -27,6 +27,8 @@ images:
   yamlfix: public.ecr.aws/saritasa/yamlfix:1.8.1    # https://lyz-code.github.io/yamlfix/
   # -- kubeval image - validate Kubernetes manifests
   kubeval: public.ecr.aws/saritasa/kubeval:0.16.1    # https://kubeval.instrumenta.dev/
+  # -- sentry cli image - needs to prepare Sentry releases
+  sentry_cli: getsentry/sentry-cli:2.19.1    # https://github.com/getsentry/sentry-cli/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -90,6 +92,11 @@ buildpacks:
               echo "Preparing for buildpack build"
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d,Procfile} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
+
+              # copy built dir to workspace for further usage in sentry-release task (source maps release)
+              echo "Save source maps"
+              mkdir -p $(workspaces.source.path)/$(params.sourcemaps_dir)
+              cp -rf $(params.source_subpath)/. $(workspaces.source.path)/$(params.sourcemaps_dir)
             fi
           securityContext:
             privileged: true
@@ -250,7 +257,7 @@ buildpacks:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            # clean `.dcproj` related files related to local development docker .NET project
+            # clean `.dcproj` files related to local development docker .NET project
             cd $(resources.inputs.app.path)
             find . -name '*.dcproj' -type f -delete
 
@@ -351,6 +358,47 @@ buildpacks:
 kaniko:
   # -- should we enable the kaniko pipeline
   enabled: false
+  # needs to build static to be able to push it in Sentry during deploy
+  # there are no other ways to do this, because kaniko builder builds frontend
+  # deps right inside of the docker image (so we can't take it from it)
+  buildTaskSteps:
+    - name: build-static
+      image: node:$(params.node_version)
+      imagePullPolicy: IfNotPresent
+      resources: {}
+      workingDir: $(resources.inputs.app.path)
+      script: |
+        #!/usr/bin/env bash
+        set -o pipefail
+
+        if [[ ! -f package.json ]]; then
+          echo "No package.json found, stepping out"
+        else
+          echo "Installing node.js dependencies"
+          # set cache
+          npm config set cache $(workspaces.source.path)/.npm --global
+          npm ci
+          if [[ $? -ne 0 ]]; then
+            echo "unable to install dependencies, exit_code: $?"
+            exit 1
+          fi
+          echo "Building $(params.environment) target"
+          npm run build:$(params.environment)
+          if [[ $? -ne 0 ]];  then
+            echo "unable to build $(params.environment) exit_code: $?"
+            exit 1
+          fi
+          echo "Cleaning up"
+          rm -rf node_modules
+
+          # copy built dir to workspace for further usage in sentry-release task (source maps release)
+          echo "Save source maps"
+          mkdir -p sourcemaps
+          cp -rf $(params.source_subpath)/. sourcemaps
+        fi
+      securityContext:
+        privileged: true
+
 
 wordpress:
   # -- should we enable the wordpress pipeline
@@ -381,3 +429,15 @@ podTemplate:
 saritasa-tekton:
   # -- should we configure dependency chart here.
   enabled: false
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ Sentry                                                                                                               │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+sentry:
+  enabled: false
+  authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API
+  authTokenSecretKey: "auth-token"
+  org: "saritasa"
+  url: https://sentry.saritasa.rocks/

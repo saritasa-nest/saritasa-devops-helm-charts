@@ -99,6 +99,11 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
+    - name: sourcemaps_dir
+      type: string
+      description: name of the dir where frontend sourcemaps would be stored in workspace
+      default: "sourcemaps"
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API

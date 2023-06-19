@@ -256,3 +256,31 @@ finally:
       - name: status
         value: "$(tasks.deploy.status)"
 {{- end }}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Sentry release reusable snippet in various pipelines                         │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "task.sentryRelease" -}}
+- name: sentry-release
+  taskRef:
+    name:  sentry-release
+  resources:
+    inputs:
+      - name: app
+        resource: app
+  params:
+    - name: project
+      value: "$(params.project)"
+    - name: environment
+      value: "$(params.environment)"
+    - name: component
+      value: "$(params.component)"
+    - name: sourcemaps_dir
+      value: "$(params.sourcemaps_dir)"
+  workspaces:
+    - name: source
+      workspace: source
+  runAfter:
+    - deploy
+{{- end }}
