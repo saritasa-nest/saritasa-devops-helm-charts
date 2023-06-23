@@ -34,7 +34,7 @@ apps:
           notifications.argoproj.io/subscribe.on-health-degraded.slack: project-nmbl; project-nmbl-alarms
           notifications.argoproj.io/subscribe.on-sync-failed.slack: project-nmbl-ci; project-nmbl-alarms
           notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-nmbl; project-nmbl-alarms
-          notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-nmbl-ci; project-nmbl-alarms
+          notifications.argoproj.io/subscribe.on-deployed.slack: project-nmbl-ci
       syncWave: 200
     mailList: nmbl@saritasa.com
     devopsMailList: devops+nmbl@saritasa.com

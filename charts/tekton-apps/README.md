@@ -118,7 +118,7 @@ spec:
                   notifications.argoproj.io/subscribe.on-health-degraded.slack: project-vp; project-vp-alarms
                   notifications.argoproj.io/subscribe.on-sync-failed.slack: project-vp-ci; project-vp-alarms
                   notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-vp; project-vp-alarms
-                  notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-vp-ci; project-vp-alarms
+                  notifications.argoproj.io/subscribe.on-deployed.slack: project-vp-ci
             mailList: vp@site.com
             devopsMailList: devops+vp@site.com
             jiraURL: https://site.atlassian.net/browse/vp
@@ -365,7 +365,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -471,7 +471,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
                 sourceRepos:
                   - git@github.com:saritasa-nest/xxx-backend.git
                   - git@github.com:saritasa-nest/xxx-frontend.git
@@ -576,7 +576,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -659,7 +659,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -740,7 +740,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -821,7 +821,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -903,7 +903,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
                 sourceRepos:
                   - https://charts.bitnami.com/bitnami
               mailList: xxx@saritasa.com
@@ -983,7 +983,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
                 sourceRepos:
                   - https://charts.bitnami.com/bitnami
               mailList: xxx@saritasa.com
@@ -1060,7 +1060,7 @@ spec:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
-                    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
                 sourceRepos:
                   - https://charts.bitnami.com/bitnami
                   - git@github.com:saritasa-nest/xxx-kubernetes-aws.git
