@@ -99,6 +99,9 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
+    # below parameter is used at the end of `build-static` tasks (defined in values.yaml)
+    # for `frontend` and `kaniko` builds to store built static to `/workspace/source/sourcemaps/`
+    # dir for further usage in `sentry-release` task
     - name: sourcemaps_dir
       type: string
       description: name of the dir where frontend sourcemaps would be stored in workspace

@@ -388,13 +388,15 @@ kaniko:
             echo "unable to build $(params.environment) exit_code: $?"
             exit 1
           fi
-          echo "Cleaning up"
-          rm -rf node_modules
 
           # copy built dir to workspace for further usage in sentry-release task (source maps release)
           echo "Save source maps"
           mkdir -p sourcemaps
           cp -rf $(params.source_subpath)/. sourcemaps
+
+          echo "Cleaning up"
+          rm -rf node_modules
+          rm -rf $(params.source_subpath)
         fi
       securityContext:
         privileged: true

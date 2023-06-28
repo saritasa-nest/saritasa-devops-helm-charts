@@ -65,11 +65,15 @@ spec:
           echo "Found '${PROJECT_NAME}' project in Sentry, proceed with release."
         fi
 
+        # sentry-cli uses last repository commit sha1 as proposed version, i.e. 7e734134fb23497e68976784f7eaa106c4a8f3a8
+        # https://docs.sentry.io/product/cli/releases/#creating-releases
         VERSION=$(sentry-cli releases propose-version)
+
         sentry-cli releases new -p ${PROJECT_NAME} ${VERSION}
         sentry-cli releases set-commits --auto --ignore-missing -p ${PROJECT_NAME} ${VERSION}
 
-        # needs to upload source maps for frontend projects
+        # needs to upload source maps for frontend projects from `/workspace/source/sourcemaps/` tekton build dir to Sentry,
+        # they are generated and saved to `/workspace/source/sourcemaps/` dir at the end of `build-static` step
         if [[ -d "$(workspaces.source.path)/$(params.sourcemaps_dir)" ]]; then
           echo "Upload source maps for 'frontend' project"
           sentry-cli releases files -p ${PROJECT_NAME} ${VERSION} upload-sourcemaps $(workspaces.source.path)/$(params.sourcemaps_dir)
@@ -78,5 +82,8 @@ spec:
         fi
 
         sentry-cli releases deploys -p ${PROJECT_NAME} ${VERSION} new -e $(params.environment)
+
+        # mark release as finalized and released, before this step it is marked as `unreleased`
+        # https://docs.sentry.io/product/cli/releases/#finalizing-releases
         sentry-cli releases finalize -p ${PROJECT_NAME} ${VERSION}
 {{ end }}
