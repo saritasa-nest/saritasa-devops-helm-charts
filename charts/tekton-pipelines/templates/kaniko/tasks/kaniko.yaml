@@ -51,21 +51,6 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
-    - name: node_version
-      type: string
-      description: nodejs version of the image used to build static
-      default: "14"
-
-    - name: source_subpath
-      type: string
-      description: a subpath within the `source` input where the source to build is located.
-      default: ""
-
-    - name: sourcemaps_dir
-      type: string
-      description: name of the dir where frontend sourcemaps would be stored in workspace
-      default: "sourcemaps"
-
   results:
     - name: password
       description: The password to authenticate to ecr registry.
@@ -83,11 +68,6 @@ spec:
       script: |
         #!/bin/bash
         aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
-
-    # insert customized steps as defined in the values.yaml of the helm chart
-    {{- if .Values.kaniko.buildTaskSteps }}
-    {{- .Values.kaniko.buildTaskSteps | toYaml | nindent 4}}
-    {{ end }}
 
     - name: build
       image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}

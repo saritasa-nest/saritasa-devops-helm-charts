@@ -31,10 +31,6 @@ spec:
       default: ''
       description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
 
-    - name: source_subpath
-      description: a subpath within the `source` input where the source to build is located.
-      default: ""
-
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -62,8 +58,6 @@ spec:
           value: "$(tt.params.kaniko_extra_args)"
         - name: repository_submodules
           value: "$(tt.params.repository_submodules)"
-        - name: source_subpath
-          value: "$(tt.params.source_subpath)"
         - name: project
           value: "$(tt.params.project)"
         - name: component

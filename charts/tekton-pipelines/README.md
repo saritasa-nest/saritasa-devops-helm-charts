@@ -204,13 +204,6 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.sentry_cli | string | `"getsentry/sentry-cli:2.19.1"` | sentry cli image - needs to prepare Sentry releases |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
-| kaniko.buildTaskSteps[0].image | string | `"node:$(params.node_version)"` |  |
-| kaniko.buildTaskSteps[0].imagePullPolicy | string | `"IfNotPresent"` |  |
-| kaniko.buildTaskSteps[0].name | string | `"build-static"` |  |
-| kaniko.buildTaskSteps[0].resources | object | `{}` |  |
-| kaniko.buildTaskSteps[0].script | string | `"#!/usr/bin/env bash\nset -o pipefail\n\nif [[ ! -f package.json ]]; then\n  echo \"No package.json found, stepping out\"\nelse\n  echo \"Installing node.js dependencies\"\n  # set cache\n  npm config set cache $(workspaces.source.path)/.npm --global\n  npm ci\n  if [[ $? -ne 0 ]]; then\n    echo \"unable to install dependencies, exit_code: $?\"\n    exit 1\n  fi\n  echo \"Building $(params.environment) target\"\n  npm run build:$(params.environment)\n  if [[ $? -ne 0 ]];  then\n    echo \"unable to build $(params.environment) exit_code: $?\"\n    exit 1\n  fi\n\n  # copy built dir to workspace for further usage in sentry-release task (source maps release)\n  echo \"Save source maps\"\n  mkdir -p sourcemaps\n  cp -rf $(params.source_subpath)/. sourcemaps\n\n  echo \"Cleaning up\"\n  rm -rf node_modules\n  rm -rf $(params.source_subpath)\nfi\n"` |  |
-| kaniko.buildTaskSteps[0].securityContext.privileged | bool | `true` |  |
-| kaniko.buildTaskSteps[0].workingDir | string | `"$(resources.inputs.app.path)"` |  |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
