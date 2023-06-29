@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.7](https://img.shields.io/badge/Version-0.2.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.2.8](https://img.shields.io/badge/Version-0.2.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -308,8 +308,7 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.wordpressTablePrefix - wordpress DB tables prefix (default: wp_)
   - apps[PROJECT].components[NAME].wordpress.wordpressScheme - wordpress access scheme (default: "https")
   - apps[PROJECT].components[NAME].wordpress.wordpressEmail - target for sending emails (default: devops+<client-name>@saritasa.com)
-  - apps[PROJECT].components[NAME].wordpress.existingSecret - name of existing in kubernetes secret with wp admin auth info (default: "<project_name>-<component_name>-<env>",
-    i.e. "taco-wordpress-dev")
+  - apps[PROJECT].components[NAME].wordpress.existingSecret - name of existing in kubernetes secret with wp admin and smtp auth info, should contain sections: 'wordpress-password', 'smtp-password'.
   - apps[PROJECT].components[NAME].wordpress.smtpHost - SMTP host for sending emails (default: mailhog.mailhog.svc.cluster.local)
   - apps[PROJECT].components[NAME].wordpress.smtpPort - SMTP port for sending emails (default: 1025)
   - apps[PROJECT].components[NAME].wordpress.smtpUser - SMTP user for sending emails (default: <project_name>, i.e. taco)

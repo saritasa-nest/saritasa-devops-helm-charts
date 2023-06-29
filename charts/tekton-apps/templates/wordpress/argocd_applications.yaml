@@ -248,8 +248,10 @@ spec:
         wordpressScheme: {{ .wordpressScheme | default "https" }}
         wordpressTablePrefix: {{ .wordpressTablePrefix | default "wp_" }}
         allowEmptyPassword: false
-        existingSecret: {{ .existingSecret | default (printf "%s-%s-%s" $project.project $component.name $projectEnvironment) }}
-
+        {{ if .existingSecret }}
+        existingSecret: {{ .existingSecret }}
+        smtpExistingSecret: {{ .existingSecret }}
+        {{- end }}
         smtpHost: {{ .smtpHost | default "mailhog.mailhog.svc.cluster.local" }}
         smtpPort: {{ .smtpHort | default 1025 }}
         smtpUser: {{ .smtpUser | default $project.project }}
