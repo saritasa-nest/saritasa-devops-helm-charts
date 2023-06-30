@@ -31,6 +31,9 @@ spec:
       default: ''
       description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
 
+    - name: sentry_project_name
+      description: name of the project in Sentry
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -58,10 +61,8 @@ spec:
           value: "$(tt.params.kaniko_extra_args)"
         - name: repository_submodules
           value: "$(tt.params.repository_submodules)"
-        - name: project
-          value: "$(tt.params.project)"
-        - name: component
-          value: "$(tt.params.component)"
+        - name: sentry_project_name
+          value: "$(tt.params.sentry_project_name)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}

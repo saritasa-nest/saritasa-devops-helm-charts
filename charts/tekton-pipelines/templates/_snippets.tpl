@@ -270,12 +270,10 @@ finally:
       - name: app
         resource: app
   params:
-    - name: project
-      value: "$(params.project)"
     - name: environment
       value: "$(params.environment)"
-    - name: component
-      value: "$(params.component)"
+    - name: sentry_project_name
+      value: "$(params.sentry_project_name)"
     - name: sourcemaps_dir
       value: "$(params.sourcemaps_dir)"
   workspaces:

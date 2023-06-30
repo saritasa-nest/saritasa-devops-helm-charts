@@ -45,13 +45,9 @@ spec:
       description: The name of the project.toml file which should be used for build
       default: "project.toml"
 
-    - name: project
+    - name: sentry_project_name
       type: string
-      description: name of the project, which component is deployed
-
-    - name: component
-      type: string
-      description: name of the application component, which is deployed
+      description: name of the project in Sentry
 
     - name: sourcemaps_dir
       type: string

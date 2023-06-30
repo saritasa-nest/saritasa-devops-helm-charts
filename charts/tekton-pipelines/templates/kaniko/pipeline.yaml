@@ -28,13 +28,9 @@ spec:
       description: extra args to be passed into kaniko builder
       default: ''
 
-    - name: project
+    - name: sentry_project_name
       type: string
-      description: name of the project, which component is deployed
-
-    - name: component
-      type: string
-      description: name of the application component, which is deployed
+      description: name of the project in Sentry
 
     - name: sourcemaps_dir
       type: string

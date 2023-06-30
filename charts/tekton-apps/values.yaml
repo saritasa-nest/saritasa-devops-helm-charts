@@ -98,6 +98,8 @@ apps: []
   #           value: buildpack1.yml
   #         - name: project_config_filename
   #           value: project1.toml
+  #         - name: sentry_project_name
+  #           value: xxx-backend
 
   #     - name: frontend
   #       repository: xxx-frontend
@@ -127,6 +129,8 @@ apps: []
   #           value: buildpack2.yml
   #         - name: project_config_filename
   #           value: project2.toml
+  #         - name: sentry_project_name
+  #           value: xxx-frontend
 
   #     - name: wordpress
   #       repository: xxx-wordpress

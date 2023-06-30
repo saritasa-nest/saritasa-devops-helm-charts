@@ -18,13 +18,10 @@ spec:
         type: git
 
   params:
-    - name: project
-      type: string
-      description: name of the project, which component is deployed
 
-    - name: component
+    - name: sentry_project_name
       type: string
-      description: name of the application component, which is deployed
+      description: name of the project in Sentry
 
     - name: environment
       type: string
@@ -56,7 +53,7 @@ spec:
         #!/usr/bin/env sh
         set +x
 
-        PROJECT_NAME="$(params.project)-$(params.component)"
+        PROJECT_NAME="$(params.sentry_project_name)"
         PROJECT=$(sentry-cli projects list | awk -v col=4 '{print $col}' | grep ^${PROJECT_NAME}$)
         if [[ -z "${PROJECT}" ]]; then
           echo "Didn't find '${PROJECT_NAME}' project in Sentry. Skip this step."

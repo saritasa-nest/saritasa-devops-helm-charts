@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.8](https://img.shields.io/badge/Version-0.2.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 0.2.9-dev.1](https://img.shields.io/badge/Version-0.2.9--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -768,6 +768,87 @@ spec:
                       value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
                     - name: buildpack_runner_image
                       value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.16"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
+  If you need to pass custom project's name for Sentry, use `sentry_project_name` parameter in Trigger Binding as in example below. By
+  default `sentry_project_name` is configured as  `<project_name>-<component_name>` if custom value is not passed.
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: dev
+          ...
+          apps:
+            - project: xxx-dev
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: xxx-dev
+                notifications:
+                  annotations:
+                    notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  repository: xxx-backend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/backend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+                    - name: sentry_project_name
+                      value: custom-xxx-dev-backend
 
       repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
       targetRevision: "0.1.16"
