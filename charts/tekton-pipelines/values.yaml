@@ -190,14 +190,21 @@ buildpacks:
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/usr/bin/env bash
-            set -e
-            [ -f poetry.lock ] \
-              && (echo "poetry.lock is found, skipping pip section."; exit;)
-            [ -f manage.py ] && (cp requirements/$(params.environment)*.txt requirements.txt \
-              || echo "Unable to find requirements for $(params.environment)")
-            [ -f requirements.txt ] && echo "Found requirements.txt" \
-              || (echo "requirements.txt is not found! Halting execution."; exit 1;)
-
+            set -eo pipefail
+            if [ -f poetry.lock ]; then
+              echo "poetry.lock is found, skipping pip section."
+              exit
+            else
+              if [ -f manage.py ]; then
+                cp requirements/$(params.environment)*.txt requirements.txt || echo "Unable to find requirements for $(params.environment)"
+              fi
+              if [ -f requirements.txt ]; then
+                echo "Found requirements.txt"
+              else
+                echo "requirements.txt is not found! Halting execution."
+                exit 1
+              fi
+            fi
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
 # │ This generated buildpack pipeline is used by our dotnet team and has a custom step that is used to obtain semantic   │
