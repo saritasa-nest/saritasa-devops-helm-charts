@@ -191,6 +191,8 @@ buildpacks:
           script: |
             #!/usr/bin/env bash
             set -e
+            [ -f poetry.lock ] \
+              && (echo "poetry.lock is found, skipping pip section."; exit;)
             [ -f manage.py ] && (cp requirements/$(params.environment)*.txt requirements.txt \
               || echo "Unable to find requirements for $(params.environment)")
             [ -f requirements.txt ] && echo "Found requirements.txt" \
