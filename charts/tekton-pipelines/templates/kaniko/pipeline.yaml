@@ -28,6 +28,15 @@ spec:
       description: extra args to be passed into kaniko builder
       default: ''
 
+    - name: sentry_project_name
+      type: string
+      description: name of the project in Sentry
+
+    - name: sourcemaps_dir
+      type: string
+      description: name of the dir where frontend sourcemaps would be stored in workspace
+      default: "sourcemaps"
+
   workspaces:
     - name: source
 
@@ -97,6 +106,10 @@ spec:
           value: "$(params.application)"
       runAfter:
         - kustomize
+
+  {{ if .Values.sentry.enabled }}
+    {{ include "task.sentryRelease" . | nindent 4 }}
+  {{ end }}
 
   {{ include "task.finalNotification" . | nindent 2 }}
 

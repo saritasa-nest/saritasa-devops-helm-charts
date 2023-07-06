@@ -43,6 +43,8 @@ spec:
       description: The name of the project.toml file which should be used for build
       default: "project.toml"
 
+    - name: sentry_project_name
+      description: name of the project in Sentry
 
   resourcetemplates:
   - kind: PipelineRun
@@ -75,6 +77,8 @@ spec:
           value: "$(tt.params.buildpack_config_filename)"
         - name: project_config_filename
           value: "$(tt.params.project_config_filename)"
+        - name: sentry_project_name
+          value: "$(tt.params.sentry_project_name)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}

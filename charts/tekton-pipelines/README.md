@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.35](https://img.shields.io/badge/Version-0.1.35-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.36](https://img.shields.io/badge/Version-0.1.36-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -142,6 +142,19 @@ to specific project trigger-binding:
   value: --build-arg=BASE_IMAGE=965067289393.dkr.ecr.us-west-2.amazonaws.com/saritasa/legacy/php:php71-smart-screen-base
 ```
 
+Chart has possibility to perform `Sentry` releases if it is needed, you can configure it by updating below settings in values.yaml:
+
+```yaml
+sentry:
+  enabled: true
+  authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API (change it if you have custom value)
+  authTokenSecretKey: "auth-token"      # key for auth token in `authTokenSecret` secret (change it if you have custom value)
+  org: "saritasa"                       # name of your Sentry organization (change it if you have custom value)
+  url: https://sentry.saritasa.rocks/   # Sentry url (change it if you have custom value)
+```
+
+After configuring these values, you will have an extra `sentry-release` step after `argocd-deploy` one for buildpacks and kaniko builds.
+
 ## `chart.valuesTable`
 
 | Key | Type | Default | Description |
@@ -188,6 +201,7 @@ to specific project trigger-binding:
 | images.kubeval | string | `"public.ecr.aws/saritasa/kubeval:0.16.1"` | kubeval image - validate Kubernetes manifests |
 | images.kustomize | string | `"registry.k8s.io/kustomize/kustomize:v5.0.0"` | kustomize cli |
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
+| images.sentry_cli | string | `"getsentry/sentry-cli:2.19.1"` | sentry cli image - needs to prepare Sentry releases |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
@@ -195,6 +209,11 @@ to specific project trigger-binding:
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
 | podTemplate.tolerations | list | `[{"effect":"NoSchedule","key":"ci","operator":"Equal","value":"true"}]` | tolerations |
 | saritasa-tekton.enabled | bool | `false` | should we configure dependency chart here. |
+| sentry.authTokenSecret | string | `"sentry-auth-token"` |  |
+| sentry.authTokenSecretKey | string | `"auth-token"` |  |
+| sentry.enabled | bool | `false` |  |
+| sentry.org | string | `"saritasa"` |  |
+| sentry.url | string | `"https://sentry.saritasa.rocks/"` |  |
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |
 
 ----------------------------------------------

@@ -62,6 +62,7 @@ spec:
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "buildpack_config_filename" "default" "buildpack.yml" ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "project_config_filename" "default" "project.toml" ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "sentry_project_name" "default" (printf "%s-%s" $project.project $component.name) ) | nindent 2 }}
   {{- end}}
 ---
 

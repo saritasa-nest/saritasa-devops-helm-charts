@@ -27,6 +27,8 @@ images:
   yamlfix: public.ecr.aws/saritasa/yamlfix:1.8.1    # https://lyz-code.github.io/yamlfix/
   # -- kubeval image - validate Kubernetes manifests
   kubeval: public.ecr.aws/saritasa/kubeval:0.16.1    # https://kubeval.instrumenta.dev/
+  # -- sentry cli image - needs to prepare Sentry releases
+  sentry_cli: getsentry/sentry-cli:2.19.1    # https://github.com/getsentry/sentry-cli/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -90,6 +92,19 @@ buildpacks:
               echo "Preparing for buildpack build"
               cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d,Procfile} $(params.source_subpath)  2>/dev/null
               chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
+
+              # copy built dir to workspace for further usage in sentry-release task (source maps release)
+              echo "Save source maps"
+              mkdir -p $(workspaces.source.path)/$(params.sourcemaps_dir)
+              cp -rf $(params.source_subpath)/. $(workspaces.source.path)/$(params.sourcemaps_dir)
+
+              # needs to clean up created source maps for envs != `dev` to not show it on `staging` and `prod` envs,
+              # so now to be able to upload source maps to Sentry for all existing envs, `frontend` should be ALWAYS
+              # built with source maps for any env (dev / staging / prod)
+              if [[ "$(params.environment)" != "dev" ]]; then
+                echo "Clean up source maps from docker image"
+                find $(params.source_subpath)/. -name "*.map" -type f -delete
+              fi
             fi
           securityContext:
             privileged: true
@@ -250,7 +265,7 @@ buildpacks:
           resources: {}
           script: |
             #!/usr/bin/env bash
-            # clean `.dcproj` related files related to local development docker .NET project
+            # clean `.dcproj` files related to local development docker .NET project
             cd $(resources.inputs.app.path)
             find . -name '*.dcproj' -type f -delete
 
@@ -381,3 +396,15 @@ podTemplate:
 saritasa-tekton:
   # -- should we configure dependency chart here.
   enabled: false
+
+
+# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+# │ Sentry                                                                                                               │
+# │                                                                                                                      │
+# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+sentry:
+  enabled: false
+  authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API
+  authTokenSecretKey: "auth-token"
+  org: "saritasa"
+  url: https://sentry.saritasa.rocks/
