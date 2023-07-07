@@ -194,16 +194,15 @@ buildpacks:
             if [ -f poetry.lock ]; then
               echo "poetry.lock is found, skipping pip section."
               exit
+            fi
+            if [ -f manage.py ]; then
+              cp requirements/$(params.environment)*.txt requirements.txt || echo "Unable to find requirements for $(params.environment)"
+            fi
+            if [ -f requirements.txt ]; then
+              echo "Found requirements.txt"
             else
-              if [ -f manage.py ]; then
-                cp requirements/$(params.environment)*.txt requirements.txt || echo "Unable to find requirements for $(params.environment)"
-              fi
-              if [ -f requirements.txt ]; then
-                echo "Found requirements.txt"
-              else
-                echo "requirements.txt is not found! Halting execution."
-                exit 1
-              fi
+              echo "requirements.txt is not found! Halting execution."
+              exit 1
             fi
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
