@@ -184,21 +184,25 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: copy-requirements
-          image: docker.io/library/bash:5.1.8
+          image: docker.io/fnndsc/python-poetry:1.5.1
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
-            if [ -f poetry.lock ]; then
-              echo "poetry.lock is found, skipping pip section."
-              exit
-            fi
-            if [ -f manage.py ]; then
+            if [[ -f poetry.lock ]]; then
+              echo "poetry.lock is found, preparing requirements.txt"
+              TARGET="main"
+              if [[ "$(params.environment)" =~ "^dev" ]]; then
+                TARGET="${TARGET},dev"
+              fi
+              poetry export --with ${TARGET} --output requirements.txt
+            elif [[ -f manage.py ]]; then
+              echo "manage.py found, preparing requirements.txt" "
               cp requirements/$(params.environment)*.txt requirements.txt || echo "Unable to find requirements for $(params.environment)"
             fi
-            if [ -f requirements.txt ]; then
+            if [[ -f requirements.txt ]]; then
               echo "Found requirements.txt"
             else
               echo "requirements.txt is not found! Halting execution."
