@@ -199,7 +199,7 @@ buildpacks:
               fi
               poetry export --with ${TARGET} --output requirements.txt
             elif [[ -f manage.py ]]; then
-              echo "manage.py found, preparing requirements.txt" "
+              echo "manage.py found, preparing requirements.txt"
               cp requirements/$(params.environment)*.txt requirements.txt || echo "Unable to find requirements for $(params.environment)"
             fi
             if [[ -f requirements.txt ]]; then
