@@ -8,11 +8,11 @@ image:
   # -- pull policy
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "1.5.0"
+  tag: "1.5.3"
 
 github:
   # -- github app auth pem file used for terraform github provider authentication
-  appAuthSecret: terraform-cicd-app.2022-11-18.private-key.pem
+  appAuthSecret: terraform-cicd-app.2023-07-12.private-key.pem
   # -- github gh cli secret containing token for authentication of the github CLI
   tokenSecret: github-cli-token
   # -- github repository containing terraform infra-dev-aws code
