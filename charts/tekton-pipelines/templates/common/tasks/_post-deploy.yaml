@@ -1,0 +1,42 @@
+{{- define "task.postDeploy" -}}
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: {{ .namePrefix }}-post-deploy
+  namespace: {{ .namespace }}
+
+spec:
+  description: >-
+    Task performs custom post deploy actions, which are set from values.yaml
+    (for ex. run selenium tests or etc)
+
+  params:
+
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: sha
+      type: string
+      description: sha commit ID of the image deployed in cluster
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  # insert customized steps as defined in the values.yaml of the helm chart
+  {{ if .steps }}
+  steps:
+    {{ .steps | toYaml | nindent 4}}
+  {{ end }}
+---
+{{- end }}

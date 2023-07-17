@@ -108,7 +108,41 @@ buildpacks:
             fi
           securityContext:
             privileged: true
+      postDeployTaskSteps:
+        - name: argo-events
+          image: badouralix/curl-jq
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
 
+            # add extra params from env and convert them to lowercase to work with this
+            # data later in argo workflow
+            EXTRA=$(jq -n env | jq 'walk(if type=="object" then with_entries(.key|=ascii_downcase) else . end)')
+            JSON_PAYLOAD='{
+              "project": "$(params.project)",
+              "environment": "$(params.environment)",
+              "application": "$(params.application)",
+              "sha": "$(params.sha)",
+              "extra": ${EXTRA}
+            }'
+
+            echo "Payload: $JSON_PAYLOAD"
+
+            OUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location --request POST "build-succeed-eventsource-svc.argo-events.svc.cluster.local" \
+              --header 'Content-Type: application/json' \
+              --data-raw "$JSON_PAYLOAD")
+
+            STATUS_CODE=$(echo "${OUTPUT}" | sed -e 's/.*\httpcode=//')
+            if [ ${STATUS_CODE} -ne 204 ]; then
+                echo "Curl operation/command failed due to server return code - ${STATUS_CODE}"
+                exit 1
+            fi
+
+            echo "Sent 'build-succeed' webhook"
+
+          securityContext:
+            privileged: true
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
@@ -195,6 +229,41 @@ buildpacks:
               || echo "Unable to find requirements for $(params.environment)")
             [ -f requirements.txt ] && echo "Found requirements.txt" \
               || (echo "requirements.txt is not found! Halting execution."; exit 1;)
+      postDeployTaskSteps:
+        - name: argo-events
+          image: badouralix/curl-jq
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          script: |
+            #!/usr/bin/env bash
+
+            # add extra params from env and convert them to lowercase to work with this
+            # data later in argo workflow
+            EXTRA=$(jq -n env | jq 'walk(if type=="object" then with_entries(.key|=ascii_downcase) else . end)')
+            JSON_PAYLOAD='{
+              "project": "$(params.project)",
+              "environment": "$(params.environment)",
+              "application": "$(params.application)",
+              "sha": "$(params.sha)",
+              "extra": ${EXTRA}
+            }'
+
+            echo "Payload: $JSON_PAYLOAD"
+
+            OUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location --request POST "build-succeed-eventsource-svc.argo-events.svc.cluster.local" \
+              --header 'Content-Type: application/json' \
+              --data-raw "$JSON_PAYLOAD")
+
+            STATUS_CODE=$(echo "${OUTPUT}" | sed -e 's/.*\httpcode=//')
+            if [ ${STATUS_CODE} -ne 204 ]; then
+                echo "Curl operation/command failed due to server return code - ${STATUS_CODE}"
+                exit 1
+            fi
+
+            echo "Sent 'build-succeed' webhook"
+
+          securityContext:
+            privileged: true
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
@@ -366,6 +435,41 @@ buildpacks:
 kaniko:
   # -- should we enable the kaniko pipeline
   enabled: false
+  postDeployTaskSteps:
+    - name: argo-events
+      image: badouralix/curl-jq
+      imagePullPolicy: IfNotPresent
+      resources: {}
+      script: |
+        #!/usr/bin/env bash
+
+        # add extra params from env and convert them to lowercase to work with this
+        # data later in argo workflow
+        EXTRA=$(jq -n env | jq 'walk(if type=="object" then with_entries(.key|=ascii_downcase) else . end)')
+        JSON_PAYLOAD='{
+          "project": "$(params.project)",
+          "environment": "$(params.environment)",
+          "application": "$(params.application)",
+          "sha": "$(params.sha)",
+          "extra": ${EXTRA}
+        }'
+
+        echo "Payload: $JSON_PAYLOAD"
+
+        OUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location --request POST "build-succeed-eventsource-svc.argo-events.svc.cluster.local" \
+          --header 'Content-Type: application/json' \
+          --data-raw "$JSON_PAYLOAD")
+
+        STATUS_CODE=$(echo "${OUTPUT}" | sed -e 's/.*\httpcode=//')
+        if [ ${STATUS_CODE} -ne 204 ]; then
+            echo "Curl operation/command failed due to server return code - ${STATUS_CODE}"
+            exit 1
+        fi
+
+        echo "Sent 'build-succeed' webhook"
+
+      securityContext:
+        privileged: true
 
 wordpress:
   # -- should we enable the wordpress pipeline

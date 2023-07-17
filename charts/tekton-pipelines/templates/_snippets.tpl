@@ -225,7 +225,7 @@
 # │ slack notification reusable snippet in various pipelines                     │
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
-{{- define "task.finalNotification" -}}
+{{- define "pipeline.finalNotification" -}}
 finally:
   - name: slack-notification
     taskRef:
@@ -261,7 +261,7 @@ finally:
 # │ Sentry release reusable snippet in various pipelines                         │
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
-{{- define "task.sentryRelease" -}}
+{{- define "pipeline.sentryRelease" -}}
 - name: sentry-release
   taskRef:
     name:  sentry-release
@@ -281,4 +281,23 @@ finally:
       workspace: source
   runAfter:
     - deploy
+{{- end }}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ post deploy reusable snippet in various pipelines                            │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.postDeploy" -}}
+- name: post-deploy
+  taskRef:
+    name:  post-deploy
+  params:
+    - name: application
+      value: "$(params.application)"
+    - name: project
+      value: "$(params.project)"
+    - name: sha
+      value: "$(params.sha)"
+    - name: environment
+      value: "$(params.environment)"
 {{- end }}

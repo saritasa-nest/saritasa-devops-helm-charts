@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.36](https://img.shields.io/badge/Version-0.1.36-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.37-dev-ksenia.1](https://img.shields.io/badge/Version-0.1.37--dev--ksenia.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -165,6 +165,12 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackDjangoBuildPipeline.enabled | bool | `false` | should we enable the django buildpack pipeline |
 | buildpacks.generate.buildpackDjangoBuildPipeline.name | string | `"buildpack-django-build-pipeline"` | the name of the generated pipeline |
+| buildpacks.generate.buildpackDjangoBuildPipeline.postDeployTaskSteps[0].image | string | `"badouralix/curl-jq"` |  |
+| buildpacks.generate.buildpackDjangoBuildPipeline.postDeployTaskSteps[0].imagePullPolicy | string | `"IfNotPresent"` |  |
+| buildpacks.generate.buildpackDjangoBuildPipeline.postDeployTaskSteps[0].name | string | `"argo-events"` |  |
+| buildpacks.generate.buildpackDjangoBuildPipeline.postDeployTaskSteps[0].resources | object | `{}` |  |
+| buildpacks.generate.buildpackDjangoBuildPipeline.postDeployTaskSteps[0].script | string | `"#!/usr/bin/env bash\n\n# add extra params from env and convert them to lowercase to work with this\n# data later in argo workflow\nEXTRA=$(jq -n env | jq 'walk(if type==\"object\" then with_entries(.key|=ascii_downcase) else . end)')\nJSON_PAYLOAD='{\n  \"project\": \"$(params.project)\",\n  \"environment\": \"$(params.environment)\",\n  \"application\": \"$(params.application)\",\n  \"sha\": \"$(params.sha)\",\n  \"extra\": ${EXTRA}\n}'\n\necho \"Payload: $JSON_PAYLOAD\"\n\nOUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location --request POST \"build-succeed-eventsource-svc.argo-events.svc.cluster.local\" \\\n  --header 'Content-Type: application/json' \\\n  --data-raw \"$JSON_PAYLOAD\")\n\nSTATUS_CODE=$(echo \"${OUTPUT}\" | sed -e 's/.*\\httpcode=//')\nif [ ${STATUS_CODE} -ne 204 ]; then\n    echo \"Curl operation/command failed due to server return code - ${STATUS_CODE}\"\n    exit 1\nfi\n\necho \"Sent 'build-succeed' webhook\"\n"` |  |
+| buildpacks.generate.buildpackDjangoBuildPipeline.postDeployTaskSteps[0].securityContext.privileged | bool | `true` |  |
 | buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskName | string | `"buildpack-dotnet"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackDotnetBuildPipeline.enabled | bool | `false` | should we enable the dotnet buildpack pipeline |
@@ -173,6 +179,12 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackFrontendBuildPipeline.enabled | bool | `false` | should we enable the frontend buildpack pipeline |
 | buildpacks.generate.buildpackFrontendBuildPipeline.name | string | `"buildpack-frontend-build-pipeline"` | the name of the generated pipeline |
+| buildpacks.generate.buildpackFrontendBuildPipeline.postDeployTaskSteps[0].image | string | `"badouralix/curl-jq"` |  |
+| buildpacks.generate.buildpackFrontendBuildPipeline.postDeployTaskSteps[0].imagePullPolicy | string | `"IfNotPresent"` |  |
+| buildpacks.generate.buildpackFrontendBuildPipeline.postDeployTaskSteps[0].name | string | `"argo-events"` |  |
+| buildpacks.generate.buildpackFrontendBuildPipeline.postDeployTaskSteps[0].resources | object | `{}` |  |
+| buildpacks.generate.buildpackFrontendBuildPipeline.postDeployTaskSteps[0].script | string | `"#!/usr/bin/env bash\n\n# add extra params from env and convert them to lowercase to work with this\n# data later in argo workflow\nEXTRA=$(jq -n env | jq 'walk(if type==\"object\" then with_entries(.key|=ascii_downcase) else . end)')\nJSON_PAYLOAD='{\n  \"project\": \"$(params.project)\",\n  \"environment\": \"$(params.environment)\",\n  \"application\": \"$(params.application)\",\n  \"sha\": \"$(params.sha)\",\n  \"extra\": ${EXTRA}\n}'\n\necho \"Payload: $JSON_PAYLOAD\"\n\nOUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location --request POST \"build-succeed-eventsource-svc.argo-events.svc.cluster.local\" \\\n  --header 'Content-Type: application/json' \\\n  --data-raw \"$JSON_PAYLOAD\")\n\nSTATUS_CODE=$(echo \"${OUTPUT}\" | sed -e 's/.*\\httpcode=//')\nif [ ${STATUS_CODE} -ne 204 ]; then\n    echo \"Curl operation/command failed due to server return code - ${STATUS_CODE}\"\n    exit 1\nfi\n\necho \"Sent 'build-succeed' webhook\"\n"` |  |
+| buildpacks.generate.buildpackFrontendBuildPipeline.postDeployTaskSteps[0].securityContext.privileged | bool | `true` |  |
 | buildpacks.generate.buildpackGoBuildPipeline.buildTaskName | string | `"buildpack-go"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackGoBuildPipeline.enabled | bool | `false` | should we enable the GO buildpack pipeline |
 | buildpacks.generate.buildpackGoBuildPipeline.name | string | `"buildpack-go-build-pipeline"` | the name of the generated pipeline |
@@ -205,6 +217,12 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
+| kaniko.postDeployTaskSteps[0].image | string | `"badouralix/curl-jq"` |  |
+| kaniko.postDeployTaskSteps[0].imagePullPolicy | string | `"IfNotPresent"` |  |
+| kaniko.postDeployTaskSteps[0].name | string | `"argo-events"` |  |
+| kaniko.postDeployTaskSteps[0].resources | object | `{}` |  |
+| kaniko.postDeployTaskSteps[0].script | string | `"#!/usr/bin/env bash\n\n# add extra params from env and convert them to lowercase to work with this\n# data later in argo workflow\nEXTRA=$(jq -n env | jq 'walk(if type==\"object\" then with_entries(.key|=ascii_downcase) else . end)')\nJSON_PAYLOAD='{\n  \"project\": \"$(params.project)\",\n  \"environment\": \"$(params.environment)\",\n  \"application\": \"$(params.application)\",\n  \"sha\": \"$(params.sha)\",\n  \"extra\": ${EXTRA}\n}'\n\necho \"Payload: $JSON_PAYLOAD\"\n\nOUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location --request POST \"build-succeed-eventsource-svc.argo-events.svc.cluster.local\" \\\n  --header 'Content-Type: application/json' \\\n  --data-raw \"$JSON_PAYLOAD\")\n\nSTATUS_CODE=$(echo \"${OUTPUT}\" | sed -e 's/.*\\httpcode=//')\nif [ ${STATUS_CODE} -ne 204 ]; then\n    echo \"Curl operation/command failed due to server return code - ${STATUS_CODE}\"\n    exit 1\nfi\n\necho \"Sent 'build-succeed' webhook\"\n"` |  |
+| kaniko.postDeployTaskSteps[0].securityContext.privileged | bool | `true` |  |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
 | podTemplate.tolerations | list | `[{"effect":"NoSchedule","key":"ci","operator":"Equal","value":"true"}]` | tolerations |
@@ -216,3 +234,5 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | sentry.url | string | `"https://sentry.saritasa.rocks/"` |  |
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |
 
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

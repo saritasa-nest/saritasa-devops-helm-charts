@@ -11,6 +11,9 @@
                   "component"         $component
                   "environment"       $projectEnvironment }}
 
+# initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict
+{{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
+
 # ========================================================================
 # 🌱 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT TRIGGER BINDING
 # ========================================================================
@@ -22,7 +25,7 @@ metadata:
 spec:
   params:
   - name: application
-    value: {{ include "tekton-apps.resourceName" $data }}
+    value: {{ or $argocd.appName (include "tekton-apps.resourceName" $data) }}
   - name: project
     value: {{ $project.project }}
   - name: component
