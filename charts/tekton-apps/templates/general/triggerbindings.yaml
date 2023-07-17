@@ -28,7 +28,7 @@ metadata:
 spec:
   params:
   - name: application
-    value: {{ include "tekton-apps.resourceName" $data }}
+    value: {{ or $argocd.appName (include "tekton-apps.resourceName" $data) }}
   - name: project
     value: {{ $project.project }}
   - name: component
