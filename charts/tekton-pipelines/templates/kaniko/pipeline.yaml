@@ -115,9 +115,7 @@ spec:
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{ if .Values.kaniko.postDeployTaskSteps }}
-    {{ include "pipeline.postDeploy" "kaniko-post-deploy" | nindent 4 }}
-  {{ end }}
+  {{ include "pipeline.postDeploy" "kaniko-post-deploy" | nindent 4 }}
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 

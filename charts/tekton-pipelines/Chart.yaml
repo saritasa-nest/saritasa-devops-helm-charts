@@ -111,7 +111,7 @@ description: |
             script: |
               #!/bin/bash
               echo "hello world2"
-        postDeployTaskSteps:
+        extraPostDeployTaskSteps:
           - name: hello1
             image: node:16
             imagePullPolicy: IfNotPresent

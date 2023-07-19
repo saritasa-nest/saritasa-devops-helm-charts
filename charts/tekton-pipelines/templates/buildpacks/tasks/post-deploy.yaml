@@ -1,8 +1,8 @@
 {{- range $pipeline := $.Values.buildpacks.generate }}
-{{ $data := dict "steps"      $pipeline.postDeployTaskSteps
+{{ $data := dict "extraSteps" $pipeline.extraPostDeployTaskSteps
                  "namespace"  $.Release.Namespace
                  "namePrefix" $pipeline.name }}
-{{ if and (and $.Values.buildpacks.enabled $pipeline.enabled) $pipeline.postDeployTaskSteps }}
+{{ if and (and $.Values.buildpacks.enabled $pipeline.enabled) }}
 {{ include "task.postDeploy" $data }}
 {{ end }}
 {{- end}}

@@ -180,9 +180,7 @@ spec:
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{ if (.pipeline.postDeployTaskSteps) }}
-    {{ include "pipeline.postDeploy" (printf "%s-post-deploy" .pipeline.name) | nindent 4 }}
-  {{ end }}
+  {{ include "pipeline.postDeploy" (printf "%s-post-deploy" .pipeline.name) | nindent 4 }}
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 
