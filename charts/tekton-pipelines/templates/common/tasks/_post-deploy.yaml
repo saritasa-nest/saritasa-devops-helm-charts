@@ -18,6 +18,10 @@ spec:
 
     - name: project
       type: string
+      description: project's namespace
+
+    - name: namespace
+      type: string
       description: name of the project, which component is deployed
 
     - name: sha
@@ -50,6 +54,7 @@ spec:
         # would be triggered based on this 'extra' params.
         EXTRA=$(jq -n env | jq 'walk(if type=="object" then with_entries(.key|=ascii_downcase) else . end)')
         JSON_TEMPLATE='{
+          "namespace": "$(params.namespace)",
           "project": "$(params.project)",
           "environment": "$(params.environment)",
           "application": "$(params.application)",

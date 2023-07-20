@@ -296,6 +296,8 @@ finally:
       value: "$(params.application)"
     - name: project
       value: "$(params.project)"
+    - name: namespace
+      value: "$(params.namespace)"
     - name: sha
       value: "$(params.sha)"
     - name: environment

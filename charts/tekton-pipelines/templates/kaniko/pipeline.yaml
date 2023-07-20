@@ -17,6 +17,10 @@ spec:
       type: string
       description: name of the project, which component is deployed
 
+    - name: namespace
+      type: string
+      description: project's namespace
+
     - name: docker_file
       type: string
       default: Dockerfile
