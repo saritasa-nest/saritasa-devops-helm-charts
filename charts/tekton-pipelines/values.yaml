@@ -364,7 +364,7 @@ buildpacks:
 
 kaniko:
   # -- should we enable the kaniko pipeline
-  enabled: true
+  enabled: false
 
 wordpress:
   # -- should we enable the wordpress pipeline

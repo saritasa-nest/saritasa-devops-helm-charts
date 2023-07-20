@@ -212,7 +212,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.sentry_cli | string | `"getsentry/sentry-cli:2.19.1"` | sentry cli image - needs to prepare Sentry releases |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
-| kaniko.enabled | bool | `true` | should we enable the kaniko pipeline |
+| kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
 | podTemplate.tolerations | list | `[{"effect":"NoSchedule","key":"ci","operator":"Equal","value":"true"}]` | tolerations |

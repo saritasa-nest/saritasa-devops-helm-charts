@@ -180,7 +180,7 @@ spec:
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{ include "pipeline.postDeploy" (printf "%s-post-deploy" .pipeline.name) | nindent 4 }}
+  {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 

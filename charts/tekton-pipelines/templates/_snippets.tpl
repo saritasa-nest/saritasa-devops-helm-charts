@@ -290,7 +290,7 @@ finally:
 {{- define "pipeline.postDeploy" -}}
 - name: post-deploy
   taskRef:
-    name:  {{ . }}
+    name:  {{ .name }}
   params:
     - name: application
       value: "$(params.application)"
@@ -301,5 +301,5 @@ finally:
     - name: environment
       value: "$(params.environment)"
   runAfter:
-    - sentry-release
+    - {{ if .sentry_enabled }} sentry-release {{ else }} deploy {{ end }}
 {{- end }}
