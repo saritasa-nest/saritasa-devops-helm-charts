@@ -16,6 +16,10 @@ spec:
       type: string
       description: name of the project, which component is deployed
 
+    - name: namespace
+      type: string
+      description: project's namespace
+
     - name: repository_submodules
       type: string
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)

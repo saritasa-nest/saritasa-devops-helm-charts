@@ -30,6 +30,8 @@ spec:
     value: {{ $project.project }}
   - name: component
     value: {{ $component.name }}
+  - name: namespace
+    value: {{ $project.argocd.namespace }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_namespace" "default" $project.argocd.namespace ) | nindent 2 }}
   {{- if hasKey $component "triggerBinding" }}
