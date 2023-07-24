@@ -28,11 +28,13 @@ metadata:
 spec:
   params:
   - name: application
-    value: {{ include "tekton-apps.resourceName" $data }}
+    value: {{ or $argocd.appName (include "tekton-apps.resourceName" $data) }}
   - name: project
     value: {{ $project.project }}
   - name: component
     value: {{ $component.name }}
+  - name: namespace
+    value: {{ $project.argocd.namespace }}
   - name: repository_submodules
     value: "{{ $component.repository_submodules | default true }}"
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}

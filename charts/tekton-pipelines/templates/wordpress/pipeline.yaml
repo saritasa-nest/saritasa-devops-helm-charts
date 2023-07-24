@@ -27,6 +27,6 @@ spec:
         - name: kubernetes_namespace
           value: "$(params.kubernetes_namespace)"
 
-  {{ include "task.finalNotification" . | nindent 2 }}
+  {{ include "pipeline.finalNotification" . | nindent 2 }}
 
 {{ end }}

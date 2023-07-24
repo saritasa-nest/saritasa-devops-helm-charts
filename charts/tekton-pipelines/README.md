@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.37-dev.5](https://img.shields.io/badge/Version-0.1.37--dev.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.38-dev.1](https://img.shields.io/badge/Version-0.1.38--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -132,6 +132,14 @@ buildpacks:
           script: |
             #!/bin/bash
             echo "hello world2"
+      extraPostDeployTaskSteps:
+        - name: hello1
+          image: node:16
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            echo "hello world1"
 ```
 
 If you want to modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to `kaniko-pipeline`.

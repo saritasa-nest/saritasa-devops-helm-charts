@@ -15,6 +15,9 @@ spec:
     {{ include "trigger-template.defaultParams" . | nindent 4 }}
     {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
 
+    - name: namespace
+      description: project's namespace
+
     - name: repository_ssh_url
       description: git repository ssh url
 
@@ -65,6 +68,10 @@ spec:
         name: {{ .pipeline.name }}
       params:
         {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
+        - name: project
+          value: "$(tt.params.project)"
+        - name: namespace
+          value: "$(tt.params.namespace)"
         - name: buildpack_builder_image
           value: "$(tt.params.buildpack_builder_image)"
         - name: buildpack_runner_image
