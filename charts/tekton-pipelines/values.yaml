@@ -190,23 +190,33 @@ buildpacks:
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
+
             if [[ -f poetry.lock ]]; then
-              echo "poetry.lock is found, preparing requirements.txt"
+              echo "'poetry.lock' is found, preparing requirements.txt"
               TARGET="main"
-              if [[ "$(params.environment)" =~ "^dev" ]]; then
+              if [[ "$(params.environment)" == "dev" ]]; then
                 TARGET="${TARGET},dev"
               fi
+              echo "Export '${TARGET}' targets dependencies"
               poetry export --with ${TARGET} --output requirements.txt
-            elif [[ -f manage.py ]]; then
-              echo "manage.py found, preparing requirements.txt"
-              cp requirements/$(params.environment)*.txt requirements.txt || echo "Unable to find requirements for $(params.environment)"
+              exit 0
             fi
+
+            if ls requirements/$(params.environment)*.txt >/dev/null 2>&1; then
+              echo "'requirements' folder is found, preparing requirements.txt"
+              cp requirements/$(params.environment)*.txt requirements.txt
+              exit 0
+            fi
+
             if [[ -f requirements.txt ]]; then
-              echo "Found requirements.txt"
-            else
-              echo "requirements.txt is not found! Halting execution."
-              exit 1
+              echo "'requirements.txt' found"
+              exit 0
             fi
+
+            # otherwise raise error, because no requirements were found
+            echo "requirements.txt is not found! Halting execution."
+            exit 1
+
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
 # │ This generated buildpack pipeline is used by our dotnet team and has a custom step that is used to obtain semantic   │
