@@ -13,6 +13,14 @@ spec:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
     {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
 
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: namespace
+      type: string
+      description: project's namespace
+
     - name: docker_file
       type: string
       default: Dockerfile
@@ -108,9 +116,11 @@ spec:
         - kustomize
 
   {{ if .Values.sentry.enabled }}
-    {{ include "task.sentryRelease" . | nindent 4 }}
+    {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{ include "task.finalNotification" . | nindent 2 }}
+  {{ include "pipeline.postDeploy" (dict "name" "kaniko-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
+
+  {{ include "pipeline.finalNotification" . | nindent 2 }}
 
 {{ end }}

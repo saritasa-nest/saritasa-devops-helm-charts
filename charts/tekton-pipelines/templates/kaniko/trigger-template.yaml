@@ -9,6 +9,9 @@ spec:
     {{ include "trigger-template.defaultParams" . | nindent 4 }}
     {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
 
+    - name: namespace
+      description: project's namespace
+
     - name: repository_ssh_url
       description: git repository ssh url
 
@@ -53,6 +56,10 @@ spec:
         name: kaniko-build-pipeline
       params:
         {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
+        - name: project
+          value: "$(tt.params.project)"
+        - name: namespace
+          value: "$(tt.params.namespace)"
         - name: docker_file
           value: "$(tt.params.docker_file)"
         - name: docker_context

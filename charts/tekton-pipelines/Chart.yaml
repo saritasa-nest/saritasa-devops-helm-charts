@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.36
+version: 0.1.37-dev-ksenia.2
 
 
 maintainers:
@@ -111,6 +111,14 @@ description: |
             script: |
               #!/bin/bash
               echo "hello world2"
+        extraPostDeployTaskSteps:
+          - name: hello1
+            image: node:16
+            imagePullPolicy: IfNotPresent
+            workingDir: $(resources.inputs.app.path)
+            script: |
+              #!/bin/bash
+              echo "hello world1"
   ```
 
   If you want to modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to `kaniko-pipeline`.

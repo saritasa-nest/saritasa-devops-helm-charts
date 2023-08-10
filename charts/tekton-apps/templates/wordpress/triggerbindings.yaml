@@ -11,6 +11,9 @@
                   "component"         $component
                   "environment"       $projectEnvironment }}
 
+# initialize `argocd` variable with either `$component.argocd` dict if it exists or with empty dict
+{{ $argocd := ternary $component.argocd dict (hasKey $component "argocd") -}}
+
 # ========================================================================
 # 🌱 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT TRIGGER BINDING
 # ========================================================================
@@ -22,11 +25,13 @@ metadata:
 spec:
   params:
   - name: application
-    value: {{ include "tekton-apps.resourceName" $data }}
+    value: {{ or $argocd.appName (include "tekton-apps.resourceName" $data) }}
   - name: project
     value: {{ $project.project }}
   - name: component
     value: {{ $component.name }}
+  - name: namespace
+    value: {{ $project.argocd.namespace }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_namespace" "default" $project.argocd.namespace ) | nindent 2 }}
   {{- if hasKey $component "triggerBinding" }}
