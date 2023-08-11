@@ -73,7 +73,7 @@ spec:
         STATUS_CODE=$(echo "${OUTPUT}" | sed -e 's/.*\httpcode=//')
         if [ ${STATUS_CODE} -ne 204 ] && [ ${STATUS_CODE} -ne 200 ]; then
             echo "Curl operation/command failed due to server return code - ${STATUS_CODE}"
-            exit 1
+            exit 0
         fi
 
         echo "Sent 'build-succeed' webhook"
