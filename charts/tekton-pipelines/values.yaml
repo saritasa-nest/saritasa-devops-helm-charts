@@ -183,17 +183,39 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: copy-requirements
-          image: docker.io/library/bash:5.1.8
+          image: docker.io/fnndsc/python-poetry:1.5.1
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/usr/bin/env bash
-            set -e
-            [ -f manage.py ] && (cp requirements/$(params.environment)*.txt requirements.txt \
-              || echo "Unable to find requirements for $(params.environment)")
-            [ -f requirements.txt ] && echo "Found requirements.txt" \
-              || (echo "requirements.txt is not found! Halting execution."; exit 1;)
+            set -eo pipefail
+
+            if [[ -f poetry.lock ]]; then
+              echo "'poetry.lock' is found, preparing requirements.txt"
+              TARGET="main"
+              if [[ "$(params.environment)" == "dev" ]]; then
+                TARGET="${TARGET},dev"
+              fi
+              echo "Export '${TARGET}' targets dependencies"
+              poetry export --with ${TARGET} --output requirements.txt
+              exit 0
+            fi
+
+            if ls requirements/$(params.environment)*.txt >/dev/null 2>&1; then
+              echo "'requirements' folder is found, preparing requirements.txt"
+              cp requirements/$(params.environment)*.txt requirements.txt
+              exit 0
+            fi
+
+            if [[ -f requirements.txt ]]; then
+              echo "'requirements.txt' found"
+              exit 0
+            fi
+
+            # otherwise raise error, because no requirements were found
+            echo "requirements.txt is not found! Halting execution."
+            exit 1
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
