@@ -198,7 +198,7 @@ buildpacks:
                 TARGET="${TARGET},dev"
               fi
               echo "Export '${TARGET}' targets dependencies"
-              poetry export --with ${TARGET} --output requirements.txt
+              poetry export --without-hashes --with ${TARGET} --output requirements.txt
               exit 0
             fi
 
