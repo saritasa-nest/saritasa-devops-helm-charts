@@ -94,6 +94,7 @@ spec:
       envFrom:
         - secretRef:
             name: $(params.build_secret)
+            optional: true
       command:
         - /kaniko/executor
       args:
