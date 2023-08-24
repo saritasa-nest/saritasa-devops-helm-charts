@@ -26,6 +26,11 @@ spec:
       type: string
       description: name of the argocd application we're going to deploy/sync
 
+    - name: build_secret
+      type: string
+      description: name of kubernetes secret for docker build
+      default: ''
+
     - name: docker_registry
       type: string
       description: aws private ecr registry address
@@ -76,6 +81,19 @@ spec:
       env:
         - name: "DOCKER_CONFIG"
           value: "/tekton/home/.docker/"
+        # - name: SECRET_USER
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: saritasa-ci-experiments-kaniko-test
+        #       key: secret_user
+        # - name: SECRET_TOKEN
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: saritasa-ci-experiments-kaniko-test
+        #       key: secret_token
+      envFrom:
+        - secretRef:
+            name: $(params.build_secret)
       command:
         - /kaniko/executor
       args:

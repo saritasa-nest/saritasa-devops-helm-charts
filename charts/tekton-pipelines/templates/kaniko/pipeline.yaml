@@ -44,6 +44,11 @@ spec:
       type: string
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
+    
+    - name: build_secret
+      type: string
+      description: name of kubernetes secret for 'kaniko build' (similar to 'docker build')
+      default: ''
 
   workspaces:
     - name: source
@@ -81,6 +86,8 @@ spec:
         - name: extra_args
           value:
             - $(params.kaniko_extra_args)
+        - name: build_secret
+          value: "$(params.build_secret)"
       workspaces:
         - name: source
           workspace: source

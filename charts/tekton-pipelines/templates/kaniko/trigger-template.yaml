@@ -37,6 +37,10 @@ spec:
     - name: sentry_project_name
       description: name of the project in Sentry
 
+    - name: build_secret
+      default: ''
+      description: name of kubernetes secret for 'kaniko build' (similar to 'docker build')
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -70,6 +74,8 @@ spec:
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
+        - name: build_secret
+          value: "$(tt.params.build_secret)"
 
       resources:
         {{- include "pipeline.defaultResources" . | nindent 8 }}
