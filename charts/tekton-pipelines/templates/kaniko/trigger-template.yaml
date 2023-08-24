@@ -38,7 +38,7 @@ spec:
       description: name of the project in Sentry
 
     - name: build_secret
-      default: ''
+      default: 'build-secret'
       description: name of kubernetes secret for 'kaniko build' (similar to 'docker build')
 
   resourcetemplates:
