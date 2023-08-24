@@ -29,7 +29,7 @@ spec:
     - name: build_secret
       type: string
       description: name of kubernetes secret for docker build
-      default: ''
+      default: 'build-secret'
 
     - name: docker_registry
       type: string
