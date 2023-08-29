@@ -115,10 +115,13 @@ spec:
               namespace: prod
               notifications:
                 annotations:
+                  # In rocks/cloud cluster use slack-token integration:
                   notifications.argoproj.io/subscribe.on-health-degraded.slack: project-vp; project-vp-alarms
                   notifications.argoproj.io/subscribe.on-sync-failed.slack: project-vp-ci; project-vp-alarms
                   notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-vp; project-vp-alarms
                   notifications.argoproj.io/subscribe.on-deployed.slack: project-vp-ci
+                  # In staging/prod client cluster use webhook integration:
+                  notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
             mailList: vp@site.com
             devopsMailList: devops+vp@site.com
             jiraURL: https://site.atlassian.net/browse/vp
@@ -186,7 +189,12 @@ spec:
 
   Above helm chart creates a new ArgoCD project for each project in values, for each component in project's components there is created a separate ArgoCD
   application and required for Tekton ci/cd resources (triggerbindings, roles, configmaps, jobs, serviceaccounts, pvcs and etc).
+
   For each Argocd project, notifications to multiple slack channels with different types of triggers are added. The example above define for each subscription, the slack channels (project-xx, project-xx-ci project-xx-alarms) that should be added by default. This can be modified to add/remove a channel in case of a custom config needed.
+
+  There are two ways of activating notifications, using slack-token integration and using project-webhooks integration.
+  The slack-token allows sending to any slack channel where the app is installed, that's why we should only use it in rocks/cloud cluster and not in clients clusters.
+  The project-webhook integrations can only send to the channel where it's created in Slack app 'client deployments' (https://api.slack.com/apps/A01LM626QTZ/incoming-webhooks?) and it should be used in staging/prod client clusters.
 
   # fill below parameters for each `project` block
 
@@ -361,10 +369,13 @@ spec:
                 namespace: prod
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -467,10 +478,13 @@ spec:
                 namespace: xxx
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
                   - git@github.com:saritasa-nest/xxx-backend.git
                   - git@github.com:saritasa-nest/xxx-frontend.git
@@ -572,10 +586,13 @@ spec:
                 namespace: xxx-dev
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -655,10 +672,13 @@ spec:
                   - argo-cd
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -736,10 +756,13 @@ spec:
                   - argo-cd
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -817,10 +840,13 @@ spec:
                 namespace: xxx-dev
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -898,10 +924,13 @@ spec:
                 namespace: xxx-dev
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -980,10 +1009,13 @@ spec:
                 namespace: xxx
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
                   - https://charts.bitnami.com/bitnami
               mailList: xxx@saritasa.com
@@ -1060,10 +1092,13 @@ spec:
                 namespace: xxx
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
                   - https://charts.bitnami.com/bitnami
               mailList: xxx@saritasa.com
@@ -1137,10 +1172,13 @@ spec:
                 namespace: xxx
                 notifications:
                   annotations:
+                    # In rocks/cloud cluster use slack-token integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
                     notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
                   - https://charts.bitnami.com/bitnami
                   - git@github.com:saritasa-nest/xxx-kubernetes-aws.git
