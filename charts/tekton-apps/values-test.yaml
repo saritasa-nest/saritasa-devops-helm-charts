@@ -31,10 +31,13 @@ apps:
       namespace: staging
       notifications:
         annotations:
+          # In rocks/cloud cluster use slack-token integration:
           notifications.argoproj.io/subscribe.on-health-degraded.slack: project-nmbl; project-nmbl-alarms
           notifications.argoproj.io/subscribe.on-sync-failed.slack: project-nmbl-ci; project-nmbl-alarms
           notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-nmbl; project-nmbl-alarms
           notifications.argoproj.io/subscribe.on-deployed.slack: project-nmbl-ci
+          # In staging/prod client cluster use webhook integration:
+          notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
       syncWave: 200
     mailList: nmbl@saritasa.com
     devopsMailList: devops+nmbl@saritasa.com
