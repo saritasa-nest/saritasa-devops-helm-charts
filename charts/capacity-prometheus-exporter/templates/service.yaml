@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "capacity-prometheus-exporter.fullname" . }}
+  labels:
+    {{- include "capacity-prometheus-exporter.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "capacity-prometheus-exporter.selectorLabels" . | nindent 4 }}
