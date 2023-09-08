@@ -51,9 +51,13 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
 
           args:
+            # address and port to listen on:
             - -listen=0.0.0.0:9162
+            # use usernames instead of internal IDs for author labels
             - -realnames
+            # max number of issues to fetch per repository (0 disables issues fetching)
             - -issue-depth=0
+            # max number of milestones to fetch per repository (0 disables milestones fetching)
             - -milestone-depth=0
             {{- toYaml .Values.args | nindent 12 }}
 

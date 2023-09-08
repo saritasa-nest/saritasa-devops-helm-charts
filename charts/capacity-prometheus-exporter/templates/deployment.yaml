@@ -50,8 +50,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: ENVIRONMENT
-              value: {{ .Values.appEnvironment }}
+            {{- toYaml .Values.env | nindent 12 }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

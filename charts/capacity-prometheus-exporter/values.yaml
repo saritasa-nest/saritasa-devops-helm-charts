@@ -34,9 +34,9 @@ podSecurityContext: {}
 
 # -- security options for the running pod
 securityContext:
-  # capabilities:
-  #   drop:
-  #   - ALL
+  capabilities:
+    drop:
+    - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
@@ -67,4 +67,6 @@ tolerations: []
 
 affinity: {}
 
-appEnvironment: prod
+env:
+  - name: ENVIRONMENT
+    value: prod
