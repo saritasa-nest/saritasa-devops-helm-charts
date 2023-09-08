@@ -1,7 +1,7 @@
 
 # capacity-prometheus-exporter
 
-![Version: 0.0.1-dev-4](https://img.shields.io/badge/Version-0.0.1--dev--4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.1-dev-5](https://img.shields.io/badge/Version-0.0.1--dev--5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A Kubernetes's helm chart for a exporter that get information about Kubernetes nodes and serve the results in order to be scrapped by Prometheus
 
@@ -16,11 +16,12 @@ A Kubernetes's helm chart for a exporter that get information about Kubernetes n
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| appEnvironment | string | `"prod"` |  |
+| env[0].name | string | `"ENVIRONMENT"` |  |
+| env[0].value | string | `"prod"` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | pull policy |
 | image.repository | string | `"saritasallc/capacity-prometheus-exporter"` | default docker registry |
-| image.tag | string | `"0.3.2-dev"` | Overrides the image tag whose default is the chart appVersion. |
+| image.tag | string | `"0.3.3-dev"` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | docker pull secret |
 | nameOverride | string | `""` |  |
 | nodeSelector."kubernetes.io/arch" | string | `"amd64"` |  |
@@ -28,7 +29,7 @@ A Kubernetes's helm chart for a exporter that get information about Kubernetes n
 | podSecurityContext | object | `{}` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
-| securityContext | object | `{"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | security options for the running pod |
+| securityContext | object | `{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | security options for the running pod |
 | service | object | `{"port":8080,"type":"ClusterIP"}` | type of the service to create |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |

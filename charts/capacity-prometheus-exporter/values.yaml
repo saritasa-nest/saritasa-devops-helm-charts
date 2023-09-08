@@ -8,7 +8,7 @@ image:
   # -- pull policy
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "0.3.2-dev"
+  tag: "0.3.3-dev"
 
 # Amount of pods in deployment
 replicaCount: 1
@@ -34,9 +34,9 @@ podSecurityContext: {}
 
 # -- security options for the running pod
 securityContext:
-  # capabilities:
-  #   drop:
-  #   - ALL
+  capabilities:
+    drop:
+    - ALL
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
@@ -67,4 +67,6 @@ tolerations: []
 
 affinity: {}
 
-appEnvironment: prod
+env:
+  - name: ENVIRONMENT
+    value: prod
