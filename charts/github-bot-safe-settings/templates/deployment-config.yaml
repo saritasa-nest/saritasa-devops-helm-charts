@@ -1,0 +1,8 @@
+{{- $fullName := include "safe-settings.fullname" . -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "safe-settings.fullname" . }}-deployment-config
+data:
+  {{ .Values.appEnv.DEPLOYMENT_CONFIG_FILE | default "deployment-settings.yml" }}: |
+    {{- required "A valid appEnv.APP_ID is required!" .Values.deploymentConfig | toYaml | nindent 4 }}

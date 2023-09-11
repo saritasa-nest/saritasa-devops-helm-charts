@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "safe-settings.fullname" . }}
+  labels:
+    {{- include "safe-settings.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "safe-settings.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "safe-settings.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "safe-settings.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config-volume
+          configMap:
+            name: {{ include "safe-settings.fullname" . }}-deployment-config
+        {{- if and .Values.appEnv.NODE_EXTRA_CA_CERTS .Values.nodeExtraCaCerts }}
+        - name: cacert-volume
+          configMap:
+            name: {{ include "safe-settings.fullname" . }}-trusted-cacerts
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+          - secretRef:
+              name: {{ include "safe-settings.fullname" . }}-app-env
+          volumeMounts:
+          - name: config-volume
+            mountPath: {{ "/opt/safe-settings/" }}{{ .Values.appEnv.DEPLOYMENT_CONFIG_FILE | default "deployment-settings.yml" }}
+            subPath: {{ .Values.appEnv.DEPLOYMENT_CONFIG_FILE | default "deployment-settings.yml" }}
+          {{- if and .Values.appEnv.NODE_EXTRA_CA_CERTS .Values.nodeExtraCaCerts }}
+          - name: cacert-volume
+            mountPath: "/opt/safe-settings/{{ .Values.appEnv.NODE_EXTRA_CA_CERTS }}"
+            subPath: {{ .Values.appEnv.NODE_EXTRA_CA_CERTS }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
