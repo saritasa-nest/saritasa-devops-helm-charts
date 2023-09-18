@@ -54,14 +54,3 @@ app.kubernetes.io/name: {{ include "prometheus-xrstf-github-exporter.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 maintenance: 'true'
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "prometheus-xrstf-github-exporter.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "prometheus-xrstf-github-exporter.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
