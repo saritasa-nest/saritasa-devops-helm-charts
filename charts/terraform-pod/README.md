@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.15](https://img.shields.io/badge/Version-0.0.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.6](https://img.shields.io/badge/AppVersion-1.5.6-informational?style=flat-square)
+![Version: 0.0.16](https://img.shields.io/badge/Version-0.0.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.7](https://img.shields.io/badge/AppVersion-1.5.7-informational?style=flat-square)
 
 ## Maintainers
 
@@ -163,7 +163,7 @@ unset creds
 | github.username | string | `""` | github username (who runs this terraform code) |
 | image.pullPolicy | string | `"Always"` | pull policy |
 | image.repository | string | `"public.ecr.aws/saritasa/terraform"` | default docker registry |
-| image.tag | string | `"1.5.6"` | Overrides the image tag whose default is the chart appVersion. |
+| image.tag | string | `"1.5.7"` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | docker pull secret |
 | infracost.apiKey | string | `""` | infracost api token value (optional, if passed - takes precedence over apiKeySecret) |
 | infracost.apiKeySecret | string | `"infracost-api-key"` | infracost api key secret (should contain a single attr: token=) |
