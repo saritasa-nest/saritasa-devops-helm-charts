@@ -1,0 +1,25 @@
+apiVersion: v2
+name: prometheus-xrstf-github-exporter
+
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1-dev-3
+
+maintainers:
+  - url: https://www.saritasa.com/
+    name: Saritasa
+    email: nospam@saritasa.com
+
+description: |
+  A Helm chart for Kubernetes to a github stats exporter for Prometheus.
+
+  You will need to create the secret containing Github token first:
+  The token must have permissions to:
+  "Read access to code, issues, metadata, and pull requests, actions"
+  in all the repositories to be scrapped
+  ```sh
+  kubectl -n prometheus create secret generic github-token \
+    --from-literal=token=YOUR_TOKEN
