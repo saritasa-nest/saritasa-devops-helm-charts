@@ -71,7 +71,7 @@ resources: {}
 autoscaling:
   enabled: false
   minReplicas: 1
-  maxReplicas: 100
+  maxReplicas: 5
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
@@ -89,12 +89,14 @@ appEnv:
   NODE_EXTRA_CA_CERTS: ""
 
 deploymentConfig:
+  # Set restrictions on repositories
   restrictedRepos:
     # You can exclude certain repos from safe-settings processing
-    #  If no file is specified, then the following repositories - 'admin', '.github', 'safe-settings' are exempted by default
+    # If no file is specified, then the following repositories - 'admin', '.github', 'safe-settings', '.*-test' are exempted by default
     exclude: ['^admin$', '^\.github$', '^safe-settings$', '.*-test']
     # Alternatively you can only include certain repos
     include: ['^test$']
+  # No collaborator should be given admin permission
   configvalidators:
     - plugin: collaborators
       error: |
@@ -102,7 +104,9 @@ deploymentConfig:
       script: |
         console.log(`baseConfig ${JSON.stringify(baseconfig)}`)
         return baseconfig.permission != 'admin'
+  # Validators check whether certain configuration options can be overridden
   overridevalidators:
+    # Validation of branch security settings to prevent the value of the number of required approvals from being reduced when overriding branch security settings.
     - plugin: branches
       error: |
         `Branch protection required_approving_review_count cannot be overidden to a lower value`
@@ -113,6 +117,7 @@ deploymentConfig:
           return overrideconfig.protection.required_pull_request_reviews.required_approving_review_count >= baseconfig.protection.required_pull_request_reviews.required_approving_review_count
         }
         return true
+    # Checking label settings. Does not perform any specific checks on label settings and always returns true
     - plugin: labels
       error: |
         Some error
