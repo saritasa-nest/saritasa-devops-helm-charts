@@ -61,6 +61,12 @@ databases:
     secret: saritasa-rocks-postgres
     # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
     terraformEnvVarName: TF_VAR_rds_postgress_password
+  # -- rocks mssql
+  mssql:
+    # -- secret with "password" value
+    secret: saritasa-rocks-mssql
+    # -- name of the TF_VAR env variable to be used by the terraform as the password for the database
+    terraformEnvVarName: TF_VAR_rds_mssql_password
 
 # -- where to obtain argo-cd credentials to be used
 argocd:
