@@ -102,13 +102,26 @@ spec:
         argo_app_url=$(echo $argo_app_url | sed 's/\/\//\//g')
         argo_app_url="https://$argo_app_url"
 
+        # Preparing jira links
+        # We are using grep as ash doesn't support regex test
+        jira_task=$(echo "$(params.head_commit_message)" | grep -oE '[A-Z0-9]+-[0-9]+')
+        if [[ -n $jira_task ]];
+        then
+          echo "Found $jira_task jira task, preparing link"
+          head_commit_message=$(echo $(params.head_commit_message) | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
+        else
+          echo "Not jira task found";
+          head_commit_message=$(params.head_commit_message)
+        fi
+
+
         slack-notifier \
         -user_name "Tekton" \
         -icon_emoji ":white_check_mark:" \
         -color "$color" \
         -author_name "[$(params.application)] by $(params.pusher_name)" \
         -author_link "$(params.pusher_url)" \
-        -title "$(params.head_commit_message)" \
+        -title "$head_commit_message" \
         -text "$text_status" \
         -thumb_url "$thumb_url" \
         -field1_title "Open Application" \
