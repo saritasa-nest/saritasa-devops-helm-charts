@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.39](https://img.shields.io/badge/Version-0.1.39-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.40-dev.0](https://img.shields.io/badge/Version-0.1.40--dev.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -140,6 +140,45 @@ buildpacks:
           script: |
             #!/bin/bash
             echo "hello world1"
+```
+
+If you want to modify `build` step from `buildTaskSteps` added by default, you just need to add a new `build` task to `buildTaskSteps`
+and helm chart will understand that there is added custom `build` logic:
+
+ ```yaml
+buildpacks:
+  enabled: true
+  generate:
+    buildpackFrontendBuildPipelineNew:
+      name: buildpack-frontend-build-pipeline-new
+      enabled: false
+      buildTaskName: buildpack-frontend-new
+      buildTaskSteps:
+        - name: build
+          image: node:16
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+
+            az login --identity --username <managed-indentity>
+            az acr login --name <container-registry>
+
+            /cnb/lifecycle/creator \
+              -app=$(params.source_subpath) \
+              -project-metadata=project.toml \
+              -cache-dir=/cache \
+              -layers=/layers \
+              -platform=$(workspaces.source.path)/$(params.platform_dir) \
+              -report=/layers/report.toml \
+              -cache-image=$(params.cache_image) \
+              -uid=$(params.user_id) \
+              -gid=$(params.group_id) \
+              -process-type=$(params.process_type) \
+              -skip-restore=$(params.skip_restore) \
+              -previous-image=$(resources.outputs.image.url) \
+              -run-image=$(params.run_image) \
+              $(resources.outputs.image.url)
 ```
 
 If you want to modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to `kaniko-pipeline`.

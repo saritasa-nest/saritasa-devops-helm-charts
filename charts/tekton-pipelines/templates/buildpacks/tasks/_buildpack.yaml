@@ -141,6 +141,8 @@ spec:
     {{- .pipeline.buildTaskSteps | toYaml | nindent 4}}
     {{ end }}
 
+    {{- $custom_build_exists:= include "value-exists" (dict "items" .pipeline.buildTaskSteps "name" "build" ) }}
+    {{- if eq $custom_build_exists "false" }}
     # if you need to debug this step you can do:
     # insert `sleep 3000` after the aws ecr get-login-password command and then get inside the container
     # k exec -ti `k --no-headers=true get pods -l tekton.dev/task=buildpack | awk '{print $1}'` -c step-create bash
@@ -178,7 +180,7 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
-
+    {{ end }}
   volumes:
     - name: empty-dir
       emptyDir: {}

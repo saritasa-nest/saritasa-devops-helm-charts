@@ -305,3 +305,16 @@ finally:
   runAfter:
     - {{ if .sentry_enabled }} sentry-release {{ else }} deploy {{ end }}
 {{- end }}
+
+{{/*
+Check if list of maps (dict name, value) contains a specific named key and return true or false
+the way you use it:
+{{- include "value-exists" (dict "items" .pipeline.buildTaskSteps "name" "build" ) }}
+*/}}
+{{- define "value-exists" -}}
+{{- $search := dict "found" false }}
+{{- range $item := .items }}
+{{- if eq (lower $.name) (lower $item.name) }}{{- $_ := set $search "found" true }}{{- end }}
+{{- end }}
+{{- $search.found -}}
+{{- end -}}
