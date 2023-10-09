@@ -108,7 +108,7 @@ spec:
         if [[ -n $jira_task ]];
         then
           echo "Found $jira_task jira task, preparing link"
-          head_commit_message=$(echo $(params.head_commit_message) | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
+          head_commit_message=$(echo "$(params.head_commit_message)" | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
         else
           echo "Not jira task found";
           head_commit_message=$(params.head_commit_message)
