@@ -104,14 +104,14 @@ spec:
 
         # Preparing jira links
         # We are using grep as ash doesn't support regex test
-        jira_task=$(echo "$(params.head_commit_message)" | grep -oE '[A-Z0-9]+-[0-9]+')
+        jira_task=$(echo "$(params.head_commit_message)" | grep -oE '[A-Z0-9]+-[0-9]+' | head -n 1)
         if [[ -n $jira_task ]];
         then
           echo "Found $jira_task jira task, preparing link"
           head_commit_message=$(echo "$(params.head_commit_message)" | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
         else
           echo "Not jira task found";
-          head_commit_message=$(params.head_commit_message)
+          head_commit_message="$(params.head_commit_message)"
         fi
 
 
