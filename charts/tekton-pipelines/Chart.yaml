@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.40
+version: 0.1.41
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -118,6 +118,60 @@ description: |
             script: |
               #!/bin/bash
               echo "hello world1"
+  ```
+
+  If you want to modify `build` step from buildpack's `build` Task added by default, you just need to add a new `overrideBuildStep` key with new step
+  content in values.yaml for required pipeline and helm chart will provision a custom `build` step:
+
+   ```yaml
+  buildpacks:
+    enabled: true
+    generate:
+      buildpackFrontendBuildPipelineNew:
+        name: buildpack-frontend-build-pipeline-new
+        enabled: false
+        buildTaskName: buildpack-frontend-new
+
+        overrideBuildStep:
+          name: build
+          image: node:16
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            az login --identity --username <managed-indentity>
+            az acr login --name <container-registry>
+            /cnb/lifecycle/creator \
+              -app=$(params.source_subpath) \
+              -project-metadata=project.toml \
+              -cache-dir=/cache \
+              -layers=/layers \
+              -platform=$(workspaces.source.path)/$(params.platform_dir) \
+              -report=/layers/report.toml \
+              -cache-image=$(params.cache_image) \
+              -uid=$(params.user_id) \
+              -gid=$(params.group_id) \
+              -process-type=$(params.process_type) \
+              -skip-restore=$(params.skip_restore) \
+              -previous-image=$(resources.outputs.image.url) \
+              -run-image=$(params.run_image) \
+              $(resources.outputs.image.url)
+
+        buildTaskSteps:
+          - name: hello1
+            image: node:16
+            imagePullPolicy: IfNotPresent
+            workingDir: $(resources.inputs.app.path)
+            script: |
+              #!/bin/bash
+              echo "hello world1"
+          - name: hello2
+            image: node:16
+            imagePullPolicy: IfNotPresent
+            workingDir: $(resources.inputs.app.path)
+            script: |
+              #!/bin/bash
+              echo "hello world2"
   ```
 
   If you want to modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to `kaniko-pipeline`.

@@ -58,6 +58,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-frontend
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
       # -- steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
@@ -128,6 +131,9 @@ buildpacks:
         - fix PHP detection if repo contains buth node.js and php code
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-php
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
       # -- steps to run in the `buildpack-php` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
@@ -179,6 +185,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-django
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
       # -- steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
@@ -231,6 +240,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-dotnet
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
       # -- steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
@@ -344,6 +356,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-nodejs
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
@@ -357,6 +372,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-go
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: RUBY                                                                                                      │
@@ -370,6 +388,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-ruby
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: JAVA                                                                                                      │
@@ -383,6 +404,9 @@ buildpacks:
       enabled: false
       # -- the generated name of the tekton task implementing the "build" step
       buildTaskName: buildpack-java
+      # -- buildpack `build` step can be overridden to be able to perform custom
+      # docker auth or add other required functionality
+      overrideBuildStep: {}
 
 kaniko:
   # -- should we enable the kaniko pipeline
