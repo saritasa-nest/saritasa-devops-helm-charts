@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.14-dev.1](https://img.shields.io/badge/Version-0.2.14--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 0.2.14-dev.2](https://img.shields.io/badge/Version-0.2.14--dev.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -226,6 +226,7 @@ spec:
   - apps[PROJECT].components[NAME].repository - the name of the repository containing the code (may be absent in case of wordpress application without deployment, i.e. bolrdswp, taco,
     saritasa-wordpress-demo)
   - apps[PROJECT].components[NAME].pipeline - the name of the pipeline building the code from the repository above
+  - apps[PROJECT].components[NAME].namespace - the name of the namespace for component. Optional parameter
   - apps[PROJECT].components[NAME].argocd.source.syncWave - custom component ArgoCD application sync wave (default: "210")
   - apps[PROJECT].components[NAME].argocd.source.path - path to directory responsible for kubernetes resources creation of the ArgoCD Application (default: kubernetes repo path for basic
     projects "apps/<apps[PROJECT].components[NAME].name>/manifests/<environment>" or "null" for wordpress projects)

@@ -205,6 +205,7 @@ description: |
     - apps[PROJECT].components[NAME].repository - the name of the repository containing the code (may be absent in case of wordpress application without deployment, i.e. bolrdswp, taco,
       saritasa-wordpress-demo)
     - apps[PROJECT].components[NAME].pipeline - the name of the pipeline building the code from the repository above
+    - apps[PROJECT].components[NAME].namespace - the name of the namespace for component. Optional parameter
     - apps[PROJECT].components[NAME].argocd.source.syncWave - custom component ArgoCD application sync wave (default: "210")
     - apps[PROJECT].components[NAME].argocd.source.path - path to directory responsible for kubernetes resources creation of the ArgoCD Application (default: kubernetes repo path for basic
       projects "apps/<apps[PROJECT].components[NAME].name>/manifests/<environment>" or "null" for wordpress projects)
