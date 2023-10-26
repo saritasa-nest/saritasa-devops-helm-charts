@@ -154,10 +154,8 @@ apps: []
   #         podSecurityContext:
   #           enabled: false
   #           fsGroup: 101
-  #         ci:
-  #           enabled: false
-  #           repository_ssh_url: --branch environment git@github.com:saritasa-nest/xxx-wordpress.git
-  #           branch: environment
+  #         repositorySshUrl: git@github.com:saritasa-nest/xxx-wordpress.git
+  #         repositoryRevision: environment
   #         externalDatabase:
   #           host: xxx.rds.amazonaws.com
   #           user: xxx-environment-userwp
