@@ -23,7 +23,7 @@ metadata:
     jiraURL: {{ $project.jiraURL }}
 spec:
   destination:
-    namespace: {{ $project.argocd.namespace }}
+    namespace: {{ or ($component.argocd).namespace ($project.argocd).namespace | required ".component.namespace is required in project settings" }}
     server: https://kubernetes.default.svc
   project: {{ $project.project }}
   source:
