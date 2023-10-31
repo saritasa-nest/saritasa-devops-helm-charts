@@ -171,51 +171,51 @@ spec:
                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/paketo/runner:full
                   - name: source_subpath
                     value: dist/web
-      - name: vp-wordpress
-        repository: vp-wordpress
-        pipeline: wordpress-build-pipeline
-        applicationURL: https://wp.site.com
-        argocd:
-          namespace: wordpress
-          source:
-            targetRevision: 16.1.14
-        wordpress:
-          image:
-            tag: 6.2.2
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 1000m
-              memory: 1G
-          nodeSelector:
-            apps: 'true'
-          podSecurityContext:
-            enabled: true
-            fsGroup: 1000
-            seccompProfile:
-              type: "RuntimeDefault"
-          containerSecurityContext:
-            enabled: true
-            runAsUser: 1000
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-          repositorySshUrl: git@github.com:saritasa-nest/vp-wordpress.git
-          repositoryRevision: main
-          extraEnvVars:
-            - name: PHP_MAX_EXECUTION_TIME
-              value: "300"
-            - name: PHP_MAX_INPUT_VARS
-              value: "3000"
-            - name: PHP_UPLOAD_MAX_FILESIZE
-              value: "800M"
-            - name: PHP_POST_MAX_SIZE
-              value: "800M"
-          ingress:
-            hostname: wp.site.com
+              - name: vp-wordpress
+                repository: vp-wordpress
+                pipeline: wordpress-build-pipeline
+                applicationURL: https://wp.site.com
+                argocd:
+                  namespace: wordpress
+                  source:
+                    targetRevision: 16.1.14
+                wordpress:
+                  image:
+                    tag: 6.2.2
+                  resources:
+                    requests:
+                      cpu: 100m
+                      memory: 128Mi
+                    limits:
+                      cpu: 1000m
+                      memory: 1G
+                  nodeSelector:
+                    apps: 'true'
+                  podSecurityContext:
+                    enabled: true
+                    fsGroup: 1000
+                    seccompProfile:
+                      type: "RuntimeDefault"
+                  containerSecurityContext:
+                    enabled: true
+                    runAsUser: 1000
+                    runAsNonRoot: true
+                    allowPrivilegeEscalation: false
+                    capabilities:
+                      drop: ["ALL"]
+                  repositorySshUrl: git@github.com:saritasa-nest/vp-wordpress.git
+                  repositoryRevision: main
+                  extraEnvVars:
+                    - name: PHP_MAX_EXECUTION_TIME
+                      value: "300"
+                    - name: PHP_MAX_INPUT_VARS
+                      value: "3000"
+                    - name: PHP_UPLOAD_MAX_FILESIZE
+                      value: "800M"
+                    - name: PHP_POST_MAX_SIZE
+                      value: "800M"
+                  ingress:
+                    hostname: wp.site.com
 
           externalDatabase:
             host: vp-prod-mysql.c9vogyeycoc9.us-east-1.rds.amazonaws.com
