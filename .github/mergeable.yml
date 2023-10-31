@@ -29,8 +29,8 @@ mergeable:
     validate:
       - do: approvals
         min:
-          count: 2
-          message: 'At minimum 2 people are required to review this PR before merging'
+          count: 6
+          message: 'At minimum 6 people are required to review this PR before merging'
         block:
           changes_requested: true
           message: 'You have open changes requested from the reviewers'
