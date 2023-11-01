@@ -1115,7 +1115,7 @@ description: |
     ```
 
     More complicated example of project containing `wordpress` and `frontend` component.
-    If you need to use an additional namespace, you need to add the permission to deploy there for argosd and a target to the namespace.
+    If you need to deploy wordpress component in a namespace different from ArgoCD project's one (i.e. `wordpress`), you need to add `extraDestinationNamespaces: ["wordpress"]` and `argocd.namespace=wordpress`, like in the example below
     Also defined sample of all extra wordpress params that could be set:
 
     ```yaml
