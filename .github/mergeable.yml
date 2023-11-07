@@ -29,13 +29,13 @@ mergeable:
     validate:
       - do: approvals
         min:
-          count: 6
-          message: 'At minimum 6 people are required to review this PR before merging'
+          count: 4
+          message: 'At minimum 4 people are required to review this PR before merging'
         block:
           changes_requested: true
           message: 'You have open changes requested from the reviewers'
         required:
-          reviewers: ['roman-mightydevops', 'kseniyashaydurova']
+          reviewers: ['dmitry-mightydevops', 'kseniyashaydurova', 'luciano-buono']
 
   # CHANGELOG.md is required in the PR
   - when: pull_request.*
