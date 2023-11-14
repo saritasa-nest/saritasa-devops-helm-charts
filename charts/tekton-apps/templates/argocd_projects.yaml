@@ -28,7 +28,7 @@ metadata:
     {{- end }}
 spec:
   destinations:
-  - namespace: {{ or ($component.argocd).destinationNamespace ($project.argocd).namespace }}
+  - namespace: {{ $project.argocd.namespace }}
     server: https://kubernetes.default.svc
   - namespace: ci
     server: https://kubernetes.default.svc
