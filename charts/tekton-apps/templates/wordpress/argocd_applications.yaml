@@ -18,7 +18,7 @@ metadata:
     jiraURL: {{ $project.jiraURL }}
 spec:
   destination:
-    namespace: {{ or ($component.argocd).destinationNamespace ($project.argocd).namespace | required ".component.namespace is required in project settings" }}
+    namespace: {{ include "chooseNamespace" $component }}
     server: https://kubernetes.default.svc
   ignoreDifferences:
     - group: v1

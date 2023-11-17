@@ -199,7 +199,6 @@ spec:
 
 {{ end }}
 
-
 {{/*
 Check if list of maps (dict name, value) contains a specific named key and then render it or default
 the way you use it:
@@ -214,4 +213,15 @@ the way you use it:
 - name: {{ .name }}
   value: {{ .default }}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Check what namespace need to use, from component or project field
+*/}}
+{{- define "chooseNamespace" -}}
+{{- $ -}}
+{{/*
+{{- $namespace := or ((.component).argocd).destinationNamespace ((.extraApp).argocd).namespace | default "" }}
+{{- or $namespace ((.project).argocd).namespace | required "Error: .extraApp.argocd.destinationNamespace or .component.argocd.destinationNamespace or .project.argocd.namespace is required in project settings" }}
+*/}}
 {{- end -}}

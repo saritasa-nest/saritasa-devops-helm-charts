@@ -16,7 +16,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "210"
 spec:
   destination:
-    namespace: {{ or ($extraApp.argocd).destinationNamespace ($project.argocd).namespace | required ".extraApp.argocd.destinationNamespace or .project.argocd.namespace is required in project settings" }}
+  namespace: {{ include "chooseNamespace" $project.project }}
+  {{/*  namespace: {{ include "chooseNamespace" (dict "component" (dict) "project" $project "extraApp" $extraApp ) }} */}}
     server: https://kubernetes.default.svc
   project: {{ $project.project }}
   source:
