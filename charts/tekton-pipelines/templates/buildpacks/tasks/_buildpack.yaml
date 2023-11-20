@@ -188,7 +188,7 @@ spec:
           -skip-restore=$(params.skip_restore) \
           -previous-image=$(resources.outputs.image.url) \
           -run-image=$(params.run_image) \
-          ${ADDITIONAL_TAG:-""} \
+          ${ADDITIONAL_TAG} \
           $(resources.outputs.image.url)
 
       volumeMounts:
