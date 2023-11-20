@@ -191,6 +191,26 @@ buildpacks:
       # -- steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
+        - name: build-static
+          image: node:$(params.node_version)
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            set -e
+            [ -f package.json ] && {
+              echo "install node.js dependencies"
+
+              # set cache
+              npm config set cache $(workspaces.source.path)/.npm --global
+              npm ci
+
+              npm run build:$(params.environment) || echo "unable to build $(params.environment)"
+              rm -rf node_modules && echo "remove node_modules dir"
+            } || echo "No package.json found"
+          securityContext:
+            privileged: true
         - name: copy-requirements
           image: docker.io/fnndsc/python-poetry:1.5.1
           imagePullPolicy: IfNotPresent
