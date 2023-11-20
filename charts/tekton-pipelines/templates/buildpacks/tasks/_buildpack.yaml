@@ -90,6 +90,16 @@ spec:
       description: a subpath within the `source` input where the source to build is located.
       default: ""
 
+    - name: add_tag_latest
+      type: string
+      description: push image to registry with additional tag `latest` 
+      default: "false"
+
+    - name: docker_registry_repository
+      type: string
+      description: full path to project ECR repository  
+      default: ""
+
     - name: skip_restore
       type: string
       description: do not write layer metadata or restore cached layers
@@ -159,6 +169,11 @@ spec:
 
         aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.docker_registry)
 
+        if [ "$(params.add_tag_latest)" == "true" ]
+        then
+          ADDITIONAL_TAG="-tag=$(params.docker_registry_repository):latest"
+        fi 
+
         /cnb/lifecycle/creator \
           -app=$(params.source_subpath) \
           -project-metadata=project.toml \
@@ -173,6 +188,7 @@ spec:
           -skip-restore=$(params.skip_restore) \
           -previous-image=$(resources.outputs.image.url) \
           -run-image=$(params.run_image) \
+          ${ADDITIONAL_TAG:-""} \
           $(resources.outputs.image.url)
 
       volumeMounts:

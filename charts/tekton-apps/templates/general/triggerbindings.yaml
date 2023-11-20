@@ -37,6 +37,8 @@ spec:
     value: {{ $project.argocd.namespace }}
   - name: repository_submodules
     value: "{{ $component.repository_submodules | default true }}"
+  - name: add_tag_latest
+    value: "{{ $component.add_tag_latest | default false }}"
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- if $.Values.defaultRegistry }}
   - name: docker_registry

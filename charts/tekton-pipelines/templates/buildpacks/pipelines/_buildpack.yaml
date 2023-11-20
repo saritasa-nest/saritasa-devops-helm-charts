@@ -25,6 +25,11 @@ spec:
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
 
+    - name: add_tag_latest
+      type: string
+      description: push image to registry with additional tag `latest` 
+      default: "false"
+
     - name: buildpack_builder_image
       type: string
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
@@ -132,6 +137,10 @@ spec:
           value: $(params.application)-buildpacks-cache
         - name: source_subpath
           value: "$(params.source_subpath)"
+        - name: add_tag_latest
+          value: "$(params.add_tag_latest)"
+        - name: docker_registry_repository
+          value: "$(params.docker_registry_repository)"
         - name: platform_dir
           value: "$(params.platform_dir)"
         - name: buildpack_config_filename
