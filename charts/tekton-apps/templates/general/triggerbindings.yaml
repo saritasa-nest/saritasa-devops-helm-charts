@@ -37,8 +37,6 @@ spec:
     value: {{ $project.argocd.namespace }}
   - name: repository_submodules
     value: "{{ $component.repository_submodules | default true }}"
-  - name: add_tag_latest
-    value: "{{ $component.add_tag_latest | default false }}"
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   {{- if $.Values.defaultRegistry }}
   - name: docker_registry
@@ -67,6 +65,7 @@ spec:
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "buildpack_config_filename" "default" "buildpack.yml" ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "project_config_filename" "default" "project.toml" ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "sentry_project_name" "default" (printf "%s-%s" $project.project $component.name) ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "add_tag_latest" "default" "'false'" ) | nindent 2 }}
   {{- end}}
 ---
 
