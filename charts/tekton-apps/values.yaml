@@ -55,128 +55,128 @@ eventlistener:
 
 
 # -- list of projects and the project's apps to be triggered
-apps:
-  - project: xxx
-    enabled: true
-    argocd:
-      labels:
-        created-by: xxx
-        ops-main: xxx
-        ops-secondary: xxx
-        pm: xxx
-        tm: xxx
-      namespace: test
-    mailList: xxx@saritasa.com
-    devopsMailList: devops+xxx@saritasa.com
-    jiraURL: https://saritasa.atlassian.net/browse/xxx
-    tektonURL: https://tekton.site.com/#/namespaces/ci/pipelineruns
-    slack: client-xxx-ci
-    kubernetesRepository:
-      name: xxx-kubernetes-aws
-      branch: main
-      url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+apps: []
+  # - project: xxx
+  #   enabled: true
+  #   argocd:
+  #     labels:
+  #       created-by: xxx
+  #       ops-main: xxx
+  #       ops-secondary: xxx
+  #       pm: xxx
+  #       tm: xxx
+  #     namespace: test
+  #   mailList: xxx@saritasa.com
+  #   devopsMailList: devops+xxx@saritasa.com
+  #   jiraURL: https://saritasa.atlassian.net/browse/xxx
+  #   tektonURL: https://tekton.site.com/#/namespaces/ci/pipelineruns
+  #   slack: client-xxx-ci
+  #   kubernetesRepository:
+  #     name: xxx-kubernetes-aws
+  #     branch: main
+  #     url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
 
-    extraApps:
-      - path: dev/argocd/apps
-        repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
-        targetRevision: main
-        argocd:
-          destinationNamespace: extra
+  #   extraApps:
+  #     - path: dev/argocd/apps
+  #       repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+  #       targetRevision: main
+  #       argocd:
+  #         destinationNamespace: extra
 
-    components:
-      - name: backend
-        repository: xxx-backend
-        argocd:
-          ignoreDeploymentReplicasDiff: true
-        pipeline: buildpack
-        applicationURL: https://api.site.com
-        eventlistener:
-          template: buildpack-backend-build-pipeline-trigger-template
-        extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
-          KEY: value
-        triggerBinding:
-          - name: docker_registry_repository
-            value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend
-          - name: buildpack_builder_image
-            value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1
-          - name: buildpack_runner_image
-            value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
-          - name: buildpack_config_filename
-            value: buildpack1.yml
-          - name: project_config_filename
-            value: project1.toml
-          - name: sentry_project_name
-            value: xxx-backend
+  #   components:
+  #     - name: backend
+  #       repository: xxx-backend
+  #       argocd:
+  #         ignoreDeploymentReplicasDiff: true
+  #       pipeline: buildpack
+  #       applicationURL: https://api.site.com
+  #       eventlistener:
+  #         template: buildpack-backend-build-pipeline-trigger-template
+  #       extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
+  #         KEY: value
+  #       triggerBinding:
+  #         - name: docker_registry_repository
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/backend
+  #         - name: buildpack_builder_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/builder:v1
+  #         - name: buildpack_runner_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/google/runner:v1
+  #         - name: buildpack_config_filename
+  #           value: buildpack1.yml
+  #         - name: project_config_filename
+  #           value: project1.toml
+  #         - name: sentry_project_name
+  #           value: xxx-backend
 
-      - name: frontend
-        repository: xxx-frontend
-        argocd:
-          ignoreDeploymentReplicasDiff: true
-        pipeline: buildpack
-        applicationURL: https://site.com
-        eventlistener:
-          enableWebhookSecret: false
-          filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
-          template: buildpack-frontend-build-pipeline-trigger-template
-          extraOverlays: []
-          # - key: truncated_sha
-          #   expression: "body.head_commit.id.truncate(7)"
-          eventTypes: ["pull_request", "push"]
-        extraBuildConfigParams: {}
-        triggerBinding:
-          - name: docker_registry_repository
-            value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend
-          - name: buildpack_builder_image
-            value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/builder:full
-          - name: buildpack_runner_image
-            value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
-          - name: source_subpath
-            value: dist/web
-          - name: buildpack_config_filename
-            value: buildpack2.yml
-          - name: project_config_filename
-            value: project2.toml
-          - name: sentry_project_name
-            value: xxx-frontend
+  #     - name: frontend
+  #       repository: xxx-frontend
+  #       argocd:
+  #         ignoreDeploymentReplicasDiff: true
+  #       pipeline: buildpack
+  #       applicationURL: https://site.com
+  #       eventlistener:
+  #         enableWebhookSecret: false
+  #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
+  #         template: buildpack-frontend-build-pipeline-trigger-template
+  #         extraOverlays: []
+  #         # - key: truncated_sha
+  #         #   expression: "body.head_commit.id.truncate(7)"
+  #         eventTypes: ["pull_request", "push"]
+  #       extraBuildConfigParams: {}
+  #       triggerBinding:
+  #         - name: docker_registry_repository
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/frontend
+  #         - name: buildpack_builder_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/builder:full
+  #         - name: buildpack_runner_image
+  #           value: XXX.dkr.ecr.us-west-2.amazonaws.com/xxx/dev/buildpacks/paketo/runner:full
+  #         - name: source_subpath
+  #           value: dist/web
+  #         - name: buildpack_config_filename
+  #           value: buildpack2.yml
+  #         - name: project_config_filename
+  #           value: project2.toml
+  #         - name: sentry_project_name
+  #           value: xxx-frontend
 
-      - name: wordpress
-        repository: xxx-wordpress
-        pipeline: wordpress-build-pipeline
-        applicationURL: https://site.com
-        argocd:
-          destinationNamespace: wordpress
-          # ignoreDeploymentReplicasDiff: true
-          source:
-            targetRevision: 15.2.4
-        wordpress:
-          imageTag: 6.0.2
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 1000m
-              memory: 1G
-          nodeSelector:
-            apps: 'true'
-          podSecurityContext:
-            enabled: false
-            fsGroup: 101
-          repositorySshUrl: git@github.com:saritasa-nest/xxx-wordpress.git
-          repositoryRevision: environment
-          externalDatabase:
-            host: xxx.rds.amazonaws.com
-            user: xxx-environment-userwp
-            existingSecret: xxx-wordpress-environment-externaldb
-            database: xxx-environment-wp
-        eventlistener:
-          enableWebhookSecret: false
-          filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
-          template: wordpress-build-pipeline-trigger-template
-          extraOverlays: []
-          # - key: truncated_sha
-          #   expression: "body.head_commit.id.truncate(7)"
-          eventTypes: ["pull_request", "push"]
+  #     - name: wordpress
+  #       repository: xxx-wordpress
+  #       pipeline: wordpress-build-pipeline
+  #       applicationURL: https://site.com
+  #       argocd:
+  #         destinationNamespace: wordpress
+  #         # ignoreDeploymentReplicasDiff: true
+  #         source:
+  #           targetRevision: 15.2.4
+  #       wordpress:
+  #         imageTag: 6.0.2
+  #         resources:
+  #           requests:
+  #             cpu: 100m
+  #             memory: 128Mi
+  #           limits:
+  #             cpu: 1000m
+  #             memory: 1G
+  #         nodeSelector:
+  #           apps: 'true'
+  #         podSecurityContext:
+  #           enabled: false
+  #           fsGroup: 101
+  #         repositorySshUrl: git@github.com:saritasa-nest/xxx-wordpress.git
+  #         repositoryRevision: environment
+  #         externalDatabase:
+  #           host: xxx.rds.amazonaws.com
+  #           user: xxx-environment-userwp
+  #           existingSecret: xxx-wordpress-environment-externaldb
+  #           database: xxx-environment-wp
+  #       eventlistener:
+  #         enableWebhookSecret: false
+  #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
+  #         template: wordpress-build-pipeline-trigger-template
+  #         extraOverlays: []
+  #         # - key: truncated_sha
+  #         #   expression: "body.head_commit.id.truncate(7)"
+  #         eventTypes: ["pull_request", "push"]
 
 # -- run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy"
 runPostInstallMountPvcJob: false
