@@ -218,4 +218,6 @@ the way you use it:
 {{/*
 Check what namespace need to use, from project or component or extraApp field
 */}}
+{{- define "tekton-apps.set-namespace-from-component-or-project" -}}
+{{- or ((.component).argocd).destinationNamespace ((.project).argocd).namespace | required "Error: One of the following should be set: .project.argocd.namespace, .component.argocd.destinationNamespace, or .extraApp.argocd.destinationNamespace" }}
 {{- end -}}
