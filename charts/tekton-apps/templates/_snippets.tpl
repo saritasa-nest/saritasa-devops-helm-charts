@@ -216,12 +216,6 @@ the way you use it:
 {{- end -}}
 
 {{/*
-Check what namespace need to use, from component or project field
-*/}}
-{{- define "chooseNamespace" -}}
-{{- $ -}}
-{{/*
-{{- $namespace := or ((.component).argocd).destinationNamespace ((.extraApp).argocd).namespace | default "" }}
-{{- or $namespace ((.project).argocd).namespace | required "Error: .extraApp.argocd.destinationNamespace or .component.argocd.destinationNamespace or .project.argocd.namespace is required in project settings" }}
+Check what namespace need to use, from project or component or extraApp field
 */}}
 {{- end -}}

@@ -76,6 +76,13 @@ apps:
       branch: main
       url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
 
+    extraApps:
+      - path: dev/argocd/apps
+        repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+        targetRevision: main
+        argocd:
+          destinationNamespace: extra
+
     components:
       - name: backend
         repository: xxx-backend

@@ -18,7 +18,7 @@ metadata:
     jiraURL: {{ $project.jiraURL }}
 spec:
   destination:
-    namespace: {{ include "chooseNamespace" $component }}
+    namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project) }}
     server: https://kubernetes.default.svc
   ignoreDifferences:
     - group: v1
