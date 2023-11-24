@@ -1026,6 +1026,25 @@ spec:
         - CreateNamespace=true
   ```
 
+  We can add both tags `${env}-${commit_hash}` (i.e. `:dev-dsjfh43`) and `:latest` on the built image in tekton-pipelines:
+  ```bash
+    Saving 190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:staging-802d5f2...
+    *** Images (sha256:9e15b5041fec79448e25948503ddd68ee8563d7d3bacacb4f3f20c1e5a23b891):
+        190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:staging-802d5f2
+        190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:latest
+  ```
+
+  Set `add_tag_latest` parameter to "true" in `triggerBinding` as shown below: 
+  ```yaml
+  triggerBinding:
+    - name: docker_registry_repository
+      value: 190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend
+  ....
+  ....
+    - name: add_tag_latest
+      value: 'true'
+  ```
+
   Simple wordpress application example filled by default:
 
   ```yaml
