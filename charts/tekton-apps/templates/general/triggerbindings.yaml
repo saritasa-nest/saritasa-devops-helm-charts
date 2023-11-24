@@ -34,7 +34,7 @@ spec:
   - name: component
     value: {{ $component.name }}
   - name: namespace
-    value: {{ $project.argocd.namespace }}
+    value: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
   - name: repository_submodules
     value: "{{ $component.repository_submodules | default true }}"
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}

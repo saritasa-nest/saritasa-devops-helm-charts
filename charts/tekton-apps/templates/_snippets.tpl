@@ -219,5 +219,5 @@ the way you use it:
 Get namespace and return component `destinationNamespace` if it exists, otherwise return project's `namespace`.
 */}}
 {{- define "tekton-apps.set-namespace-from-component-or-project" -}}
-{{- or ((.component).argocd).destinationNamespace ((.project).argocd).namespace | required "Error: One of the following should be set: .project.argocd.namespace, .component.argocd.destinationNamespace, or .extraApp.argocd.destinationNamespace" }}
+{{- or ((.component).argocd).destinationNamespace ((.project).argocd).namespace | required (printf "Error: One of the following should be set: .project.argocd.namespace or %s.argocd.DestinationNamespace" .component_name) }}
 {{- end -}}

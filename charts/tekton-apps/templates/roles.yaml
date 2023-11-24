@@ -15,7 +15,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role") }}
- namespace: {{ $.Release.Namespace }}
+ namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
 rules:
   - apiGroups:  ["extensions", "apps", "batch", ""]
     resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
