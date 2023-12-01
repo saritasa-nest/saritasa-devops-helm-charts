@@ -32,7 +32,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-role") }}
- # We don't need to use the tekton-apps.set-namespace-from-component-or-project snippet here and below because these objects are not used in other namespaces
+ # We don't need to use the tekton-apps.set-namespace-from-component-or-project snippet here and below (like we do for wordpress) because these objects are not used in other namespaces
  namespace: {{ $.Release.Namespace }}
 rules:
   - apiGroups:  ["triggers.tekton.dev"]
