@@ -1013,6 +1013,7 @@ description: |
           190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:latest
     ```
 
+    1. For buildpacks pipelines:
     Set `add_tag_latest` parameter to "true" in `triggerBinding` as shown below:
     ```yaml
     triggerBinding:
@@ -1022,6 +1023,24 @@ description: |
     ....
       - name: add_tag_latest
         value: 'true'
+    ```
+
+    2. For kaniko pipelines:
+    We tag image by this argument by default:
+    `--destination=$(resources.outputs.image.url`
+    We can use this argument twice, so set `kaniko_extra_args` with
+    `--destination` equals full image path plus `:latest`. It will be
+    added as additional tag and pushed to the registry.
+    ```yaml
+    triggerBinding:
+      - name: docker_registry_repository
+        value: 190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend
+      - name: docker_file
+        value: Dockerfile
+      - name: docker_context
+        value: .
+      - name: kaniko_extra_args
+        value: "--destination=190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:latest"
     ```
 
     Simple wordpress application example filled by default:
