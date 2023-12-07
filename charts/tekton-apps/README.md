@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.14](https://img.shields.io/badge/Version-0.2.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 0.2.15-dev.10](https://img.shields.io/badge/Version-0.2.15-dev.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -171,59 +171,6 @@ spec:
                     value: xxx.dkr.ecr.us-west-2.amazonaws.com/vp/staging/buildpacks/paketo/runner:full
                   - name: source_subpath
                     value: dist/web
-      - name: vp-wordpress
-        repository: vp-wordpress
-        pipeline: wordpress-build-pipeline
-        applicationURL: https://wp.site.com
-        argocd:
-          namespace: wordpress
-          source:
-            targetRevision: 16.1.14
-        wordpress:
-          image:
-            tag: 6.2.2
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 1000m
-              memory: 1G
-          nodeSelector:
-            apps: 'true'
-          podSecurityContext:
-            enabled: true
-            fsGroup: 1000
-            seccompProfile:
-              type: "RuntimeDefault"
-          containerSecurityContext:
-            enabled: true
-            runAsUser: 1000
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: ["ALL"]
-          repositorySshUrl: git@github.com:saritasa-nest/vp-wordpress.git
-          repositoryRevision: main
-          extraEnvVars:
-            - name: PHP_MAX_EXECUTION_TIME
-              value: "300"
-            - name: PHP_MAX_INPUT_VARS
-              value: "3000"
-            - name: PHP_UPLOAD_MAX_FILESIZE
-              value: "800M"
-            - name: PHP_POST_MAX_SIZE
-              value: "800M"
-          ingress:
-            hostname: wp.site.com
-
-          externalDatabase:
-            host: vp-prod-mysql.c9vogyeycoc9.us-east-1.rds.amazonaws.com
-            user: vp-prod-wordpress-user
-            existingSecret: vp-wordpress-externaldb
-            database: vp-prod-wordpress
-        eventlistener:
-          template: wordpress-build-pipeline-trigger-template
 
         # make sure PVCs are bound after the chart is synced
         # by temporarily mount them into short-live job.
@@ -1189,6 +1136,7 @@ spec:
   ```
 
   More complicated example of project containing `wordpress` and `frontend` component.
+  If you need to deploy wordpress component in a namespace different from ArgoCD project's one (i.e. `wordpress`), you need to add `extraDestinationNamespaces: ["wordpress"]` and `argocd.namespace=wordpress`, like in the example below
   Also defined sample of all extra wordpress params that could be set:
 
   ```yaml
@@ -1224,6 +1172,8 @@ spec:
                   pm: xxx
                   tm: xxx
                 namespace: xxx
+                extraDestinationNamespaces:
+                  - wordpress
                 notifications:
                   annotations:
                     # In rocks/cloud cluster use slack-token integration:
@@ -1251,6 +1201,10 @@ spec:
                   repository: xxx-wordpress
                   pipeline: wordpress-build-pipeline
                   applicationURL: https://xxx.site.url
+                  argocd:
+                    source:
+                    targetRevision: 16.1.14
+                    destinationNamespace: wordpress
                   wordpress:
                     imageTag: "5.8.1"
                     repository_ssh_url: "git@github.com:saritasa-nest/xxx-wordpress.git"
