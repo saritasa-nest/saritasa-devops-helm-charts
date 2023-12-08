@@ -8,6 +8,9 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
+  # metrics.backend-destination field specifies the system metrics destination.
+  # It supports either prometheus (the default) or stackdriver.
+  # Note: Using Stackdriver will incur additional charges.
   metrics.backend-destination: prometheus
 
 {{ end }}
