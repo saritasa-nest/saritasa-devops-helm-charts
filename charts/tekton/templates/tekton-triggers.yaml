@@ -1402,8 +1402,14 @@ spec:
               value: "9000"
           securityContext:
             allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - "ALL"
             # User 65532 is the distroless nonroot user ID
-            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
 
 ---
 # Copyright 2019 The Tekton Authors
@@ -1535,7 +1541,13 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             # User 65532 is the distroless nonroot user ID
-            runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - "ALL"
+            seccompProfile:
+              type: RuntimeDefault
 
 ---
 {{end}}
