@@ -19,9 +19,6 @@ spec:
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
 
-    - name: kubernetes_repository_ssh_url
-      description: git repository ssh url for kubernetes manifests repo
-
     - name: docker_file
       default: Dockerfile
       description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
@@ -39,7 +36,7 @@ spec:
 
   resourcetemplates:
   - kind: PipelineRun
-    apiVersion: tekton.dev/v1beta1
+    apiVersion: tekton.dev/v1
     metadata:
       generateName: $(tt.params.application)-kaniko-build-pipeline-run-
       labels:
@@ -55,7 +52,7 @@ spec:
       pipelineRef:
         name: kaniko-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
+        {{- include "pipelinerun.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
         - name: project
           value: "$(tt.params.project)"
         - name: namespace
@@ -70,9 +67,6 @@ spec:
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
-
-      resources:
-        {{- include "pipeline.defaultResources" . | nindent 8 }}
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}

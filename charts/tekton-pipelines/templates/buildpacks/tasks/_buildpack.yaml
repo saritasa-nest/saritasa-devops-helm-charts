@@ -1,5 +1,5 @@
 {{- define "task.buildpack" -}}
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: {{ .pipeline.buildTaskName }}
@@ -10,14 +10,6 @@ spec:
 
   workspaces:
     - name: source
-
-  resources:
-    inputs:
-      - name: app
-        type: git
-    outputs:
-      - name: image
-        type: image
 
   params:
     - name: application
@@ -36,6 +28,10 @@ spec:
       type: string
       description: reference to a run image to use
       default: ""
+
+    - name: app_image
+      type: string
+      description: reference to a result app image
 
     - name: docker_registry
       type: string
@@ -107,6 +103,12 @@ spec:
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
 
+  # results:
+  #   - name: app_image_digest
+  #     description: Image digest result after build
+  #   - name: app_image_url
+  #     description: Image url result after build
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
@@ -119,7 +121,6 @@ spec:
     - name: prepare
       image: {{ .images.bash | default "docker.io/library/bash:latest" }}
       imagePullPolicy: {{ .imagePullPolicy }}
-      resources: {}
       script: |
           #!/usr/bin/env bash
           set -e
@@ -127,7 +128,6 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
           chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-          chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -152,8 +152,7 @@ spec:
     - name: build
       image: $(params.builder_image)
       imagePullPolicy: {{ .imagePullPolicy }}
-      resources: {}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       script: |
         #!/bin/bash
 
@@ -173,7 +172,7 @@ spec:
           -skip-restore=$(params.skip_restore) \
           -previous-image=$(resources.outputs.image.url) \
           -run-image=$(params.run_image) \
-          $(resources.outputs.image.url)
+          $(params.app_image)
 
       volumeMounts:
         - name: layers-dir
@@ -183,6 +182,17 @@ spec:
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
+
+    # - name: results
+    #   image: docker.io/library/bash:5.1.4@sha256:b208215a4655538be652b2769d82e576bc4d0a2bb132144c060efc5be8c3f5d6
+    #   script: |
+    #     #!/usr/bin/env bash
+    #     set -e
+    #     grep "digest" /layers/report.toml | cut -d'"' -f2 | cut -d'"' -f2 | tr -d '\n' | tee "$(results.app_image_digest.path)"
+    #     echo -n "$(params.app_image)" | tee "$(results.app_image_url.path)"
+      volumeMounts:
+        - name: layers-dir
+          mountPath: /layers
     {{ end }}
   volumes:
     - name: empty-dir

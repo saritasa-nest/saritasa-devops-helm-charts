@@ -1,5 +1,5 @@
 {{ if .Values.kaniko.enabled }}
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: kaniko-build-pipeline
@@ -46,27 +46,15 @@ spec:
       default: "sourcemaps"
 
   workspaces:
-    - name: source
-
-  resources:
-    - name: app
-      type: git
-    - name: kubernetes-repo
-      type: git
-    - name: image
-      type: image
+    - name: app-source
+    - name: k8s-source
 
   tasks:
     - name: kaniko
       taskRef:
         name: kaniko
-      resources:
-          inputs:
-            - name: app
-              resource: app
-          outputs:
-              - name: image
-                resource: image
+      # results:
+      #   - name: app_image_digest
       params:
         - name: application
           value: "$(params.application)"
@@ -81,22 +69,38 @@ spec:
         - name: extra_args
           value:
             - $(params.kaniko_extra_args)
+        - name: app_image
+          value: "$(params.app_image)"
       workspaces:
         - name: source
-          workspace: source
+          workspace: app-source
+
+    - name: git-clone-k8s-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: k8s-source
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
 
     - name: kustomize
       taskRef:
         name: kustomize
-      resources:
-        inputs:
-          - name: kubernetes-repo
-            resource: kubernetes-repo
+      workspace:
+        - name: source
+          value: k8s-source
       params:
         - name: application
           value: "$(params.application)"
         - name: image
-          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+          value: "$(params.app_image)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch

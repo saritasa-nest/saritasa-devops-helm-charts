@@ -12,10 +12,10 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    inputs:
-      - name: app
-        type: git
+  # resources:
+  #   inputs:
+  #     - name: app
+  #       type: git
 
   params:
 
@@ -48,7 +48,7 @@ spec:
     - name: release
       image: {{ .Values.images.sentry_cli }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       script: |
         #!/usr/bin/env sh
         set +x

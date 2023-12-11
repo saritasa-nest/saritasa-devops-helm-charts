@@ -34,10 +34,10 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    inputs:
-      - name: app
-        type: git
+  # resources:
+  #   inputs:
+  #     - name: app
+  #       type: git
 
   params:
     - name: application
@@ -64,7 +64,7 @@ spec:
       script: |
         #!/usr/bin/env bash
 
-        path=$(resources.inputs.app.path)
+        path=$(workspaces.source.path)
 
         # rename `buildpack_config_filename` file to `buildpack.yml` and
         # `project_config_filename` to `project.toml` if they are not equal to
@@ -103,7 +103,7 @@ spec:
 
         import toml, os, sys
 
-        source_path = "$(resources.inputs.app.path)/project.toml"
+        source_path = "$(workspaces.source.path)/project.toml"
         env_dir = "$(workspaces.source.path)/$(params.platform_dir)/env"
 
         try:

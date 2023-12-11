@@ -7,10 +7,12 @@ spec:
   description: >-
     Nodejs version detected from package.json
 
-  resources:
-    inputs:
-      - name: app
-        type: git
+  # resources:
+  #   inputs:
+  #     - name: app
+  #       type: git
+  workspaces:
+    - name: source
 
   params:
     - name: default_version
@@ -25,7 +27,7 @@ spec:
     - name: get-nodejs-version
       image: cfmanteiga/alpine-bash-curl-jq
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       script: |
         #!/usr/bin/env bash
         set -Eeo pipefail

@@ -104,14 +104,22 @@
   type: string
   description: private docker registry repository address
 
-- name: kubernetes_repository_kustomize_path
+- name: kubernetes_repository_ssh_url
   type: string
-  description: overlay path for kustomize call
+  description: git repo for kustomize management
 
 - name: kubernetes_branch
   type: string
   default: main
   description: git branch for kustomize managed git repo
+
+- name: kubernetes_repository_kustomize_path
+  type: string
+  description: overlay path for kustomize call
+
+- name: app_image
+  type: string
+  description: reference to a app result image
 {{- end}}
 
 {{- define "trigger-template.defaultDockerKubernetesParams" -}}
@@ -121,12 +129,18 @@
 - name: docker_registry_repository
   description: private docker registry repository address
 
+- name: kubernetes_repository_ssh_url
+  description: git repo for kustomize management
+
+- name: kubernetes_branch
+  description: git branch for kustomize managed git repo
+
 - name: kubernetes_repository_kustomize_path
   description: overlay path for kustomize call
 
-- name: kubernetes_branch
-  default: main
-  description: git branch for kustomize managed git repo
+- name: app_image
+  description: reference to a app result image
+
 {{- end}}
 
 
@@ -138,7 +152,7 @@
 # │ - kubernetes (bool)                                                          │
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
-{{- define "pipeline.defaultTTBoundParams" -}}
+{{- define "pipelinerun.defaultTTBoundParams" -}}
 - name: "application"
   value: "$(tt.params.application)"
 - name: sha
@@ -166,10 +180,14 @@
   value: "$(tt.params.docker_registry_repository)"
 {{- end }}
 {{- if .kubernetes }}
+- name: kubernetes_repository_ssh_url
+  value: "$(tt.params.kubernetes_repository_ssh_url)
 - name: kubernetes_repository_kustomize_path
   value: "$(tt.params.kubernetes_repository_kustomize_path)"
 - name: kubernetes_branch
   value: "$(tt.params.kubernetes_branch)"
+- name: app_image
+  value:
 {{- end }}
 - name: environment
   value: "$(tt.params.environment)"
@@ -177,48 +195,22 @@
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
-# │ Default resources for the pipeline run. Defined in trigger template          │
-# │ - app: our git repository with the code we're building                       │
-# │ - kubernetes-repo: out git repo containing kube manifests                    │
-# │ - image: docker registry image                                               │
-# │                                                                              │
-# └──────────────────────────────────────────────────────────────────────────────┘
-{{- define "pipeline.defaultResources" -}}
-- name: app
-  resourceSpec:
-    type: git
-    params:
-      - name: url
-        value: $(tt.params.repository_ssh_url)
-      - name: revision
-        value: $(tt.params.head_commit)
-      - name: submodules
-        value: $(tt.params.repository_submodules)
-- name: kubernetes-repo
-  resourceSpec:
-    type: git
-    params:
-      - name: url
-        value: $(tt.params.kubernetes_repository_ssh_url)
-      - name: revision
-        value: $(tt.params.kubernetes_branch)
-- name: image
-  resourceSpec:
-    type: image
-    params:
-      - name: url
-        value: $(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)
-{{- end}}
-
-# ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Default workspaces associated with tekton pipeline runs                      │
 # │ - source: contains app git repo source code cloned by tekton                 │
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
 {{- define "pipeline.defaultWorkspaces" -}}
-- name: source
+- name: app-source
   persistentVolumeClaim:
     claimName: $(tt.params.application)-workspace-pvc
+- name: k8s-source
+  volumeClaimTemplate:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
 {{- end}}
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
@@ -265,10 +257,6 @@ finally:
 - name: sentry-release
   taskRef:
     name:  sentry-release
-  resources:
-    inputs:
-      - name: app
-        resource: app
   params:
     - name: environment
       value: "$(params.environment)"
@@ -278,7 +266,7 @@ finally:
       value: "$(params.sourcemaps_dir)"
   workspaces:
     - name: source
-      workspace: source
+      workspace: app-source
   runAfter:
     - deploy
 {{- end }}

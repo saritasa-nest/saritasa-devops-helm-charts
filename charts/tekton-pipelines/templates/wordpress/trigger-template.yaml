@@ -13,7 +13,7 @@ spec:
 
   resourcetemplates:
   - kind: PipelineRun
-    apiVersion: tekton.dev/v1beta1
+    apiVersion: tekton.dev/v1
     metadata:
       generateName: $(tt.params.application)-build-pipeline-run-
       labels:
@@ -26,7 +26,7 @@ spec:
       pipelineRef:
         name: wordpress-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
+        {{- include "pipelinerun.defaultTTBoundParams" . | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
       podTemplate:

@@ -1,5 +1,5 @@
 {{- define "pipeline.buildpack" -}}
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Pipeline
 metadata:
   name: {{ .pipeline.name }}
@@ -63,24 +63,33 @@ spec:
       default: "sourcemaps"
 
   workspaces:
-    - name: source
-
-  resources:
-    - name: app
-      type: git
-    - name: kubernetes-repo
-      type: git
-    - name: image
-      type: image
+    - name: app-source
+    - name: k8s-source
 
   tasks:
+    - name: git-clone-app-source
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repository_url)
+        - name: revision
+          value: $(params.head_commit)
+        - name: submodules
+          value: $(params.repository_submodules)
+      workspaces:
+        - name: output
+          workspace: app-source
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
+
     - name: prepare-build
       taskRef:
         name: buildpack-prepare-build
-      resources:
-        inputs:
-          - name: app
-            resource: app
+      workspaces:
+        - name: source
+          workspace: app-source
       params:
         - name: application
           value: "$(params.application)"
@@ -90,17 +99,13 @@ spec:
           value: "$(params.buildpack_config_filename)"
         - name: project_config_filename
           value: "$(params.project_config_filename)"
-      workspaces:
-        - name: source
-          workspace: source
 
     - name: detect-nodejs-version
       taskRef:
         name: detect-nodejs-version
-      resources:
-        inputs:
-          - name: app
-            resource: app
+      workspaces:
+        - name: source
+          workspace: app-source
       params:
         - name: default_version
           value: "14"
@@ -110,13 +115,9 @@ spec:
     - name: {{ .pipeline.buildTaskName }}
       taskRef:
         name: {{ .pipeline.buildTaskName }}
-      resources:
-          inputs:
-            - name: app
-              resource: app
-          outputs:
-              - name: image
-                resource: image
+      workspaces:
+        - name: source
+          workspace: app-source
       params:
         - name: application
           value: "$(params.application)"
@@ -126,6 +127,8 @@ spec:
           value: "$(params.buildpack_builder_image)"
         - name: run_image
           value: "$(params.buildpack_runner_image)"
+        - name: app_image
+          value: "$(params.app_image)"
         - name: docker_registry
           value: $(params.docker_registry)
         - name: cache
@@ -144,24 +147,38 @@ spec:
           value: "$(params.environment)"
         - name: sourcemaps_dir
           value: "$(params.sourcemaps_dir)"
-      workspaces:
-        - name: source
-          workspace: source
+      # results:
+      # - name: app_image_digest
+      #   description: Result app image digest
       runAfter:
         - detect-nodejs-version
+
+    - name: git-clone-k8s-source
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+      workspaces:
+        - name: output
+          workspace: k8s-source
+      podTemplate:
+        securityContext:
+          fsGroup: 65532
 
     - name: kustomize
       taskRef:
         name: kustomize
-      resources:
-        inputs:
-          - name: kubernetes-repo
-            resource: kubernetes-repo
+      workspace:
+        - name: source
+          workspace: k8s-source
       params:
         - name: application
           value: "$(params.application)"
         - name: image
-          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+          value: "$(params.app_image)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch

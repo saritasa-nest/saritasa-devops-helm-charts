@@ -7,10 +7,8 @@ spec:
   description: >-
     Updates image tag in the kustomize overlay of the app
 
-  resources:
-    inputs:
-      - name: kubernetes-repo
-        type: git
+  workspace:
+    - name: source
 
   params:
     - name: application
@@ -41,7 +39,7 @@ spec:
     - name: git-set-user
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)
+      workingDir: $(workspaces.source.path)
       script: |
         git config user.email "$DEVOPS_GROUP_EMAIL"
         git config user.name "tekton-kustomize"
@@ -49,7 +47,7 @@ spec:
     - name: update-image
       image: {{ .Values.images.kustomize | default "registry.k8s.io/kustomize/kustomize:v5.0.0"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)
+      workingDir: $(workspaces.k8s-source.path)
       script: |
         app=$(params.application)
         env=$(params.environment)
@@ -60,7 +58,7 @@ spec:
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)
+      workingDir: $(workspaces.source.path)
       script: |
         CONFIG=/workdir/yamlfix.toml
         if [ -f .yamlfix.toml ]; then
@@ -72,7 +70,7 @@ spec:
     - name: kubeval
       image: {{ .Values.images.kubeval | default "public.ecr.aws/saritasa/kubeval:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)
+      workingDir: $(workspaces.source.path)
       script: |
         APISERVER=https://kubernetes.default.svc
         SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
@@ -87,7 +85,7 @@ spec:
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.kubernetes-repo.path)
+      workingDir: $(workspaces.source.path)
       script: |
         set +x
         git checkout $(params.kubernetes_branch)
