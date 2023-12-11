@@ -86,9 +86,8 @@ spec:
           value: $(params.kubernetes_repository_ssh_url)
         - name: revision
           value: $(params.kubernetes_branch)
-      podTemplate:
-        securityContext:
-          fsGroup: 65532
+      securityContext:
+        fsGroup: 65532
 
     - name: kustomize
       taskRef:
