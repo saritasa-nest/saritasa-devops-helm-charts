@@ -86,15 +86,13 @@ spec:
           value: $(params.kubernetes_repository_ssh_url)
         - name: revision
           value: $(params.kubernetes_branch)
-      securityContext:
-        fsGroup: 65532
 
     - name: kustomize
       taskRef:
         name: kustomize
       workspaces:
         - name: source
-          value: k8s-source
+          workspace: k8s-source
       params:
         - name: application
           value: "$(params.application)"
