@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 1.0.0-dev.1](https://img.shields.io/badge/Version-1.0.0--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.0-dev.2](https://img.shields.io/badge/Version-1.0.0--dev.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -120,7 +120,7 @@ buildpacks:
         - name: hello1
           image: node:16
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world1"
@@ -128,7 +128,7 @@ buildpacks:
         - name: hello2
           image: node:16
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world2"
@@ -136,7 +136,7 @@ buildpacks:
         - name: hello1
           image: node:16
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world1"
@@ -158,7 +158,7 @@ buildpacks:
         name: build
         image: node:16
         imagePullPolicy: IfNotPresent
-        workingDir: $(resources.inputs.app.path)
+        workingDir: $(workspaces.source.path)
         script: |
           #!/bin/bash
           az login --identity --username <managed-indentity>
@@ -175,22 +175,22 @@ buildpacks:
             -gid=$(params.group_id) \
             -process-type=$(params.process_type) \
             -skip-restore=$(params.skip_restore) \
-            -previous-image=$(resources.outputs.image.url) \
+            -previous-image=$(params.app_image) \
             -run-image=$(params.run_image) \
-            $(resources.outputs.image.url)
+            $(params.app_image)
 
       buildTaskSteps:
         - name: hello1
           image: node:16
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world1"
         - name: hello2
           image: node:16
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world2"

@@ -80,9 +80,9 @@ spec:
       workspaces:
         - name: output
           workspace: app-source
-      podTemplate:
-        securityContext:
-          fsGroup: 65532
+      # podTemplate:
+      #   securityContext:
+      #     fsGroup: 65532
 
     - name: prepare-build
       taskRef:
@@ -164,14 +164,14 @@ spec:
       workspaces:
         - name: output
           workspace: k8s-source
-      podTemplate:
-        securityContext:
-          fsGroup: 65532
+      # podTemplate:
+      #   securityContext:
+      #     fsGroup: 65532
 
     - name: kustomize
       taskRef:
         name: kustomize
-      workspace:
+      workspaces:
         - name: source
           workspace: k8s-source
       params:

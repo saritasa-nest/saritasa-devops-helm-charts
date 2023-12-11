@@ -7,14 +7,14 @@ buildpacks:
         - name: first-step
           image: first-step-image
           imagePullPolicy: IfNotPresent
-          resources:
+          computeResources:
             limits:
               cpu: 512m
               memory: 1Gi
             requests:
               cpu: 250m
               memory: 500Mi
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo First Step
@@ -23,14 +23,14 @@ buildpacks:
         - name: second-step
           image: second-step-image
           imagePullPolicy: IfNotPresent
-          resources:
+          computeResources:
             limits:
               cpu: 512m
               memory: 1Gi
             requests:
               cpu: 250m
               memory: 500Mi
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo Second Step

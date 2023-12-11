@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: detect-nodejs-version
@@ -7,10 +7,6 @@ spec:
   description: >-
     Nodejs version detected from package.json
 
-  # resources:
-  #   inputs:
-  #     - name: app
-  #       type: git
   workspaces:
     - name: source
 

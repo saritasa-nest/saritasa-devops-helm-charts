@@ -181,13 +181,13 @@
 {{- end }}
 {{- if .kubernetes }}
 - name: kubernetes_repository_ssh_url
-  value: "$(tt.params.kubernetes_repository_ssh_url)
+  value: "$(tt.params.kubernetes_repository_ssh_url)"
 - name: kubernetes_repository_kustomize_path
   value: "$(tt.params.kubernetes_repository_kustomize_path)"
 - name: kubernetes_branch
   value: "$(tt.params.kubernetes_branch)"
 - name: app_image
-  value:
+  value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
 {{- end }}
 - name: environment
   value: "$(tt.params.environment)"

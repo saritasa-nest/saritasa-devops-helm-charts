@@ -13,7 +13,7 @@ spec:
 
   resourcetemplates:
   - kind: PipelineRun
-    apiVersion: tekton.dev/v1
+    apiVersion: tekton.dev/v1beta1
     metadata:
       generateName: $(tt.params.application)-build-pipeline-run-
       labels:
@@ -29,19 +29,20 @@ spec:
         {{- include "pipelinerun.defaultTTBoundParams" . | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
-      podTemplate:
-        volumes:
-        - name: podinfo
-          downwardAPI:
-            items:
-              - path: "labels"
-                fieldRef:
-                  fieldPath: metadata.labels
-              - path: "annotations"
-                fieldRef:
-                  fieldPath: metadata.annotations
-        {{- if .Values.podTemplate }}
-        {{ toYaml .Values.podTemplate | nindent  8 }}
-        {{end }}
+      taskRunTemplate:
+        podTemplate:
+          volumes:
+          - name: podinfo
+            downwardAPI:
+              items:
+                - path: "labels"
+                  fieldRef:
+                    fieldPath: metadata.labels
+                - path: "annotations"
+                  fieldRef:
+                    fieldPath: metadata.annotations
+          {{- if .Values.podTemplate }}
+          {{ toYaml .Values.podTemplate | nindent  10 }}
+          {{end }}
 
 {{ end }}

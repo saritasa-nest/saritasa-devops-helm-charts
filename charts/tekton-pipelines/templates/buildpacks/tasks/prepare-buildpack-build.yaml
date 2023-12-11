@@ -34,11 +34,6 @@ spec:
   workspaces:
     - name: source
 
-  # resources:
-  #   inputs:
-  #     - name: app
-  #       type: git
-
   params:
     - name: application
       type: string

@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: kustomize
@@ -7,7 +7,7 @@ spec:
   description: >-
     Updates image tag in the kustomize overlay of the app
 
-  workspace:
+  workspaces:
     - name: source
 
   params:

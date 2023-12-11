@@ -93,7 +93,7 @@ spec:
     - name: kustomize
       taskRef:
         name: kustomize
-      workspace:
+      workspaces:
         - name: source
           value: k8s-source
       params:

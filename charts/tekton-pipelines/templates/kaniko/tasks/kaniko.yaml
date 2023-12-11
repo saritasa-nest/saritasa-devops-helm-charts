@@ -81,8 +81,8 @@ spec:
         - --build-arg=ENVIRONMENT=$(params.environment)
         - --dockerfile=$(params.docker_file)
         - --context=$(workspaces.source.path)/$(params.docker_context)
-        - --destination=$(resources.outputs.image.url)
-        - --digest-file=$(results.app_image_digest.path)
+        - --destination=$(params.app_image)
+        # - --digest-file=$(results.app_image_digest.path)
         # - --verbosity=debug
 
       volumeMounts:

@@ -36,7 +36,7 @@ spec:
 
   resourcetemplates:
   - kind: PipelineRun
-    apiVersion: tekton.dev/v1
+    apiVersion: tekton.dev/v1beta1
     metadata:
       generateName: $(tt.params.application)-kaniko-build-pipeline-run-
       labels:
@@ -70,21 +70,21 @@ spec:
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
+      taskRunTemplate:
+        podTemplate:
+          volumes:
+          - name: podinfo
+            downwardAPI:
+              items:
+                - path: "labels"
+                  fieldRef:
+                    fieldPath: metadata.labels
+                - path: "annotations"
+                  fieldRef:
+                    fieldPath: metadata.annotations
 
-      podTemplate:
-        volumes:
-        - name: podinfo
-          downwardAPI:
-            items:
-              - path: "labels"
-                fieldRef:
-                  fieldPath: metadata.labels
-              - path: "annotations"
-                fieldRef:
-                  fieldPath: metadata.annotations
-
-        {{- if .Values.podTemplate }}
-        {{ toYaml .Values.podTemplate | nindent  8 }}
-        {{end }}
+          {{- if .Values.podTemplate }}
+          {{ toYaml .Values.podTemplate | nindent  10 }}
+          {{end }}
 
 {{ end }}

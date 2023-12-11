@@ -1,5 +1,5 @@
 {{- define "task.postDeploy" -}}
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: {{ .namePrefix }}-post-deploy
@@ -41,7 +41,6 @@ spec:
     - name: argo-events
       image: badouralix/curl-jq
       imagePullPolicy: IfNotPresent
-      resources: {}
       script: |
         #!/usr/bin/env sh
 

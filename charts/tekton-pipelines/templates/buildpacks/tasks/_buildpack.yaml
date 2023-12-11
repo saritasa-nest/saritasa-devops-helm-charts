@@ -170,7 +170,7 @@ spec:
           -gid=$(params.group_id) \
           -process-type=$(params.process_type) \
           -skip-restore=$(params.skip_restore) \
-          -previous-image=$(resources.outputs.image.url) \
+          -previous-image=$(params.app_image) \
           -run-image=$(params.run_image) \
           $(params.app_image)
 
