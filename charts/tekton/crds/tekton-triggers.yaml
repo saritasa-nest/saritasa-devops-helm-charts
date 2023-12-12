@@ -20,8 +20,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
+    triggers.tekton.dev/release: "v0.25.3"
+    version: "v0.25.3"
   annotations:
     "helm.sh/hook": "pre-install"
 spec:

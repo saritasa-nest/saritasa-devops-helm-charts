@@ -31,7 +31,7 @@ saritasa-tekton
 
 ## `chart.version`
 
-![Version: 1.0.0-dev.1](https://img.shields.io/badge/Version-1.0.0--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.54.0](https://img.shields.io/badge/AppVersion-v0.54.0-informational?style=flat-square)
+![Version: 1.0.0-dev.4](https://img.shields.io/badge/Version-1.0.0--dev.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.54.0](https://img.shields.io/badge/AppVersion-v0.54.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -206,7 +206,7 @@ Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries f
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | default is to avoid running tekton pods on windows nodes. | affinity for tekton-related pods |
-| dashboard.enabled | bool | `false` | enable tekton dashboard |
+| dashboard.enabled | bool | `true` | enable tekton dashboard |
 | dashboard.ingress | object | `{}` | tekton ingress configuration |
 | domainZone | string | `"site.com"` | This is required name of the hosted zone. All public services would be created under this hosted zone |
 | engine.config | object | `{}` | tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm |
