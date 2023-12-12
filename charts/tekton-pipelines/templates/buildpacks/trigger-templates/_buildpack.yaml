@@ -1,5 +1,5 @@
 {{- define "trigger-template.buildpack" -}}
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: {{ .pipeline.name }}-trigger-template
@@ -48,7 +48,7 @@ spec:
 
   resourcetemplates:
   - kind: PipelineRun
-    apiVersion: tekton.dev/v1beta1
+    apiVersion: tekton.dev/v1
     metadata:
       generateName: $(tt.params.application)-build-pipeline-run-
       labels:
