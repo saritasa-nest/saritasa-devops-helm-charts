@@ -1,0 +1,34 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment }}
+# Rolebinding for PipelineRun serviceAccount
+# Provides access to required resources, see more:
+# https://tekton.dev/docs/pipelines/pipelineruns/#specifying-custom-serviceaccount-credentials
+---
+# kind: RoleBinding
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-role-binding") }}
+#   namespace: {{ $.Release.Namespace }}
+# roleRef:
+#   apiGroup: rbac.authorization.k8s.io
+#   kind: Role
+#   name: tekton-triggers-core-interceptors-secrets
+# subjects:
+# - kind: ServiceAccount
+#   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-sa") }}
+#   namespace: {{ $.Release.Namespace }}
+
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range project
+{{- end }} # if apps

@@ -1,0 +1,77 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+# ========================================================================
+# {{ $project.project | upper }} PROJECT
+{{- range $component := $project.components }}
+
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+# initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise
+{{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
+
+# ========================================================================
+# 🐤 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT
+# ========================================================================
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment
+                  "eventlistener"     $.Values.eventlistener
+                  "gitBranchPrefixes" $gitBranchPrefixes }}
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: {{ include "tekton-apps.resourceName" $data }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  serviceAccountName: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-sa") }}
+  interceptors:
+  - ref:
+      kind: ClusterInterceptor
+      name: "cel"
+    params:
+      - name: "filter"
+        value: {{ .eventlistener.filter | default (include "tekton-apps.eventlistener.filter" $gitBranchPrefixes) }} &&
+               body.head_commit.author.name != "tekton-kustomize" &&
+               body.repository.name == {{ .repository | quote }}
+      - name: "overlays"
+        value:
+        - key: truncated_sha
+          expression: "body.head_commit.id.truncate(7)"
+        - key: branch_name
+          expression: "body.ref.split('/')[2]"
+        {{- if .eventlistener.extraOverlays }}
+        {{- toYaml .eventlistener.extraOverlays | nindent 8 }}
+        {{ end }}
+  - ref:
+      kind: ClusterInterceptor
+      name: "github"
+    params:
+      {{- if .eventlistener.enableWebhookSecret }}
+      - name: "secretRef"
+        value:
+          secretName: {{ include "tekton-apps.resourceName" (set $ "suffix" "webhook-secret") }}
+          secretKey: secret-token
+      {{- end }}
+      - name: "eventTypes"
+        value:
+      {{- if .eventlistener.eventTypes }}
+        {{- toYaml .eventlistener.eventTypes | nindent 8 }}
+      {{- else }}
+        - "push"
+      {{- end }}
+  bindings:
+  - kind: TriggerBinding
+    name: sha
+    value: $(extensions.truncated_sha)
+  - kind: TriggerBinding
+    ref: {{ include "tekton-apps.resourceName" (set $data "suffix" "env") }}
+  - kind: TriggerBinding
+    ref: github-trigger-binding
+  template:
+    ref: {{ .eventlistener.template }}
+{{- end }} # range component
+{{- end }} # if project.enabled
+{{- end }} # range project
+{{- end }} # if Values.apps

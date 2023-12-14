@@ -1,6 +1,6 @@
 {{ if .Values.apps }}
 {{- range $project := .Values.apps }}
-{{- if and $project.enabled }}
+{{- if $project.enabled }}
 
 # initialize `kubernetesRepository` variable with either `$project.kubernetesRepository` dict
 # if it is set or create a new default empty dict

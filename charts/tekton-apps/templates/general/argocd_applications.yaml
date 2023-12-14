@@ -1,6 +1,6 @@
 {{ if .Values.apps }}
 {{- range $project := .Values.apps }}
-{{- if and $project.enabled }}
+{{- if $project.enabled }}
 {{- range $component := $project.components }}
 {{- if not (hasKey $component "wordpress") }}
 
