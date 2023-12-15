@@ -1,5 +1,12 @@
 # Changelog
 
+## 2023-10-28
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/103)
+- fix typo in `kaniko` task docker image
+
 ## 2023-10-27
 
 [prod]
