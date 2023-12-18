@@ -39,6 +39,10 @@
   type: string
   description: git repository https url
 
+- name: repository_ssh_url
+  type: string
+  description: git repository ssh url
+
 - name: environment
   type: string
   description: environment name of the app being built, i.e. dev/staging/prod
@@ -74,6 +78,9 @@
   description: author link to profile
 
 - name: repository_url
+  description: git repository https url
+
+- name: repository_ssh_url
   description: git repository https url
 
 - name: environment
@@ -171,6 +178,8 @@
   value: "$(tt.params.pusher_url)"
 - name: repository_url
   value: "$(tt.params.repository_url)"
+- name: repository_ssh_url
+  value: "$(tt.params.repository_ssh_url)"
 - name: branch
   value: "$(tt.params.branch)"
 {{- if .docker }}

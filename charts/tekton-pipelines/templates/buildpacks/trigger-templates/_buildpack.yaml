@@ -69,8 +69,6 @@ spec:
           value: "$(tt.params.buildpack_builder_image)"
         - name: buildpack_runner_image
           value: "$(tt.params.buildpack_runner_image)"
-        - name: app_image
-          value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
         - name: repository_submodules
