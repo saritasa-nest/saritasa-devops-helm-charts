@@ -21,8 +21,7 @@ spec:
         project: $(tt.params.project)
         environment: $(tt.params.environment)
         component: $(tt.params.component)
-    spec:
-      serviceAccountName: $(tt.params.application)-build-pipeline-sa
+    spec: 
       pipelineRef:
         name: wordpress-build-pipeline
       params:

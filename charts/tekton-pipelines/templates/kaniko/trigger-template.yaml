@@ -45,10 +45,6 @@ spec:
         environment: $(tt.params.environment)
         component: $(tt.params.component)
     spec:
-      serviceAccountName: $(tt.params.application)-build-pipeline-sa
-      serviceAccountNames:
-        - taskName: kustomize
-          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: kaniko-build-pipeline
       params:
@@ -67,9 +63,17 @@ spec:
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
-
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
+      taskRunSpecs:
+        # sa with app repo secret
+        - pipelineTaskName: git-clone-app-source
+          serviceAccountName: $(tt.params.application)-build-pipeline-sa
+        # sa with k8s repo secret
+        - pipelineTaskName: git-clone-k8s-source
+          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+        - pipelineTaskName: kustomize
+          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       taskRunTemplate:
         podTemplate:
           volumes:
