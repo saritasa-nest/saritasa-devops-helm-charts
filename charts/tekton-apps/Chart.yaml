@@ -13,7 +13,7 @@ appVersion: "v0.29.0"
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 
-version: 0.2.15
+version: 0.2.16
 
 maintainers:
   - url: https://www.saritasa.com/
