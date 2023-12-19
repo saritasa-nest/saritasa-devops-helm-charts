@@ -75,7 +75,7 @@ spec:
       workingDir: $(resources.inputs.app.path)
       env:
         - name: "DOCKER_CONFIG"
-          value: "/kaniko/.docker/"
+          value: "/tekton/home/.docker/"
       command:
         - /kaniko/executor
       args:

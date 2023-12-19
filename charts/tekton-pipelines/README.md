@@ -266,7 +266,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.awscli | string | `"docker.io/amazon/aws-cli:2.7.4"` | aws cli image (used for aws ecr auth) |
 | images.bash | string | `"docker.io/library/bash:5.1.8"` | bash image (used for various ops in steps) |
 | images.git | string | `"alpine/git:v2.32.0"` | git image |
-| images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:23b7edd9b1fd0d35c742ccb308f2ee20eb936788f61b0e1ec16d1df36a5d171f"` | kaniko image used to build containers containing docker files - v1.19.1, uploaded December 15 2023 |
+| images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650"` | kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022 |
 | images.kubectl | string | `"bitnami/kubectl:1.22.10"` | kubectl cli |
 | images.kubeval | string | `"public.ecr.aws/saritasa/kubeval:0.16.1"` | kubeval image - validate Kubernetes manifests |
 | images.kustomize | string | `"registry.k8s.io/kustomize/kustomize:v5.0.0"` | kustomize cli |
