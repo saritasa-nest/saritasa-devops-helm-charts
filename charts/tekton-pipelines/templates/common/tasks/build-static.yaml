@@ -15,6 +15,25 @@ spec:
     - name: node_version
       type: string
       description: nodejs version to be used
+    - name: user_id
+      type: string
+      description: the user id of the builder image user.
+      default: "1000"
+    - name: group_id
+      type: string
+      description: the group id of the builder image user.
+      default: "1000"
+    - name: source_subpath
+      type: string
+      description: a subpath within the `source` input where the source to build is located.
+      default: ""
+    # below parameter is used at the end of `build-static` tasks (defined in values.yaml)
+    # for `frontend` build to store built static to `/workspace/source/sourcemaps/`
+    # dir for further usage in `sentry-release` task
+    - name: sourcemaps_dir
+      type: string
+      description: name of the dir where frontend sourcemaps would be stored in workspace
+      default: "sourcemaps"
   steps:
     - name: build-static
       image: node:$(params.node_version)
