@@ -92,6 +92,8 @@ spec:
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       taskRunTemplate:
         podTemplate:
+          securityContext:
+            fsGroup: 65532
           volumes:
           - name: $(tt.params.application)-buildpacks-cache
             persistentVolumeClaim:
