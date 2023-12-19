@@ -109,6 +109,18 @@ spec:
       runAfter:
         - prepare-build
 
+    - name: build-static
+      taskRef:
+        name: build-static
+      workspaces:
+        - name: source
+          workspace: app-source
+      params:
+        - name: node_version
+          value: "$(tasks.detect-nodejs-version.results.node-version)"
+      runAfter:
+        - detect-nodejs-version
+
     - name: {{ .pipeline.buildTaskName }}
       taskRef:
         name: {{ .pipeline.buildTaskName }}
@@ -144,11 +156,8 @@ spec:
           value: "$(params.environment)"
         - name: sourcemaps_dir
           value: "$(params.sourcemaps_dir)"
-      # results:
-      # - name: app_image_digest
-      #   description: Result app image digest
       runAfter:
-        - detect-nodejs-version
+        - build-static
 
     - name: git-clone-k8s-source
       taskRef:

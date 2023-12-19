@@ -63,53 +63,7 @@ buildpacks:
       overrideBuildStep: {}
       # -- steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
-      buildTaskSteps:
-        - name: build-static
-          image: node:$(params.node_version)
-          imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
-          script: |
-            #!/usr/bin/env bash
-            set -o pipefail
-
-            if [[ ! -f package.json ]]; then
-              echo "No package.json found, stepping out"
-            else
-              echo "Installing node.js dependencies"
-              # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci
-              if [[ $? -ne 0 ]]; then
-                echo "unable to install dependencies, exit_code: $?"
-                exit 1
-              fi
-              echo "Building $(params.environment) target"
-              npm run build:$(params.environment)
-              if [[ $? -ne 0 ]];  then
-                echo "unable to build $(params.environment) exit_code: $?"
-                exit 1
-              fi
-              echo "Cleaning up"
-              rm -rf node_modules
-              echo "Preparing for buildpack build"
-              cp -rf {project.toml,nginx.conf,buildpack.yml,nginx.d,.nginx.d,nginx.*,httpd.conf,.http.d,httpd.d,Procfile} $(params.source_subpath)  2>/dev/null
-              chown -R $(params.user_id):$(params.group_id) $(params.source_subpath)
-
-              # copy built dir to workspace for further usage in sentry-release task (source maps release)
-              echo "Save source maps"
-              mkdir -p $(workspaces.source.path)/$(params.sourcemaps_dir)
-              cp -rf $(params.source_subpath)/. $(workspaces.source.path)/$(params.sourcemaps_dir)
-
-              # needs to clean up created source maps for envs != `dev` to not show it on `staging` and `prod` envs,
-              # so now to be able to upload source maps to Sentry for all existing envs, `frontend` should be ALWAYS
-              # built with source maps for any env (dev / staging / prod)
-              if [[ "$(params.environment)" != "dev" ]]; then
-                echo "Clean up source maps from docker image"
-                find $(params.source_subpath)/. -name "*.map" -type f -delete
-              fi
-            fi
-          securityContext:
-            privileged: true
+      buildTaskSteps: {}
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
@@ -136,26 +90,6 @@ buildpacks:
       # -- steps to run in the `buildpack-php` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        - name: build-static
-          image: node:$(params.node_version)
-          imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
-          script: |
-            #!/bin/bash
-            set -e
-            [ -f package.json ] && {
-              echo "install node.js dependencies"
-
-              # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci
-
-              npm run build:$(params.environment) || echo "unable to build $(params.environment)"
-              rm -rf node_modules && echo "remove node_modules dir"
-            } || echo "No package.json found"
-          securityContext:
-            privileged: true
-
         - name: fix-php-detection
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
@@ -188,25 +122,6 @@ buildpacks:
       # -- steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        - name: build-static
-          image: node:$(params.node_version)
-          imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
-          script: |
-            #!/bin/bash
-            set -e
-            [ -f package.json ] && {
-              echo "install node.js dependencies"
-
-              # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci
-
-              npm run build:$(params.environment) || echo "unable to build $(params.environment)"
-              rm -rf node_modules && echo "remove node_modules dir"
-            } || echo "No package.json found"
-          securityContext:
-            privileged: true
         - name: copy-requirements
           image: docker.io/fnndsc/python-poetry:1.5.1
           imagePullPolicy: IfNotPresent
@@ -261,16 +176,6 @@ buildpacks:
       # -- steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
-        - name: git-fetch-tags
-          image: alpine/git:v2.32.0
-          imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
-          script: |
-            git fetch --tags --unshallow
-          securityContext:
-            privileged: true
-            runAsUser: 0
-
         - name: get-semantic-version
           workingDir: $(workspaces.source.path)
           image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
@@ -313,47 +218,6 @@ buildpacks:
             # clean `.dcproj` files related to local development docker .NET project
             cd $(workspaces.source.path)
             find . -name '*.dcproj' -type f -delete
-
-        - name: build-static
-          image: node:$(params.node_version)
-          imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
-          script: |
-            #!/bin/bash
-            set -Eeo pipefail
-
-            if [ ! -f buildpack.yml ]; then
-              echo "no buildpack.yml file found"
-              exit 0
-            fi
-
-            # download jq
-            # install js-yaml, which converts yaml to json
-            npm i -g js-yaml
-            wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 -O ./jq
-            chmod +x jq
-
-            # the package.json is expected to be in that folder that we get from
-            # buildpack.yml file
-            package_path=$(js-yaml buildpack.yml | ./jq -r '."dotnet-build"."project-path"')
-            cd "$package_path"
-
-            # if that folder has package.json then run build:ENV task
-            [ -f package.json ] && {
-              echo "install node.js dependencies"
-
-              # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
-              npm ci
-
-              (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
-              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-            } || echo "No package.json found"
-
-            echo "done"
-          securityContext:
-            privileged: true
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │
