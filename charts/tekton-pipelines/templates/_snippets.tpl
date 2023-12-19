@@ -250,6 +250,8 @@ finally:
         value: "$(params.pusher_url)"
       - name: repository_url
         value: "$(params.repository_url)"
+      - name: repository_ssh_url
+        value: "$(params.repository_ssh_url)"
       - name: branch
         value: "$(params.branch)"
       - name: environment
