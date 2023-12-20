@@ -10,72 +10,72 @@ spec:
     Pipeline will only build the image utilizing buildpack-frontend task and then send notification via slack. The deployment is done via argocd
 
   params:
-    
+
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
-    
+
     - name: sha
       type: string
       description: sha commit ID of the image deployed in cluster
-    
+
     - name: head_commit
       type: string
       description: full SHA commit ID
-    
+
     - name: head_commit_message
       type: string
       description: description of the commit (by developer)
-    
+
     - name: pusher_name
       type: string
       description: author name
-    
+
     - name: pusher_email
       type: string
       description: author email
-    
+
     - name: pusher_avatar
       type: string
       description: author url avatar image
-    
+
     - name: pusher_url
       type: string
       description: author link to profile
-    
+
     - name: repository_url
       type: string
       description: git repository https url
-    
+
     - name: environment
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
-    
+
     - name: branch
       type: string
       description: git branch
-    
-    - name: docker_registry
+
+    - name: image_registry
       type: string
       description: private docker registry address
-    
-    - name: docker_registry_repository
+
+    - name: image_registry_repository
       type: string
       description: private docker registry repository address
-    
+
     - name: kubernetes_repository_ssh_url
       type: string
       description: git repo for kustomize management
-    
+
     - name: kubernetes_branch
       type: string
       default: main
       description: git branch for kustomize managed git repo
-    
+
     - name: kubernetes_repository_kustomize_path
       type: string
       description: overlay path for kustomize call
-    
+
     - name: app_image
       type: string
       description: reference to a app result image
@@ -148,9 +148,6 @@ spec:
       workspaces:
         - name: output
           workspace: app-source
-      # podTemplate:
-      #   securityContext:
-      #     fsGroup: 65532
 
     - name: prepare-build
       taskRef:
@@ -197,8 +194,8 @@ spec:
           value: "$(params.buildpack_runner_image)"
         - name: app_image
           value: "$(params.app_image)"
-        - name: docker_registry
-          value: $(params.docker_registry)
+        - name: image_registry
+          value: $(params.image_registry)
         - name: cache
           value: $(params.application)-buildpacks-cache
         - name: source_subpath
@@ -232,9 +229,6 @@ spec:
       workspaces:
         - name: output
           workspace: k8s-source
-      # podTemplate:
-      #   securityContext:
-      #     fsGroup: 65532
 
     - name: kustomize
       taskRef:
@@ -265,9 +259,9 @@ spec:
       runAfter:
         - kustomize
 
-  
 
-  
+
+
     - name: post-deploy
       taskRef:
         name:  buildpack-frontend-build-pipeline-post-deploy
@@ -283,9 +277,245 @@ spec:
         - name: environment
           value: "$(params.environment)"
       runAfter:
-        -  deploy 
+        -  deploy
 
-  
+
+  finally:
+    - name: slack-notification
+      taskRef:
+        name: slack-notification
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: sha
+          value: "$(params.sha)"
+        - name: head_commit
+          value: "$(params.head_commit)"
+        - name: head_commit_message
+          value: "$(params.head_commit_message)"
+        - name: pusher_name
+          value: "$(params.pusher_name)"
+        - name: pusher_email
+          value: "$(params.pusher_email)"
+        - name: pusher_avatar
+          value: "$(params.pusher_avatar)"
+        - name: pusher_url
+          value: "$(params.pusher_url)"
+        - name: repository_url
+          value: "$(params.repository_url)"
+        - name: branch
+          value: "$(params.branch)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: status
+          value: "$(tasks.deploy.status)"
+---
+# Source: saritasa-tekton-pipelines/templates/kaniko/pipeline.yaml
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: kaniko-build-pipeline
+  namespace: default
+spec:
+  description: >-
+    Pipeline will only build the image utilizing dockerfile using kaniko and then send notification via slack.
+    The deployment is done via argocd
+
+  params:
+
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: sha
+      type: string
+      description: sha commit ID of the image deployed in cluster
+
+    - name: head_commit
+      type: string
+      description: full SHA commit ID
+
+    - name: head_commit_message
+      type: string
+      description: description of the commit (by developer)
+
+    - name: pusher_name
+      type: string
+      description: author name
+
+    - name: pusher_email
+      type: string
+      description: author email
+
+    - name: pusher_avatar
+      type: string
+      description: author url avatar image
+
+    - name: pusher_url
+      type: string
+      description: author link to profile
+
+    - name: repository_url
+      type: string
+      description: git repository https url
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+    - name: branch
+      type: string
+      description: git branch
+
+    - name: image_registry
+      type: string
+      description: private docker registry address
+
+    - name: image_registry_repository
+      type: string
+      description: private docker registry repository address
+
+    - name: kubernetes_repository_ssh_url
+      type: string
+      description: git repo for kustomize management
+
+    - name: kubernetes_branch
+      type: string
+      default: main
+      description: git branch for kustomize managed git repo
+
+    - name: kubernetes_repository_kustomize_path
+      type: string
+      description: overlay path for kustomize call
+
+    - name: app_image
+      type: string
+      description: reference to a app result image
+
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: namespace
+      type: string
+      description: project's namespace
+
+    - name: docker_file
+      type: string
+      default: Dockerfile
+      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
+
+    - name: docker_context
+      type: string
+      default: "."
+      description: dockerfile context path
+
+    - name: kaniko_extra_args
+      type: string
+      description: extra args to be passed into kaniko builder
+      default: ''
+
+    - name: sentry_project_name
+      type: string
+      description: name of the project in Sentry
+
+    - name: sourcemaps_dir
+      type: string
+      description: name of the dir where frontend sourcemaps would be stored in workspace
+      default: "sourcemaps"
+
+  workspaces:
+    - name: app-source
+    - name: k8s-source
+
+  tasks:
+    - name: kaniko
+      taskRef:
+        name: kaniko
+      # results:
+      #   - name: app_image_digest
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: image_registry
+          value: $(params.image_registry)
+        - name: environment
+          value: "$(params.environment)"
+        - name: docker_file
+          value: "$(params.registry_file)"
+        - name: docker_context
+          value: "$(params.registry_context)"
+        - name: extra_args
+          value:
+            - $(params.kaniko_extra_args)
+        - name: app_image
+          value: "$(params.app_image)"
+      workspaces:
+        - name: source
+          workspace: app-source
+
+    - name: git-clone-k8s-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: k8s-source
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+
+    - name: kustomize
+      taskRef:
+        name: kustomize
+      workspaces:
+        - name: source
+          value: k8s-source
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: image
+          value: "$(params.app_image)"
+        - name: kustomize_overlay_path
+          value: "$(params.kubernetes_repository_kustomize_path)"
+        - name: kubernetes_branch
+          value: "$(params.kubernetes_branch)"
+        - name: environment
+          value: "$(params.environment)"
+      runAfter:
+        - kaniko
+
+    - name: deploy
+      taskRef:
+        name: argocd-deploy
+      params:
+        - name : application
+          value: "$(params.application)"
+      runAfter:
+        - kustomize
+
+
+
+
+    - name: post-deploy
+      taskRef:
+        name:  kaniko-post-deploy
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: project
+          value: "$(params.project)"
+        - name: namespace
+          value: "$(params.namespace)"
+        - name: sha
+          value: "$(params.sha)"
+        - name: environment
+          value: "$(params.environment)"
+      runAfter:
+        -  deploy
+
+
   finally:
     - name: slack-notification
       taskRef:
@@ -351,7 +581,7 @@ spec:
       type: string
       description: reference to a result app image
 
-    - name: docker_registry
+    - name: image_registry
       type: string
       description: private docker registry address
 
@@ -455,39 +685,35 @@ spec:
         privileged: true
 
     # insert customized steps as defined in the values.yaml of the helm chart
-    - image: first-step-image
-      imagePullPolicy: IfNotPresent
-      name: first-step
-      resources:
+    - computeResources:
         limits:
           cpu: 512m
           memory: 1Gi
         requests:
           cpu: 250m
           memory: 500Mi
+      image: first-step-image
+      imagePullPolicy: IfNotPresent
+      name: first-step
       script: |
         #!/bin/bash
         echo First Step
-      securityContext:
-        privileged: true
       workingDir: $(workspaces.source.path)
-    - image: second-step-image
-      imagePullPolicy: IfNotPresent
-      name: second-step
-      resources:
+    - computeResources:
         limits:
           cpu: 512m
           memory: 1Gi
         requests:
           cpu: 250m
           memory: 500Mi
+      image: second-step-image
+      imagePullPolicy: IfNotPresent
+      name: second-step
       script: |
         #!/bin/bash
         echo Second Step
-      securityContext:
-        privileged: true
       workingDir: $(workspaces.source.path)
-    
+
     # if you need to debug this step you can do:
     # insert `sleep 3000` after the aws ecr get-login-password command and then get inside the container
     # k exec -ti `k --no-headers=true get pods -l tekton.dev/task=buildpack | awk '{print $1}'` -c step-create bash
@@ -498,7 +724,7 @@ spec:
       script: |
         #!/bin/bash
 
-        aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.docker_registry)
+        aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.image_registry)
 
         /cnb/lifecycle/creator \
           -app=$(params.source_subpath) \
@@ -535,7 +761,7 @@ spec:
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
-    
+
   volumes:
     - name: empty-dir
       emptyDir: {}
@@ -1227,47 +1453,47 @@ spec:
     You can see my question about dealing with task status here: https://github.com/tektoncd/pipeline/issues/3762
 
   params:
-    
+
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
-    
+
     - name: sha
       type: string
       description: sha commit ID of the image deployed in cluster
-    
+
     - name: head_commit
       type: string
       description: full SHA commit ID
-    
+
     - name: head_commit_message
       type: string
       description: description of the commit (by developer)
-    
+
     - name: pusher_name
       type: string
       description: author name
-    
+
     - name: pusher_email
       type: string
       description: author email
-    
+
     - name: pusher_avatar
       type: string
       description: author url avatar image
-    
+
     - name: pusher_url
       type: string
       description: author link to profile
-    
+
     - name: repository_url
       type: string
       description: git repository https url
-    
+
     - name: environment
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
-    
+
     - name: branch
       type: string
       description: git branch
@@ -1403,6 +1629,184 @@ spec:
         -field6_value "$error_msg" \
         -field6_short false
 ---
+# Source: saritasa-tekton-pipelines/templates/kaniko/tasks/kaniko.yaml
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: kaniko
+  namespace: default
+
+spec:
+  description: >-
+    This is task for legacy Saritasa projects written with Dockerfile, compilation is done by using Kaniko
+    https://www.baeldung.com/ops/kaniko
+
+  workspaces:
+    - name: source
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: image_registry
+      type: string
+      description: aws private ecr registry address
+
+    - name: docker_file
+      type: string
+      description: name of the dockerfile
+      default: "Dockerfile"
+
+    - name: docker_context
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: "."
+
+    - name: extra_args
+      type: array
+      description: extra args to be passed into kaniko builder
+      default: []
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+    - name: app_image
+      type: string
+      description: result app image url
+
+  results:
+    - name: password
+      description: The password to authenticate to ecr registry.
+    # - name: app_image_digest
+    #   description: result app image digest
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  steps:
+    - name: authenticate
+      image: docker.io/amazon/aws-cli:2.7.4
+      imagePullPolicy: IfNotPresent
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/bash
+        aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
+
+    - name: build
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: IfNotPresent
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: "DOCKER_CONFIG"
+          value: "/tekton/home/.docker/"
+      command:
+        - /kaniko/executor
+      args:
+        - $(params.extra_args[*])
+        - --build-arg=ENVIRONMENT=$(params.environment)
+        - --dockerfile=$(params.registry_file)
+        - --context=$(workspaces.source.path)/$(params.registry_context)
+        - --destination=$(params.app_image)
+        # - --digest-file=$(results.app_image_digest.path)
+        # - --verbosity=debug
+
+      volumeMounts:
+        - name: layers-dir
+          mountPath: /layers
+
+      # kaniko assumes it is running as root, which means this example fails on platforms
+      # that default to run containers as random uid (like OpenShift). Adding this securityContext
+      # makes it explicit that it needs to run as root.
+      securityContext:
+        runAsUser: 0
+---
+# Source: saritasa-tekton-pipelines/templates/kaniko/tasks/post-deploy.yaml
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: kaniko-post-deploy
+  namespace: default
+
+spec:
+  description: >-
+    Task performs custom post deploy actions, which are set from values.yaml
+    (for ex. run selenium tests or etc)
+
+  params:
+
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: namespace
+      type: string
+      description: project's namespace
+
+    - name: sha
+      type: string
+      description: sha commit ID of the image deployed in cluster
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  steps:
+    - name: argo-events
+      image: badouralix/curl-jq
+      imagePullPolicy: IfNotPresent
+      script: |
+        #!/usr/bin/env sh
+
+        # Env contains params passed from '*-build-pipeline-config' ConfigMap,
+        # here we convert them to lowercased json and pass to JSON_PAYLOAD as 'extra'.
+
+        # This workflow allows us to pass any dynamic custom parameters needed to argo-events
+        # sensors without changing tekton helm charts all the time, so any project may have
+        # any custom parameter, which will be passed to argo-events and then corresponding Sensor
+        # would be triggered based on this 'extra' params.
+        EXTRA=$(jq -n env | jq 'walk(if type=="object" then with_entries(.key|=ascii_downcase) else . end)')
+        JSON_TEMPLATE='{
+          "namespace": "$(params.namespace)",
+          "project": "$(params.project)",
+          "environment": "$(params.environment)",
+          "application": "$(params.application)",
+          "sha": "$(params.sha)",
+          "extra": %s
+        }'
+        JSON_PAYLOAD=$(printf "$JSON_TEMPLATE" "$EXTRA")
+
+        echo "Payload: $JSON_PAYLOAD"
+
+        OUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location \
+          --request POST "build-succeed-eventsource-svc.argo-events.svc.cluster.local:12000/build-succeed" \
+          --header 'Content-Type: application/json' \
+          --data-raw "$JSON_PAYLOAD")
+
+        STATUS_CODE=$(echo "${OUTPUT}" | sed -e 's/.*\httpcode=//')
+        if [ ${STATUS_CODE} -ne 204 ] && [ ${STATUS_CODE} -ne 200 ]; then
+            echo "Curl operation/command failed due to server return code - ${STATUS_CODE}"
+            exit 0
+        fi
+
+        echo "Sent 'build-succeed' webhook"
+
+  # insert customized steps as defined in the values.yaml of the helm chart
+---
 # Source: saritasa-tekton-pipelines/templates/common/triggers/github-trigger-binding.yaml
 apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerBinding
@@ -1446,61 +1850,61 @@ spec:
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
   params:
-    
+
     - name: application
       description: name of the argocd application we're going to deploy/sync
-    
+
     - name: sha
       description: sha commit ID of the image deployed in cluster
-    
+
     - name: head_commit
       description: full SHA commit ID
-    
+
     - name: head_commit_message
       description: description of the commit (by developer)
-    
+
     - name: pusher_name
       description: author name
-    
+
     - name: pusher_email
       description: author email
-    
+
     - name: pusher_avatar
       description: author url avatar image
-    
+
     - name: pusher_url
       description: author link to profile
-    
+
     - name: repository_url
       description: git repository https url
-    
+
     - name: environment
       description: environment name of the app being built, i.e. dev/staging/prod
-    
+
     - name: project
       description: name of the project, which component is deployed
-    
+
     - name: component
       description: name of the application component, which is deployed
-    
+
     - name: branch
       description: git branch
-    
-    - name: docker_registry
+
+    - name: image_registry
       description: private docker registry address
-    
-    - name: docker_registry_repository
+
+    - name: image_registry_repository
       description: private docker registry repository address
-    
+
     - name: kubernetes_repository_ssh_url
       description: git repo for kustomize management
-    
+
     - name: kubernetes_branch
       description: git branch for kustomize managed git repo
-    
+
     - name: kubernetes_repository_kustomize_path
       description: overlay path for kustomize call
-    
+
     - name: app_image
       description: reference to a app result image
 
@@ -1573,10 +1977,10 @@ spec:
           value: "$(tt.params.repository_url)"
         - name: branch
           value: "$(tt.params.branch)"
-        - name: docker_registry
-          value: "$(tt.params.docker_registry)"
-        - name: docker_registry_repository
-          value: "$(tt.params.docker_registry_repository)"
+        - name: image_registry
+          value: "$(tt.params.image_registry)"
+        - name: image_registry_repository
+          value: "$(tt.params.image_registry_repository)"
         - name: kubernetes_repository_ssh_url
           value: "$(tt.params.kubernetes_repository_ssh_url)"
         - name: kubernetes_repository_kustomize_path
@@ -1584,7 +1988,7 @@ spec:
         - name: kubernetes_branch
           value: "$(tt.params.kubernetes_branch)"
         - name: app_image
-          value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
+          value: "$(tt.params.image_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
         - name: environment
           value: "$(tt.params.environment)"
         - name: project
@@ -1596,7 +2000,7 @@ spec:
         - name: buildpack_runner_image
           value: "$(tt.params.buildpack_runner_image)"
         - name: app_image
-          value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
+          value: "$(tt.params.image_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
         - name: repository_submodules
@@ -1635,7 +2039,198 @@ spec:
                 - path: "annotations"
                   fieldRef:
                     fieldPath: metadata.annotations
-          
+
+          nodeSelector:
+            ci: "true"
+          tolerations:
+          - effect: NoSchedule
+            key: ci
+            operator: Equal
+            value: "true"
+---
+# Source: saritasa-tekton-pipelines/templates/kaniko/trigger-template.yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: kaniko-build-pipeline-trigger-template
+  namespace: default
+spec:
+  params:
+
+    - name: application
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: sha
+      description: sha commit ID of the image deployed in cluster
+
+    - name: head_commit
+      description: full SHA commit ID
+
+    - name: head_commit_message
+      description: description of the commit (by developer)
+
+    - name: pusher_name
+      description: author name
+
+    - name: pusher_email
+      description: author email
+
+    - name: pusher_avatar
+      description: author url avatar image
+
+    - name: pusher_url
+      description: author link to profile
+
+    - name: repository_url
+      description: git repository https url
+
+    - name: environment
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+    - name: project
+      description: name of the project, which component is deployed
+
+    - name: component
+      description: name of the application component, which is deployed
+
+    - name: branch
+      description: git branch
+
+    - name: image_registry
+      description: private docker registry address
+
+    - name: image_registry_repository
+      description: private docker registry repository address
+
+    - name: kubernetes_repository_ssh_url
+      description: git repo for kustomize management
+
+    - name: kubernetes_branch
+      description: git branch for kustomize managed git repo
+
+    - name: kubernetes_repository_kustomize_path
+      description: overlay path for kustomize call
+
+    - name: app_image
+      description: reference to a app result image
+
+    - name: namespace
+      description: project's namespace
+
+    - name: repository_ssh_url
+      description: git repository ssh url
+
+    - name: repository_submodules
+      description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
+      default: "true"
+
+    - name: docker_file
+      default: Dockerfile
+      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
+
+    - name: docker_context
+      default: "."
+      description: dockerfile context path
+
+    - name: kaniko_extra_args
+      default: ''
+      description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
+
+    - name: sentry_project_name
+      description: name of the project in Sentry
+
+  resourcetemplates:
+  - kind: PipelineRun
+    apiVersion: tekton.dev/v1beta1
+    metadata:
+      generateName: $(tt.params.application)-kaniko-build-pipeline-run-
+      labels:
+        app: $(tt.params.application)
+        project: $(tt.params.project)
+        environment: $(tt.params.environment)
+        component: $(tt.params.component)
+    spec:
+      serviceAccountName: $(tt.params.application)-build-pipeline-sa
+      serviceAccountNames:
+        - taskName: kustomize
+          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+      pipelineRef:
+        name: kaniko-build-pipeline
+      params:
+        - name: "application"
+          value: "$(tt.params.application)"
+        - name: sha
+          value: "$(tt.params.sha)"
+        - name: head_commit
+          value: "$(tt.params.head_commit)"
+        - name: head_commit_message
+          value: "$(tt.params.head_commit_message)"
+        - name: pusher_name
+          value: "$(tt.params.pusher_name)"
+        - name: pusher_email
+          value: "$(tt.params.pusher_email)"
+        - name: pusher_avatar
+          value: "$(tt.params.pusher_avatar)"
+        - name: pusher_url
+          value: "$(tt.params.pusher_url)"
+        - name: repository_url
+          value: "$(tt.params.repository_url)"
+        - name: branch
+          value: "$(tt.params.branch)"
+        - name: image_registry
+          value: "$(tt.params.image_registry)"
+        - name: image_registry_repository
+          value: "$(tt.params.image_registry_repository)"
+        - name: kubernetes_repository_ssh_url
+          value: "$(tt.params.kubernetes_repository_ssh_url)"
+        - name: kubernetes_repository_kustomize_path
+          value: "$(tt.params.kubernetes_repository_kustomize_path)"
+        - name: kubernetes_branch
+          value: "$(tt.params.kubernetes_branch)"
+        - name: app_image
+          value: "$(tt.params.image_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
+        - name: environment
+          value: "$(tt.params.environment)"
+        - name: project
+          value: "$(tt.params.project)"
+        - name: namespace
+          value: "$(tt.params.namespace)"
+        - name: docker_file
+          value: "$(tt.params.registry_file)"
+        - name: docker_context
+          value: "$(tt.params.registry_context)"
+        - name: kaniko_extra_args
+          value: "$(tt.params.kaniko_extra_args)"
+        - name: repository_submodules
+          value: "$(tt.params.repository_submodules)"
+        - name: sentry_project_name
+          value: "$(tt.params.sentry_project_name)"
+
+      workspaces:
+        - name: app-source
+          persistentVolumeClaim:
+            claimName: $(tt.params.application)-workspace-pvc
+        - name: k8s-source
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 2Gi
+      taskRunTemplate:
+        podTemplate:
+          volumes:
+          - name: podinfo
+            downwardAPI:
+              items:
+                - path: "labels"
+                  fieldRef:
+                    fieldPath: metadata.labels
+                - path: "annotations"
+                  fieldRef:
+                    fieldPath: metadata.annotations
+
           nodeSelector:
             ci: "true"
           tolerations:

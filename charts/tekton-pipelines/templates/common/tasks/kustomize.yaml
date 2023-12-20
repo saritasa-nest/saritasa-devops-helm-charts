@@ -11,24 +11,10 @@ spec:
     - name: source
 
   params:
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
-
-    - name: image
-      type: string
-      description: new image for the application
-
-    - name: kustomize_overlay_path
-      type: string
-      description: overlay path for kustomize call
-
-    - name: kubernetes_branch
-      default: "main"
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.git" (dict "target" "task") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "task") | nindent 4 }}
+    {{- include "params.kubernetes" (dict "target" "task") | nindent 4 }}
 
   stepTemplate:
     envFrom:
@@ -47,13 +33,13 @@ spec:
     - name: update-image
       image: {{ .Values.images.kustomize | default "registry.k8s.io/kustomize/kustomize:v5.0.0"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.k8s-source.path)
+      workingDir: $(workspaces.source.path)
       script: |
         app=$(params.application)
         env=$(params.environment)
         application=${app%-$env}
-        cd $(params.kustomize_overlay_path) && \
-          /app/kustomize edit set image $application=$(params.image)
+        cd $(params.kubernetes_repository_kustomize_path) && \
+          /app/kustomize edit set image $application=$(params.app_image)
 
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
@@ -65,7 +51,7 @@ spec:
           CONFIG=$(realpath .yamlfix.toml)
         fi
 
-        find $(params.kustomize_overlay_path) -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
+        find $(params.kubernetes_repository_kustomize_path) -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
 
     - name: kubeval
       image: {{ .Values.images.kubeval | default "public.ecr.aws/saritasa/kubeval:latest"}}
@@ -80,7 +66,7 @@ spec:
         KUBERNETES_VERSION=$(echo $KUBERNETES_INFO | jq -r ".gitVersion" | grep -oE '\d\d?\.\d\d?\.\d\d?')
 
         export KUBEVAL_SCHEMA_LOCATION=https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master
-        kustomize build $(params.kustomize_overlay_path) | kubeval --ignore-missing-schemas --kubernetes-version=$KUBERNETES_VERSION -f -
+        kustomize build $(params.kubernetes_repository_kustomize_path) | kubeval --ignore-missing-schemas --kubernetes-version=$KUBERNETES_VERSION -f -
 
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
@@ -95,7 +81,7 @@ spec:
           echo "There are no changes, nothing to commit"
           exit
         fi
-        git commit -am "feat: $(params.environment) argocd deployment $(params.kustomize_overlay_path), new image: $(params.image)"
+        git commit -am "feat: $(params.environment) argocd deployment $(params.kubernetes_repository_kustomize_path), new image: $(params.image)"
         # define retry delays appropriate for dash
         set -- "0" "1" "3" "5"
         for DELAY

@@ -10,9 +10,7 @@ spec:
     values to platform dir for further processing by buildpack task.
 
   params:
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
 
   stepTemplate:
     envFrom:

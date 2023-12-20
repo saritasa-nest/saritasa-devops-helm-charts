@@ -1,8 +1,75 @@
-{{- range $pipeline := .Values.buildpacks.generate }}
-{{$data := dict "pipeline"    $pipeline
-                "namespace"   $.Release.Namespace
-                "podTemplate" $.Values.podTemplate }}
-{{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
-{{ include "trigger-template.buildpack" $data }}
-{{ end }}
-{{- end}}
+{{- range $pipeline := .Values.buildpacks.generate -}}
+{{- if and $.Values.buildpacks.enabled .enabled -}}
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: {{ .name }}-trigger-template
+  namespace: {{ $.Release.Namespace }}
+spec:
+# ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ Parameters of the triggertemplate are pushed here based on triggerbindings   │
+# │ objects                                                                      │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+  params: 
+    {{- include "params.app" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.git" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.buildpack" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.kubernetes" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.sentry" (dict "target" "tt" "sentry" $.Values.sentry.enabled) | nindent 4 }}
+
+  resourcetemplates:
+  - kind: PipelineRun
+    apiVersion: tekton.dev/v1
+    metadata:
+      generateName: $(tt.params.application)-build-pipeline-run-
+      labels:
+        app: $(tt.params.application)
+        project: $(tt.params.project)
+        environment: $(tt.params.environment)
+        component: $(tt.params.component)
+    spec:
+      pipelineRef:
+        name: {{ .name }}
+      params:
+        {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.buildpack" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.kubernetes" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "tt") | nindent 8 }}
+      workspaces:
+        {{- include "pipeline.source_workspaces" . | nindent 8 }}
+      taskRunSpecs:
+        # sa with app repo secret
+        - pipelineTaskName: git-clone-app-source
+          serviceAccountName: $(tt.params.application)-build-pipeline-sa
+        # sa with k8s repo secret
+        - pipelineTaskName: git-clone-k8s-source
+          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+        - pipelineTaskName: kustomize
+          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+      taskRunTemplate:
+        podTemplate:
+          securityContext:
+            fsGroup: 65532
+          volumes:
+          - name: $(tt.params.application)-buildpacks-cache
+            persistentVolumeClaim:
+              claimName: $(tt.params.application)-buildpacks-cache-pvc
+          - name: podinfo
+            downwardAPI:
+              items:
+                - path: "labels"
+                  fieldRef:
+                    fieldPath: metadata.labels
+                - path: "annotations"
+                  fieldRef:
+                    fieldPath: metadata.annotations
+          {{- if $.Values.podTemplate }}
+          {{ toYaml $.Values.podTemplate | nindent  10 }}
+          {{end }}
+{{- end }}
+{{- end }}

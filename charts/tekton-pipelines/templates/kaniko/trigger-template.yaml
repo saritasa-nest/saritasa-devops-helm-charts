@@ -1,4 +1,5 @@
 {{ if .Values.kaniko.enabled }}
+---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
@@ -6,33 +7,12 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   params:
-    {{ include "trigger-template.defaultParams" . | nindent 4 }}
-    {{ include "trigger-template.defaultDockerKubernetesParams" . | nindent 4 }}
-
-    - name: namespace
-      description: project's namespace
-
-    - name: repository_ssh_url
-      description: git repository ssh url
-
-    - name: repository_submodules
-      description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
-      default: "true"
-
-    - name: docker_file
-      default: Dockerfile
-      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
-
-    - name: docker_context
-      default: "."
-      description: dockerfile context path
-
-    - name: kaniko_extra_args
-      default: ''
-      description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
-
-    - name: sentry_project_name
-      description: name of the project in Sentry
+    {{- include "params.app" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.git" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.docker" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.kubernetes" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.sentry" (dict "target" "tt" "sentry" $.Values.sentry.enabled) | nindent 4 }}
 
   resourcetemplates:
   - kind: PipelineRun
@@ -48,23 +28,14 @@ spec:
       pipelineRef:
         name: kaniko-build-pipeline
       params:
-        {{- include "pipelinerun.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
-        - name: project
-          value: "$(tt.params.project)"
-        - name: namespace
-          value: "$(tt.params.namespace)"
-        - name: docker_file
-          value: "$(tt.params.docker_file)"
-        - name: docker_context
-          value: "$(tt.params.docker_context)"
-        - name: kaniko_extra_args
-          value: "$(tt.params.kaniko_extra_args)"
-        - name: repository_submodules
-          value: "$(tt.params.repository_submodules)"
-        - name: sentry_project_name
-          value: "$(tt.params.sentry_project_name)"
+        {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.docker" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.kubernetes" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "tt") | nindent 8 }}
       workspaces:
-        {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
+        {{- include "pipeline.source_workspaces" . | nindent 8 }}
       taskRunSpecs:
         # sa with app repo secret
         - pipelineTaskName: git-clone-app-source
@@ -76,6 +47,8 @@ spec:
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       taskRunTemplate:
         podTemplate:
+          securityContext:
+            fsGroup: 65532
           volumes:
           - name: podinfo
             downwardAPI:

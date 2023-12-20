@@ -10,8 +10,8 @@ spec:
     You can see my question about dealing with task status here: https://github.com/tektoncd/pipeline/issues/3762
 
   params:
-    {{ include "pipeline.defaultParams" . | nindent 4 }}
-
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.git" (dict "target" "task") | nindent 4 }}
     - name: status
       type: string
       description: status of the deployment (i.e. "succeeded")

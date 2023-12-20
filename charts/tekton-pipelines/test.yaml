@@ -2,6 +2,7 @@ buildpacks:
   enabled: true
   generate:
     buildpackFrontendBuildPipeline:
+      name: buildpack-frontend-build-pipeline
       enabled: true
       buildTaskSteps:
         - name: first-step
@@ -18,8 +19,8 @@ buildpacks:
           script: |
             #!/bin/bash
             echo First Step
-          securityContext:
-            privileged: true
+          # securityContext:
+          #   privileged: true
         - name: second-step
           image: second-step-image
           imagePullPolicy: IfNotPresent
@@ -34,21 +35,21 @@ buildpacks:
           script: |
             #!/bin/bash
             echo Second Step
-          securityContext:
-            privileged: true
-    buildpackDjangoBuildPipeline:
-      enabled: false
-    buildpackPhpBuildPipeline:
-      enabled: false
-    buildpackDotnetBuildPipeline:
-      enabled: false
-    buildpackNodejsBuildPipeline:
-      enabled: false
-    buildpackGoBuildPipeline:
-      enabled: false
-    buildpackRubyBuildPipeline:
-      enabled: false
+          # securityContext:
+          #   privileged: true
+    # buildpackDjangoBuildPipeline:
+    #   enabled: false
+    # buildpackPhpBuildPipeline:
+    #   enabled: false
+    # buildpackDotnetBuildPipeline:
+    #   enabled: false
+    # buildpackNodejsBuildPipeline:
+    #   enabled: false
+    # buildpackGoBuildPipeline:
+    #   enabled: false
+    # buildpackRubyBuildPipeline:
+    #   enabled: false
 kaniko:
-  enabled: false
+  enabled: true
 wordpress:
   enabled: false

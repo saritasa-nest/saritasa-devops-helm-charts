@@ -6,8 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   params:
-    {{ include "trigger-template.defaultParams" . | nindent 4 }}
-
+    {{- include "params.app" (dict "target" "tt") | nindent 4 }}
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 

@@ -1,6 +1,155 @@
 {{- range $pipeline := .Values.buildpacks.generate }}
-{{$data := dict "pipeline" $pipeline "namespace" $.Release.Namespace "sentry" $.Values.sentry}}
 {{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
-{{ include "pipeline.buildpack" $data }}
-{{ end }}
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: {{ .name }}
+  namespace: {{$.Release.Namespace }}
+spec:
+  description: |-
+    {{- .description | default (printf "Pipeline will only build the image utilizing %s task and then send notification via slack. The deployment is done via argocd" (.buildTaskName)) | nindent 4 }}
+
+  params:
+    {{- include "params.app" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.git" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.buildpack" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.kubernetes" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.sentry" (dict "target" "pl") | nindent 4 }}
+
+  workspaces:
+    - name: app-source
+    - name: k8s-source
+
+  tasks:
+    - name: git-clone-app-source
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repository_ssh_url)
+        - name: revision
+          value: $(params.head_commit)
+        - name: submodules
+          value: $(params.repository_submodules)
+      workspaces:
+        - name: output
+          workspace: app-source
+
+    - name: buildpack-prepare-build
+      taskRef:
+        name: buildpack-prepare-build
+      workspaces:
+        - name: source
+          workspace: app-source
+      params:
+        {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
+    - name: detect-nodejs-version
+      taskRef:
+        name: detect-nodejs-version
+      workspaces:
+        - name: source
+          workspace: app-source
+      params:
+        - name: default_version
+          value: "14"
+      runAfter:
+        - prepare-build
+
+    - name: build-static
+      taskRef:
+        name: build-static
+      workspaces:
+        - name: source
+          workspace: app-source
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
+        - name: node_version
+          value: "$(tasks.detect-nodejs-version.results.node-version)"
+      runAfter:
+        - detect-nodejs-version
+
+    - name: {{ .buildTaskName }}
+      taskRef:
+        name: {{ .buildTaskName }}
+      workspaces:
+        - name: source
+          workspace: app-source
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
+      runAfter:
+        - build-static
+
+    - name: git-clone-k8s-source
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+      workspaces:
+        - name: output
+          workspace: k8s-source
+
+    - name: kustomize
+      taskRef:
+        name: kustomize
+      workspaces:
+        - name: source
+          workspace: k8s-source
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.kubernetes" (dict "source" "pl") | nindent 8 }}
+      runAfter:
+        - {{ .buildTaskName }}
+
+    - name: deploy
+      taskRef:
+        name: argocd-deploy
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+      runAfter:
+        - kustomize
+
+    - name: sentry-release
+      when:
+        cel: "'$(params.sentry_enabled)' != 'false'"
+      taskRef:
+        name:  sentry-release
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
+      workspaces:
+        - name: source
+          workspace: app-source
+      runAfter:
+        - deploy
+
+    - name: post-deploy
+      taskRef:
+        name:  {{ .name }}-post-deploy
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.git" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.kubernetes" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
+      workspaces:
+        - name: app-source
+          workspace: app-source
+        - name: k8s-source
+          workspace: k8s-source
+      runAfter:
+        - deploy
+
+  {{ include "pipeline.finalNotification" . | nindent 2 }}
+{{- end}}
 {{- end}}

@@ -63,7 +63,7 @@ buildpacks:
       overrideBuildStep: {}
       # -- steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI
       # @default -- see values.yaml for the default values of it
-      buildTaskSteps: {}
+      buildTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │

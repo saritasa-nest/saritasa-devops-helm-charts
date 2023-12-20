@@ -1,4 +1,5 @@
-{{- define "task.postDeploy" -}}
+{{ define "task.post-deploy" }}
+---
 apiVersion: tekton.dev/v1
 kind: Task
 metadata:
@@ -11,26 +12,16 @@ spec:
     (for ex. run selenium tests or etc)
 
   params:
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.git" (dict "target" "task") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "task") | nindent 4 }}
+    {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
+    {{- include "params.kubernetes" (dict "target" "task") | nindent 4 }}
+    {{- include "params.sentry" (dict "target" "task") | nindent 4 }}
 
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
-
-    - name: project
-      type: string
-      description: name of the project, which component is deployed
-
-    - name: namespace
-      type: string
-      description: project's namespace
-
-    - name: sha
-      type: string
-      description: sha commit ID of the image deployed in cluster
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
+  workspaces:
+    - name: app-source
+    - name: k8s-source
 
   stepTemplate:
     envFrom:
@@ -81,5 +72,4 @@ spec:
   {{ if .extraSteps }}
     {{ .extraSteps | toYaml | nindent 4}}
   {{ end }}
----
 {{- end }}

@@ -13,18 +13,8 @@ spec:
     - name: source
 
   params:
-    - name: sentry_project_name
-      type: string
-      description: name of the project in Sentry
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
-
-    - name: sourcemaps_dir
-      type: string
-      description: name of the dir where frontend sourcemaps would be stored in workspace
-      default: "sourcemaps"
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.sentry" (dict "target" "task") | nindent 4 }}
 
   stepTemplate:
     env:
@@ -65,9 +55,9 @@ spec:
 
         # needs to upload source maps for frontend projects from `/workspace/source/sourcemaps/` tekton build dir to Sentry,
         # they are generated and saved to `/workspace/source/sourcemaps/` dir at the end of `build-static` step
-        if [[ -d "$(workspaces.source.path)/$(params.sourcemaps_dir)" ]]; then
+        if [[ -d "$(workspaces.source.path)/$(params.sentry_sourcemaps_dir)" ]]; then
           echo "Upload source maps for 'frontend' project"
-          sentry-cli releases files -p ${PROJECT_NAME} ${VERSION} upload-sourcemaps $(workspaces.source.path)/$(params.sourcemaps_dir)
+          sentry-cli releases files -p ${PROJECT_NAME} ${VERSION} upload-sourcemaps $(workspaces.source.path)/$(params.sentry_sourcemaps_dir)
         else
           echo "That is not 'frontend' project, no source maps should be uploaded"
         fi

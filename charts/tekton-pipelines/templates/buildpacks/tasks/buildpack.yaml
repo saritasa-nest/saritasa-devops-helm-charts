@@ -5,6 +5,102 @@
                 "images"          $.Values.images
                 "imagePullPolicy" $.Values.imagePullPolicy }}
 {{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
-{{ include "task.buildpack" $data }}
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: {{ .buildTaskName }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  description: |-
+    {{- .description | default (printf "The Buildpacks %s task builds source into a container image and pushes it to a AWS ECR registry, using Cloud Native Buildpacks" (.buildTaskName)) | nindent 4}}
+
+  workspaces:
+    - name: source
+
+  params:
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "task") | nindent 4 }}
+    {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
+
+  stepTemplate:
+    env:
+      - name: CNB_PLATFORM_API
+        value: {{ .cnbPlatformAPI | default "0.4" | quote }}
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  steps:
+    - name: prepare
+      image: {{ $.Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ $.Values.imagePullPolicy }}
+      script: |
+          #!/usr/bin/env bash
+          set -e
+          chown -R "$(params.user_id):$(params.group_id)" "/tekton/home" &&
+          chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
+          chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
+          chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+      volumeMounts:
+        - name: layers-dir
+          mountPath: /layers
+        - name: $(params.buildpack_cache_pvc)
+          mountPath: /cache
+      securityContext:
+        privileged: true
+
+    # insert customized steps as defined in the values.yaml of the helm chart
+    {{- if .buildTaskSteps }}
+    {{- .buildTaskSteps | toYaml | nindent 4}}
+    {{ end }}
+
+    {{- if .overrideBuildStep }}
+    # override build step as defined in the values.yaml of the helm chart
+    {{- $overriddenBuild := append list .overrideBuildStep -}}
+    {{- $overriddenBuild | toYaml | nindent 4}}
+    {{ else }}
+    # if you need to debug this step you can do:
+    # insert `sleep 3000` after the aws ecr get-login-password command and then get inside the container
+    # k exec -ti `k --no-headers=true get pods -l tekton.dev/task=buildpack | awk '{print $1}'` -c step-create bash
+    - name: build
+      image: $(params.buildpack_builder_image)
+      imagePullPolicy: {{ $.Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/bash
+
+        aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.image_registry)
+
+        /cnb/lifecycle/creator \
+          -app=$(params.source_subpath) \
+          -project-metadata=project.toml \
+          -cache-dir=/cache \
+          -layers=/layers \
+          -platform=$(workspaces.source.path)/$(params.platform_dir) \
+          -report=/layers/report.toml \
+          -cache-image=$(params.buildpack_cache_image) \
+          -uid=$(params.user_id) \
+          -gid=$(params.group_id) \
+          -process-type=$(params.process_type) \
+          -skip-restore=$(params.buildpack_skip_restore) \
+          -previous-image=$(params.app_image) \
+          -run-image=$(params.buildpack_runner_image) \
+          $(params.app_image)
+
+      volumeMounts:
+        - name: layers-dir
+          mountPath: /layers
+        - name: $(params.buildpack_cache_pvc)
+          mountPath: /cache
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+    {{ end }}
+  volumes:
+    - name: empty-dir
+      emptyDir: {}
+    - name: layers-dir
+      emptyDir: {}
 {{ end }}
 {{- end}}

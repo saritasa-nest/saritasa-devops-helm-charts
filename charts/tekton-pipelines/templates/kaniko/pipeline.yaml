@@ -10,67 +10,39 @@ spec:
     The deployment is done via argocd
 
   params:
-    {{ include "pipeline.defaultParams" . | nindent 4 }}
-    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
-
-    - name: project
-      type: string
-      description: name of the project, which component is deployed
-
-    - name: namespace
-      type: string
-      description: project's namespace
-
-    - name: docker_file
-      type: string
-      default: Dockerfile
-      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
-
-    - name: docker_context
-      type: string
-      default: "."
-      description: dockerfile context path
-
-    - name: kaniko_extra_args
-      type: string
-      description: extra args to be passed into kaniko builder
-      default: ''
-
-    - name: sentry_project_name
-      type: string
-      description: name of the project in Sentry
-
-    - name: sourcemaps_dir
-      type: string
-      description: name of the dir where frontend sourcemaps would be stored in workspace
-      default: "sourcemaps"
+    {{- include "params.app" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.git" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.docker" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.kubernetes" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.sentry" (dict "target" "pl" "sentry" $.Values.sentry.enabled) | nindent 4 }}
 
   workspaces:
     - name: app-source
     - name: k8s-source
 
   tasks:
+    - name: git-clone-app-source
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repository_ssh_url)
+        - name: revision
+          value: $(params.head_commit)
+        - name: submodules
+          value: $(params.repository_submodules)
+      workspaces:
+        - name: output
+          workspace: app-source
+
     - name: kaniko
       taskRef:
         name: kaniko
-      # results:
-      #   - name: app_image_digest
       params:
-        - name: application
-          value: "$(params.application)"
-        - name: docker_registry
-          value: $(params.docker_registry)
-        - name: environment
-          value: "$(params.environment)"
-        - name: docker_file
-          value: "$(params.docker_file)"
-        - name: docker_context
-          value: "$(params.docker_context)"
-        - name: extra_args
-          value:
-            - $(params.kaniko_extra_args)
-        - name: app_image
-          value: "$(params.app_image)"
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.docker" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: source
           workspace: app-source
@@ -78,14 +50,14 @@ spec:
     - name: git-clone-k8s-source
       taskRef:
         name: git-clone
-      workspaces:
-        - name: output
-          workspace: k8s-source
       params:
         - name: url
           value: $(params.kubernetes_repository_ssh_url)
         - name: revision
           value: $(params.kubernetes_branch)
+      workspaces:
+        - name: output
+          workspace: k8s-source
 
     - name: kustomize
       taskRef:
@@ -94,16 +66,9 @@ spec:
         - name: source
           workspace: k8s-source
       params:
-        - name: application
-          value: "$(params.application)"
-        - name: image
-          value: "$(params.app_image)"
-        - name: kustomize_overlay_path
-          value: "$(params.kubernetes_repository_kustomize_path)"
-        - name: kubernetes_branch
-          value: "$(params.kubernetes_branch)"
-        - name: environment
-          value: "$(params.environment)"
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.kubernetes" (dict "source" "pl") | nindent 8 }}
       runAfter:
         - kaniko
 
@@ -111,16 +76,41 @@ spec:
       taskRef:
         name: argocd-deploy
       params:
-        - name : application
-          value: "$(params.application)"
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
       runAfter:
         - kustomize
 
-  {{ if .Values.sentry.enabled }}
-    {{ include "pipeline.sentryRelease" . | nindent 4 }}
-  {{ end }}
+    - name: sentry-release
+      when:
+        cel: "'$(params.sentry_enabled)' != 'false'"
+      taskRef:
+        name:  sentry-release
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
+      workspaces:
+        - name: source
+          workspace: app-source
+      runAfter:
+        - deploy
 
-  {{ include "pipeline.postDeploy" (dict "name" "kaniko-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
+    - name: post-deploy
+      taskRef:
+        name:  kaniko-post-deploy
+      params:
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.git" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.kubernetes" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
+      workspaces:
+        - name: app-source
+          workspace: app-source
+        - name: k8s-source
+          workspace: k8s-source
+      runAfter:
+        - deploy
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 

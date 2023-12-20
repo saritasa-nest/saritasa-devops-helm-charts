@@ -1,0 +1,31 @@
+---
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: authenticating-git-commands
+spec:
+  serviceAccountName: saritasa-ci-experiments-dotnet-backend-dev-build-pipeline-sa
+  workspaces:
+    - name: output
+      emptyDir: {}
+  params:
+    - name: url
+      value: "git@github.com:saritasa-nest/saritasa-ci-experiments-dotnet-backend.git"
+    - name: revision
+      value: 75bb3ffea171761a6c72d72cd29e0b2e68e0e777
+    - name: submodules
+      value: true
+  taskRef:
+    name: git-clone
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+    nodeSelector:
+      ci: 'true'
+    tolerations:
+      - effect: NoSchedule
+        key: ci
+        operator: Equal
+        value: 'true'
+
+

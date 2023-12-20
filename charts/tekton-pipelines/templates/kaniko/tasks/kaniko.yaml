@@ -18,7 +18,7 @@ spec:
       type: string
       description: name of the argocd application we're going to deploy/sync
 
-    - name: docker_registry
+    - name: image_registry
       type: string
       description: aws private ecr registry address
 
@@ -50,8 +50,6 @@ spec:
   results:
     - name: password
       description: The password to authenticate to ecr registry.
-    # - name: app_image_digest
-    #   description: result app image digest
 
   stepTemplate:
     envFrom:
@@ -79,8 +77,8 @@ spec:
       args:
         - $(params.extra_args[*])
         - --build-arg=ENVIRONMENT=$(params.environment)
-        - --dockerfile=$(params.docker_file)
-        - --context=$(workspaces.source.path)/$(params.docker_context)
+        - --dockerfile=$(params.registry_file)
+        - --context=$(workspaces.source.path)/$(params.registry_context)
         - --destination=$(params.app_image)
         # - --digest-file=$(results.app_image_digest.path)
         # - --verbosity=debug
