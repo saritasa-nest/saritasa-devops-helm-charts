@@ -1,5 +1,5 @@
-{{- range $pipeline := .Values.buildpacks.generate -}}
-{{- if and $.Values.buildpacks.enabled .enabled -}}
+{{- range $pipeline := .Values.buildpacks.generate }}
+{{- if and $.Values.buildpacks.enabled .enabled }}
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate

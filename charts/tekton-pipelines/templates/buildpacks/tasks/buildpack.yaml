@@ -4,7 +4,7 @@
                 "cnbPlatformAPI"  $.Values.buildpacks.cnbPlatformAPI
                 "images"          $.Values.images
                 "imagePullPolicy" $.Values.imagePullPolicy }}
-{{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
+{{- if and $.Values.buildpacks.enabled $pipeline.enabled }}
 ---
 apiVersion: tekton.dev/v1
 kind: Task

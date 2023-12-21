@@ -1,5 +1,5 @@
 {{- range $pipeline := .Values.buildpacks.generate }}
-{{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
+{{- if and $.Values.buildpacks.enabled $pipeline.enabled }}
 ---
 apiVersion: tekton.dev/v1
 kind: Pipeline
