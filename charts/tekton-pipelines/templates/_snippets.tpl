@@ -72,12 +72,20 @@
 
 {{- end}}
 {{- define "params.registry" -}}
+{{- if ne .target "tt"}}
 - name: image_registry
-  {{ if ne .target "tt"}}type: string {{ end }}
+  type: string
+{{- else}}
+- name: docker_registry
+{{- end }}
   description: private docker registry address
 
+{{ if ne .target "tt"}}
 - name: image_registry_repository
-  {{ if ne .target "tt"}}type: string {{ end }}
+  type: string
+{{else}}
+- name: docker_registry_repository
+{{ end }}
   description: private docker registry repository address
 
 - name: app_image
@@ -242,16 +250,21 @@
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.repository_submodules)"
 {{- end }}
 {{- define "bonds.registry" -}}
+{{- if eq .source "tt"}}
 - name: image_registry
-  value: "$({{ if eq .source "tt"}}tt.{{ end }}params.image_registry)"
+  value: "$(tt.params.docker_registry)"
 - name: image_registry_repository
-  value: "$({{ if eq .source "tt"}}tt.{{ end }}params.image_registry_repository)"
+  value: "$(tt.params.docker_registry_repository)"
 - name: app_image
-  {{ if eq .source "tt"}}
-  value: "$(tt.params.image_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
-  {{ else }}
+  value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
+{{ else }}
+- name: image_registry
+  value: "$(params.image_registry)"
+- name: image_registry_repository
+  value: "$(params.image_registry_repository)"
+- name: app_image
   value: "$(params.app_image)"
-  {{ end }}
+{{- end }}
 {{- end }}
 {{- define "bonds.docker" -}}
 - name: docker_file
