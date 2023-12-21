@@ -80,6 +80,7 @@ spec:
           workspace: app-source
       params:
         {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "params.git" (dict "target" "pl") | nindent 4 }}
         {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
       runAfter:

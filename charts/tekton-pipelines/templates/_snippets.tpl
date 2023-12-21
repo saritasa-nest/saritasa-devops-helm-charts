@@ -97,8 +97,13 @@
   description: dockerfile context path
 
 - name: docker_extra_args
-  {{ if eq .target "task"}}type: array{{ else if ne .target "tt"}}type: string{{ end }}
+  {{ if eq .target "task"}}
+  type: array
+  default: []
+  {{ else if ne .target "tt"}}
+  type: string
   default: ''
+  {{ end }}
   description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
 
 {{- end}}
