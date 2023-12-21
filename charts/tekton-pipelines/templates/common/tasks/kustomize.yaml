@@ -12,7 +12,6 @@ spec:
 
   params:
     {{- include "params.app" (dict "target" "task") | nindent 4 }}
-    {{- include "params.git" (dict "target" "task") | nindent 4 }}
     {{- include "params.registry" (dict "target" "task") | nindent 4 }}
     {{- include "params.kubernetes" (dict "target" "task") | nindent 4 }}
 
