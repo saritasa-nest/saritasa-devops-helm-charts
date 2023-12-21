@@ -272,8 +272,6 @@
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.source_subpath)"
 - name: platform_dir
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.platform_dir)"
-- name: repository_submodules
-  value: "$({{ if eq .source "tt"}}tt.{{ end }}params.repository_submodules)"
 - name: buildpack_config_filename
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_config_filename)"
 - name: project_config_filename
@@ -286,8 +284,8 @@
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.group_id)"
 - name: buildpack_cache_pvc
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_cache_pvc)"
-- name: buildpack_cache_pvc
-  value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_cache_pvc)"
+- name: buildpack_cache_image
+  value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_cache_image)"
 - name: buildpack_skip_restore
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_skip_restore)"
 {{- end }}
