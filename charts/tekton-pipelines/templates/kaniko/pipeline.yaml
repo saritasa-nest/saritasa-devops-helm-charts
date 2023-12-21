@@ -82,7 +82,9 @@ spec:
 
     - name: sentry-release
       when:
-        cel: "'$(params.sentry_enabled)' != 'false'"
+        - input: "$(params.sentry_enabled)"
+          operator: notin
+          values: ["false"] 
       taskRef:
         name:  sentry-release
       params:
