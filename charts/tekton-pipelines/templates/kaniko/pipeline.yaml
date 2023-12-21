@@ -32,6 +32,8 @@ spec:
           value: $(params.head_commit)
         - name: submodules
           value: $(params.repository_submodules)
+        - name: depth
+          value: "0"
       workspaces:
         - name: output
           workspace: app-source
@@ -104,13 +106,10 @@ spec:
         {{- include "bonds.git" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.docker" (dict "source" "pl") | nindent 8 }}
-        {{- include "bonds.kubernetes" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: app-source
           workspace: app-source
-        - name: k8s-source
-          workspace: k8s-source
       runAfter:
         - deploy
 

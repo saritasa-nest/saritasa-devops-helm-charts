@@ -27,6 +27,8 @@ spec:
         value: {{ .Values.sentry.org }}
       - name: SENTRY_URL
         value: {{ .Values.sentry.url }}
+      - name: SENTRY_LOG_LEVEL
+        value: "[info|debug]"
 
   steps:
     - name: release
