@@ -1,0 +1,113 @@
+{{ if .Values.buildpacks.enabled }}
+
+# TODO:
+#
+# 1. Try to remove `set` step in `buildpack-prepare-build` task once below
+# issues would be fixed or Tekton engine upgrade will allow us to do that in a
+# better way:
+#
+# https://github.com/tektoncd/catalog/blob/main/task/buildpacks/0.3/buildpacks.yaml#L68-L113
+#
+# but we should use it until this is resolved:
+# - https://github.com/buildpacks/tekton-integration/issues/33
+# - https://github.com/buildpacks/tekton-integration/issues/32
+#
+# 2. Try to remove `prepare` step in `buildpack-prepare-build` task and logics
+# to pass different file names for `buildpack.yml` and `project.toml` with
+# `buildpack_config_filename` and `project_config_filename` vars once Tekton
+# engine would be upgraded. If `cnb lifecycle` won't allow to do that even after
+# Tekton upgrade, we can try to build projects with `pack` instead.
+
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: buildpack-prepare-build
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    This task prepares project contents to build process:
+      - determines which `project.toml` and `buildpack.yaml` files should be
+        used for a build
+      - parses project.toml file and stores its environment variables values to
+        platform dir for further processing by buildpack task.
+
+  workspaces:
+    - name: source
+
+  params:
+    {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
+
+  steps:
+    - name: prepare
+      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env bash
+
+        path=$(resources.inputs.app.path)
+
+        # rename `buildpack_config_filename` file to `buildpack.yml` and
+        # `project_config_filename` to `project.toml` if they are not equal to
+        # defaults (buildpack.yml, project.toml)
+        if [[ $(params.buildpack_config_filename) != "buildpack.yml" ]]; then
+          mv $path/$(params.buildpack_config_filename) $path/buildpack.yml
+          echo "Rename $path/$(params.buildpack_config_filename) to $path/buildpack.yml"
+        fi
+
+        if [[ $(params.project_config_filename) != "project.toml" ]]; then
+          mv $path/$(params.project_config_filename) $path/project.toml
+          echo "Rename $path/$(params.project_config_filename) to $path/project.toml"
+        fi
+
+    - name: clean
+      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env bash
+        # clean platform env dir before new run, so when env var is removed from project.toml file
+        # it wouldn't influence the build
+        set -e
+
+        ENV_PATH=$(workspaces.source.path)/$(params.platform_dir)/env
+
+        if [ -d $ENV_PATH ]; then
+          echo "clean everything from $ENV_PATH"
+          rm -f $ENV_PATH/*
+        fi
+
+    - name: set
+      image: {{ .Values.images.python | default "saritasallc/python3:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env python3
+
+        import toml, os, sys
+
+        source_path = "$(resources.inputs.app.path)/project.toml"
+        env_dir = "$(workspaces.source.path)/$(params.platform_dir)/env"
+
+        try:
+          with open(source_path, "r") as f:
+            settings = toml.load(f)
+        except FileNotFoundError:
+          quit()
+        except Exception as e:
+          raise Exception("Unable to parse project.toml file\nTraceback: {e}")
+
+        env_vars = settings.get("build", {}).get("env", [])
+        env_vars = {item["name"]: item["value"] for item in env_vars}
+
+        # create directory if not exists
+        if env_vars and not os.path.exists(env_dir):
+            os.makedirs(env_dir)
+
+        # create env variables files
+        for name, value in env_vars.items():
+          with open(f"{env_dir}/{name}", "w") as f:
+            f.write(value)
+            print(
+              f"Created `{env_dir}/{name}` var file with `{value}` value",
+              file=sys.stdout
+            )
+
+{{ end }}
