@@ -16,12 +16,10 @@ spec:
     {{- include "params.git" (dict "target" "task") | nindent 4 }}
     {{- include "params.registry" (dict "target" "task") | nindent 4 }}
     {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
-    {{- include "params.kubernetes" (dict "target" "task") | nindent 4 }}
     {{- include "params.sentry" (dict "target" "task") | nindent 4 }}
 
   workspaces:
     - name: app-source
-    - name: k8s-source
 
   stepTemplate:
     envFrom:
