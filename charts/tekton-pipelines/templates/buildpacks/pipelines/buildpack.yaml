@@ -55,7 +55,7 @@ spec:
         - name: default_version
           value: "14"
       runAfter:
-        - prepare-build
+        - buildpack-prepare-build
 
     - name: build-static
       taskRef:

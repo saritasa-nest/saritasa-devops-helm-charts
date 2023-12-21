@@ -149,7 +149,7 @@
 - name: buildpack_cache_pvc
   {{ if ne .target "tt"}}type: string {{ end }}
   description: the name of the persistent app cache volume.
-  default: empty-dir
+  default: "empty-dir"
 
 - name: buildpack_cache_image
   {{ if ne .target "tt"}}type: string {{ end }}
@@ -169,7 +169,7 @@
 
 - name: kubernetes_branch
   {{ if ne .target "tt"}}type: string {{ end }}
-  default: main
+  default: "main"
   description: git branch for kustomize managed git repo
 
 - name: kubernetes_repository_kustomize_path
@@ -180,7 +180,7 @@
 {{- define "params.sentry" -}}
 - name: sentry_enabled
   {{ if ne .target "tt"}}type: string{{ end }}
-  default: {{.sentry | default "false"}}
+  default: "{{.sentry | default "false"}}"
   description: Status sentry for app
 
 - name: sentry_project_name
