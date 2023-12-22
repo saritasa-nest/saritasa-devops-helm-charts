@@ -31,10 +31,23 @@ spec:
         value: "[info|debug]"
 
   steps:
+    - name: prepare
+      image: {{ $.Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ $.Values.imagePullPolicy }}
+      script: |
+          #!/usr/bin/env bash
+          set -e
+          chown -R "65532:65532" "$(workspaces.source.path)"
+      securityContext:
+        privileged: true
     - name: release
       image: {{ .Values.images.sentry_cli }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(workspaces.source.path)
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
       script: |
         #!/usr/bin/env sh
         set +x
