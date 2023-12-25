@@ -16,7 +16,7 @@ spec:
     {{- include "params.app" (dict "target" "tt") | nindent 4 }}
     {{- include "params.git" (dict "target" "tt") | nindent 4 }}
     {{- include "params.registry" (dict "target" "tt") | nindent 4 }}
-    {{- include "params.buildpack" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.buildpack" (dict "target" "tt" "cnbPlatformAPI" $.Values.buildpacks.cnbPlatformAPI ) | nindent 4 }}
     {{- include "params.kubernetes" (dict "target" "tt") | nindent 4 }}
     {{- include "params.sentry" (dict "target" "tt" "sentry" $.Values.sentry.enabled) | nindent 4 }}
 

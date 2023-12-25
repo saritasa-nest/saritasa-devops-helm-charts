@@ -121,7 +121,7 @@
 - name: buildpack_cnb_platform_api
   {{ if ne .target "tt"}}type: string {{ end }}
   description: the Platform specification defines the interface between the CNB lifecycle and a platform that runs it
-  default: "0.4"
+  default: {{ .cnbPlatformAPI | default "0.4" }}
 
 - name: buildpack_builder_image
   {{ if ne .target "tt"}}type: string {{ end }}
