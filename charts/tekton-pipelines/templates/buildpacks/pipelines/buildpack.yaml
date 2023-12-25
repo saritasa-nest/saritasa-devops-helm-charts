@@ -78,7 +78,7 @@ spec:
       taskRef:
         name: {{ .buildTaskName }}
       workspaces:
-        - name: source
+        - name: app
           workspace: app-source
       params:
         {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
@@ -99,6 +99,8 @@ spec:
       workspaces:
         - name: output
           workspace: k8s-source
+      runAfter:
+        - {{ .buildTaskName }}
 
     - name: kustomize
       taskRef:
@@ -111,7 +113,7 @@ spec:
         {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.kubernetes" (dict "source" "pl") | nindent 8 }}
       runAfter:
-        - {{ .buildTaskName }}
+        - git-clone-k8s-source
 
     - name: deploy
       taskRef:
