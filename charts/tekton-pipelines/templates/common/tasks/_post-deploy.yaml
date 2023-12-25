@@ -15,8 +15,12 @@ spec:
     {{- include "params.app" (dict "target" "task") | nindent 4 }}
     {{- include "params.git" (dict "target" "task") | nindent 4 }}
     {{- include "params.registry" (dict "target" "task") | nindent 4 }}
-    {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
     {{- include "params.sentry" (dict "target" "task") | nindent 4 }}
+    {{- if eq .namePrefix "kaniko"}}
+    {{- include "params.docker" (dict "target" "task") | nindent 4 }}
+    {{else}}
+    {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
+    {{ end }}
 
   workspaces:
     - name: app-source
