@@ -111,6 +111,8 @@
   {{ else if ne .target "tt"}}
   type: string
   default: ''
+  {{ else }}
+  default: ''
   {{ end }}
   description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
 
@@ -277,13 +279,11 @@
 - name: docker_context
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.docker_context)"
 - name: docker_extra_args
-  {{ if eq .target "task"}}
+  {{ if eq .source "tt"}}
+  value: "$(tt.params.docker_extra_args)"
+  {{else}}
   value:
     - "$(params.docker_extra_args)"
-  {{ else if ne .target "tt"}}
-  value: "$(params.docker_extra_args)"
-  {{ else }}
-  value: "$(tt.params.docker_extra_args)"
   {{ end }}
 {{- end }}
 {{- define "bonds.buildpack" -}}
