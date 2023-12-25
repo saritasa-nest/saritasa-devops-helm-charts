@@ -47,6 +47,9 @@ spec:
           workspace: app-source
       params:
         {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
+      runAfter:
+        - git-clone-app-source
+        
     - name: detect-nodejs-version
       taskRef:
         name: detect-nodejs-version

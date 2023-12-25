@@ -44,7 +44,7 @@ spec:
       script: |
         #!/usr/bin/env bash
 
-        path=$(resources.inputs.app.path)
+        path=$(workspace.source.path)
 
         # rename `buildpack_config_filename` file to `buildpack.yml` and
         # `project_config_filename` to `project.toml` if they are not equal to
