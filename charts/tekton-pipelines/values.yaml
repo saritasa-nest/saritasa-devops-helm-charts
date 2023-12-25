@@ -93,7 +93,7 @@ buildpacks:
         - name: fix-php-detection
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             # workaround to fix no PHP detection, when package.json presents
@@ -125,7 +125,7 @@ buildpacks:
         - name: copy-requirements
           image: docker.io/fnndsc/python-poetry:1.5.1
           imagePullPolicy: IfNotPresent
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
@@ -177,7 +177,7 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: get-semantic-version
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
           imagePullPolicy: IfNotPresent
           script: |
@@ -205,18 +205,16 @@ buildpacks:
 
             /tools/dotnet-gitversion /updateprojectfiles
             git status
-            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
             echo "semantic version updated"
 
         - name: remove-dcproj-files
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
           script: |
             #!/usr/bin/env bash
             # clean `.dcproj` files related to local development docker .NET project
-            cd $(workspaces.source.path)
             find . -name '*.dcproj' -type f -delete
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
