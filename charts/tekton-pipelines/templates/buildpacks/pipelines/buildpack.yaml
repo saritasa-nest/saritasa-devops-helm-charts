@@ -146,7 +146,6 @@ spec:
         {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.git" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
-        {{- include "bonds.buildpack" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: app-source
