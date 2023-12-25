@@ -28,14 +28,6 @@ spec:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
-    - name: authenticate
-      image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
-      script: |
-        #!/bin/bash
-        aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
-
     - name: build
       image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -53,10 +45,6 @@ spec:
         - --destination=$(params.app_image)
         # - --digest-file=$(results.app_image_digest.path)
         # - --verbosity=debug
-
-      volumeMounts:
-        - name: layers-dir
-          mountPath: /layers
 
       # kaniko assumes it is running as root, which means this example fails on platforms
       # that default to run containers as random uid (like OpenShift). Adding this securityContext
