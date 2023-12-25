@@ -28,6 +28,17 @@ spec:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
+    # google can't fix chown/chmod in kaniko for 2 years, latest test was on v1.19.2
+    # https://github.com/GoogleContainerTools/kaniko/issues/2108
+    - name: prepare
+      image: {{ $.Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ $.Values.imagePullPolicy }}
+      script: |
+          #!/usr/bin/env bash
+          set -e
+          chown -R "1000:1000" "$(workspaces.source.path)"
+      securityContext:
+        privileged: true
     - name: build
       image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
