@@ -135,6 +135,7 @@ spec:
         name:  sentry-release
       params:
         {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
+        {{- include "bonds.git" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: source

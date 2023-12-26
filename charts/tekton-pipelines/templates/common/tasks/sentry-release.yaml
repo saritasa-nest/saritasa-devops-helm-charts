@@ -14,6 +14,7 @@ spec:
 
   params:
     {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.git" (dict "target" "task") | nindent 4 }}
     {{- include "params.sentry" (dict "target" "task") | nindent 4 }}
 
   stepTemplate:
@@ -28,7 +29,7 @@ spec:
       - name: SENTRY_URL
         value: {{ .Values.sentry.url }}
       - name: SENTRY_LOG_LEVEL
-        value: "[info|debug]"
+        value: "debug"
 
   steps:
     - name: prepare
@@ -64,6 +65,10 @@ spec:
         # sentry-cli uses last repository commit sha1 as proposed version, i.e. 7e734134fb23497e68976784f7eaa106c4a8f3a8
         # https://docs.sentry.io/product/cli/releases/#creating-releases
         VERSION=$(sentry-cli releases propose-version)
+        if [[ -z "${VERSION}" ]]; then
+          echo "Failed fetch revision, using incomming commit param"
+          VERSION=$(params.sha)
+        fi
 
         sentry-cli releases new -p ${PROJECT_NAME} ${VERSION}
         sentry-cli releases set-commits --auto --ignore-missing -p ${PROJECT_NAME} ${VERSION}
