@@ -94,9 +94,6 @@ spec:
           mountPath: /layers
         - name: $(params.buildpack_cache_pvc)
           mountPath: /cache
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
     {{ end }}
   volumes:
     - name: empty-dir
