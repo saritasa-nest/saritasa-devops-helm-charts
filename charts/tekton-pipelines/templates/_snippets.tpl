@@ -166,11 +166,6 @@
   description: the group id of the builder image user.
   default: "1000"
 
-- name: buildpack_cache_pvc
-  {{ if ne .target "tt"}}type: string {{ end }}
-  description: the name of the persistent app cache volume.
-  default: "empty-dir"
-
 - name: buildpack_cache_image
   {{ if ne .target "tt"}}type: string {{ end }}
   description: the name of the persistent app cache image.
@@ -307,8 +302,6 @@
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.user_id)"
 - name: group_id
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.group_id)"
-- name: buildpack_cache_pvc
-  value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_cache_pvc)"
 - name: buildpack_cache_image
   value: "$({{ if eq .source "tt"}}tt.{{ end }}params.buildpack_cache_image)"
 - name: buildpack_skip_restore

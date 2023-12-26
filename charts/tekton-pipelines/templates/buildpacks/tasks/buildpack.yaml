@@ -46,7 +46,7 @@ spec:
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
-        - name: $(params.buildpack_cache_pvc)
+        - name: $(params.application)-buildpacks-cache
           mountPath: /cache
       securityContext:
         privileged: true
@@ -92,7 +92,7 @@ spec:
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
-        - name: $(params.buildpack_cache_pvc)
+        - name: $(params.application)-buildpacks-cache
           mountPath: /cache
     {{ end }}
   volumes:
