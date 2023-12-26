@@ -1,0 +1,55 @@
+buildpacks:
+  enabled: true
+  generate:
+    buildpackFrontendBuildPipeline:
+      name: buildpack-frontend-build-pipeline
+      enabled: true
+      buildTaskSteps:
+        - name: first-step
+          image: first-step-image
+          imagePullPolicy: IfNotPresent
+          computeResources:
+            limits:
+              cpu: 512m
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 500Mi
+          workingDir: $(workspaces.source.path)
+          script: |
+            #!/bin/bash
+            echo First Step
+          # securityContext:
+          #   privileged: true
+        - name: second-step
+          image: second-step-image
+          imagePullPolicy: IfNotPresent
+          computeResources:
+            limits:
+              cpu: 512m
+              memory: 1Gi
+            requests:
+              cpu: 250m
+              memory: 500Mi
+          workingDir: $(workspaces.source.path)
+          script: |
+            #!/bin/bash
+            echo Second Step
+          # securityContext:
+          #   privileged: true
+    # buildpackDjangoBuildPipeline:
+    #   enabled: false
+    # buildpackPhpBuildPipeline:
+    #   enabled: false
+    # buildpackDotnetBuildPipeline:
+    #   enabled: false
+    # buildpackNodejsBuildPipeline:
+    #   enabled: false
+    # buildpackGoBuildPipeline:
+    #   enabled: false
+    # buildpackRubyBuildPipeline:
+    #   enabled: false
+kaniko:
+  enabled: true
+wordpress:
+  enabled: false

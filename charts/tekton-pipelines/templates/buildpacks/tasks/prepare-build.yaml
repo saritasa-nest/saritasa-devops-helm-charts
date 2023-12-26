@@ -18,7 +18,7 @@
 # engine would be upgraded. If `cnb lifecycle` won't allow to do that even after
 # Tekton upgrade, we can try to build projects with `pack` instead.
 
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: buildpack-prepare-build
@@ -34,37 +34,17 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    inputs:
-      - name: app
-        type: git
-
   params:
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
-
-    - name: platform_dir
-      type: string
-      description: The name of the platform directory.
-
-    - name: buildpack_config_filename
-      type: string
-      description: The name of the buildpack.yml file which should be used for build
-
-    - name: project_config_filename
-      type: string
-      description: The name of the project.toml file which should be used for build
+    {{- include "params.buildpack" (dict "target" "task") | nindent 4 }}
 
   steps:
-
     - name: prepare
       image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         #!/usr/bin/env bash
 
-        path=$(resources.inputs.app.path)
+        path=$(workspace.source.path)
 
         # rename `buildpack_config_filename` file to `buildpack.yml` and
         # `project_config_filename` to `project.toml` if they are not equal to

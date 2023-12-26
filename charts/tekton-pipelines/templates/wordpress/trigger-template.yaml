@@ -1,19 +1,18 @@
 {{ if .Values.wordpress.enabled }}
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: wordpress-build-pipeline-trigger-template
   namespace: {{ .Release.Namespace }}
 spec:
   params:
-    {{ include "trigger-template.defaultParams" . | nindent 4 }}
-
+    {{- include "params.app" (dict "target" "tt") | nindent 4 }}
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
   resourcetemplates:
   - kind: PipelineRun
-    apiVersion: tekton.dev/v1beta1
+    apiVersion: tekton.dev/v1
     metadata:
       generateName: $(tt.params.application)-build-pipeline-run-
       labels:
@@ -21,27 +20,27 @@ spec:
         project: $(tt.params.project)
         environment: $(tt.params.environment)
         component: $(tt.params.component)
-    spec:
-      serviceAccountName: $(tt.params.application)-build-pipeline-sa
+    spec: 
       pipelineRef:
         name: wordpress-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
+        {{- include "pipelinerun.defaultTTBoundParams" . | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
-      podTemplate:
-        volumes:
-        - name: podinfo
-          downwardAPI:
-            items:
-              - path: "labels"
-                fieldRef:
-                  fieldPath: metadata.labels
-              - path: "annotations"
-                fieldRef:
-                  fieldPath: metadata.annotations
-        {{- if .Values.podTemplate }}
-        {{ toYaml .Values.podTemplate | nindent  8 }}
-        {{end }}
+      taskRunTemplate:
+        podTemplate:
+          volumes:
+          - name: podinfo
+            downwardAPI:
+              items:
+                - path: "labels"
+                  fieldRef:
+                    fieldPath: metadata.labels
+                - path: "annotations"
+                  fieldRef:
+                    fieldPath: metadata.annotations
+          {{- if .Values.podTemplate }}
+          {{ toYaml .Values.podTemplate | nindent  10 }}
+          {{end }}
 
 {{ end }}

@@ -1,4 +1,5 @@
 {{ if .Values.apps }}
+# Default global eventlistener
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
@@ -8,6 +9,9 @@ metadata:
     argocd.argoproj.io/sync-wave: "10"
 spec:
   serviceAccountName: {{ .Values.serviceAccount.name }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
   {{- if .Values.nodeSelector }}
   resources:
     kubernetesResource:
@@ -17,32 +21,4 @@ spec:
             nodeSelector:
               {{- toYaml .Values.nodeSelector | nindent 14 }}
   {{- end }}
-
-  triggers:
-  {{- range $project := .Values.apps }}
-  {{- if $project.enabled }}
-  # ========================================================================
-  # {{ $project.project | upper }} PROJECT
-  {{- range $component := $project.components }}
-
-  # initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
-  {{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
-
-  # initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise
-  {{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
-
-  # ========================================================================
-  # 🐤 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT
-  # ========================================================================
-
-  {{- $data := dict "project"           $project
-                    "component"         $component
-                    "environment"       $projectEnvironment
-                    "eventlistener"     $.Values.eventlistener
-                    "gitBranchPrefixes" $gitBranchPrefixes }}
-  {{- include "tekton-apps.eventlistener.trigger" $data | nindent 4 }}
-
-{{- end }} # range component
-{{- end }} # if project.enabled
-{{- end }} # range project
 {{- end }} # if apps

@@ -1,5 +1,5 @@
 {{ if .Values.kaniko.enabled }}
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: kaniko
@@ -13,43 +13,10 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    inputs:
-      - name: app
-        type: git
-    outputs:
-      - name: image
-        type: image
-
   params:
-    - name: application
-      type: string
-      description: name of the argocd application we're going to deploy/sync
-
-    - name: docker_registry
-      type: string
-      description: aws private ecr registry address
-
-    - name: docker_file
-      type: string
-      description: name of the dockerfile
-      default: "Dockerfile"
-
-    - name: docker_context
-      type: string
-      description: |
-        The build context used by Kaniko
-        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-      default: "."
-
-    - name: extra_args
-      type: array
-      description: extra args to be passed into kaniko builder
-      default: []
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
+    {{- include "params.registry" (dict "target" "task") | nindent 4 }}
+    {{- include "params.docker" (dict "target" "task") | nindent 4 }}
 
   results:
     - name: password
@@ -61,29 +28,33 @@ spec:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
-    - name: authenticate
-      image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+    # google can't fix chown/chmod in kaniko for 2 years, latest test was on v1.19.2
+    # https://github.com/GoogleContainerTools/kaniko/issues/2108
+    - name: prepare
+      image: {{ $.Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ $.Values.imagePullPolicy }}
       script: |
-        #!/bin/bash
-        aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
-
+          #!/usr/bin/env bash
+          set -e
+          chown -R "1000:1000" "$(workspaces.source.path)"
+      securityContext:
+        privileged: true
     - name: build
       image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       env:
         - name: "DOCKER_CONFIG"
           value: "/tekton/home/.docker/"
       command:
         - /kaniko/executor
       args:
-        - $(params.extra_args[*])
+        - $(params.docker_extra_args[*])
         - --build-arg=ENVIRONMENT=$(params.environment)
-        - --dockerfile=$(resources.inputs.app.path)/$(params.docker_file)
-        - --context=$(resources.inputs.app.path)/$(params.docker_context)
-        - --destination=$(resources.outputs.image.url)
+        - --dockerfile=$(params.docker_file)
+        - --context=$(workspaces.source.path)/$(params.docker_context)
+        - --destination=$(params.app_image)
+        # - --digest-file=$(results.app_image_digest.path)
         # - --verbosity=debug
 
       # kaniko assumes it is running as root, which means this example fails on platforms

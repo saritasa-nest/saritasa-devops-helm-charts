@@ -6,9 +6,16 @@ metadata:
   name: config-defaults
   namespace: tekton-pipelines
 data:
-  default-service-account: {{ $config.defaultServiceAccount | default "build-bot-sa" | quote }}
+  # default-service-account contains the default service account name
+  # to use for TaskRun and PipelineRun, if none is specified.
   default-timeout-minutes: {{ $config.defaultTimeoutMinutes | default "60" | quote }}
+  # default-service-account contains the default service account name
+  # to use for TaskRun and PipelineRun, if none is specified.
+  default-service-account: {{ $config.defaultServiceAccount | default "build-bot-sa" | quote }}
   {{ if hasKey .Values.engine.config "defaultPodTemplate" -}}
+  # default-pod-template contains the default pod template to use for
+  # TaskRun and PipelineRun. If a pod template is specified on the
+  # PipelineRun, the default-pod-template is merged with that one.
   default-pod-template: |
     {{- .Values.engine.config.defaultPodTemplate | nindent 4 }}
   {{end}}
