@@ -16,7 +16,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "210"
 spec:
   destination:
-    namespace: {{ $project.argocd.namespace }}
+    namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $extraApp "project" $project "component_name" "extraApp") }}
     server: https://kubernetes.default.svc
   project: {{ $project.project }}
   source:

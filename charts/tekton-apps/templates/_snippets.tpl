@@ -199,7 +199,6 @@ spec:
 
 {{ end }}
 
-
 {{/*
 Check if list of maps (dict name, value) contains a specific named key and then render it or default
 the way you use it:
@@ -214,4 +213,12 @@ the way you use it:
 - name: {{ .name }}
   value: {{ .default }}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Get namespace and return component `destinationNamespace` if it exists, otherwise return project's `namespace`. You need to pass the component_name value as a parameter when including the function, like this:
+{{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
+*/}}
+{{- define "tekton-apps.set-namespace-from-component-or-project" -}}
+{{- or ((.component).argocd).destinationNamespace ((.project).argocd).namespace | required (printf "Error: One of the following should be set: .project.argocd.namespace or %s.argocd.DestinationNamespace" .component_name) }}
 {{- end -}}

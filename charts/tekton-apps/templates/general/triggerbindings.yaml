@@ -34,7 +34,7 @@ spec:
   - name: component
     value: {{ $component.name }}
   - name: namespace
-    value: {{ $project.argocd.namespace }}
+    value: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
   - name: repository_submodules
     value: "{{ $component.repository_submodules | default true }}"
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
@@ -43,13 +43,13 @@ spec:
     value: {{ $.Values.defaultRegistry }}
   {{- end }}
   {{- toYaml $component.triggerBinding | nindent 2 }}
-  
+
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "buildpack_config_filename" "default" "buildpack.yml" ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "project_config_filename" "default" "project.toml" ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "sentry_project_name" "default" (printf "%s-%s" $project.project $component.name) ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "add_tag_latest" "default" "'false'" ) | nindent 2 }}
-  
+
   {{- if $argocdSource }}
   # ! OLD WAY:
   # If you see this message - pls transfer kubernetes manifests into dedicated kubernetes git repo
