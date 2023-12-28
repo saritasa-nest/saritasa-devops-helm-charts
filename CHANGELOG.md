@@ -1,5 +1,12 @@
 # Changelog
 
+## 2023-12-26
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/100)
+- Added push image to registry with additional tag `latest`
+
 ## 2023-10-27
 
 [prod]
