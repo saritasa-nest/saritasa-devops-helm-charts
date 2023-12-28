@@ -101,6 +101,8 @@ apps:
             value: dist
           - name: kubernetes_branch
             value: feature/add-staging
+          - name: add_tag_latest
+            value: 'true'
 
       - name: wordpress
         repository: xxx-wordpress

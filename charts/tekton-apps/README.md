@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.15-dev.10](https://img.shields.io/badge/Version-0.2.15-dev.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 0.2.17](https://img.shields.io/badge/Version-0.2.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -717,6 +717,218 @@ spec:
         - CreateNamespace=true
   ```
 
+  Component namespace can be set in 2 ways:
+  1. From `project.argocd.namespace` - this is useful when all project components share the same project namespace. Example:
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: staging
+          ...
+          apps:
+            - project: xxx
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: xxx
+                notifications:
+                  annotations:
+                    # In rocks/cloud cluster use slack-token integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  repository: xxx-backend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/backend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+                - name: frontend
+                  repository: xxx-frontend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/frontend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.16"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
+  2. From `component.argocd.destionationNamespaces` - this can be useful when component has different namespace from the project. For example:
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: staging
+          ...
+          apps:
+            - project: xxx
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                  ops-main: xxx
+                  ops-secondary: xxx
+                  pm: xxx
+                  tm: xxx
+                namespace: xxx
+                extraDestinationNamespaces:
+                  - jitsi
+                notifications:
+                  annotations:
+                    # In rocks/cloud cluster use slack-token integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-sync-failed.slack: project-xxx-ci; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-xxx; project-xxx-alarms
+                    notifications.argoproj.io/subscribe.on-deployed.slack: project-xxx-ci
+                    # In staging/prod client cluster use webhook integration:
+                    notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  repository: xxx-backend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/backend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+                - name: frontend
+                  repository: xxx-frontend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/frontend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+                - name: jitsi
+                  repository: xxx-jitsi
+                  pipeline: buildpack-django-build-pipeline
+                  argocd:
+                    destinationNamespace: jitsi
+                  applicationURL: https://xxx.site.url
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                    gitWebhookBranches:
+                      - develop
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/jitsi
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.16"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
   If you want to enable ignoring deployment replicas count differences in ArgoCD application of your component add `apps[PROJECT].components[NAME].argocd.ignoreDeploymentReplicasDiff: true` flag like in the below example (it may be needed for `staging` and `prod` envs, where you have horizontal pod autoscheduling - HPA):
 
   ```yaml
@@ -973,6 +1185,44 @@ spec:
         - CreateNamespace=true
   ```
 
+  We can add both tags `${env}-${commit_hash}` (i.e. `:dev-dsjfh43`) and `:latest` on the built image in tekton-pipelines:
+  ```bash
+    Saving 190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:staging-802d5f2...
+    *** Images (sha256:9e15b5041fec79448e25948503ddd68ee8563d7d3bacacb4f3f20c1e5a23b891):
+        190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:staging-802d5f2
+        190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:latest
+  ```
+
+  1. For buildpacks pipelines:
+  Set `add_tag_latest` parameter to "true" in `triggerBinding` as shown below:
+  ```yaml
+  triggerBinding:
+    - name: docker_registry_repository
+      value: 190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend
+  ....
+  ....
+    - name: add_tag_latest
+      value: 'true'
+  ```
+
+  2. For kaniko pipelines:
+  We tag image by this argument by default:
+  `--destination=$(resources.outputs.image.url`
+  We can use this argument twice, so set `kaniko_extra_args` with
+  `--destination` equals full image path plus `:latest`. It will be
+  added as additional tag and pushed to the registry.
+  ```yaml
+  triggerBinding:
+    - name: docker_registry_repository
+      value: 190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend
+    - name: docker_file
+      value: Dockerfile
+    - name: docker_context
+      value: .
+    - name: kaniko_extra_args
+      value: "--destination=190499200307.dkr.ecr.us-west-2.amazonaws.com/ygm/staging/backend:latest"
+  ```
+
   Simple wordpress application example filled by default:
 
   ```yaml
@@ -1136,7 +1386,7 @@ spec:
   ```
 
   More complicated example of project containing `wordpress` and `frontend` component.
-  If you need to deploy wordpress component in a namespace different from ArgoCD project's one (i.e. `wordpress`), you need to add `extraDestinationNamespaces: ["wordpress"]` and `argocd.namespace=wordpress`, like in the example below
+  If you need to deploy wordpress component in a namespace different from ArgoCD project's one (i.e. `wordpress`), you need to add `project.argocd.extraDestinationNamespaces: ["wordpress"]` and `components.argocd.destinationNamespace=wordpress`, like in the example below
   Also defined sample of all extra wordpress params that could be set:
 
   ```yaml
@@ -1363,4 +1613,4 @@ whitelistIP: |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.3](https://github.com/norwoodj/helm-docs/releases/v1.11.3)
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

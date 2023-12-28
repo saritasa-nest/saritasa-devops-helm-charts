@@ -44,6 +44,12 @@ spec:
   {{- end }}
   {{- toYaml $component.triggerBinding | nindent 2 }}
 
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "buildpack_config_filename" "default" "buildpack.yml" ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "project_config_filename" "default" "project.toml" ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "sentry_project_name" "default" (printf "%s-%s" $project.project $component.name) ) | nindent 2 }}
+  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "add_tag_latest" "default" "'false'" ) | nindent 2 }}
+
   {{- if $argocdSource }}
   # ! OLD WAY:
   # If you see this message - pls transfer kubernetes manifests into dedicated kubernetes git repo
@@ -61,10 +67,6 @@ spec:
     value: {{ $project.kubernetesRepository.url }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_branch" "default" ($project.kubernetesRepository).branch ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_repository_kustomize_path" "default" (printf "apps/%s/manifests/%s" $component.name $projectEnvironment) ) | nindent 2 }}
-  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "source_subpath" "default" "." ) | nindent 2 }}
-  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "buildpack_config_filename" "default" "buildpack.yml" ) | nindent 2 }}
-  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "project_config_filename" "default" "project.toml" ) | nindent 2 }}
-  {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "sentry_project_name" "default" (printf "%s-%s" $project.project $component.name) ) | nindent 2 }}
   {{- end}}
 ---
 
