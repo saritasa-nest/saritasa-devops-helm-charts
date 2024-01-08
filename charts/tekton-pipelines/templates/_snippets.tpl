@@ -329,17 +329,16 @@
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘
 {{- define "pipeline.source_workspaces" -}}
-- name: app-source
-  persistentVolumeClaim:
-    claimName: $(tt.params.application)-workspace-pvc
-- name: k8s-source
+- name: source
   volumeClaimTemplate:
+    metadata:
+      name: $(tt.params.application)
     spec:
       accessModes:
       - ReadWriteOnce
       resources:
         requests:
-          storage: 2Gi 
+          storage: 10Gi 
 {{- end }}
 
 

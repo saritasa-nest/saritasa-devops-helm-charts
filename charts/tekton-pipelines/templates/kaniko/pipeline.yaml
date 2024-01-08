@@ -18,8 +18,7 @@ spec:
     {{- include "params.sentry" (dict "target" "pl" "sentry" $.Values.sentry.enabled) | nindent 4 }}
 
   workspaces:
-    - name: app-source
-    - name: k8s-source
+    - name: source
 
   tasks:
     - name: git-clone-app-source
@@ -36,7 +35,8 @@ spec:
           value: "0"
       workspaces:
         - name: output
-          workspace: app-source
+          workspace: source
+          subPath: app
 
     - name: kaniko
       taskRef:
@@ -47,7 +47,8 @@ spec:
         {{- include "bonds.docker" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: source
-          workspace: app-source
+          workspace: source
+          subPath: app
       runAfter:
         - git-clone-app-source
 
@@ -61,7 +62,8 @@ spec:
           value: $(params.kubernetes_branch)
       workspaces:
         - name: output
-          workspace: k8s-source
+          workspace: source
+          subPath: k8s
       runAfter:
         - kaniko
 
@@ -70,7 +72,8 @@ spec:
         name: kustomize
       workspaces:
         - name: source
-          workspace: k8s-source
+          workspace: source
+          subPath: k8s
       params:
         {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
@@ -99,7 +102,8 @@ spec:
         {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: source
-          workspace: app-source
+          workspace: source
+          subPath: app
       runAfter:
         - deploy
 
@@ -113,7 +117,8 @@ spec:
         {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
       workspaces:
         - name: app-source
-          workspace: app-source
+          workspace: source
+          subPath: app
       runAfter:
         - deploy
 

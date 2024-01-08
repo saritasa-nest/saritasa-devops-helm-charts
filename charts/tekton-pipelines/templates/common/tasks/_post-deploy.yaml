@@ -18,7 +18,7 @@ spec:
     {{- include "params.sentry" (dict "target" "task") | nindent 4 }}
 
   workspaces:
-    - name: app-source
+    - name: source
 
   stepTemplate:
     envFrom:
