@@ -116,7 +116,7 @@ spec:
         {{- include "bonds.registry" (dict "source" "pl") | nindent 8 }}
         {{- include "bonds.sentry" (dict "source" "pl") | nindent 8 }}
       workspaces:
-        - name: app-source
+        - name: source
           workspace: source
           subPath: app
       runAfter:
