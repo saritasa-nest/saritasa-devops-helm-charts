@@ -1,0 +1,52 @@
+# Default roles for triggers and pipelines
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: default-pipeline-role
+ namespace: {{ $.Release.Namespace }}
+rules:
+  - apiGroups:  ["extensions", "apps", "batch", ""]
+    resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
+    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups:  [""]
+    resources:  ["pods/log"]
+    verbs:      ["get", "list", "watch"]
+  - apiGroups:  ["tekton.dev"]
+    resources:  ["pipelineruns"]
+    verbs:      ["get", "list", "create"]
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: default-trigger-role
+ namespace: {{ $.Release.Namespace }}
+rules:
+  - apiGroups:  ["triggers.tekton.dev"]
+    resources:  ["eventlisteners", "triggerbindings", "triggertemplates", "clusterinterceptors"]
+    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  - apiGroups:  ["triggers.tekton.dev"]
+    resources:  ["triggers", "clustertriggerbindings"]
+    verbs:      ["get", "list", "watch"]
+
+  - apiGroups:  ["tekton.dev"]
+    resources:  ["pipelineruns", "pipelineresources", "taskruns"]
+    verbs:      ["create"]
+
+  - apiGroups:  ["extensions"]
+    resources:  ["ingresses"]
+    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  - apiGroups:  [""]
+    resources:  ["configmaps", "secrets", "serviceaccounts"]
+    verbs:      ["get", "list", "watch", "impersonate"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: default-trigger-clusterrole
+rules:
+  - apiGroups: ["triggers.tekton.dev"]
+    resources: ["clustertriggerbindings", "clusterinterceptors"]
+    verbs: ["get", "list", "watch"]
