@@ -51,7 +51,7 @@ spec:
       args:
         - $(params.docker_extra_args[*])
         - --build-arg=ENVIRONMENT=$(params.environment)
-        - --dockerfile=$(params.docker_file)
+        - --dockerfile=$(workspaces.source.path)/$(params.docker_file)
         - --context=$(workspaces.source.path)/$(params.docker_context)
         - --destination=$(params.app_image)
         # - --digest-file=$(results.app_image_digest.path)
