@@ -7,6 +7,7 @@ metadata:
 spec:
   params:
     {{- include "params.app" (dict "target" "tt") | nindent 4 }}
+    {{- include "params.git" (dict "target" "tt") | nindent 4 }}
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
@@ -20,11 +21,12 @@ spec:
         project: $(tt.params.project)
         environment: $(tt.params.environment)
         component: $(tt.params.component)
-    spec: 
+    spec:
       pipelineRef:
         name: wordpress-build-pipeline
       params:
         {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
+        {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
       taskRunTemplate:

@@ -11,6 +11,7 @@ spec:
 
   params:
     {{- include "params.app" (dict "target" "pl") | nindent 4 }}
+    {{- include "params.git" (dict "target" "pl") | nindent 4 }}
     - name: kubernetes_namespace
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
