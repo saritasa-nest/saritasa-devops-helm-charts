@@ -8,8 +8,7 @@ spec:
   description: >-
     Deletes pod from the deployment and waits for deployment to bring a new one
   params:
-    - name: application
-      description: The name of the argocd application being built
+    {{- include "params.app" (dict "target" "task") | nindent 4 }}
     - name: kubernetes_namespace
       description: Namespace in which we need to redeploy
   steps:

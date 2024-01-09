@@ -24,7 +24,7 @@ spec:
       pipelineRef:
         name: wordpress-build-pipeline
       params:
-        {{- include "pipelinerun.defaultTTBoundParams" . | nindent 8 }}
+        {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
       taskRunTemplate:

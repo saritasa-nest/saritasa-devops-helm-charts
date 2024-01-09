@@ -10,8 +10,7 @@ spec:
     chart.
 
   params:
-    {{ include "pipeline.defaultParams" . | nindent 4 }}
-
+    {{- include "params.app" (dict "target" "pl") | nindent 4 }}
     - name: kubernetes_namespace
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
@@ -22,8 +21,7 @@ spec:
       taskRef:
         name: redeploy
       params:
-        - name: application
-          value: "$(params.application)"
+        {{- include "bonds.app" (dict "source" "pl") | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(params.kubernetes_namespace)"
 
