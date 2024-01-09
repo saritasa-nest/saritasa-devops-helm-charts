@@ -73,6 +73,11 @@ spec:
 
         aws ecr get-login-password --region $AWS_REGION | docker login -u AWS --password-stdin $(params.image_registry)
 
+        if [ "$(params.add_tag_latest)" == "true" ]
+        then
+          ADDITIONAL_TAG="-tag=$(params.image_registry_repository):latest"
+        fi 
+
         /cnb/lifecycle/creator \
           -app=$(params.source_subpath) \
           -project-metadata=project.toml \
@@ -87,6 +92,7 @@ spec:
           -skip-restore=$(params.buildpack_skip_restore) \
           -previous-image=$(params.app_image) \
           -run-image=$(params.buildpack_runner_image) \
+          ${ADDITIONAL_TAG} \
           $(params.app_image)
 
       volumeMounts:
