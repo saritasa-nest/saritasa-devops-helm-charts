@@ -92,7 +92,7 @@
   {{ if ne .target "tt"}}type: string {{ end }}
   description: reference to a app result image
 
-- name: add_latest_tag
+- name: add_tag_latest
   {{ if ne .target "tt"}}type: string {{ end }}
   description: push image to registry with additional tag `latest`
   default: "false"
@@ -264,7 +264,7 @@
   value: "$(tt.params.docker_registry_repository)"
 - name: app_image
   value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
-- name: add_latest_tag
+- name: add_tag_latest
   value: "$(tt.params.add_latest_tag)"
 {{ else }}
 - name: image_registry
