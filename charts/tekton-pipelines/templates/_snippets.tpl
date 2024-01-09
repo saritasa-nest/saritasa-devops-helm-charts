@@ -265,7 +265,7 @@
 - name: app_image
   value: "$(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)"
 - name: add_tag_latest
-  value: "$(tt.params.add_latest_tag)"
+  value: "$(tt.params.add_tag_latest)"
 {{ else }}
 - name: image_registry
   value: "$(params.image_registry)"
@@ -273,8 +273,8 @@
   value: "$(params.image_registry_repository)"
 - name: app_image
   value: "$(params.app_image)"
-- name: add_latest_tag
-  value: "$(params.add_latest_tag)"
+- name: add_tag_latest
+  value: "$(params.add_tag_latest)"
 {{- end }}
 {{- end }}
 {{- define "bonds.docker" -}}
