@@ -200,9 +200,6 @@ spec:
           mountPath: /layers
         - name: $(params.cache)
           mountPath: /cache
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
     {{ end }}
   volumes:
     - name: empty-dir
