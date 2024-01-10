@@ -27,7 +27,7 @@ spec:
 
     - name: add_tag_latest
       type: string
-      description: push image to registry with additional tag `latest` 
+      description: push image to registry with additional tag `latest`
       default: "false"
 
     - name: buildpack_builder_image
@@ -57,6 +57,20 @@ spec:
       type: string
       description: The name of the project.toml file which should be used for build
       default: "project.toml"
+
+    - name: user_id
+      type: string
+      description: the user id of the builder image user.
+      default: "1000"
+
+    - name: group_id
+      type: string
+      description: the group id of the builder image user.
+      default: "1000"
+
+    - name: buildpack_cnb_platform_api
+      type: string
+      description: the Platform specification defines the interface between the CNB lifecycle and a platform that runs it
 
     - name: sentry_project_name
       type: string
@@ -147,6 +161,12 @@ spec:
           value: "$(params.buildpack_config_filename)"
         - name: project_config_filename
           value: "$(params.project_config_filename)"
+        - name: user_id
+          value: "$(params.user_id)"
+        - name: group_id
+          value: "$(params.group_id)"
+        - name: buildpack_cnb_platform_api
+          value: "$(params.buildpack_cnb_platform_api)"
         - name: node_version
           value: "$(tasks.detect-nodejs-version.results.node-version)"
         - name: environment
