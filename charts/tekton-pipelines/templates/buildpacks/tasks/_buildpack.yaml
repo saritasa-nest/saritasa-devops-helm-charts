@@ -142,6 +142,7 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
           chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
           chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+          chmod -R g+w "$(resources.inputs.app.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
