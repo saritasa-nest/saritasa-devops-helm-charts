@@ -1,21 +1,27 @@
 # Default roles for triggers and pipelines
 ---
+# Default role for eventlistener sa
+# it should be able to list triggers in namespace
+# and impersonate trigger sa with creds for github webhook
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
- name: default-pipeline-role
+ name: default-eventlistener-role
  namespace: {{ $.Release.Namespace }}
 rules:
-  - apiGroups:  ["extensions", "apps", "batch", ""]
-    resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
-    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
-  - apiGroups:  [""]
-    resources:  ["pods/log"]
+  - apiGroups:  ["triggers.tekton.dev"]
+    resources:  ["triggers"]
     verbs:      ["get", "list", "watch"]
-  - apiGroups:  ["tekton.dev"]
-    resources:  ["pipelineruns"]
-    verbs:      ["get", "list", "create"]
+
+  - apiGroups:  [""]
+    resources:  ["serviceaccounts"]
+    verbs:      ["impersonate"]
 ---
+# Default role for trigger sa
+# it should be able to
+# list triggerbindings, triggertemplates, configmaps and secrets in namespace
+# create pipeline runs and resources
+# and impersonate sa with creds for pipelinerun
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -23,25 +29,24 @@ metadata:
  namespace: {{ $.Release.Namespace }}
 rules:
   - apiGroups:  ["triggers.tekton.dev"]
-    resources:  ["eventlisteners", "triggerbindings", "triggertemplates", "clusterinterceptors"]
+    resources:  ["triggerbindings", "triggertemplates"]
     verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
-
-  - apiGroups:  ["triggers.tekton.dev"]
-    resources:  ["triggers", "clustertriggerbindings"]
-    verbs:      ["get", "list", "watch"]
 
   - apiGroups:  ["tekton.dev"]
     resources:  ["pipelineruns", "pipelineresources", "taskruns"]
     verbs:      ["create"]
 
-  - apiGroups:  ["extensions"]
-    resources:  ["ingresses"]
-    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+  - apiGroups:  [""]
+    resources:  ["configmaps", "secrets"]
+    verbs:      ["get", "list", "watch"]
 
   - apiGroups:  [""]
-    resources:  ["configmaps", "secrets", "serviceaccounts"]
-    verbs:      ["get", "list", "watch", "impersonate"]
+    resources:  ["serviceaccounts"]
+    verbs:      ["impersonate"]
 ---
+# Default cluster wide role for trigger sa
+# it should be able to
+# list clusterlever resources
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -50,3 +55,27 @@ rules:
   - apiGroups: ["triggers.tekton.dev"]
     resources: ["clustertriggerbindings", "clusterinterceptors"]
     verbs: ["get", "list", "watch"]
+---
+# Default role for build-pipeline sa
+# it should be able to
+# control pipelineruns and resources
+# list and get secrets in namespace
+# and impersonate sa with creds for tasks
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: default-build-pipeline-role
+ namespace: {{ $.Release.Namespace }}
+rules:
+  - apiGroups:  ["tekton.dev"]
+    resources:  ["pipelineruns", "pipelineresources", "taskruns"]
+    verbs:      ["create"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["serviceaccounts"]
+    verbs: ["impersonate"]

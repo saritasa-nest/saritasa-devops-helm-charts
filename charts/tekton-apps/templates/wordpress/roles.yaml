@@ -12,6 +12,7 @@
                   "environment"       $projectEnvironment }}
 
 # wordpress projects needs extra permissions in addition to common ones to be able to stop current application pod in project's namespace and start a new one
+---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -24,10 +25,6 @@ rules:
   - apiGroups:  [""]
     resources:  ["pods/log"]
     verbs:      ["get", "list", "watch"]
-  - apiGroups:  ["tekton.dev"]
-    resources:  ["pipelineruns"]
-    verbs:      ["get", "list", "create"]
-
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -42,8 +39,6 @@ subjects:
 - kind: ServiceAccount
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
   namespace: {{ $.Release.Namespace }}
-
----
 
 {{- end }} # if component.wordpress
 {{- end }} # range component
