@@ -1,0 +1,13 @@
+# Default values for grafana-dashboards.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+ingressNginx:
+  enabled: true
+  namespace: grafana
+  # -- provision `NGINX Ingress controller` dashboard
+  controller: true
+  # -- provision `NGINX Ingress controller - Loki` dashboard
+  controllerLoki: true
+  # -- provision `Request Handling Performance` dashboard
+  requestHandlingPerformance: true
