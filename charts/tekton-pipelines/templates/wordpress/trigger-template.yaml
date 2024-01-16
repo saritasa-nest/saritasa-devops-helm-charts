@@ -24,13 +24,13 @@ spec:
     spec:
       pipelineRef:
         name: wordpress-build-pipeline
-      serviceAccountName: $(tt.params.application)-build-pipeline-sa
       params:
         {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
         {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
       taskRunTemplate:
+        serviceAccountName: $(tt.params.application)-build-pipeline-sa
         podTemplate:
           volumes:
           - name: podinfo

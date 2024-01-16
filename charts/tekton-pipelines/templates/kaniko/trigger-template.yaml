@@ -27,7 +27,6 @@ spec:
     spec:
       pipelineRef:
         name: kaniko-build-pipeline
-      serviceAccountName: $(tt.params.application)-build-pipeline-sa
       params:
         {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
         {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}
@@ -44,6 +43,7 @@ spec:
         - pipelineTaskName: kustomize
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       taskRunTemplate:
+        serviceAccountName: $(tt.params.application)-build-pipeline-sa
         podTemplate:
           securityContext:
             fsGroup: 65532
