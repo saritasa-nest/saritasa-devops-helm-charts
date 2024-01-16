@@ -6,6 +6,8 @@ metadata:
   namespace: {{ .Values.ingressNginx.namespace }}
   labels:
     grafana_dashboard: "1"
+  annotations:
+    k8s-sidecar-target-directory: {{ .Values.ingressNginx.targetDirectory }}
 data:
   ingress-nginx-controller-loki.json: |
     {

@@ -31,7 +31,7 @@ grafana-dashboards
 
 ## `chart.version`
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -52,4 +52,5 @@ A Helm chart for provisioning grafana dashboards
 | ingressNginx.enabled | bool | `true` |  |
 | ingressNginx.namespace | string | `"grafana"` |  |
 | ingressNginx.requestHandlingPerformance | bool | `true` | provision `Request Handling Performance` dashboard |
+| ingressNginx.targetDirectory | string | `"/var/lib/grafana/dashboards/ingress-nginx/"` |  |
 
