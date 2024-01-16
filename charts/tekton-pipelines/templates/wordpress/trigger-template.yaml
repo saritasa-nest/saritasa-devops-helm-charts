@@ -24,6 +24,7 @@ spec:
     spec:
       pipelineRef:
         name: wordpress-build-pipeline
+      serviceAccountName: $(tt.params.application)-build-pipeline-sa
       params:
         {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
         {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}

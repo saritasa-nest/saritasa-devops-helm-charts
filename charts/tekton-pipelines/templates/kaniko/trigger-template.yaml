@@ -27,6 +27,7 @@ spec:
     spec:
       pipelineRef:
         name: kaniko-build-pipeline
+      serviceAccountName: $(tt.params.application)-build-pipeline-sa
       params:
         {{- include "bonds.app" (dict "source" "tt") | nindent 8 }}
         {{- include "bonds.git" (dict "source" "tt") | nindent 8 }}
@@ -37,9 +38,6 @@ spec:
       workspaces:
         {{- include "pipeline.source_workspaces" . | nindent 8 }}
       taskRunSpecs:
-        # sa with app repo secret
-        - pipelineTaskName: git-clone-app-source
-          serviceAccountName: $(tt.params.application)-build-pipeline-sa
         # sa with k8s repo secret
         - pipelineTaskName: git-clone-k8s-source
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
