@@ -43,6 +43,9 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
           chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
+          # we have to grant group write permission as buildtime and runtime uid are different in new buildpacks
+          # https://github.com/buildpacks/rfcs/blob/main/text/0085-run-uid.md
+          chmod -R g+w "$(workspaces.app.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -76,7 +79,7 @@ spec:
         if [ "$(params.add_tag_latest)" == "true" ]
         then
           ADDITIONAL_TAG="-tag=$(params.image_registry_repository):latest"
-        fi 
+        fi
 
         /cnb/lifecycle/creator \
           -app=$(params.source_subpath) \
