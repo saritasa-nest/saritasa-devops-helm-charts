@@ -1,0 +1,30 @@
+# Default values for grafana-dashboards.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# you should define target directories for dashboards in configuration kube-prometheus-stack
+# grafana:
+#   dashboardProviders:
+#     dashboardproviders.yaml:
+#       apiVersion: 1
+#       providers:
+#         - name: 'ingress-nginx'
+#           orgId: 1
+#           type: file
+#           folder: 'ingress-nginx'
+#           disableDeletion: true
+#           editable: false
+#           allowUiUpdates: false
+#           options:
+#             path: /var/lib/grafana/dashboards/ingress-nginx/
+
+ingressNginx:
+  enabled: true
+  namespace: grafana
+  targetDirectory: /var/lib/grafana/dashboards/ingress-nginx/
+  # -- provision `NGINX Ingress controller` dashboard
+  controller: true
+  # -- provision `NGINX Ingress controller - Loki` dashboard
+  controllerLoki: true
+  # -- provision `Request Handling Performance` dashboard
+  requestHandlingPerformance: true
