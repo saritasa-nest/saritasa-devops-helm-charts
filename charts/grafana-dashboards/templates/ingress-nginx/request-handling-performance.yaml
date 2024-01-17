@@ -3,7 +3,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: ingress-nginx-request-handling-performance
-  namespace: {{ .Values.ingressNginx.namespace }}
+  namespace: {{ .Values.ingressNginx.namespace | default "grafana" }}
   labels:
     grafana_dashboard: "1"
   annotations:
