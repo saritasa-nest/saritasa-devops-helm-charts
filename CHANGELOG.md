@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-01-17
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/106)
+- Added aws grafana dashboards in `grafana-dashboards` helm chart
+
 ## 2024-01-16
 
 [prod]
