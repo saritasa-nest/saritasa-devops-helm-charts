@@ -10,6 +10,7 @@ metadata:
     k8s-sidecar-target-directory: {{ .Values.aws.targetDirectory }}
 data:
   aws-sqs.json: |
+  {{`
     {
       "annotations": {
         "list": [
@@ -895,4 +896,5 @@ data:
       "version": 2,
       "weekStart": ""
     }
+  `}}
 {{- end }}

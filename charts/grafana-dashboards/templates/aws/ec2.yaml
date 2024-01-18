@@ -10,6 +10,7 @@ metadata:
     k8s-sidecar-target-directory: {{ .Values.aws.targetDirectory }}
 data:
   aws-ec2.json: |
+  {{`
     {
       "annotations": {
         "list": [
@@ -2158,4 +2159,5 @@ data:
       "version": 1,
       "weekStart": ""
     }
+  `}}
 {{- end }}

@@ -16,7 +16,7 @@
 #           editable: false
 #           allowUiUpdates: false
 #           options:
-#             path: /var/lib/grafana/dashboards/ingress-nginx/
+#             path: /tmp/dashboards/ingress-nginx/
 
 ingressNginx:
   # -- if you want to enable ingress-nginx dashboards
@@ -24,7 +24,7 @@ ingressNginx:
   # -- namespace where configmaps for ingress-nginx dashboards should be created
   namespace: grafana
   # -- directory where ingress-nginx dashboards will be installed
-  targetDirectory: /var/lib/grafana/dashboards/ingress-nginx/
+  targetDirectory: /tmp/dashboards/ingress-nginx/
   # -- provision `NGINX Ingress controller` dashboard
   controller: true
   # -- provision `NGINX Ingress controller - Loki` dashboard
@@ -38,7 +38,7 @@ aws:
   # -- namespace where configmaps for aws dashboards should be created
   namespace: grafana
   # -- directory where aws dashboards will be installed
-  targetDirectory: /var/lib/grafana/dashboards/aws/
+  targetDirectory: /tmp/dashboards/aws/
   # -- provision `AWS Billing Dashboard` dashboard
   billing: true
   # -- provision `Amazon CloudWatch Logs` dashboard

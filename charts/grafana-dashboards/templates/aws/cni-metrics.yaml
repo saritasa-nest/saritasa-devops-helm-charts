@@ -10,6 +10,7 @@ metadata:
     k8s-sidecar-target-directory: {{ .Values.aws.targetDirectory }}
 data:
   aws-cni-metrics.json: |
+  {{`
     {
       "annotations": {
         "list": [
@@ -542,7 +543,7 @@ data:
               "exemplar": true,
               "expr": "count_values(\"value\", 100*awscni_eni_allocated/awscni_eni_max)",
               "interval": "",
-              "legendFormat": {{- "{{value}}" | quote -}},
+              "legendFormat": "{{value}}",
               "refId": "A"
             }
           ],
@@ -1025,7 +1026,7 @@ data:
               "exemplar": true,
               "expr": "sum by (reason) (awscni_del_ip_req_count{reason!=\"PodDeleted\"})",
               "interval": "",
-              "legendFormat": {{- "{{reason}}" | quote -}},
+              "legendFormat": "{{reason}}",
               "refId": "A"
             }
           ],
@@ -1096,7 +1097,7 @@ data:
               },
               "expr": "sum by (api) (sum_over_time(awscni_aws_api_error_count[$__interval]))",
               "interval": "",
-              "legendFormat": {{- "{{api}}" | quote -}},
+              "legendFormat": "{{api}}",
               "refId": "A"
             }
           ],
@@ -1191,7 +1192,7 @@ data:
               },
               "expr": "sum by (api) (sum_over_time(awscni_aws_api_error_count[$__interval]))",
               "interval": "",
-              "legendFormat": {{- "{{api}}" | quote -}},
+              "legendFormat": "{{api}}",
               "refId": "A"
             }
           ],
@@ -1322,7 +1323,7 @@ data:
               "exemplar": true,
               "expr": "avg by (api)(rate(awscni_aws_api_latency_ms_sum[5m])/rate(awscni_aws_api_latency_ms_count[5m]))",
               "interval": "",
-              "legendFormat": {{- "{{api}}" | quote -}},
+              "legendFormat": "{{api}}",
               "refId": "A"
             }
           ],
@@ -1413,7 +1414,7 @@ data:
               },
               "expr": "sum by (fn) (awscni_ipamd_action_inprogress)",
               "interval": "",
-              "legendFormat": {{- "{{fn}}" | quote -}},
+              "legendFormat": "{{fn}}",
               "refId": "A"
             }
           ],
@@ -1508,7 +1509,7 @@ data:
               "expr": "sum(rate(awscni_reconcile_count[5m])) by (fn)",
               "instant": false,
               "interval": "",
-              "legendFormat": {{- "{{fn}}" | quote -}},
+              "legendFormat": "{{fn}}",
               "refId": "A"
             }
           ],
@@ -1937,4 +1938,5 @@ data:
       "version": 1,
       "weekStart": ""
     }
+  `}}
 {{- end }}

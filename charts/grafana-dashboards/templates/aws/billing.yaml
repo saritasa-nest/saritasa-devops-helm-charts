@@ -10,6 +10,7 @@ metadata:
     k8s-sidecar-target-directory: {{ .Values.aws.targetDirectory }}
 data:
   aws-billing.json: |
+  {{`
     {
       "annotations": {
         "list": [
@@ -654,7 +655,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "alias": {{- "{{ServiceName}}" | quote -}},
+              "alias": "{{ServiceName}}",
               "application": {
                 "filter": ""
               },
@@ -762,7 +763,7 @@ data:
           "strokeWidth": "1",
           "targets": [
             {
-              "alias": {{- "{{ServiceName}}" | quote -}},
+              "alias": "{{ServiceName}}",
               "application": {
                 "filter": ""
               },
@@ -1011,4 +1012,5 @@ data:
       "version": 1,
       "weekStart": ""
     }
+  `}}
 {{- end }}
