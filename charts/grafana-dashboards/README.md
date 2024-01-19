@@ -31,7 +31,7 @@ grafana-dashboards
 
 ## `chart.version`
 
-![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -60,10 +60,28 @@ A Helm chart for provisioning grafana dashboards
 | aws.ses | bool | `true` | provision `AWS SES` dashboard |
 | aws.sqs | bool | `true` | provision `AWS SQS` dashboard |
 | aws.targetDirectory | string | `"/tmp/dashboards/aws/"` | directory where aws dashboards will be installed |
+| cicd.argocd | bool | `true` | provision `ArgoCD` dashboard |
+| cicd.enabled | bool | `true` | if you want to enable cicd dashboards |
+| cicd.namespace | string | `"grafana"` | namespace where configmaps for cicd dashboards should be created |
+| cicd.targetDirectory | string | `"/tmp/dashboards/cicd/"` | directory where cicd dashboards will be installed |
+| databases.enabled | bool | `true` | if you want to enable databases dashboards |
+| databases.mysql | bool | `true` | provision `MySQL Instance Summary` dashboard |
+| databases.namespace | string | `"grafana"` | namespace where configmaps for databases dashboards should be created |
+| databases.postgresql | bool | `true` | provision `PostgreSQL Database` dashboard |
+| databases.targetDirectory | string | `"/tmp/dashboards/databases/"` | directory where databases dashboards will be installed |
 | ingressNginx.controller | bool | `true` | provision `NGINX Ingress controller` dashboard |
 | ingressNginx.controllerLoki | bool | `true` | provision `NGINX Ingress controller - Loki` dashboard |
 | ingressNginx.enabled | bool | `true` | if you want to enable ingress-nginx dashboards |
 | ingressNginx.namespace | string | `"grafana"` | namespace where configmaps for ingress-nginx dashboards should be created |
 | ingressNginx.requestHandlingPerformance | bool | `true` | provision `Request Handling Performance` dashboard |
 | ingressNginx.targetDirectory | string | `"/tmp/dashboards/ingress-nginx/"` | directory where ingress-nginx dashboards will be installed |
+| istio.controlPlane | bool | `true` | provision `Istio Control Plane Dashboard` dashboard |
+| istio.enabled | bool | `true` | if you want to enable istio dashboards |
+| istio.mesh | bool | `true` | provision `Istio Mesh Dashboard` dashboard |
+| istio.namespace | string | `"grafana"` | namespace where configmaps for istio dashboards should be created |
+| istio.performance | bool | `true` | provision `Istio Performance Dashboard` dashboard |
+| istio.service | bool | `true` | provision `Istio Service Dashboard` dashboard |
+| istio.targetDirectory | string | `"/tmp/dashboards/istio/"` | directory where istio dashboards will be installed |
+| istio.wasmExtension | bool | `true` | provision `Istio Wasm Extension Dashboard` dashboard |
+| istio.workload | bool | `true` | provision `Istio Workload Dashboard` dashboard |
 
