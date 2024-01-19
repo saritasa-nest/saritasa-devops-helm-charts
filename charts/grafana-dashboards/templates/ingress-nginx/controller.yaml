@@ -3,13 +3,14 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: ingress-nginx-controller
-  namespace: {{ .Values.ingressNginx.namespace }}
+  namespace: {{ .Values.ingressNginx.namespace | default "grafana" }}
   labels:
     grafana_dashboard: "1"
   annotations:
     k8s-sidecar-target-directory: {{ .Values.ingressNginx.targetDirectory }}
 data:
   ingress-nginx-controller.json: |
+  {{`
     {
     "annotations": {
         "list": [
@@ -509,7 +510,7 @@ data:
             "instant": false,
             "interval": "",
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ ingress }}" | quote -}},
+            "legendFormat": "{{ ingress }}",
             "metric": "network",
             "refId": "A",
             "step": 10
@@ -611,7 +612,7 @@ data:
             "instant": false,
             "interval": "10s",
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ ingress }}" | quote -}},
+            "legendFormat": "{{ ingress }}",
             "metric": "container_memory_usage:sort_desc",
             "refId": "A",
             "step": 10
@@ -1136,7 +1137,7 @@ data:
             "hide": false,
             "instant": true,
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ ingress }}" | quote -}},
+            "legendFormat": "{{ ingress }}",
             "refId": "C"
             },
             {
@@ -1145,7 +1146,7 @@ data:
             "hide": false,
             "instant": true,
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ ingress }}" | quote -}},
+            "legendFormat": "{{ ingress }}",
             "refId": "D"
             },
             {
@@ -1154,7 +1155,7 @@ data:
             "hide": false,
             "instant": true,
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ destination_service }}" | quote -}},
+            "legendFormat": "{{ destination_service }}",
             "refId": "E"
             },
             {
@@ -1164,7 +1165,7 @@ data:
             "instant": true,
             "interval": "",
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ ingress }}" | quote -}},
+            "legendFormat": "{{ ingress }}",
             "refId": "F"
             },
             {
@@ -1172,7 +1173,7 @@ data:
             "format": "table",
             "instant": true,
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ ingress }}" | quote -}},
+            "legendFormat": "{{ ingress }}",
             "refId": "G"
             }
         ],
@@ -1296,7 +1297,7 @@ data:
             "editorMode": "code",
             "expr": "histogram_quantile(0.80, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress!=\"\",controller_pod=~\"$controller\",controller_class=~\"$controller_class\",controller_namespace=~\"$namespace\",ingress=~\"$ingress\"}[2m])) by (ingress,le))",
             "hide": false,
-            "legendFormat": {{- "P80-{{ingress}}" | quote -}},
+            "legendFormat": "P80-{{ingress}}",
             "range": true,
             "refId": "A"
             },
@@ -1308,7 +1309,7 @@ data:
             "editorMode": "code",
             "expr": "histogram_quantile(0.90, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress!=\"\",controller_pod=~\"$controller\",controller_class=~\"$controller_class\",controller_namespace=~\"$namespace\",ingress=~\"$ingress\"}[2m])) by (ingress,le))",
             "hide": false,
-            "legendFormat": {{- "P90-{{ingress}}" | quote -}},
+            "legendFormat": "P90-{{ingress}}",
             "range": true,
             "refId": "B"
             },
@@ -1320,7 +1321,7 @@ data:
             "editorMode": "code",
             "expr": "histogram_quantile(0.99, sum(rate(nginx_ingress_controller_request_duration_seconds_bucket{ingress!=\"\",controller_pod=~\"$controller\",controller_class=~\"$controller_class\",controller_namespace=~\"$namespace\",ingress=~\"$ingress\"}[2m])) by (ingress,le))",
             "hide": false,
-            "legendFormat": {{- "P99-{{ingress}}" | quote -}},
+            "legendFormat": "P99-{{ingress}}",
             "range": true,
             "refId": "C"
             }
@@ -1419,7 +1420,7 @@ data:
             "editorMode": "code",
             "expr": "sum(increase(nginx_ingress_controller_request_duration_seconds_bucket{ingress!=\"\",controller_pod=~\"$controller\",controller_class=~\"$controller_class\",controller_namespace=~\"$namespace\",ingress=~\"$ingress\"}[2m])) by (ingress)",
             "hide": false,
-            "legendFormat": {{- "{{ingress}}" | quote -}},
+            "legendFormat": "{{ingress}}",
             "range": true,
             "refId": "A"
             }
@@ -1521,7 +1522,7 @@ data:
             "expr": "avg (nginx_ingress_controller_ssl_expire_time_seconds{pod=~\"$controller\",namespace=~\"$namespace\", host=~\"$host\"}) by (host) - time()",
             "format": "time_series",
             "intervalFactor": 1,
-            "legendFormat": {{- "{{ host }}" | quote -}},
+            "legendFormat": "{{ host }}",
             "metric": "gke_letsencrypt_cert_expiration",
             "range": true,
             "refId": "A",
@@ -1742,4 +1743,5 @@ data:
     "version": 12,
     "weekStart": ""
     }
+  `}}
 {{- end }}
