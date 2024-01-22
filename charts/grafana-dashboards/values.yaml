@@ -18,6 +18,16 @@
 #           options:
 #             path: /tmp/dashboards/ingress-nginx/
 
+alerts:
+  # -- if you want to enable alerts dashboards
+  enabled: true
+  # -- namespace where configmaps for alerts dashboards should be created
+  namespace: grafana
+  # -- directory where alerts dashboards will be installed
+  targetDirectory: /tmp/dashboards/alerts/
+  # -- provision `Alertmanager` dashboard
+  alertmanager: true
+
 aws:
   # -- if you want to enable aws dashboards
   enabled: true
@@ -68,6 +78,18 @@ databases:
   # -- provision `PostgreSQL Database` dashboard
   postgresql: true
 
+default:
+  # -- if you want to enable default dashboards
+  enabled: true
+  # -- namespace where configmaps for default dashboards should be created
+  namespace: grafana
+  # -- directory where default dashboards will be installed
+  targetDirectory: /tmp/dashboards/default/
+  # -- provision `Generic Service Metrics` dashboard
+  genericServiceMetrics: true
+  # -- provision `Home` dashboard
+  home: true
+
 ingressNginx:
   # -- if you want to enable ingress-nginx dashboards
   enabled: true
@@ -101,3 +123,41 @@ istio:
   wasmExtension: true
   # -- provision `Istio Workload Dashboard` dashboard
   workload: true
+
+knative:
+  # -- if you want to enable knative dashboards
+  enabled: true
+  # -- namespace where configmaps for knative dashboards should be created
+  namespace: grafana
+  # -- directory where knative dashboards will be installed
+  targetDirectory: /tmp/dashboards/knative/
+  # -- provision `Knative Eventing - Broker/Trigger` dashboard
+  eventingBrokerTrigger: true
+  # -- provision `Knative Eventing - Source` dashboard
+  eventingSource: true
+  # -- provision `Knative - Reconciler` dashboard
+  reconciler: true
+  # -- provision `Knative Serving - Control Plane Efficiency` dashboard
+  servingControlPlaneEfficiency: true
+  # -- provision `Knative Serving - Revision CPU and Memory Usage` dashboard
+  servingRevisionCpuMemoryUsage: true
+  # -- provision `Knative Serving - Revision HTTP Requests` dashboard
+  servingRevisionHttpRequests: true
+  # -- provision `Knative Serving - Scaling Debugging` dashboard
+  servingScalingDebugging: true
+
+kubernetes:
+  # -- if you want to enable kubernetes dashboards
+  enabled: true
+  # -- namespace where configmaps for kubernetes dashboards should be created
+  namespace: grafana
+  # -- directory where kubernetes dashboards will be installed
+  targetDirectory: /tmp/dashboards/kubernetes/
+  # -- provision `Kubernetes - Cluster Monitoring` dashboard
+  clusterMonitoring: true
+  # -- provision `Kubernetes - Cluster Overall Dashboard` dashboard
+  clusterOverall: true
+  # -- provision `Kubernetes - Cluster Overview` dashboard
+  clusterOverview: true
+  # -- provision `Node Exporter Full` dashboard
+  nodeExporterFull: true

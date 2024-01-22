@@ -31,7 +31,7 @@ grafana-dashboards
 
 ## `chart.version`
 
-![Version: 0.0.5](https://img.shields.io/badge/Version-0.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.6](https://img.shields.io/badge/Version-0.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -47,6 +47,10 @@ A Helm chart for provisioning grafana dashboards
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| alerts.alertmanager | bool | `true` | provision `Alertmanager` dashboard |
+| alerts.enabled | bool | `true` | if you want to enable alerts dashboards |
+| alerts.namespace | string | `"grafana"` | namespace where configmaps for alerts dashboards should be created |
+| alerts.targetDirectory | string | `"/tmp/dashboards/alerts/"` | directory where alerts dashboards will be installed |
 | aws.billing | bool | `true` | provision `AWS Billing Dashboard` dashboard |
 | aws.cloudwatchLogs | bool | `true` | provision `Amazon CloudWatch Logs` dashboard |
 | aws.cniMetrics | bool | `true` | provision `AWS CNI Metrics` dashboard |
@@ -69,6 +73,11 @@ A Helm chart for provisioning grafana dashboards
 | databases.namespace | string | `"grafana"` | namespace where configmaps for databases dashboards should be created |
 | databases.postgresql | bool | `true` | provision `PostgreSQL Database` dashboard |
 | databases.targetDirectory | string | `"/tmp/dashboards/databases/"` | directory where databases dashboards will be installed |
+| default.enabled | bool | `true` | if you want to enable default dashboards |
+| default.genericServiceMetrics | bool | `true` | provision `Generic Service Metrics` dashboard |
+| default.home | bool | `true` | provision `Home` dashboard |
+| default.namespace | string | `"grafana"` | namespace where configmaps for default dashboards should be created |
+| default.targetDirectory | string | `"/tmp/dashboards/default/"` | directory where default dashboards will be installed |
 | ingressNginx.controller | bool | `true` | provision `NGINX Ingress controller` dashboard |
 | ingressNginx.controllerLoki | bool | `true` | provision `NGINX Ingress controller - Loki` dashboard |
 | ingressNginx.enabled | bool | `true` | if you want to enable ingress-nginx dashboards |
@@ -84,4 +93,21 @@ A Helm chart for provisioning grafana dashboards
 | istio.targetDirectory | string | `"/tmp/dashboards/istio/"` | directory where istio dashboards will be installed |
 | istio.wasmExtension | bool | `true` | provision `Istio Wasm Extension Dashboard` dashboard |
 | istio.workload | bool | `true` | provision `Istio Workload Dashboard` dashboard |
+| knative.enabled | bool | `true` | if you want to enable knative dashboards |
+| knative.eventingBrokerTrigger | bool | `true` | provision `Knative Eventing - Broker/Trigger` dashboard |
+| knative.eventingSource | bool | `true` | provision `Knative Eventing - Source` dashboard |
+| knative.namespace | string | `"grafana"` | namespace where configmaps for knative dashboards should be created |
+| knative.reconciler | bool | `true` | provision `Knative - Reconciler` dashboard |
+| knative.servingControlPlaneEfficiency | bool | `true` | provision `Knative Serving - Control Plane Efficiency` dashboard |
+| knative.servingRevisionCpuMemoryUsage | bool | `true` | provision `Knative Serving - Revision CPU and Memory Usage` dashboard |
+| knative.servingRevisionHttpRequests | bool | `true` | provision `Knative Serving - Revision HTTP Requests` dashboard |
+| knative.servingScalingDebugging | bool | `true` | provision `Knative Serving - Scaling Debugging` dashboard |
+| knative.targetDirectory | string | `"/tmp/dashboards/knative/"` | directory where knative dashboards will be installed |
+| kubernetes.clusterMonitoring | bool | `true` | provision `Kubernetes - Cluster Monitoring` dashboard |
+| kubernetes.clusterOverall | bool | `true` | provision `Kubernetes - Cluster Overall Dashboard` dashboard |
+| kubernetes.clusterOverview | bool | `true` | provision `Kubernetes - Cluster Overview` dashboard |
+| kubernetes.enabled | bool | `true` | if you want to enable kubernetes dashboards |
+| kubernetes.namespace | string | `"grafana"` | namespace where configmaps for kubernetes dashboards should be created |
+| kubernetes.nodeExporterFull | bool | `true` | provision `Node Exporter Full` dashboard |
+| kubernetes.targetDirectory | string | `"/tmp/dashboards/kubernetes/"` | directory where kubernetes dashboards will be installed |
 
