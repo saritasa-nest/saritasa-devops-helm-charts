@@ -18,20 +18,6 @@
 #           options:
 #             path: /tmp/dashboards/ingress-nginx/
 
-ingressNginx:
-  # -- if you want to enable ingress-nginx dashboards
-  enabled: true
-  # -- namespace where configmaps for ingress-nginx dashboards should be created
-  namespace: grafana
-  # -- directory where ingress-nginx dashboards will be installed
-  targetDirectory: /tmp/dashboards/ingress-nginx/
-  # -- provision `NGINX Ingress controller` dashboard
-  controller: true
-  # -- provision `NGINX Ingress controller - Loki` dashboard
-  controllerLoki: true
-  # -- provision `Request Handling Performance` dashboard
-  requestHandlingPerformance: true
-
 aws:
   # -- if you want to enable aws dashboards
   enabled: true
@@ -59,3 +45,59 @@ aws:
   ses: true
   # -- provision `AWS SQS` dashboard
   sqs: true
+
+cicd:
+  # -- if you want to enable cicd dashboards
+  enabled: true
+  # -- namespace where configmaps for cicd dashboards should be created
+  namespace: grafana
+  # -- directory where cicd dashboards will be installed
+  targetDirectory: /tmp/dashboards/cicd/
+  # -- provision `ArgoCD` dashboard
+  argocd: true
+
+databases:
+  # -- if you want to enable databases dashboards
+  enabled: true
+  # -- namespace where configmaps for databases dashboards should be created
+  namespace: grafana
+  # -- directory where databases dashboards will be installed
+  targetDirectory: /tmp/dashboards/databases/
+  # -- provision `MySQL Instance Summary` dashboard
+  mysql: true
+  # -- provision `PostgreSQL Database` dashboard
+  postgresql: true
+
+ingressNginx:
+  # -- if you want to enable ingress-nginx dashboards
+  enabled: true
+  # -- namespace where configmaps for ingress-nginx dashboards should be created
+  namespace: grafana
+  # -- directory where ingress-nginx dashboards will be installed
+  targetDirectory: /tmp/dashboards/ingress-nginx/
+  # -- provision `NGINX Ingress controller` dashboard
+  controller: true
+  # -- provision `NGINX Ingress controller - Loki` dashboard
+  controllerLoki: true
+  # -- provision `Request Handling Performance` dashboard
+  requestHandlingPerformance: true
+
+istio:
+  # -- if you want to enable istio dashboards
+  enabled: true
+  # -- namespace where configmaps for istio dashboards should be created
+  namespace: grafana
+  # -- directory where istio dashboards will be installed
+  targetDirectory: /tmp/dashboards/istio/
+  # -- provision `Istio Control Plane Dashboard` dashboard
+  controlPlane: true
+  # -- provision `Istio Mesh Dashboard` dashboard
+  mesh: true
+  # -- provision `Istio Performance Dashboard` dashboard
+  performance: true
+  # -- provision `Istio Service Dashboard` dashboard
+  service: true
+  # -- provision `Istio Wasm Extension Dashboard` dashboard
+  wasmExtension: true
+  # -- provision `Istio Workload Dashboard` dashboard
+  workload: true

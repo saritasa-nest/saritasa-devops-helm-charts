@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-01-20
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/107)
+- Added argocd, databases, istio grafana dashboards in `grafana-dashboards` helm chart
+
 ## 2024-01-17
 
 [prod]
