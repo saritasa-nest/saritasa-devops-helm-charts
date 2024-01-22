@@ -24,7 +24,7 @@ metadata:
     argocd.argoproj.io/sync-wave: {{ $project.argocd.syncWave | default "200" | quote }}
     jiraURL: {{ $project.jiraURL }}
     {{- if $project.argocd.notifications }}
-    {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
+    {{- omit $project.argocd.notifications.annotations "notifications.argoproj.io/subscribe.on-sync-status-unknown.slack" | toYaml | nindent 4}}
     {{- end }}
 spec:
   destinations:

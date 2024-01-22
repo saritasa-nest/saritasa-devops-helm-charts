@@ -27,7 +27,7 @@ spec:
 
     - name: add_tag_latest
       type: string
-      description: push image to registry with additional tag `latest` 
+      description: push image to registry with additional tag `latest`
       default: "false"
 
     - name: buildpack_builder_image
