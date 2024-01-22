@@ -817,7 +817,7 @@ data:
           "datasource": {
             "uid": "$datasource"
           },
-          "description": "Number of alerts by state such as `active`, `suppressed` etc.",
+          "description": "Number of alerts by state such as active, suppressed etc.",
           "fill": 4,
           "fillGradient": 0,
           "gridPos": {
