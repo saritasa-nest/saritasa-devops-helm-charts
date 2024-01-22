@@ -26,7 +26,7 @@ spec:
       default: "true"
 
     - name: add_tag_latest
-      description: push image to registry with additional tag `latest` 
+      description: push image to registry with additional tag `latest`
       default: "false"
 
     - name: kubernetes_repository_ssh_url

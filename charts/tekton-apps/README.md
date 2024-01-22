@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.17](https://img.shields.io/badge/Version-0.2.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 0.2.18-dev.1](https://img.shields.io/badge/Version-0.2.18--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -195,6 +195,7 @@ spec:
   There are two ways of activating notifications, using slack-token integration and using project-webhooks integration.
   The slack-token allows sending to any slack channel where the app is installed, that's why we should only use it in rocks/cloud cluster and not in clients clusters.
   The project-webhook integrations can only send to the channel where it's created in Slack app 'client deployments' (https://api.slack.com/apps/A01LM626QTZ/incoming-webhooks?) and it should be used in staging/prod client clusters.
+  The on-sync-status-unknown subscription is only available for Wordpress applications (it creates redundant notifications for non Wordpress apps)
 
   # fill below parameters for each `project` block
 
