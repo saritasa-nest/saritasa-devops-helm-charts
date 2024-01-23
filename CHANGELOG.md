@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-01-22
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/108)
+- Added alerts, default, knative, kubernetes grafana dashboards in `grafana-dashboards` helm chart
+
 ## 2024-01-20
 
 [prod]
