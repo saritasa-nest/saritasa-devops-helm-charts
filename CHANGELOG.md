@@ -1,11 +1,19 @@
 # Changelog
 
+## 2024-01-24
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/111)
+- Added compability with new jammy paketo buildpacks for tekton-pipelines
+
 ## 2023-12-26
 
 [prod]
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/100)
 - Added push image to registry with additional tag `latest`
+
 ## 2023-12-22
 
 [prod]
