@@ -21,6 +21,13 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
     jiraURL: {{ $project.jiraURL }}
+    {{- if (($component.argocd).notifications).annotations }}
+    {{- toYaml $component.argocd.notifications.annotations | nindent 4}}
+    {{- else }}
+      {{- if (($project.argocd).notifications).annotations }}
+      {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
+      {{- end }}
+    {{- end }}
 spec:
   destination:
     namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}

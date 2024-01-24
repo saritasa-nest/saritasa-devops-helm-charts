@@ -16,10 +16,12 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: {{ $argocd.syncWave | default "210" | quote }}
     jiraURL: {{ $project.jiraURL }}
-    {{- if $project.argocd.notifications }}
-    {{- if index $project.argocd.notifications.annotations "notifications.argoproj.io/subscribe.on-sync-status-unknown.slack" }}
-    {{- pick $project.argocd.notifications.annotations "notifications.argoproj.io/subscribe.on-sync-status-unknown.slack" | toYaml | nindent 4}}
-    {{- end }}
+    {{- if (($component.argocd).notifications).annotations }}
+    {{- toYaml $component.argocd.notifications.annotations | nindent 4}}
+    {{- else }}
+      {{- if (($project.argocd).notifications).annotations }}
+      {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
+      {{- end }}
     {{- end }}
 spec:
   destination:

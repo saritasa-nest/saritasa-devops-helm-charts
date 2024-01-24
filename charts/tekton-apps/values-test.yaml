@@ -54,6 +54,10 @@ apps:
         path: dev/argocd/apps
         repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
         targetRevision: feature/sync-boilerplate
+        argocd:
+          notifications:
+            annotations:
+              notifications.argoproj.io/subscribe.on-deployed.slack: project-nmbl-ci
 
     components:
       - name: backend
@@ -62,7 +66,9 @@ apps:
         applicationURL: https://api.proxylegalstaging.com
         argocd:
           syncWave: 210
-
+          notifications:
+            annotations:
+              notifications.argoproj.io/subscribe.on-sync-failed.slack: project-nmbl-ci
         eventlistener:
           template: buildpack-django-build-pipeline-trigger-template
         triggerBinding:
@@ -112,6 +118,9 @@ apps:
           # ignoreDeploymentReplicasDiff: true
           source:
             targetRevision: 15.2.4
+          notifications:
+            annotations:
+              notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-nmbl; project-nmbl-alarms
         wordpress:
           imageTag: 6.0.2
           repositorySshUrl: ssh://

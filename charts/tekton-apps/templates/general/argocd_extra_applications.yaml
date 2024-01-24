@@ -14,6 +14,13 @@ metadata:
   namespace: argo-cd
   annotations:
     argocd.argoproj.io/sync-wave: "210"
+    {{- if (($extraApp.argocd).notifications).annotations }}
+    {{- toYaml $extraApp.argocd.notifications.annotations | nindent 4}}
+    {{- else }}
+      {{- if (($project.argocd).notifications).annotations }}
+      {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
+      {{- end }}
+    {{- end }}
 spec:
   destination:
     namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $extraApp "project" $project "component_name" "extraApp") }}
