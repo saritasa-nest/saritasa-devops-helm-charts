@@ -5,7 +5,7 @@
 [prod]
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/110)
-- Release terraform-pod chart with 1.6.6 terraform version `0.0.22`
+- Release terraform-pod chart with 1.7.0 terraform version `0.0.22`
 
 ## 2023-12-26
 
