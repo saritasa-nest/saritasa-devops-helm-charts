@@ -31,7 +31,9 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.21](https://img.shields.io/badge/Version-0.0.21-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.6](https://img.shields.io/badge/AppVersion-1.6.6-informational?style=flat-square)
+
+![Version: 0.0.22](https://img.shields.io/badge/Version-0.0.22-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: ](https://img.shields.io/badge/AppVersion--informational?style=flat-square)
+
 
 ## Maintainers
 
@@ -59,7 +61,7 @@ helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-char
 helm upgrade --install CLIENT saritasa/terraform-pod \
   --namespace terraform \
   --set terraform.client=CLIENT \
-  --set image.tag=1.6.6 \
+  --set image.tag=1.7.0 \
   --set github.repository=saritasa-nest/CLIENT-infra-dev-aws \
   --set github.branch=feature/branch \
   --set github.username=YOUR-GITHUB-USERNAME \
@@ -77,7 +79,7 @@ For infra-aws repos you may want to pass short-term TTL AWS credentials from the
   helm upgrade --install CLIENT saritasa/terraform-pod \
     --namespace terraform \
     --set terraform.client=CLIENT \
-    --set image.tag=1.6.6 \
+    --set image.tag=1.7.0 \
     --set github.repository=saritasa-nest/CLIENT-infra-aws \
     --set github.branch=feature/branch \
     --set github.username=YOUR-GITHUB-USERNAME \
@@ -112,7 +114,7 @@ unset AWS_VAULT && creds=$(aws-vault exec saritasa/v2/administrators --json) && 
 helm template --release-name debug-tfpod \
     --namespace terraform \
     --set terraform.client=saritasa \
-    --set image.tag=1.6.6 \
+    --set image.tag=1.7.0 \
     --set github.repository=saritasa-nest/some-repo-infra-aws \
     --set github.branch=feature/branch-name \
     --set github.username=your-username \

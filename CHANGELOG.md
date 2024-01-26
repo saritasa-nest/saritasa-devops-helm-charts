@@ -7,6 +7,10 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/111)
 - Added compability with new jammy paketo buildpacks for tekton-pipelines
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/110)
+- Release terraform-pod chart with 1.7.0 terraform version `0.0.22`
+
+
 ## 2023-12-26
 
 [prod]
