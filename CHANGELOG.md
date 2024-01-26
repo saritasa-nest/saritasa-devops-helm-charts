@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-01-25
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/109)
+- Changed ArgoCD slack notifications logic to remove notifications from AppProjects CRD and put them in Applications CRDs
+
 ## 2023-12-26
 
 [prod]
