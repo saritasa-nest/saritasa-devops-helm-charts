@@ -80,6 +80,10 @@ spec:
       description: the group id of the builder image user.
       default: "1000"
 
+    - name: buildpack_cnb_platform_api
+      type: string
+      description: the Platform specification defines the interface between the CNB lifecycle and a platform that runs it
+
     - name: process_type
       type: string
       description: the default process type to set on the image.
@@ -120,7 +124,7 @@ spec:
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
-        value: {{ .cnbPlatformAPI | default "0.4" | quote }}
+        value: $(params.buildpack_cnb_platform_api)
     envFrom:
       - configMapRef:
           name: $(params.application)-build-pipeline-config # project specific values
@@ -138,6 +142,7 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
           chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
           chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+          chmod -R g+w "$(resources.inputs.app.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -196,9 +201,6 @@ spec:
           mountPath: /layers
         - name: $(params.cache)
           mountPath: /cache
-      securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
     {{ end }}
   volumes:
     - name: empty-dir

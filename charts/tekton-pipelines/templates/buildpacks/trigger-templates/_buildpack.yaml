@@ -50,6 +50,18 @@ spec:
       description: The name of the project.toml file which should be used for build
       default: "project.toml"
 
+    - name: user_id
+      description: the user id of the builder image user.
+      default: "1000"
+
+    - name: group_id
+      description: the group id of the builder image user.
+      default: "1000"
+
+    - name: buildpack_cnb_platform_api
+      description: the Platform specification defines the interface between the CNB lifecycle and a platform that runs it
+      default: "{{ .cnbPlatformAPI | default 0.4 }}"
+
     - name: sentry_project_name
       description: name of the project in Sentry
 
@@ -90,6 +102,12 @@ spec:
           value: "$(tt.params.buildpack_config_filename)"
         - name: project_config_filename
           value: "$(tt.params.project_config_filename)"
+        - name: user_id
+          value: "$(tt.params.user_id)"
+        - name: group_id
+          value: "$(tt.params.group_id)"
+        - name: buildpack_cnb_platform_api
+          value: "$(tt.params.buildpack_cnb_platform_api)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
 
