@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-01-31
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/112)
+- Fix typo in `tekton-apps` helm chart for `build-pipeline-role` Role generation
+
 ## 2024-01-25
 
 [prod]
