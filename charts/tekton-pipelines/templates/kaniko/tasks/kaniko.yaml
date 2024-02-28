@@ -70,7 +70,7 @@ spec:
         aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
 
     - name: build
-      image: {{ .Values.images.kainiko | default "gcr.io/kaniko-project/executor:latest"}}
+      image: {{ .Values.images.kaniko | default "gcr.io/kaniko-project/executor:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(resources.inputs.app.path)
       env:
