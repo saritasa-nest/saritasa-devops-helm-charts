@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-03-01
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/115)
+- adding `mergeable` configuration
+
 ## 2024-02-29
 
 [dev]
