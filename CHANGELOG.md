@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-03-21
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/116)
+- Fix typo in `tekton-pipeline` helm chart for `kaniko` image
+
 ## 2024-01-31
 
 [prod]
