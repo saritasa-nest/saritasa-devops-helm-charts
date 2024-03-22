@@ -6,6 +6,27 @@
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/116)
 - Fix typo in `tekton-pipeline` helm chart for `kaniko` image
+=======
+## 2024-03-01
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/115)
+- adding `mergeable` configuration
+
+## 2024-02-29
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/114)
+- removing `mergeable` configuration
+
+## 2024-02-28
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/113)
+- Release new `terraform-pod` version with 1.7.4 terraform
 
 ## 2024-01-31
 

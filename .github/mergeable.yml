@@ -10,7 +10,7 @@ mergeable:
          regex_flag: 'i' # case-insensitive (it is a default, to disable use 'none')
          message: 'Title must exclude "wip"'
         begins_with:
-          match: ['doc:','feat:','fix:']
+          match: ['doc:', 'feat:', 'fix:']
           message: 'Title must begin with "doc:", "feat:", or "fix:"'
 
   # "wip" label must be missing
@@ -18,6 +18,10 @@ mergeable:
     name: 'Label check'
     validate:
       - do: label
+        must_include:
+          regex: Needs Review|NeedsReview
+          regex_flag: 'i' # case-insensitive (it is a default, to disable use 'none')
+          message: 'Merging is not allowed if the "needs review" label is missing'
         must_exclude:
           regex: '\bwip\b'
           regex_flag: 'i' # case-insensitive (it is a default, to disable use 'none')
