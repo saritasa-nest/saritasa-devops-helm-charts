@@ -31,7 +31,7 @@ grafana-dashboards
 
 ## `chart.version`
 
-![Version: 0.0.7](https://img.shields.io/badge/Version-0.0.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.8](https://img.shields.io/badge/Version-0.0.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -72,6 +72,7 @@ A Helm chart for provisioning grafana dashboards
 | databases.mysql | bool | `true` | provision `MySQL Instance Summary` dashboard |
 | databases.namespace | string | `"grafana"` | namespace where configmaps for databases dashboards should be created |
 | databases.postgresql | bool | `true` | provision `PostgreSQL Database` dashboard |
+| databases.redis | bool | `true` | provision `Redis Instance Summary` dashboard |
 | databases.targetDirectory | string | `"/tmp/dashboards/databases/"` | directory where databases dashboards will be installed |
 | default.enabled | bool | `true` | if you want to enable default dashboards |
 | default.genericServiceMetrics | bool | `true` | provision `Generic Service Metrics` dashboard |
