@@ -1,5 +1,13 @@
 # Changelog
 
+## 2024-04-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/118)
+- Add `redis` grafana dashboards in `grafana-dashboards` helm chart
+
+
 ## 2024-01-22
 
 [prod]

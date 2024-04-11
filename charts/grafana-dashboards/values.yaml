@@ -77,6 +77,8 @@ databases:
   mysql: true
   # -- provision `PostgreSQL Database` dashboard
   postgresql: true
+  # -- provision `Redis Instance Summary` dashboard
+  redis: true
 
 default:
   # -- if you want to enable default dashboards
