@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-05-20
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/120)
+- Release new `terraform-pod` version with 1.8.3 terraform
+
 ## 2024-04-15
 
 [prod]
