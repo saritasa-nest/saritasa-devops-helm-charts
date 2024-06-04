@@ -284,6 +284,36 @@ finally:
 {{- end }}
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
+# │ pre deploy reusable snippet in various pipelines                             │
+# │                                                                              │
+# └──────────────────────────────────────────────────────────────────────────────┘
+{{- define "pipeline.preDeploy" -}}
+- name: pre-deploy
+  taskRef:
+    name:  {{ .name }}
+  resources:
+    inputs:
+      - name: app
+        resource: app
+  params:
+    - name: application
+      value: "$(params.application)"
+    - name: project
+      value: "$(params.project)"
+    - name: namespace
+      value: "$(params.namespace)"
+    - name: sha
+      value: "$(params.sha)"
+    - name: environment
+      value: "$(params.environment)"
+  workspaces:
+    - name: source
+      workspace: source
+  runAfter:
+    - kustomize
+{{- end }}
+
+# ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ post deploy reusable snippet in various pipelines                            │
 # │                                                                              │
 # └──────────────────────────────────────────────────────────────────────────────┘

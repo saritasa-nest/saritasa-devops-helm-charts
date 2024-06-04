@@ -111,6 +111,9 @@ buildpacks:
             fi
           securityContext:
             privileged: true
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
@@ -170,6 +173,9 @@ buildpacks:
             # buildpack is detected and used
             set -e
             [[ -f composer.json && -f package.json ]] && (rm -f package.json; ls -la .;) || echo "no php-fix is needed"
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DJANGO                                                                                                    │
@@ -245,6 +251,9 @@ buildpacks:
             # otherwise raise error, because no requirements were found
             echo "requirements.txt is not found! Halting execution."
             exit 1
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
@@ -363,6 +372,9 @@ buildpacks:
             echo "done"
           securityContext:
             privileged: true
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │
@@ -379,6 +391,9 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
@@ -395,6 +410,9 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: RUBY                                                                                                      │
@@ -411,6 +429,9 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: JAVA                                                                                                      │
@@ -427,10 +448,16 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
 
 kaniko:
   # -- should we enable the kaniko pipeline
   enabled: false
+  # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+  # can be useful to prepare different backups and tests before real deploy
+  preDeployTaskSteps: []
 
 wordpress:
   # -- should we enable the wordpress pipeline

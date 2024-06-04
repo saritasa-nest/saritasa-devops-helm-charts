@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.46
+version: 0.1.47-dev.ksenia.1
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -110,6 +110,14 @@ description: |
             script: |
               #!/bin/bash
               echo "hello world2"
+        preDeployTaskSteps:
+          - name: hello1
+            image: node:16
+            imagePullPolicy: IfNotPresent
+            workingDir: $(resources.inputs.app.path)
+            script: |
+              #!/bin/bash
+              echo "hello world1"
         extraPostDeployTaskSteps:
           - name: hello1
             image: node:16

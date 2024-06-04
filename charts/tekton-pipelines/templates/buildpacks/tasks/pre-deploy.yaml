@@ -1,0 +1,8 @@
+{{- range $pipeline := $.Values.buildpacks.generate }}
+{{ $data := dict "namespace"  $.Release.Namespace
+                 "namePrefix" $pipeline.name
+                 "pipeline" $pipeline }}
+{{ if and $.Values.buildpacks.enabled $pipeline.enabled ($pipeline).preDeployTaskSteps }}
+{{ include "task.preDeploy" $data }}
+{{ end }}
+{{- end}}

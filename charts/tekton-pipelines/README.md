@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.46](https://img.shields.io/badge/Version-0.1.46-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.47-dev.ksenia.1](https://img.shields.io/badge/Version-0.1.47--dev.ksenia.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -132,6 +132,14 @@ buildpacks:
           script: |
             #!/bin/bash
             echo "hello world2"
+      preDeployTaskSteps:
+        - name: hello1
+          image: node:16
+          imagePullPolicy: IfNotPresent
+          workingDir: $(resources.inputs.app.path)
+          script: |
+            #!/bin/bash
+            echo "hello world1"
       extraPostDeployTaskSteps:
         - name: hello1
           image: node:16
@@ -228,38 +236,46 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | buildpacks.generate.buildpackDjangoBuildPipeline.enabled | bool | `false` | should we enable the django buildpack pipeline |
 | buildpacks.generate.buildpackDjangoBuildPipeline.name | string | `"buildpack-django-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackDjangoBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackDjangoBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskName | string | `"buildpack-dotnet"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackDotnetBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-dotnet` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackDotnetBuildPipeline.enabled | bool | `false` | should we enable the dotnet buildpack pipeline |
 | buildpacks.generate.buildpackDotnetBuildPipeline.name | string | `"buildpack-dotnet-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackDotnetBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackDotnetBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskName | string | `"buildpack-frontend"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackFrontendBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-frontend` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackFrontendBuildPipeline.enabled | bool | `false` | should we enable the frontend buildpack pipeline |
 | buildpacks.generate.buildpackFrontendBuildPipeline.name | string | `"buildpack-frontend-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackFrontendBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackFrontendBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackGoBuildPipeline.buildTaskName | string | `"buildpack-go"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackGoBuildPipeline.enabled | bool | `false` | should we enable the GO buildpack pipeline |
 | buildpacks.generate.buildpackGoBuildPipeline.name | string | `"buildpack-go-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackGoBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackGoBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackJavaBuildPipeline.buildTaskName | string | `"buildpack-java"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackJavaBuildPipeline.enabled | bool | `false` | should we enable the java buildpack pipeline |
 | buildpacks.generate.buildpackJavaBuildPipeline.name | string | `"buildpack-java-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackJavaBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackJavaBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackNodejsBuildPipeline.buildTaskName | string | `"buildpack-nodejs"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackNodejsBuildPipeline.enabled | bool | `false` | should we enable the nodejs buildpack pipeline |
 | buildpacks.generate.buildpackNodejsBuildPipeline.name | string | `"buildpack-nodejs-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackNodejsBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackNodejsBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackPhpBuildPipeline.buildTaskName | string | `"buildpack-php"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackPhpBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-php` task prior to executing /cnb/lifecycle/creator CLI |
 | buildpacks.generate.buildpackPhpBuildPipeline.description | string | `"Additional steps in the build task are required for\n- compile static with node.js (old legacy projects, where static html is bundled with the PHP repo)\n- fix PHP detection if repo contains buth node.js and php code"` |  |
 | buildpacks.generate.buildpackPhpBuildPipeline.enabled | bool | `false` | should we enable the php buildpack pipeline |
 | buildpacks.generate.buildpackPhpBuildPipeline.name | string | `"buildpack-php-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackPhpBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackPhpBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.generate.buildpackRubyBuildPipeline.buildTaskName | string | `"buildpack-ruby"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackRubyBuildPipeline.enabled | bool | `false` | should we enable the ruby buildpack pipeline |
 | buildpacks.generate.buildpackRubyBuildPipeline.name | string | `"buildpack-ruby-build-pipeline"` | the name of the generated pipeline |
 | buildpacks.generate.buildpackRubyBuildPipeline.overrideBuildStep | object | `{}` | buildpack `build` step can be overridden to be able to perform custom docker auth or add other required functionality |
+| buildpacks.generate.buildpackRubyBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | imagePullPolicy | string | `"IfNotPresent"` | default imagePullPolicy to be used for images pulled in tekton task steps |
 | images | object | See below | default images used in our solution |
 | images.argocd_cli | string | `"https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64"` | argocd cli downdload URL |
@@ -275,6 +291,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
+| kaniko.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
 | podTemplate.tolerations | list | `[{"effect":"NoSchedule","key":"ci","operator":"Equal","value":"true"}]` | tolerations |
@@ -287,4 +304,4 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |
 
 ----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
+Autogenerated from chart metadata using [helm-docs v1.13.1](https://github.com/norwoodj/helm-docs/releases/v1.13.1)
