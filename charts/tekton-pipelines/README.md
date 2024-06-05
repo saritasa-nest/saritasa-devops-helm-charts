@@ -117,37 +117,29 @@ buildpacks:
       enabled: false
       buildTaskName: buildpack-frontend-new
       buildTaskSteps:
-        - name: hello1
-          image: node:16
+        - name: build-hello-world
+          image: node:22
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
-            echo "hello world1"
-
-        - name: hello2
-          image: node:16
-          imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
-          script: |
-            #!/bin/bash
-            echo "hello world2"
+            echo "hello world"
       preDeployTaskSteps:
-        - name: hello1
-          image: node:16
+        - name: pre-deploy-hello-world
+          image: node:22
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
-            echo "hello world1"
+            echo "hello world"
       extraPostDeployTaskSteps:
-        - name: hello1
-          image: node:16
+        - name: post-deploy-hello-world
+          image: node:22
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
-            echo "hello world1"
+            echo "hello world"
 ```
 
 If you want to modify `build` step from buildpack's `build` Task added by default, you just need to add a new `overrideBuildStep` key with new step
@@ -164,7 +156,7 @@ buildpacks:
 
       overrideBuildStep:
         name: build
-        image: node:16
+        image: node:22
         imagePullPolicy: IfNotPresent
         workingDir: $(resources.inputs.app.path)
         script: |
@@ -188,20 +180,13 @@ buildpacks:
             $(resources.outputs.image.url)
 
       buildTaskSteps:
-        - name: hello1
-          image: node:16
+        - name: build-hello-world
+          image: node:22
           imagePullPolicy: IfNotPresent
           workingDir: $(resources.inputs.app.path)
           script: |
             #!/bin/bash
-            echo "hello world1"
-        - name: hello2
-          image: node:16
-          imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
-          script: |
-            #!/bin/bash
-            echo "hello world2"
+            echo "hello world"
 ```
 
 If you want to modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to `kaniko-pipeline`.

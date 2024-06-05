@@ -114,6 +114,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
@@ -176,6 +183,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DJANGO                                                                                                    │
@@ -254,6 +268,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
@@ -375,6 +396,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │
@@ -394,6 +422,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
@@ -413,6 +448,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: RUBY                                                                                                      │
@@ -432,6 +474,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: JAVA                                                                                                      │
@@ -451,6 +500,13 @@ buildpacks:
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 kaniko:
   # -- should we enable the kaniko pipeline
@@ -458,6 +514,13 @@ kaniko:
   # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
   # can be useful to prepare different backups and tests before real deploy
   preDeployTaskSteps: []
+  # - name: pre-deploy-hello-world
+  #   image: node:22
+  #   imagePullPolicy: IfNotPresent
+  #   workingDir: $(resources.inputs.app.path)
+  #   script: |
+  #     #!/bin/bash
+  #     echo "hello world"
 
 wordpress:
   # -- should we enable the wordpress pipeline

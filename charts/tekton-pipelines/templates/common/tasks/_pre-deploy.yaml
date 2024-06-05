@@ -43,7 +43,17 @@ spec:
     envFrom:
       - configMapRef:
           name: $(params.application)-build-pipeline-config # project specific values
-
+    env:
+      - name: application
+        value: $(params.application)
+      - name: project
+        value: $(params.project)
+      - name: namespace
+        value: $(params.namespace)
+      - name: sha
+        value: $(params.sha)
+      - name: environment
+        value: $(params.environment)
   steps:
     # insert customized steps as defined in the values.yaml of the helm chart
     {{- if (.pipeline).preDeployTaskSteps }}
