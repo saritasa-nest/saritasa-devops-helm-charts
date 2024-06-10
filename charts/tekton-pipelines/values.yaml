@@ -111,6 +111,16 @@ buildpacks:
             fi
           securityContext:
             privileged: true
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
@@ -170,6 +180,16 @@ buildpacks:
             # buildpack is detected and used
             set -e
             [[ -f composer.json && -f package.json ]] && (rm -f package.json; ls -la .;) || echo "no php-fix is needed"
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DJANGO                                                                                                    │
@@ -245,6 +265,16 @@ buildpacks:
             # otherwise raise error, because no requirements were found
             echo "requirements.txt is not found! Halting execution."
             exit 1
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
@@ -363,6 +393,16 @@ buildpacks:
             echo "done"
           securityContext:
             privileged: true
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │
@@ -379,6 +419,16 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
@@ -395,6 +445,16 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: RUBY                                                                                                      │
@@ -411,6 +471,16 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: JAVA                                                                                                      │
@@ -427,10 +497,30 @@ buildpacks:
       # -- buildpack `build` step can be overridden to be able to perform custom
       # docker auth or add other required functionality
       overrideBuildStep: {}
+      # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+      # can be useful to prepare different backups and tests before real deploy
+      preDeployTaskSteps: []
+      # - name: pre-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(resources.inputs.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "hello world"
 
 kaniko:
   # -- should we enable the kaniko pipeline
   enabled: false
+  # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+  # can be useful to prepare different backups and tests before real deploy
+  preDeployTaskSteps: []
+  # - name: pre-deploy-hello-world
+  #   image: node:22
+  #   imagePullPolicy: IfNotPresent
+  #   workingDir: $(resources.inputs.app.path)
+  #   script: |
+  #     #!/bin/bash
+  #     echo "hello world"
 
 wordpress:
   # -- should we enable the wordpress pipeline

@@ -1,5 +1,13 @@
 # Changelog
 
+## 2024-06-04
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/121)
+- Add `pre-deploy` step for buildpacks and Kaniko CI/CD
+
+
 ## 2024-05-20
 
 [prod]

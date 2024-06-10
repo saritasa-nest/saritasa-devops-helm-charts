@@ -1,0 +1,63 @@
+{{- define "task.preDeploy" -}}
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: {{ .namePrefix }}-pre-deploy
+  namespace: {{ .namespace }}
+
+spec:
+  description: >-
+    Task performs custom pre deploy actions, which are set from values.yaml
+    (for ex. prepare different backups and etc)
+
+  workspaces:
+    - name: source
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: namespace
+      type: string
+      description: project's namespace
+
+    - name: sha
+      type: string
+      description: sha commit ID of the image deployed in cluster
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+    env:
+      - name: application
+        value: $(params.application)
+      - name: project
+        value: $(params.project)
+      - name: namespace
+        value: $(params.namespace)
+      - name: sha
+        value: $(params.sha)
+      - name: environment
+        value: $(params.environment)
+  steps:
+    # insert customized steps as defined in the values.yaml of the helm chart
+    {{- if (.pipeline).preDeployTaskSteps }}
+    {{- .pipeline.preDeployTaskSteps | toYaml | nindent 4}}
+    {{ end }}
+---
+{{- end }}

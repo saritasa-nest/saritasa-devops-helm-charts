@@ -106,6 +106,10 @@ spec:
       runAfter:
         - kaniko
 
+  {{- if (.Values.kaniko).preDeployTaskSteps }}
+  {{ include "pipeline.preDeploy" (dict "name" (printf "kaniko-pre-deploy")) | nindent 4 }}
+  {{ end }}
+
     - name: deploy
       taskRef:
         name: argocd-deploy
@@ -113,7 +117,8 @@ spec:
         - name : application
           value: "$(params.application)"
       runAfter:
-        - kustomize
+        - {{ if (.Values.kaniko).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
+
 
   {{ if .Values.sentry.enabled }}
     {{ include "pipeline.sentryRelease" . | nindent 4 }}

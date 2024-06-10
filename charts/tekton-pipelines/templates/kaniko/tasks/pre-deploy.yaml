@@ -1,0 +1,6 @@
+{{ if and .Values.kaniko.enabled (.Values.kaniko).preDeployTaskSteps }}
+{{ $data := dict "namespace"  $.Release.Namespace
+                 "namePrefix" "kaniko"
+                 "pipeline" .Values.kaniko }}
+{{ include "task.preDeploy" $data }}
+{{ end }}
