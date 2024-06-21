@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.25](https://img.shields.io/badge/Version-0.0.25-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.3](https://img.shields.io/badge/AppVersion-1.8.3-informational?style=flat-square)
+![Version: 0.0.26](https://img.shields.io/badge/Version-0.0.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.5](https://img.shields.io/badge/AppVersion-1.8.5-informational?style=flat-square)
 
 ## Maintainers
 
@@ -59,7 +59,7 @@ helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-char
 helm upgrade --install CLIENT saritasa/terraform-pod \
   --namespace terraform \
   --set terraform.client=CLIENT \
-  --set image.tag=1.8.3 \
+  --set image.tag=1.8.5 \
   --set github.repository=saritasa-nest/CLIENT-infra-dev-aws \
   --set github.branch=feature/branch \
   --set github.username=YOUR-GITHUB-USERNAME \
@@ -77,7 +77,7 @@ For infra-aws repos you may want to pass short-term TTL AWS credentials from the
   helm upgrade --install CLIENT saritasa/terraform-pod \
     --namespace terraform \
     --set terraform.client=CLIENT \
-    --set image.tag=1.8.3 \
+    --set image.tag=1.8.5 \
     --set github.repository=saritasa-nest/CLIENT-infra-aws \
     --set github.branch=feature/branch \
     --set github.username=YOUR-GITHUB-USERNAME \
@@ -112,7 +112,7 @@ unset AWS_VAULT && creds=$(aws-vault exec saritasa/v2/administrators --json) && 
 helm template --release-name debug-tfpod \
     --namespace terraform \
     --set terraform.client=saritasa \
-    --set image.tag=1.8.3 \
+    --set image.tag=1.8.5 \
     --set github.repository=saritasa-nest/some-repo-infra-aws \
     --set github.branch=feature/branch-name \
     --set github.username=your-username \
@@ -166,7 +166,7 @@ unset creds
 | github.username | string | `""` | github username (who runs this terraform code) |
 | image.pullPolicy | string | `"Always"` | pull policy |
 | image.repository | string | `"public.ecr.aws/saritasa/terraform"` | default docker registry |
-| image.tag | string | `"1.8.3"` | Overrides the image tag whose default is the chart appVersion. |
+| image.tag | string | `"1.8.5"` | Overrides the image tag whose default is the chart appVersion. |
 | imagePullSecrets | list | `[]` | docker pull secret |
 | infracost.apiKey | string | `""` | infracost api token value (optional, if passed - takes precedence over apiKeySecret) |
 | infracost.apiKeySecret | string | `"infracost-api-key"` | infracost api key secret (should contain a single attr: token=) |
