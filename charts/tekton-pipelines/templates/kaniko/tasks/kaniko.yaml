@@ -42,14 +42,14 @@ spec:
         (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
       default: "."
 
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
     - name: extra_args
       type: array
       description: extra args to be passed into kaniko builder
       default: []
-
-    - name: environment
-      type: string
-      description: environment name of the app being built, i.e. dev/staging/prod
 
   results:
     - name: password

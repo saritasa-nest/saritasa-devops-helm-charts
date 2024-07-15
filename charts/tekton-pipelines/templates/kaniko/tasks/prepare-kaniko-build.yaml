@@ -1,0 +1,69 @@
+{{ if .Values.kaniko.enabled }}
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kaniko-prepare-build
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    This task prepares project contents to build process:
+      - converts `kaniko_extra_args` from string with spaces to array to be used
+        in kaniko build for multiple `extra_params`. because TriggerBindings not
+        allows to set arrays as params
+
+  workspaces:
+    - name: source
+
+  resources:
+    inputs:
+      - name: app
+        type: git
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: docker_registry
+      type: string
+      description: aws private ecr registry address
+
+    - name: docker_file
+      type: string
+      description: name of the dockerfile
+      default: "Dockerfile"
+
+    - name: docker_context
+      type: string
+      description: |
+        The build context used by Kaniko
+        (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: "."
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+    - name: extra_args
+      type: string
+      description: extra args to be passed into kaniko builder
+      default: ""
+
+  results:
+    - name: extra_args_array
+      type: array
+      description: Extra args converted to the array type
+
+  steps:
+
+    - name: prepare
+      image: {{ .Values.images.bash | default "docker.io/library/bash:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      script: |
+        #!/usr/bin/env bash
+        IFS=' ' read -ra EXTRA_ARGS_ARRAY <<< "$(params.extra_args)"
+        echo "[${EXTRA_ARGS_ARRAY[*]}]" | tr ' ' ',' > $(results.extra_args_array.path)
+        echo "Converted extra args: `cat $(results.extra_args_array.path)`"
+
+{{ end }}
