@@ -57,6 +57,30 @@ spec:
       type: image
 
   tasks:
+    - name: prepare-build
+      taskRef:
+        name: kaniko-prepare-build
+      resources:
+        inputs:
+          - name: app
+            resource: app
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: docker_registry
+          value: $(params.docker_registry)
+        - name: environment
+          value: "$(params.environment)"
+        - name: docker_file
+          value: "$(params.docker_file)"
+        - name: docker_context
+          value: "$(params.docker_context)"
+        - name: extra_args
+          value: $(params.kaniko_extra_args)
+      workspaces:
+        - name: source
+          workspace: source
+
     - name: kaniko
       taskRef:
         name: kaniko
@@ -79,11 +103,13 @@ spec:
         - name: docker_context
           value: "$(params.docker_context)"
         - name: extra_args
-          value:
-            - $(params.kaniko_extra_args)
+          value: $(tasks.prepare-build.results.extra_args_array)
+
       workspaces:
         - name: source
           workspace: source
+      runAfter:
+        - prepare-build
 
     - name: kustomize
       taskRef:

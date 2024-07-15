@@ -1,5 +1,13 @@
 # Changelog
 
+## 2024-07-15
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/124)
+- Prepare separate `kaniko-prepare-build` step to convert `kaniko_build_args` from string
+  with spaces to array (this is needed because Tekton not allows to have arrays in TriggerBindings values)
+
 ## 2024-07-08
 
 [prod]
