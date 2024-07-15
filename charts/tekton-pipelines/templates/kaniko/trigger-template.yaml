@@ -31,7 +31,7 @@ spec:
       description: dockerfile context path
 
     - name: kaniko_extra_args
-      default: ''
+      default: []
       description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
 
     - name: sentry_project_name
