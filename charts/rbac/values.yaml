@@ -38,7 +38,7 @@ extraRbac: ""
   #     verbs: ["delete"]
   #   - apiGroups: [""]
   #     resources: ["pods/portforward", "services/portforward", "pods/exec"]
-  #     verbs: ["create"]
+  #     verbs: ["create", "get"]
   #   - apiGroups: ["extensions"]
   #     resources:  ["*"]
   #     verbs: ["get", "list", "watch"]
