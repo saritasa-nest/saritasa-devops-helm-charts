@@ -188,10 +188,8 @@ spec:
         {{- end }}
 
         livenessProbe:
-          httpGet:
-            path: /wp-admin/install.php
+          tcpSocket:
             port: 8080
-            scheme: HTTP
           periodSeconds: 120
 
         readinessProbe:
