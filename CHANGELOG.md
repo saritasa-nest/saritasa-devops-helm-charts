@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-07-23
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/125)
+- Release new `rbac` version 0.1.11 - fix developer permissions to compatible with Kubernetes 1.30: allow 'get pods/exec'
+
 ## 2024-07-08
 
 [prod]
