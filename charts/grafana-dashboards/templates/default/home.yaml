@@ -3181,8 +3181,8 @@ data:
           {
             "current": {
               "selected": false,
-              "text": "teleport.usummitapp.net",
-              "value": "teleport.usummitapp.net"
+              "text": "None",
+              "value": ""
             },
             "datasource": {
               "type": "prometheus",
@@ -3210,8 +3210,8 @@ data:
           {
             "current": {
               "selected": false,
-              "text": "github.com/saritasa-nest/usummit-kubernetes-aws",
-              "value": "github.com/saritasa-nest/usummit-kubernetes-aws"
+              "text": "None",
+              "value": ""
             },
             "datasource": {
               "type": "prometheus",
