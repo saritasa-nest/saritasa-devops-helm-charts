@@ -1223,7 +1223,7 @@ data:
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sort(\n\t100-((node_filesystem_avail_bytes{mountpoint=\"/\"} * 100) / node_filesystem_size_bytes) > 10\n)",
+              "expr": "sort_desc(\n\t100-((node_filesystem_avail_bytes{mountpoint=\"/\"} * 100) / node_filesystem_size_bytes) > 10\n)",
               "format": "time_series",
               "instant": true,
               "interval": "",
@@ -1641,8 +1641,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1752,8 +1751,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1861,8 +1859,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1982,8 +1979,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2091,8 +2087,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -3270,7 +3265,7 @@ data:
       "timezone": "browser",
       "title": "Home",
       "uid": "sSAXTzv7z",
-      "version": 2,
+      "version": 3,
       "weekStart": ""
     }
   `}}
