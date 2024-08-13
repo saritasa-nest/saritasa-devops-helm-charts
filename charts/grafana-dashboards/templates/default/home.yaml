@@ -37,7 +37,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 6,
+      "id": 193,
       "links": [
         {
           "asDropdown": true,
@@ -1011,7 +1011,7 @@ data:
           "type": "stat"
         },
         {
-          "collapsed": true,
+          "collapsed": false,
           "gridPos": {
             "h": 1,
             "w": 24,
@@ -1019,216 +1019,221 @@ data:
             "y": 4
           },
           "id": 59,
-          "panels": [
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "description": "",
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "fillOpacity": 80,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "lineWidth": 1,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "decimals": 1,
-                  "mappings": [],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "#EAB839",
-                        "value": 75
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "gridPos": {
-                "h": 8,
-                "w": 24,
-                "x": 0,
-                "y": 5
-              },
-              "id": 30,
-              "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
-                  "placement": "right",
-                  "showLegend": false
-                },
-                "orientation": "auto",
-                "showValue": "always",
-                "stacking": "none",
-                "tooltip": {
-                  "mode": "single",
-                  "sort": "none"
-                },
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 200
-              },
-              "pluginVersion": "10.2.2",
-              "targets": [
-                {
-                  "datasource": {
-                    "type": "prometheus",
-                    "uid": "prometheus"
-                  },
-                  "editorMode": "code",
-                  "exemplar": false,
-                  "expr": "(sort_desc(kubelet_volume_stats_used_bytes/kubelet_volume_stats_capacity_bytes))*100>=1",
-                  "instant": true,
-                  "interval": "",
-                  "legendFormat": "{{ persistentvolumeclaim }}",
-                  "range": false,
-                  "refId": "A"
-                }
-              ],
-              "title": "PVC Usage",
-              "type": "barchart"
-            },
-            {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus"
-              },
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "fillOpacity": 80,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "lineWidth": 1,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "mappings": [],
-                  "noValue": "OK 🥰",
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "#EAB839",
-                        "value": 75
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "percent"
-                },
-                "overrides": []
-              },
-              "gridPos": {
-                "h": 10,
-                "w": 24,
-                "x": 0,
-                "y": 13
-              },
-              "id": 38,
-              "options": {
-                "barRadius": 0,
-                "barWidth": 0.97,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
-                "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
-                  "placement": "bottom",
-                  "showLegend": false
-                },
-                "orientation": "auto",
-                "showValue": "auto",
-                "stacking": "none",
-                "tooltip": {
-                  "mode": "single",
-                  "sort": "none"
-                },
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 0
-              },
-              "pluginVersion": "10.2.2",
-              "targets": [
-                {
-                  "datasource": {
-                    "type": "prometheus",
-                    "uid": "prometheus"
-                  },
-                  "editorMode": "code",
-                  "exemplar": false,
-                  "expr": "sort(\n\t100-((node_filesystem_avail_bytes{mountpoint=\"/\"} * 100) / node_filesystem_size_bytes) > 10\n)",
-                  "format": "time_series",
-                  "instant": true,
-                  "interval": "",
-                  "legendFormat": "{{ node }} - {{ label_node_kubernetes_io_lifecycle }} - {{label_tech_stack}} > {{ label_workload }}",
-                  "range": false,
-                  "refId": "A"
-                }
-              ],
-              "title": "Node Disk Usage",
-              "type": "barchart"
-            }
-          ],
+          "panels": [],
           "title": "Storage",
           "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 75
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 5
+          },
+          "id": 30,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "width": 400
+            },
+            "orientation": "auto",
+            "showValue": "always",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 200
+          },
+          "pluginVersion": "10.2.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "(sort_desc(kubelet_volume_stats_used_bytes/kubelet_volume_stats_capacity_bytes))*100>=1",
+              "instant": true,
+              "interval": "",
+              "legendFormat": "{{ persistentvolumeclaim }}",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "PVC Usage",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "fillOpacity": 80,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "lineWidth": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "noValue": "OK 🥰",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 75
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 13
+          },
+          "id": 38,
+          "options": {
+            "barRadius": 0,
+            "barWidth": 0.97,
+            "fullHighlight": false,
+            "groupWidth": 0.7,
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "width": 400
+            },
+            "orientation": "auto",
+            "showValue": "auto",
+            "stacking": "none",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            },
+            "xTickLabelRotation": 0,
+            "xTickLabelSpacing": 0
+          },
+          "pluginVersion": "10.2.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "sort_desc(\n\t100-((node_filesystem_avail_bytes{mountpoint=\"/\"} * 100) / node_filesystem_size_bytes) > 10\n)",
+              "format": "time_series",
+              "instant": true,
+              "interval": "",
+              "legendFormat": "{{ node }}",
+              "range": false,
+              "refId": "A"
+            }
+          ],
+          "title": "Node Disk Usage",
+          "type": "barchart"
         },
         {
           "collapsed": false,
@@ -1236,7 +1241,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 5
+            "y": 23
           },
           "id": 65,
           "panels": [],
@@ -1253,7 +1258,7 @@ data:
             "h": 12,
             "w": 8,
             "x": 0,
-            "y": 6
+            "y": 24
           },
           "id": 32,
           "options": {
@@ -1301,7 +1306,7 @@ data:
             "h": 12,
             "w": 5,
             "x": 8,
-            "y": 6
+            "y": 24
           },
           "id": 75,
           "options": {
@@ -1334,6 +1339,11 @@ data:
             "globalPolygonSize": 25,
             "globalRegexPattern": "",
             "globalShape": "square",
+            "globalShowTimestampEnabled": false,
+            "globalShowTimestampFontSize": 12,
+            "globalShowTimestampFormat": "YYYY-MM-DD HH:mm:ss",
+            "globalShowTimestampPosition": "below_value",
+            "globalShowTimestampYOffset": 0,
             "globalShowTooltipColumnHeadersEnabled": true,
             "globalShowValueEnabled": true,
             "globalTextFontAutoColorEnabled": true,
@@ -1343,6 +1353,7 @@ data:
             "globalTooltipsEnabled": true,
             "globalTooltipsFontFamily": "Roboto",
             "globalTooltipsShowTimestampEnabled": true,
+            "globalTooltipsShowValueEnabled": true,
             "globalUnitFormat": "d",
             "layoutDisplayLimit": 10,
             "layoutNumColumns": 8,
@@ -1359,7 +1370,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.5",
+          "pluginVersion": "2.1.12",
           "targets": [
             {
               "datasource": {
@@ -1394,7 +1405,7 @@ data:
             "h": 12,
             "w": 5,
             "x": 13,
-            "y": 6
+            "y": 24
           },
           "id": 76,
           "options": {
@@ -1427,6 +1438,11 @@ data:
             "globalPolygonSize": 25,
             "globalRegexPattern": "",
             "globalShape": "square",
+            "globalShowTimestampEnabled": false,
+            "globalShowTimestampFontSize": 12,
+            "globalShowTimestampFormat": "YYYY-MM-DD HH:mm:ss",
+            "globalShowTimestampPosition": "below_value",
+            "globalShowTimestampYOffset": 0,
             "globalShowTooltipColumnHeadersEnabled": true,
             "globalShowValueEnabled": false,
             "globalTextFontAutoColorEnabled": true,
@@ -1436,6 +1452,7 @@ data:
             "globalTooltipsEnabled": true,
             "globalTooltipsFontFamily": "Roboto",
             "globalTooltipsShowTimestampEnabled": true,
+            "globalTooltipsShowValueEnabled": true,
             "globalUnitFormat": "none",
             "layoutDisplayLimit": 100,
             "layoutNumColumns": 8,
@@ -1452,7 +1469,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.5",
+          "pluginVersion": "2.1.12",
           "targets": [
             {
               "datasource": {
@@ -1540,7 +1557,7 @@ data:
             "h": 5,
             "w": 6,
             "x": 18,
-            "y": 6
+            "y": 24
           },
           "id": 37,
           "options": {
@@ -1624,8 +1641,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1640,7 +1656,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 18,
-            "y": 11
+            "y": 29
           },
           "id": 41,
           "options": {
@@ -1678,7 +1694,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 18
+            "y": 36
           },
           "id": 57,
           "panels": [],
@@ -1735,8 +1751,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1752,7 +1767,7 @@ data:
             "h": 11,
             "w": 13,
             "x": 0,
-            "y": 19
+            "y": 37
           },
           "id": 48,
           "options": {
@@ -1844,8 +1859,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1861,7 +1875,7 @@ data:
             "h": 11,
             "w": 11,
             "x": 13,
-            "y": 19
+            "y": 37
           },
           "id": 50,
           "options": {
@@ -1965,8 +1979,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -1982,7 +1995,7 @@ data:
             "h": 10,
             "w": 13,
             "x": 0,
-            "y": 30
+            "y": 48
           },
           "id": 49,
           "options": {
@@ -2074,8 +2087,7 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
-                    "value": null
+                    "color": "green"
                   },
                   {
                     "color": "red",
@@ -2091,7 +2103,7 @@ data:
             "h": 10,
             "w": 11,
             "x": 13,
-            "y": 30
+            "y": 48
           },
           "id": 51,
           "options": {
@@ -2158,7 +2170,7 @@ data:
             "h": 7,
             "w": 13,
             "x": 0,
-            "y": 40
+            "y": 58
           },
           "id": 72,
           "options": {
@@ -2191,6 +2203,11 @@ data:
             "globalPolygonSize": 25,
             "globalRegexPattern": "",
             "globalShape": "hexagon_pointed_top",
+            "globalShowTimestampEnabled": false,
+            "globalShowTimestampFontSize": 12,
+            "globalShowTimestampFormat": "YYYY-MM-DD HH:mm:ss",
+            "globalShowTimestampPosition": "below_value",
+            "globalShowTimestampYOffset": 0,
             "globalShowTooltipColumnHeadersEnabled": true,
             "globalShowValueEnabled": true,
             "globalTextFontAutoColorEnabled": true,
@@ -2200,6 +2217,7 @@ data:
             "globalTooltipsEnabled": true,
             "globalTooltipsFontFamily": "Roboto",
             "globalTooltipsShowTimestampEnabled": true,
+            "globalTooltipsShowValueEnabled": true,
             "globalUnitFormat": "short",
             "layoutDisplayLimit": 100,
             "layoutNumColumns": 8,
@@ -2216,7 +2234,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.5",
+          "pluginVersion": "2.1.12",
           "targets": [
             {
               "datasource": {
@@ -2248,7 +2266,7 @@ data:
             "h": 7,
             "w": 11,
             "x": 13,
-            "y": 40
+            "y": 58
           },
           "id": 73,
           "options": {
@@ -2281,6 +2299,11 @@ data:
             "globalPolygonSize": 25,
             "globalRegexPattern": "",
             "globalShape": "hexagon_pointed_top",
+            "globalShowTimestampEnabled": false,
+            "globalShowTimestampFontSize": 12,
+            "globalShowTimestampFormat": "YYYY-MM-DD HH:mm:ss",
+            "globalShowTimestampPosition": "below_value",
+            "globalShowTimestampYOffset": 0,
             "globalShowTooltipColumnHeadersEnabled": true,
             "globalShowValueEnabled": true,
             "globalTextFontAutoColorEnabled": true,
@@ -2290,6 +2313,7 @@ data:
             "globalTooltipsEnabled": true,
             "globalTooltipsFontFamily": "Roboto",
             "globalTooltipsShowTimestampEnabled": true,
+            "globalTooltipsShowValueEnabled": true,
             "globalUnitFormat": "short",
             "layoutDisplayLimit": 100,
             "layoutNumColumns": 8,
@@ -2306,7 +2330,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.5",
+          "pluginVersion": "2.1.12",
           "targets": [
             {
               "datasource": {
@@ -2329,7 +2353,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 47
+            "y": 65
           },
           "id": 63,
           "panels": [],
@@ -2351,7 +2375,7 @@ data:
             "h": 11,
             "w": 8,
             "x": 0,
-            "y": 48
+            "y": 66
           },
           "hiddenSeries": false,
           "id": 14,
@@ -2451,7 +2475,7 @@ data:
             "h": 11,
             "w": 8,
             "x": 8,
-            "y": 48
+            "y": 66
           },
           "hiddenSeries": false,
           "id": 12,
@@ -2556,7 +2580,7 @@ data:
             "h": 11,
             "w": 8,
             "x": 16,
-            "y": 48
+            "y": 66
           },
           "height": "200px",
           "hiddenSeries": false,
@@ -2660,7 +2684,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 59
+            "y": 77
           },
           "id": 77,
           "panels": [],
@@ -2686,7 +2710,7 @@ data:
             "h": 9,
             "w": 8,
             "x": 0,
-            "y": 60
+            "y": 78
           },
           "height": "200px",
           "hiddenSeries": false,
@@ -2799,7 +2823,7 @@ data:
             "h": 9,
             "w": 8,
             "x": 8,
-            "y": 60
+            "y": 78
           },
           "hiddenSeries": false,
           "id": 24,
@@ -2917,7 +2941,7 @@ data:
             "h": 9,
             "w": 8,
             "x": 16,
-            "y": 60
+            "y": 78
           },
           "hiddenSeries": false,
           "id": 22,
@@ -3019,7 +3043,7 @@ data:
             "h": 1,
             "w": 24,
             "x": 0,
-            "y": 69
+            "y": 87
           },
           "id": 78,
           "panels": [
@@ -3241,7 +3265,7 @@ data:
       "timezone": "browser",
       "title": "Home",
       "uid": "sSAXTzv7z",
-      "version": 16,
+      "version": 3,
       "weekStart": ""
     }
   `}}
