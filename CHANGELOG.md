@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-08-21
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/128)
+- Update wordpress helm chart to the latest version `23.1.4`
+
 ## 2024-08-08
 
 [prod]
