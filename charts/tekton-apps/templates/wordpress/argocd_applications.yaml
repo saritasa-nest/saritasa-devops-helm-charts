@@ -164,7 +164,6 @@ spec:
           {{- end }}
         {{- end }}
 
-
         extraVolumes:
           - name: ssh-key
             secret:
@@ -188,16 +187,9 @@ spec:
         {{- end }}
 
         livenessProbe:
-          tcpSocket:
-            port: 8080
           periodSeconds: 120
 
         readinessProbe:
-          enabled: true
-          httpGet:
-            path: /wp-admin/install.php
-            port: 8080
-            scheme: HTTP
           periodSeconds: 120
 
         service:
