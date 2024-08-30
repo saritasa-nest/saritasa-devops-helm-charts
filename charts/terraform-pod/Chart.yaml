@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.0.28
+version: 0.0.29
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -16,7 +16,7 @@ maintainers:
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "1.9.3"
+appVersion: "1.9.5"
 
 description: |
   A Helm chart for running infra-dev-aws solutions
@@ -37,7 +37,7 @@ description: |
   helm upgrade --install CLIENT saritasa/terraform-pod \
     --namespace terraform \
     --set terraform.client=CLIENT \
-    --set image.tag=1.9.3 \
+    --set image.tag=1.9.5 \
     --set github.repository=saritasa-nest/CLIENT-infra-dev-aws \
     --set github.branch=feature/branch \
     --set github.username=YOUR-GITHUB-USERNAME \
@@ -55,7 +55,7 @@ description: |
     helm upgrade --install CLIENT saritasa/terraform-pod \
       --namespace terraform \
       --set terraform.client=CLIENT \
-      --set image.tag=1.9.3 \
+      --set image.tag=1.9.5 \
       --set github.repository=saritasa-nest/CLIENT-infra-aws \
       --set github.branch=feature/branch \
       --set github.username=YOUR-GITHUB-USERNAME \
@@ -90,7 +90,7 @@ description: |
   helm template --release-name debug-tfpod \
       --namespace terraform \
       --set terraform.client=saritasa \
-      --set image.tag=1.9.3 \
+      --set image.tag=1.9.5 \
       --set github.repository=saritasa-nest/some-repo-infra-aws \
       --set github.branch=feature/branch-name \
       --set github.username=your-username \
