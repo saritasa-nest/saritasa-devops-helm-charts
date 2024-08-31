@@ -188,7 +188,7 @@ spec:
 
         customLivenessProbe:
           httpGet:
-            path: /wp-admin/install.php
+            path: /wp-login.php
             port: 8080
             scheme: HTTP
           periodSeconds: 120
@@ -196,7 +196,7 @@ spec:
         readinessProbe:
           enabled: true
           httpGet:
-            path: /wp-admin/install.php
+            path: /wp-login.php
             port: 8080
             scheme: HTTP
           periodSeconds: 120
