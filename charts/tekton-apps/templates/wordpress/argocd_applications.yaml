@@ -164,7 +164,6 @@ spec:
           {{- end }}
         {{- end }}
 
-
         extraVolumes:
           - name: ssh-key
             secret:
@@ -187,9 +186,9 @@ spec:
         extraEnvVarsSecret: {{ .extraEnvVarsSecret }}
         {{- end }}
 
-        livenessProbe:
+        customLivenessProbe:
           httpGet:
-            path: /wp-admin/install.php
+            path: /wp-login.php
             port: 8080
             scheme: HTTP
           periodSeconds: 120
@@ -197,14 +196,15 @@ spec:
         readinessProbe:
           enabled: true
           httpGet:
-            path: /wp-admin/install.php
+            path: /wp-login.php
             port: 8080
             scheme: HTTP
           periodSeconds: 120
 
         service:
           type: ClusterIP
-          port: 8080
+          ports:
+            http: 8080
 
         {{- with .ingress }}
         ingress:
