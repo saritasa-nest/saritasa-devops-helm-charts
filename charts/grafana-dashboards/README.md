@@ -31,7 +31,7 @@ grafana-dashboards
 
 ## `chart.version`
 
-![Version: 0.0.10](https://img.shields.io/badge/Version-0.0.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.11](https://img.shields.io/badge/Version-0.0.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -107,6 +107,7 @@ A Helm chart for provisioning grafana dashboards
 | kubernetes.clusterOverall | bool | `true` | provision `Kubernetes - Cluster Overall Dashboard` dashboard |
 | kubernetes.clusterOverview | bool | `true` | provision `Kubernetes - Cluster Overview` dashboard |
 | kubernetes.enabled | bool | `true` | if you want to enable kubernetes dashboards |
+| kubernetes.eventExporter | bool | `true` | provision `Kubernetes Event Exporter` dashboard |
 | kubernetes.namespace | string | `"grafana"` | namespace where configmaps for kubernetes dashboards should be created |
 | kubernetes.nodeExporterFull | bool | `true` | provision `Node Exporter Full` dashboard |
 | kubernetes.targetDirectory | string | `"/tmp/dashboards/kubernetes/"` | directory where kubernetes dashboards will be installed |
