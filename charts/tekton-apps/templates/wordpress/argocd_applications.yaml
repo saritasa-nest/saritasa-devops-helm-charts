@@ -69,10 +69,7 @@ spec:
         {{- if .updateStrategy }}
           {{- toYaml .updateStrategy | nindent 10 }}
         {{- else }}
-          type: RollingUpdate
-          rollingUpdate:
-            maxSurge: 0%
-            maxUnavailable: 100%
+          type: Recreate
         {{- end }}
 
         replicaCount: {{ .replicaCount | default 1}}

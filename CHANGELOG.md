@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-09-02
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/131)
+- Changed strategy type in wordpress helm chart to `Recreate`
+
 ## 2024-08-28
 
 [prod]
