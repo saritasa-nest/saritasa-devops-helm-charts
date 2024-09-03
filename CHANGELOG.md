@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-09-02
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/130)
+- Add `Kubernetes Event Exporter` dashboard to `grafana-dashboards` helm chart
+
 ## 2024-08-11
 
 [prod]

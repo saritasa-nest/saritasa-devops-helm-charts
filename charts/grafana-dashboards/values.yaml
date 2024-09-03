@@ -159,5 +159,7 @@ kubernetes:
   clusterOverall: true
   # -- provision `Kubernetes - Cluster Overview` dashboard
   clusterOverview: true
+  # -- provision `Kubernetes Event Exporter` dashboard
+  eventExporter: true
   # -- provision `Node Exporter Full` dashboard
   nodeExporterFull: true
