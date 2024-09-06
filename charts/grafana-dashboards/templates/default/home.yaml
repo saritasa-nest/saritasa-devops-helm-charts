@@ -175,6 +175,7 @@ data:
             "x": 0,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 44,
           "options": {
             "colorMode": "background",
@@ -211,6 +212,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Kubernetes Version",
           "transformations": [
             {
@@ -250,6 +252,7 @@ data:
             "x": 2,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 45,
           "options": {
             "colorMode": "background",
@@ -286,6 +289,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Kubernetes Version",
           "transformations": [
             {
@@ -331,6 +335,7 @@ data:
             "x": 4,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 8,
           "options": {
             "colorMode": "background",
@@ -366,6 +371,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "TSDB",
           "type": "stat"
         },
@@ -404,6 +410,7 @@ data:
             "x": 6,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 10,
           "options": {
             "colorMode": "background",
@@ -440,6 +447,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Firing Alerts",
           "type": "stat"
         },
@@ -477,6 +485,7 @@ data:
             "x": 8,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 67,
           "options": {
             "colorMode": "background",
@@ -512,6 +521,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Not Ready Nodes",
           "type": "stat"
         },
@@ -550,6 +560,7 @@ data:
             "x": 10,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 66,
           "options": {
             "colorMode": "background",
@@ -586,6 +597,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Pods Pending 5m",
           "type": "stat"
         },
@@ -624,6 +636,7 @@ data:
             "x": 12,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 68,
           "options": {
             "colorMode": "background",
@@ -660,6 +673,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Pods Crashing",
           "type": "stat"
         },
@@ -697,6 +711,7 @@ data:
             "x": 14,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 35,
           "options": {
             "colorMode": "background",
@@ -732,6 +747,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Pods OOM",
           "type": "stat"
         },
@@ -770,6 +786,7 @@ data:
             "x": 16,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 39,
           "options": {
             "colorMode": "background",
@@ -805,6 +822,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "1h",
           "title": "Failed Jobs",
           "type": "stat"
         },
@@ -838,6 +856,7 @@ data:
             "x": 18,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 42,
           "options": {
             "colorMode": "background",
@@ -873,6 +892,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Nodes",
           "type": "stat"
         },
@@ -906,6 +926,7 @@ data:
             "x": 20,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 5,
           "options": {
             "colorMode": "background",
@@ -939,6 +960,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Pod Running",
           "type": "stat"
         },
@@ -972,6 +994,7 @@ data:
             "x": 22,
             "y": 1
           },
+          "hideTimeOverride": true,
           "id": 43,
           "options": {
             "colorMode": "background",
@@ -1007,6 +1030,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Containers",
           "type": "stat"
         },
@@ -1084,6 +1108,7 @@ data:
             "x": 0,
             "y": 5
           },
+          "hideTimeOverride": false,
           "id": 30,
           "options": {
             "barRadius": 0,
@@ -1118,7 +1143,7 @@ data:
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "(sort_desc(kubelet_volume_stats_used_bytes/kubelet_volume_stats_capacity_bytes))*100>=1",
+              "expr": "(sort_desc(kubelet_volume_stats_used_bytes{node=~\"$node\"}/kubelet_volume_stats_capacity_bytes{node=~\"$node\"}))*100>=1",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ persistentvolumeclaim }}",
@@ -1223,7 +1248,7 @@ data:
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "sort_desc(\n\t100-((node_filesystem_avail_bytes{mountpoint=\"/\"} * 100) / node_filesystem_size_bytes) > 10\n)",
+              "expr": "sort_desc(\n\t100-((node_filesystem_avail_bytes{mountpoint=\"/\", node=~\"$node\"} * 100) / node_filesystem_size_bytes{node=~\"$node\"}) > 10\n)",
               "format": "time_series",
               "instant": true,
               "interval": "",
@@ -1370,7 +1395,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.12",
+          "pluginVersion": "2.1.13",
           "targets": [
             {
               "datasource": {
@@ -1469,7 +1494,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.12",
+          "pluginVersion": "2.1.13",
           "targets": [
             {
               "datasource": {
@@ -1485,6 +1510,7 @@ data:
               "refId": "A"
             }
           ],
+          "timeFrom": "5m",
           "title": "Unhealthy Argocd Apps",
           "transformations": [],
           "type": "grafana-polystat-panel"
@@ -1641,7 +1667,8 @@ data:
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -1745,13 +1772,15 @@ data:
                   "mode": "dashed+area"
                 }
               },
-              "decimals": 2,
+              "decimals": 0,
+              "fieldMinMax": true,
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -1798,7 +1827,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "topk(10, rate(container_cpu_usage_seconds_total{pod!=\"\", container!=\"\"}[5m]) / ON(namespace, pod, container) GROUP_LEFT max(kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\"}) without (node))",
+              "expr": "topk(10, rate(container_cpu_usage_seconds_total{pod!=\"\", container!=\"\", node=~\"$node\"}[5m]) / ON(namespace, pod, container) GROUP_LEFT max(kube_pod_container_resource_limits{resource=\"cpu\", unit=\"core\", node=~\"$node\"}) without (node))",
               "interval": "",
               "legendFormat": "{{ namespace }}:{{ container }}",
               "range": true,
@@ -1817,7 +1846,8 @@ data:
           "fieldConfig": {
             "defaults": {
               "color": {
-                "mode": "continuous-YlBl"
+                "mode": "continuous-YlBl",
+                "seriesBy": "last"
               },
               "custom": {
                 "axisBorderShow": false,
@@ -1852,14 +1882,22 @@ data:
                   "mode": "dashed+area"
                 }
               },
-              "decimals": 2,
+              "decimals": 0,
+              "fieldMinMax": true,
+              "links": [
+                {
+                  "targetBlank": false,
+                  "title": "Drill down",
+                  "url": "/d/${__dashboard.uid}﻿/home?node=${__series.name}"
+                }
+              ],
               "mappings": [],
-              "max": 2,
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -1894,7 +1932,7 @@ data:
             ],
             "tooltip": {
               "mode": "multi",
-              "sort": "none"
+              "sort": "desc"
             }
           },
           "pluginVersion": "9.3.1",
@@ -1906,7 +1944,7 @@ data:
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "topk(10, node_load15 / count(max(node_cpu_seconds_total{}) without (mode)) without (cpu))",
+              "expr": "topk(10, node_load15{node=~\"$node\"} / count(max(node_cpu_seconds_total{node=~\"$node\"}) without (mode)) without (cpu))",
               "instant": false,
               "interval": "",
               "legendFormat": "{{ node }}",
@@ -1973,13 +2011,15 @@ data:
                   "mode": "dashed+area"
                 }
               },
-              "decimals": 2,
+              "decimals": 0,
+              "fieldMinMax": true,
               "mappings": [],
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -2026,7 +2066,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "topk(10, container_memory_working_set_bytes{pod!=\"\", container!=\"\"} / ON(namespace, pod, container) GROUP_LEFT max(kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\"}) without (node))",
+              "expr": "topk(10, container_memory_working_set_bytes{pod!=\"\", container!=\"\", node=~\"$node\"} / ON(namespace, pod, container) GROUP_LEFT max(kube_pod_container_resource_limits{resource=\"memory\", unit=\"byte\", node=~\"$node\"}) without (node))",
               "interval": "",
               "legendFormat": "{{ namespace }}:{{ container }}",
               "range": true,
@@ -2080,14 +2120,21 @@ data:
                   "mode": "dashed+area"
                 }
               },
-              "decimals": 2,
+              "decimals": 0,
+              "links": [
+                {
+                  "title": "Drill down",
+                  "url": "/d/${__dashboard.uid}﻿/home?node=${__series.name}"
+                }
+              ],
               "mappings": [],
               "max": 2,
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green"
+                    "color": "green",
+                    "value": null
                   },
                   {
                     "color": "red",
@@ -2133,7 +2180,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "topk(10, 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)",
+              "expr": "topk(10, 1 - node_memory_MemAvailable_bytes{node=~\"$node\"} / node_memory_MemTotal_bytes{node=~\"$node\"})",
               "interval": "",
               "legendFormat": "{{ node }}",
               "range": true,
@@ -2234,7 +2281,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.12",
+          "pluginVersion": "2.1.13",
           "targets": [
             {
               "datasource": {
@@ -2330,7 +2377,7 @@ data:
             "tooltipSecondarySortByField": "value",
             "tooltipSecondarySortDirection": 1
           },
-          "pluginVersion": "2.1.12",
+          "pluginVersion": "2.1.13",
           "targets": [
             {
               "datasource": {
@@ -2338,7 +2385,7 @@ data:
                 "uid": "prometheus"
               },
               "editorMode": "code",
-              "expr": "sort(topk(10, count by (namespace)(sum by (namespace,pod,container)(kube_pod_container_info{container!=\"\", namespace!~\"ci|kube-system|argo-cd|insights-agent|tekton-pipelines|cert-manager|monitoring|prometheus|velero\"}) unless sum by (namespace,pod,container)(kube_pod_container_resource_limits{resource=\"memory\"}))))",
+              "expr": "sort(topk(10, count by (namespace)(sum by (namespace,pod,container)(kube_pod_container_info{container!=\"\", namespace!~\"ci|kube-system|argo-cd|insights-agent|tekton-pipelines|cert-manager|monitoring|prometheus|velero\",}) unless sum by (namespace,pod,container)(kube_pod_container_resource_limits{resource=\"memory\"}))))",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -3168,7 +3215,7 @@ data:
           "type": "row"
         }
       ],
-      "refresh": "5m",
+      "refresh": "1m",
       "schemaVersion": 38,
       "tags": [],
       "templating": {
@@ -3228,11 +3275,40 @@ data:
             "skipUrlSync": false,
             "sort": 0,
             "type": "query"
+          },
+          {
+            "current": {
+              "selected": true,
+              "text": [
+                "All"
+              ],
+              "value": [
+                "$__all"
+              ]
+            },
+            "definition": "label_values(kube_node_info,node)",
+            "description": "kube_node_info",
+            "hide": 0,
+            "includeAll": true,
+            "label": "node",
+            "multi": true,
+            "name": "node",
+            "options": [],
+            "query": {
+              "qryType": 1,
+              "query": "label_values(kube_node_info,node)",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 1,
+            "regex": "",
+            "skipUrlSync": false,
+            "sort": 1,
+            "type": "query"
           }
         ]
       },
       "time": {
-        "from": "now-3h",
+        "from": "now-6h",
         "to": "now"
       },
       "timepicker": {
