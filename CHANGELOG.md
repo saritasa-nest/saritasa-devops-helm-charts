@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-09-09
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/132)
+- update path for `readinessProbe` and `customLivenessProbe`
+
 ## 2024-09-02
 
 [prod]
