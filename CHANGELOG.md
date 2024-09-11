@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-09-06
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/133)
+- Edit Home dashboard in `grafana-dashboards` helm chart
+
 ## 2024-09-02
 
 [prod]
