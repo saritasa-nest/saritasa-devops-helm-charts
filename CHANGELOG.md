@@ -5,7 +5,7 @@
 [prod]
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/132)
-- update path for `readinessProbe` and `customLivenessProbe`
+- update path for `readinessProbe` and `customLivenessProbe` in the wordpress helm chart
 
 ## 2024-09-02
 
