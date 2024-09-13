@@ -26,8 +26,8 @@ rules:
     resources:  ["deployments"]
     verbs: ["get", "patch"]
   - apiGroups: ["tekton.dev"]
-    resources:  ["*"]
-    verbs:  ["taskruns", "pipelineruns", "pipelines", "tasks"]
+    resources:  ["get", "list", "watch"]
+    verbs:  ["get", "list", "watch"]
 
 ---
 kind: RoleBinding
