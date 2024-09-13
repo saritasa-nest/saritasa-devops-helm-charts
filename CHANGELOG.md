@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-09-13
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/134)
+- Fix RBAC definitions for developers and client roles
+
 ## 2024-09-02
 
 [prod]
