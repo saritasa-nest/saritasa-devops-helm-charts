@@ -26,7 +26,7 @@ rules:
     resources:  ["deployments"]
     verbs: ["get", "patch"]
   - apiGroups: ["tekton.dev"]
-    resources:  ["get", "list", "watch"]
+    resources:  ["taskruns", "pipelineruns", "pipelines", "tasks"]
     verbs:  ["get", "list", "watch"]
 
 ---
