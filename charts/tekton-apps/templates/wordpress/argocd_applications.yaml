@@ -185,7 +185,7 @@ spec:
 
         customLivenessProbe:
           httpGet:
-            path: /wp-login.php
+            path: /wp-includes/js/jquery/jquery.min.js
             port: 8080
             scheme: HTTP
           periodSeconds: 120
@@ -193,7 +193,7 @@ spec:
         readinessProbe:
           enabled: true
           httpGet:
-            path: /wp-login.php
+            path: /wp-includes/js/jquery/jquery.min.js
             port: 8080
             scheme: HTTP
           periodSeconds: 120
