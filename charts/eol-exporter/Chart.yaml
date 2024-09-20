@@ -1,0 +1,18 @@
+apiVersion: v2
+name: eol-exporter
+
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.0.1-dev-1
+
+maintainers:
+  - url: https://www.saritasa.com/
+    name: Saritasa
+    email: nospam@saritasa.com
+
+description: |
+  End of life exporter.
+  A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus

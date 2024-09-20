@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config.yaml
+  namespace: saritasa-devops-tools
+data:
+  config.yaml: |
+    {{- with .Values.eol }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
