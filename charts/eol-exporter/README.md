@@ -1,7 +1,7 @@
 
 # eol-exporter
 
-![Version: 0.1.0-dev-7](https://img.shields.io/badge/Version-0.1.0--dev--7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
+![Version: 0.1.0-dev-8](https://img.shields.io/badge/Version-0.1.0--dev--8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-2a5ca20](https://img.shields.io/badge/AppVersion-prod--2a5ca20-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
