@@ -22,7 +22,7 @@ eol-exporter:
       CONFIG_YAML_PATH:
         value: config.yaml
       JOB_INTERVAL_HOURS:
-        value: 24
+        value: '24'
     ports:
       - name: http
         containerPort: 8080
@@ -72,13 +72,13 @@ eol-exporter:
         port: 8080
       exec: {}
       tcpSocket: {}
-    resources: {}
-    # limits:
-    #   memory: 256Mi
-    #   cpu: 500m
-    # requests:
-    #   memory: 128Mi
-    #   cpu: 100m
+    resources:
+      limits:
+        memory: 256Mi
+        cpu: 500m
+      requests:
+        memory: 128Mi
+        cpu: 100m
     securityContext:
       runAsNonRoot: true
       runAsUser: 1002

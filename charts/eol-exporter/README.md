@@ -1,7 +1,7 @@
 
 # eol-exporter
 
-![Version: 0.1.0-dev-4](https://img.shields.io/badge/Version-0.1.0--dev--4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
+![Version: 0.1.0-dev-5](https://img.shields.io/badge/Version-0.1.0--dev--5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
@@ -61,7 +61,7 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.deployment.enabled | bool | `true` |  |
 | eol-exporter.deployment.env.CONFIG_YAML_PATH.value | string | `"config.yaml"` |  |
 | eol-exporter.deployment.env.ENVIRONMENT.value | string | `"prod"` |  |
-| eol-exporter.deployment.env.JOB_INTERVAL_HOURS.value | int | `24` |  |
+| eol-exporter.deployment.env.JOB_INTERVAL_HOURS.value | string | `"24"` |  |
 | eol-exporter.deployment.envFrom | object | `{}` |  |
 | eol-exporter.deployment.image.digest | string | `""` |  |
 | eol-exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -92,7 +92,10 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.deployment.readinessProbe.successThreshold | int | `1` |  |
 | eol-exporter.deployment.readinessProbe.tcpSocket | object | `{}` |  |
 | eol-exporter.deployment.readinessProbe.timeoutSeconds | int | `1` |  |
-| eol-exporter.deployment.resources | object | `{}` |  |
+| eol-exporter.deployment.resources.limits.cpu | string | `"500m"` |  |
+| eol-exporter.deployment.resources.limits.memory | string | `"256Mi"` |  |
+| eol-exporter.deployment.resources.requests.cpu | string | `"100m"` |  |
+| eol-exporter.deployment.resources.requests.memory | string | `"128Mi"` |  |
 | eol-exporter.deployment.revisionHistoryLimit | int | `5` |  |
 | eol-exporter.deployment.securityContext.runAsGroup | int | `1000` |  |
 | eol-exporter.deployment.securityContext.runAsNonRoot | bool | `true` |  |
