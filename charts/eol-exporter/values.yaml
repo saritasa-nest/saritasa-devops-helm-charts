@@ -216,4 +216,15 @@ eol-exporter:
   configmap:
     enabled: true
     files:
-      config.yaml:
+      config.yaml: |
+        eol:
+          # Get available products from:
+          # https://endoflife.date/api/all.json
+          # and find available cycles in:
+          # https://endoflife.date/api/{product}.json
+          eks:
+            current: '1.30'
+            comment: EKS
+          django:
+            current: '5.1'
+            comment: backend
