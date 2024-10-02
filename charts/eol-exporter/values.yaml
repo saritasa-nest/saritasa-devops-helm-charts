@@ -34,7 +34,7 @@ eol-exporter:
     volumes:
       config:
         configMap:
-          name: config.yaml
+          name: eol-exporter-config
     startupProbe:
       enabled: false
       failureThreshold: 30
