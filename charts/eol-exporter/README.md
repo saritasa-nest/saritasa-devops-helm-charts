@@ -1,42 +1,145 @@
 
 # eol-exporter
 
-![Version: 0.0.1-dev-2](https://img.shields.io/badge/Version-0.0.1--dev--2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.0-dev-1](https://img.shields.io/badge/Version-0.1.0--dev--1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
 
-## Maintainers
+## Requirements
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Saritasa | <nospam@saritasa.com> | <https://www.saritasa.com/> |
+| Repository | Name | Version |
+|------------|------|---------|
+| https://stakater.github.io/stakater-charts/ | eol-exporter(application) | 5.1.0 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` |  |
-| env[0].name | string | `"ENVIRONMENT"` |  |
-| env[0].value | string | `"prod"` |  |
-| env[1].name | string | `"CONFIG_YAML_PATH"` |  |
-| env[1].value | string | `"config.yaml"` |  |
-| eol.eks.comment | string | `"EKS"` |  |
-| eol.eks.current | string | `"1.30"` |  |
-| fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` | pull policy |
-| image.repository | string | `"saritasallc/eol-exporter"` | default docker registry |
-| image.tag | string | `"0.1"` | Overrides the image tag whose default is the chart appVersion. |
-| imagePullSecrets | list | `[]` | docker pull secret |
-| nameOverride | string | `""` |  |
-| nodeSelector."kubernetes.io/arch" | string | `"amd64"` |  |
-| podAnnotations | object | `{}` |  |
-| podSecurityContext | object | `{}` |  |
-| replicaCount | int | `1` |  |
-| resources | object | `{}` |  |
-| securityContext | object | `{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsNonRoot":true,"runAsUser":1002}` | security options for the running pod |
-| service | object | `{"port":8080,"type":"ClusterIP"}` | type of the service to create |
-| tolerations | list | `[]` |  |
+| eol-exporter.additionalContainers | list | `[]` |  |
+| eol-exporter.applicationName | string | `"eol-exporter"` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.policies[0].periodSeconds | int | `100` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.policies[0].type | string | `"Pods"` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.policies[0].value | int | `1` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.policies[1].periodSeconds | int | `100` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.policies[1].type | string | `"Percent"` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.policies[1].value | int | `10` |  |
+| eol-exporter.autoscaling.behavior.scaleDown.stabilizationWindowSeconds | int | `300` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.policies[0].periodSeconds | int | `30` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.policies[0].type | string | `"Pods"` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.policies[0].value | int | `1` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.policies[1].periodSeconds | int | `60` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.policies[1].type | string | `"Percent"` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.policies[1].value | int | `10` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.selectPolicy | string | `"Max"` |  |
+| eol-exporter.autoscaling.behavior.scaleUp.stabilizationWindowSeconds | int | `180` |  |
+| eol-exporter.autoscaling.enabled | bool | `false` |  |
+| eol-exporter.autoscaling.maxReplicas | int | `2` |  |
+| eol-exporter.autoscaling.metrics[0].resource.name | string | `"cpu"` |  |
+| eol-exporter.autoscaling.metrics[0].resource.target.averageUtilization | int | `70` |  |
+| eol-exporter.autoscaling.metrics[0].resource.target.type | string | `"Utilization"` |  |
+| eol-exporter.autoscaling.metrics[0].type | string | `"Resource"` |  |
+| eol-exporter.autoscaling.metrics[1].resource.name | string | `"memory"` |  |
+| eol-exporter.autoscaling.metrics[1].resource.target.averageUtilization | int | `70` |  |
+| eol-exporter.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
+| eol-exporter.autoscaling.metrics[1].type | string | `"Resource"` |  |
+| eol-exporter.autoscaling.minReplicas | int | `1` |  |
+| eol-exporter.configmap.enabled | bool | `true` |  |
+| eol-exporter.configmap.files."config.yaml" | string | `nil` |  |
+| eol-exporter.deployment.additionalLabels | object | `{}` |  |
+| eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/arch"` |  |
+| eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"amd64"` |  |
+| eol-exporter.deployment.args | list | `[]` |  |
+| eol-exporter.deployment.command | string | `""` |  |
+| eol-exporter.deployment.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| eol-exporter.deployment.containerSecurityContext.privileged | bool | `false` |  |
+| eol-exporter.deployment.containerSecurityContext.readOnlyRootFilesystem | bool | `false` |  |
+| eol-exporter.deployment.containerSecurityContext.runAsGroup | int | `1000` |  |
+| eol-exporter.deployment.containerSecurityContext.runAsNonRoot | bool | `true` |  |
+| eol-exporter.deployment.containerSecurityContext.runAsUser | int | `1002` |  |
+| eol-exporter.deployment.enabled | bool | `true` |  |
+| eol-exporter.deployment.envFrom | object | `{}` |  |
+| eol-exporter.deployment.env[0].name | string | `"ENVIRONMENT"` |  |
+| eol-exporter.deployment.env[0].value | string | `"prod"` |  |
+| eol-exporter.deployment.env[1].name | string | `"CONFIG_YAML_PATH"` |  |
+| eol-exporter.deployment.env[1].value | string | `"config.yaml"` |  |
+| eol-exporter.deployment.env[2].name | string | `"JOB_INTERVAL_HOURS"` |  |
+| eol-exporter.deployment.env[2].value | int | `24` |  |
+| eol-exporter.deployment.image.digest | string | `""` |  |
+| eol-exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
+| eol-exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
+| eol-exporter.deployment.image.tag | string | `"prod-d0d3488"` |  |
+| eol-exporter.deployment.initContainers | list | `[]` |  |
+| eol-exporter.deployment.livenessProbe.enabled | bool | `true` |  |
+| eol-exporter.deployment.livenessProbe.exec | object | `{}` |  |
+| eol-exporter.deployment.livenessProbe.failureThreshold | int | `3` |  |
+| eol-exporter.deployment.livenessProbe.httpGet.path | string | `"/favicon.ico"` |  |
+| eol-exporter.deployment.livenessProbe.httpGet.port | int | `8080` |  |
+| eol-exporter.deployment.livenessProbe.initialDelaySeconds | int | `10` |  |
+| eol-exporter.deployment.livenessProbe.periodSeconds | int | `10` |  |
+| eol-exporter.deployment.livenessProbe.successThreshold | int | `1` |  |
+| eol-exporter.deployment.livenessProbe.tcpSocket | object | `{}` |  |
+| eol-exporter.deployment.livenessProbe.timeoutSeconds | int | `1` |  |
+| eol-exporter.deployment.nodeSelector | object | `{}` |  |
+| eol-exporter.deployment.ports[0].containerPort | int | `8080` |  |
+| eol-exporter.deployment.ports[0].name | string | `"http"` |  |
+| eol-exporter.deployment.ports[0].protocol | string | `"TCP"` |  |
+| eol-exporter.deployment.readinessProbe.enabled | bool | `true` |  |
+| eol-exporter.deployment.readinessProbe.exec | object | `{}` |  |
+| eol-exporter.deployment.readinessProbe.failureThreshold | int | `3` |  |
+| eol-exporter.deployment.readinessProbe.httpGet.path | string | `"/favicon.ico"` |  |
+| eol-exporter.deployment.readinessProbe.httpGet.port | int | `8080` |  |
+| eol-exporter.deployment.readinessProbe.initialDelaySeconds | int | `10` |  |
+| eol-exporter.deployment.readinessProbe.periodSeconds | int | `10` |  |
+| eol-exporter.deployment.readinessProbe.successThreshold | int | `1` |  |
+| eol-exporter.deployment.readinessProbe.tcpSocket | object | `{}` |  |
+| eol-exporter.deployment.readinessProbe.timeoutSeconds | int | `1` |  |
+| eol-exporter.deployment.resources | object | `{}` |  |
+| eol-exporter.deployment.revisionHistoryLimit | int | `5` |  |
+| eol-exporter.deployment.securityContext.runAsGroup | int | `1000` |  |
+| eol-exporter.deployment.securityContext.runAsNonRoot | bool | `true` |  |
+| eol-exporter.deployment.securityContext.runAsUser | int | `1002` |  |
+| eol-exporter.deployment.startupProbe.enabled | bool | `false` |  |
+| eol-exporter.deployment.startupProbe.exec | object | `{}` |  |
+| eol-exporter.deployment.startupProbe.failureThreshold | int | `30` |  |
+| eol-exporter.deployment.startupProbe.httpGet | object | `{}` |  |
+| eol-exporter.deployment.startupProbe.periodSeconds | int | `10` |  |
+| eol-exporter.deployment.startupProbe.tcpSocket | object | `{}` |  |
+| eol-exporter.deployment.strategy.rollingUpdate.maxSurge | string | `"25%"` |  |
+| eol-exporter.deployment.strategy.rollingUpdate.maxUnavailable | string | `"25%"` |  |
+| eol-exporter.deployment.strategy.type | string | `"RollingUpdate"` |  |
+| eol-exporter.deployment.tolerations | list | `[]` |  |
+| eol-exporter.deployment.topologySpreadConstraints | object | `{}` |  |
+| eol-exporter.deployment.volumeMounts[0].mountPath | string | `"/workspace/app/config.yaml"` |  |
+| eol-exporter.deployment.volumeMounts[0].name | string | `"config"` |  |
+| eol-exporter.deployment.volumeMounts[0].subPath | string | `"config.yaml"` |  |
+| eol-exporter.deployment.volumes[0].configMap.name | string | `"config.yaml"` |  |
+| eol-exporter.deployment.volumes[0].name | string | `"config"` |  |
+| eol-exporter.enabled | bool | `true` |  |
+| eol-exporter.externalSecrets.enabled | bool | `false` |  |
+| eol-exporter.ingress.additionalLabels | object | `{}` |  |
+| eol-exporter.ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-staging"` |  |
+| eol-exporter.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"100m"` |  |
+| eol-exporter.ingress.annotations."nginx.ingress.kubernetes.io/proxy-connect-timeout" | string | `"300"` |  |
+| eol-exporter.ingress.annotations."nginx.ingress.kubernetes.io/proxy-read-timeout" | string | `"300"` |  |
+| eol-exporter.ingress.annotations."nginx.ingress.kubernetes.io/server-snippet" | string | `"add_header X-Robots-Tag \"noindex, nofollow, nosnippet, noarchive\";\n\n# this prevents hidden files (beginning with a period) from being served\nlocation ~ /\\. {\n  access_log        off;\n  log_not_found     off;\n  deny              all;\n}\n"` |  |
+| eol-exporter.ingress.enabled | bool | `false` |  |
+| eol-exporter.ingress.hosts | list | `[]` |  |
+| eol-exporter.ingress.ingressClassName | string | `"nginx"` |  |
+| eol-exporter.ingress.pathType | string | `"Prefix"` |  |
+| eol-exporter.ingress.servicePort | string | `"http"` |  |
+| eol-exporter.ingress.tls | list | `[]` |  |
+| eol-exporter.namespaceOverride | string | `""` |  |
+| eol-exporter.pdb.enabled | bool | `false` |  |
+| eol-exporter.pdb.minAvailable | int | `1` |  |
+| eol-exporter.service.annotations | object | `{}` |  |
+| eol-exporter.service.enabled | bool | `true` |  |
+| eol-exporter.service.ports[0].name | string | `"http"` |  |
+| eol-exporter.service.ports[0].port | int | `8080` |  |
+| eol-exporter.service.ports[0].protocol | string | `"TCP"` |  |
+| eol-exporter.service.ports[0].targetPort | int | `8080` |  |
+| eol-exporter.service.type | string | `"ClusterIP"` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)
