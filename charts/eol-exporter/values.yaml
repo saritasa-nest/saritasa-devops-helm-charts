@@ -17,22 +17,22 @@ eol-exporter:
     args: []
     envFrom: {}
     env:
-      - name: ENVIRONMENT
+      ENVIRONMENT:
         value: prod
-      - name: CONFIG_YAML_PATH
+      CONFIG_YAML_PATH:
         value: config.yaml
-      - name: JOB_INTERVAL_HOURS
+      JOB_INTERVAL_HOURS:
         value: 24
     ports:
       - name: http
         containerPort: 8080
         protocol: TCP
     volumeMounts:
-      - mountPath: /workspace/app/config.yaml
-        name: config
+      config:
+        mountPath: /workspace/app/config.yaml
         subPath: config.yaml
     volumes:
-      - name: config
+      config:
         configMap:
           name: config.yaml
     startupProbe:

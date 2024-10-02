@@ -1,7 +1,7 @@
 
 # eol-exporter
 
-![Version: 0.1.0-dev-3](https://img.shields.io/badge/Version-0.1.0--dev--3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
+![Version: 0.1.0-dev-4](https://img.shields.io/badge/Version-0.1.0--dev--4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
@@ -59,13 +59,10 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.deployment.containerSecurityContext.runAsNonRoot | bool | `true` |  |
 | eol-exporter.deployment.containerSecurityContext.runAsUser | int | `1002` |  |
 | eol-exporter.deployment.enabled | bool | `true` |  |
+| eol-exporter.deployment.env.CONFIG_YAML_PATH.value | string | `"config.yaml"` |  |
+| eol-exporter.deployment.env.ENVIRONMENT.value | string | `"prod"` |  |
+| eol-exporter.deployment.env.JOB_INTERVAL_HOURS.value | int | `24` |  |
 | eol-exporter.deployment.envFrom | object | `{}` |  |
-| eol-exporter.deployment.env[0].name | string | `"ENVIRONMENT"` |  |
-| eol-exporter.deployment.env[0].value | string | `"prod"` |  |
-| eol-exporter.deployment.env[1].name | string | `"CONFIG_YAML_PATH"` |  |
-| eol-exporter.deployment.env[1].value | string | `"config.yaml"` |  |
-| eol-exporter.deployment.env[2].name | string | `"JOB_INTERVAL_HOURS"` |  |
-| eol-exporter.deployment.env[2].value | int | `24` |  |
 | eol-exporter.deployment.image.digest | string | `""` |  |
 | eol-exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | eol-exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
@@ -111,11 +108,9 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.deployment.strategy.type | string | `"RollingUpdate"` |  |
 | eol-exporter.deployment.tolerations | list | `[]` |  |
 | eol-exporter.deployment.topologySpreadConstraints | object | `{}` |  |
-| eol-exporter.deployment.volumeMounts[0].mountPath | string | `"/workspace/app/config.yaml"` |  |
-| eol-exporter.deployment.volumeMounts[0].name | string | `"config"` |  |
-| eol-exporter.deployment.volumeMounts[0].subPath | string | `"config.yaml"` |  |
-| eol-exporter.deployment.volumes[0].configMap.name | string | `"config.yaml"` |  |
-| eol-exporter.deployment.volumes[0].name | string | `"config"` |  |
+| eol-exporter.deployment.volumeMounts.config.mountPath | string | `"/workspace/app/config.yaml"` |  |
+| eol-exporter.deployment.volumeMounts.config.subPath | string | `"config.yaml"` |  |
+| eol-exporter.deployment.volumes.config.configMap.name | string | `"config.yaml"` |  |
 | eol-exporter.enabled | bool | `true` |  |
 | eol-exporter.externalSecrets.enabled | bool | `false` |  |
 | eol-exporter.ingress.additionalLabels | object | `{}` |  |
