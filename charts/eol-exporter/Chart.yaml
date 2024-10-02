@@ -10,7 +10,7 @@ type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.1.0-dev-5
+version: 0.1.0-dev-6
 appVersion: prod-d0d3488
 
 dependencies:

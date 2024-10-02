@@ -1,7 +1,7 @@
 
 # eol-exporter
 
-![Version: 0.1.0-dev-5](https://img.shields.io/badge/Version-0.1.0--dev--5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
+![Version: 0.1.0-dev-6](https://img.shields.io/badge/Version-0.1.0--dev--6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-d0d3488](https://img.shields.io/badge/AppVersion-prod--d0d3488-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
@@ -44,8 +44,8 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.autoscaling.metrics[1].resource.target.type | string | `"Utilization"` |  |
 | eol-exporter.autoscaling.metrics[1].type | string | `"Resource"` |  |
 | eol-exporter.autoscaling.minReplicas | int | `1` |  |
-| eol-exporter.configmap.enabled | bool | `true` |  |
-| eol-exporter.configmap.files."config.yaml" | string | `"eol:\n  # Get available products from:\n  # https://endoflife.date/api/all.json\n  # and find available cycles in:\n  # https://endoflife.date/api/{product}.json\n  eks:\n    current: '1.30'\n    comment: EKS\n  django:\n    current: '5.1'\n    comment: backend\n"` |  |
+| eol-exporter.configMap.enabled | bool | `true` |  |
+| eol-exporter.configMap.files.config."config.yaml" | string | `"eol:\n  # Get available products from:\n  # https://endoflife.date/api/all.json\n  # and find available cycles in:\n  # https://endoflife.date/api/{product}.json\n  eks:\n    current: '1.30'\n    comment: EKS\n  django:\n    current: '5.1'\n    comment: backend\n"` |  |
 | eol-exporter.deployment.additionalLabels | object | `{}` |  |
 | eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/arch"` |  |
 | eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
