@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: config.yaml
-data:
-  config.yaml: |
-    {{- with .Values.eol }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}

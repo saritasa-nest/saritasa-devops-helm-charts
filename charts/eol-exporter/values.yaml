@@ -1,75 +1,230 @@
-# Default values for eol-exporter.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+---
+eol-exporter:
+  enabled: true
+  namespaceOverride: ''
+  applicationName: eol-exporter
+  externalSecrets:
+    enabled: false
+  deployment:
+    enabled: true
+    image:
+      repository: saritasallc/eol-exporter
+      tag: prod-b9828d4
+      digest: ''  # if set to a non empty value, digest takes precedence on the tag
+      pullPolicy: IfNotPresent
+    initContainers: []
+    command: ''
+    args: []
+    envFrom: {}
+    env:
+      ENVIRONMENT:
+        value: prod
+      CONFIG_YAML_PATH:
+        value: config.yaml
+      JOB_INTERVAL_HOURS:
+        value: '24'
+    ports:
+      - name: http
+        containerPort: 8080
+        protocol: TCP
+    volumeMounts:
+      config:
+        mountPath: /workspace/app/config.yaml
+        subPath: config.yaml
+    volumes:
+      config:
+        configMap:
+          name: eol-exporter-config
+    startupProbe:
+      enabled: false
+      failureThreshold: 30
+      periodSeconds: 10
+      # Must specify either one of the following field when enabled
+      httpGet: {}
+      exec: {}
+      tcpSocket: {}
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+      initialDelaySeconds: 10
+      # Must specify either one of the following field when enabled
+      httpGet:
+        # Prometheus client WSGI server has a /favicon.ico path that gives a 200 OK response that can
+        # be configured as health check endpoint. See:
+        # https://github.com/prometheus/client_python/blob/master/prometheus_client/exposition.py#L121
+        path: /favicon.ico
+        port: 8080
+      exec: {}
+      tcpSocket: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+      initialDelaySeconds: 10
+      # Must specify either one of the following field when enabled
+      httpGet:
+        path: /favicon.ico
+        port: 8080
+      exec: {}
+      tcpSocket: {}
+    resources:
+      limits:
+        memory: 256Mi
+        cpu: 500m
+      requests:
+        memory: 128Mi
+        cpu: 100m
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1002
+      runAsGroup: 1000
+      # fsGroup: 2000
+      # fsGroupChangePolicy: "OnRootMismatch"
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      runAsNonRoot: true
+      runAsUser: 1002
+      runAsGroup: 1000
+      readOnlyRootFilesystem: false
+      # capabilities:
+      #   drop:
+      #     - ALL
+      #   add:
+      #     - CHOWN
+      #     - NET_ADMIN
+      #     - SYS_TIME
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+    additionalLabels: {}
+    tolerations: []
+    nodeSelector: {}
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+    topologySpreadConstraints: {}
+    revisionHistoryLimit: 5
+  additionalContainers: []
+  service:
+    enabled: true
+    annotations: {}
+    ports:
+      - port: 8080
+        name: http
+        protocol: TCP
+        targetPort: 8080
+    type: ClusterIP
+  ingress:
+    enabled: false
+    ingressClassName: nginx
+    servicePort: http
+    pathType: Prefix
 
-image:
-  # -- default docker registry
-  repository: saritasallc/eol-exporter
-  # -- pull policy
-  pullPolicy: IfNotPresent
-  # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "0.1"
+    # deviation from standard way of defining the services
+    hosts: []
+    # - host: backend.site.com
+    #   paths:
+    #     - path: /
+    #       pathType: Prefix
+    #       serviceName: backend
+    #       servicePort: http
+    additionalLabels: {}
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: '300'
+      nginx.ingress.kubernetes.io/proxy-read-timeout: '300'
+      nginx.ingress.kubernetes.io/server-snippet: |
+        add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
 
-# Amount of pods in deployment
-replicaCount: 1
-
-# -- docker pull secret
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-# -- security options for the running pod
-securityContext:
-  capabilities:
-    drop:
-    - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1002
-  runAsGroup: 1000
-
-# -- type of the service to create
-service:
-  type: ClusterIP
-  port: 8080
-
-
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 400Mi
-  # requests:
-  #   cpu: 50m
-  #   memory: 200Mi
-
-# Current image has only amd64 support
-nodeSelector:
-  kubernetes.io/arch: amd64
-
-tolerations: []
-
-affinity: {}
-
-env:
-  - name: ENVIRONMENT
-    value: prod
-  - name: CONFIG_YAML_PATH
-    value: config.yaml
-
-eol:
-  # Get available products from:
-  # https://endoflife.date/api/all.json
-  # and find available cycles in:
-  # https://endoflife.date/api/{product}.json
-  eks:
-    current: '1.30'
-    comment: 'EKS'
+        # this prevents hidden files (beginning with a period) from being served
+        location ~ /\. {
+          access_log        off;
+          log_not_found     off;
+          deny              all;
+        }
+    tls: []
+    # - hosts:
+    #   - nginx.site.com
+    #   secretName: nginx.site.com-crt
+  pdb:
+    enabled: false
+    minAvailable: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 2
+    # you can also adjust the value based on average actual value (regardless of the % use of the requested memory resources)
+    # for example:
+    #
+    # metrics:
+    # - type: Resource
+    #   resource:
+    #     name: memory
+    #     target:
+    #       type: AverageValue
+    #       averageValue: 900Mi
+    #
+    # see explanation: https://stackoverflow.com/questions/69184304/how-memory-metric-is-evaluated-by-kubernetes-hpa
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 70
+      - type: Resource
+        resource:
+          name: memory
+          target:
+            type: Utilization
+            averageUtilization: 70
+    behavior:
+      scaleDown:
+        stabilizationWindowSeconds: 300
+        policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 100
+          - type: Percent
+            value: 10
+            periodSeconds: 100
+      scaleUp:
+        stabilizationWindowSeconds: 180
+        policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 30
+          - type: Percent
+            value: 10
+            periodSeconds: 60
+        selectPolicy: Max
+  configMap:
+    enabled: true
+    files:
+      config:
+        config.yaml: |
+          # Get available products from:
+          # https://endoflife.date/api/all.json
+          # and find available cycles in:
+          # https://endoflife.date/api/{product}.json
+          eks:
+            current: '1.30'
+            comment: EKS
+          django:
+            current: '5.1'
+            comment: backend
