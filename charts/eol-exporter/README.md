@@ -1,7 +1,7 @@
 
 # eol-exporter
 
-![Version: 0.1.0-dev-9](https://img.shields.io/badge/Version-0.1.0--dev--9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-2a5ca20](https://img.shields.io/badge/AppVersion-prod--2a5ca20-informational?style=flat-square)
+![Version: 0.1.0-dev-10](https://img.shields.io/badge/Version-0.1.0--dev--10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-b9828d4](https://img.shields.io/badge/AppVersion-prod--b9828d4-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
@@ -66,7 +66,7 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.deployment.image.digest | string | `""` |  |
 | eol-exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | eol-exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| eol-exporter.deployment.image.tag | string | `nil` |  |
+| eol-exporter.deployment.image.tag | string | `"prod-b9828d4"` |  |
 | eol-exporter.deployment.initContainers | list | `[]` |  |
 | eol-exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | eol-exporter.deployment.livenessProbe.exec | object | `{}` |  |

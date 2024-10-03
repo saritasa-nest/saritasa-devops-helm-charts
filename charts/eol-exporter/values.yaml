@@ -9,7 +9,7 @@ eol-exporter:
     enabled: true
     image:
       repository: saritasallc/eol-exporter
-      tag:
+      tag: prod-b9828d4
       digest: ''  # if set to a non empty value, digest takes precedence on the tag
       pullPolicy: IfNotPresent
     initContainers: []
