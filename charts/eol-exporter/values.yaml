@@ -9,7 +9,7 @@ eol-exporter:
     enabled: true
     image:
       repository: saritasallc/eol-exporter
-      tag: prod-d0d3488
+      tag:
       digest: ''  # if set to a non empty value, digest takes precedence on the tag
       pullPolicy: IfNotPresent
     initContainers: []
@@ -218,14 +218,13 @@ eol-exporter:
     files:
       config:
         config.yaml: |
-          eol:
-            # Get available products from:
-            # https://endoflife.date/api/all.json
-            # and find available cycles in:
-            # https://endoflife.date/api/{product}.json
-            eks:
-              current: '1.30'
-              comment: EKS
-            django:
-              current: '5.1'
-              comment: backend
+          # Get available products from:
+          # https://endoflife.date/api/all.json
+          # and find available cycles in:
+          # https://endoflife.date/api/{product}.json
+          eks:
+            current: '1.30'
+            comment: EKS
+          django:
+            current: '5.1'
+            comment: backend

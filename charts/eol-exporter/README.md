@@ -1,7 +1,7 @@
 
 # eol-exporter
 
-![Version: 0.1.0-dev-8](https://img.shields.io/badge/Version-0.1.0--dev--8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-2a5ca20](https://img.shields.io/badge/AppVersion-prod--2a5ca20-informational?style=flat-square)
+![Version: 0.1.0-dev-9](https://img.shields.io/badge/Version-0.1.0--dev--9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-2a5ca20](https://img.shields.io/badge/AppVersion-prod--2a5ca20-informational?style=flat-square)
 
 End of life exporter.
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
@@ -45,7 +45,7 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.autoscaling.metrics[1].type | string | `"Resource"` |  |
 | eol-exporter.autoscaling.minReplicas | int | `1` |  |
 | eol-exporter.configMap.enabled | bool | `true` |  |
-| eol-exporter.configMap.files.config."config.yaml" | string | `"eol:\n  # Get available products from:\n  # https://endoflife.date/api/all.json\n  # and find available cycles in:\n  # https://endoflife.date/api/{product}.json\n  eks:\n    current: '1.30'\n    comment: EKS\n  django:\n    current: '5.1'\n    comment: backend\n"` |  |
+| eol-exporter.configMap.files.config."config.yaml" | string | `"# Get available products from:\n# https://endoflife.date/api/all.json\n# and find available cycles in:\n# https://endoflife.date/api/{product}.json\neks:\n  current: '1.30'\n  comment: EKS\ndjango:\n  current: '5.1'\n  comment: backend\n"` |  |
 | eol-exporter.deployment.additionalLabels | object | `{}` |  |
 | eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/arch"` |  |
 | eol-exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
@@ -66,7 +66,7 @@ A Kubernetes's helm chart for a exporter that get information about end of life/
 | eol-exporter.deployment.image.digest | string | `""` |  |
 | eol-exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | eol-exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| eol-exporter.deployment.image.tag | string | `"prod-d0d3488"` |  |
+| eol-exporter.deployment.image.tag | string | `nil` |  |
 | eol-exporter.deployment.initContainers | list | `[]` |  |
 | eol-exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | eol-exporter.deployment.livenessProbe.exec | object | `{}` |  |
