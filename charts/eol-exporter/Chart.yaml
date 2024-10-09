@@ -4,14 +4,28 @@ description: |
   End of life exporter.
   A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
 
+  You must supply a valid configmap with a list of products with its versions. Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
+  for example values.
+  Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json
+  A `comment` field is optional, and it will be added as a label in the metrics.
+
+  A Prometheus extra scrape config must be configured in order to be able to watch the metrics in Prometheus.
+  The service name will be defined as: $CHART_NAME.$NAMESPACE:$PORT
+  By default this is: eol-exporter.prometheus:8080
+  An example extraScrapeConfigs is available in: https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/README.md#prometheus-server-config
+
+  The exporter provides two metrics:
+  - endoflife_expiration_timestamp_seconds: Information about end of life (EOL) of products. Metric value is the UNIX timestamp of the eolDate label
+  - endoflife_expired: Information about end of life (EOL) of products. Boolean value of 1 for expired products.
+
 # Application charts are a collection of templates that can be packaged into versioned archives
 # to be deployed.
 type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.1.0-dev-10
-appVersion: prod-b9828d4
+version: 0.1.0-dev-11
+appVersion: prod-843dabc
 
 dependencies:
   # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=5.1.0

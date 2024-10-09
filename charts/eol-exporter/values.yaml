@@ -8,8 +8,13 @@ eol-exporter:
   deployment:
     enabled: true
     image:
+      # Image is built and uploaded into private ECR based on source code
+      # Refer to the Readme to know how to push new public tags:
+      # https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
+      # Public image is available on:
+      # https://hub.docker.com/r/saritasallc/eol-exporter/tags
       repository: saritasallc/eol-exporter
-      tag: prod-b9828d4
+      tag: prod-843dabc
       digest: ''  # if set to a non empty value, digest takes precedence on the tag
       pullPolicy: IfNotPresent
     initContainers: []
@@ -17,10 +22,17 @@ eol-exporter:
     args: []
     envFrom: {}
     env:
-      ENVIRONMENT:
-        value: prod
+      # Metrics port for the exporter
+      PORT:
+        value: '8080'
+      # API endpoint for the endoflife.date site
+      EOL_API_ENDPOINT:
+        value: https://endoflife.date/api
+      # File location for the configMap
+      # The filename in the mountPath section of the volume `config` must match this variable
       CONFIG_YAML_PATH:
         value: config.yaml
+      # Frequency of the endoflife API calls background job
       JOB_INTERVAL_HOURS:
         value: '24'
     ports:
@@ -52,10 +64,7 @@ eol-exporter:
       initialDelaySeconds: 10
       # Must specify either one of the following field when enabled
       httpGet:
-        # Prometheus client WSGI server has a /favicon.ico path that gives a 200 OK response that can
-        # be configured as health check endpoint. See:
-        # https://github.com/prometheus/client_python/blob/master/prometheus_client/exposition.py#L121
-        path: /favicon.ico
+        path: /metrics
         port: 8080
       exec: {}
       tcpSocket: {}
@@ -68,7 +77,7 @@ eol-exporter:
       initialDelaySeconds: 10
       # Must specify either one of the following field when enabled
       httpGet:
-        path: /favicon.ico
+        path: /metrics
         port: 8080
       exec: {}
       tcpSocket: {}
@@ -83,8 +92,7 @@ eol-exporter:
       runAsNonRoot: true
       runAsUser: 1002
       runAsGroup: 1000
-      # fsGroup: 2000
-      # fsGroupChangePolicy: "OnRootMismatch"
+      fsGroup: 1000
     containerSecurityContext:
       allowPrivilegeEscalation: false
       privileged: false
@@ -92,13 +100,9 @@ eol-exporter:
       runAsUser: 1002
       runAsGroup: 1000
       readOnlyRootFilesystem: false
-      # capabilities:
-      #   drop:
-      #     - ALL
-      #   add:
-      #     - CHOWN
-      #     - NET_ADMIN
-      #     - SYS_TIME
+      capabilities:
+        drop:
+          - ALL
     strategy:
       type: RollingUpdate
       rollingUpdate:
@@ -128,103 +132,26 @@ eol-exporter:
         protocol: TCP
         targetPort: 8080
     type: ClusterIP
-  ingress:
-    enabled: false
-    ingressClassName: nginx
-    servicePort: http
-    pathType: Prefix
-
-    # deviation from standard way of defining the services
-    hosts: []
-    # - host: backend.site.com
-    #   paths:
-    #     - path: /
-    #       pathType: Prefix
-    #       serviceName: backend
-    #       servicePort: http
-    additionalLabels: {}
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-staging
-      nginx.ingress.kubernetes.io/proxy-body-size: 100m
-      nginx.ingress.kubernetes.io/proxy-connect-timeout: '300'
-      nginx.ingress.kubernetes.io/proxy-read-timeout: '300'
-      nginx.ingress.kubernetes.io/server-snippet: |
-        add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
-
-        # this prevents hidden files (beginning with a period) from being served
-        location ~ /\. {
-          access_log        off;
-          log_not_found     off;
-          deny              all;
-        }
-    tls: []
-    # - hosts:
-    #   - nginx.site.com
-    #   secretName: nginx.site.com-crt
   pdb:
     enabled: false
     minAvailable: 1
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 2
-    # you can also adjust the value based on average actual value (regardless of the % use of the requested memory resources)
-    # for example:
-    #
-    # metrics:
-    # - type: Resource
-    #   resource:
-    #     name: memory
-    #     target:
-    #       type: AverageValue
-    #       averageValue: 900Mi
-    #
-    # see explanation: https://stackoverflow.com/questions/69184304/how-memory-metric-is-evaluated-by-kubernetes-hpa
-    metrics:
-      - type: Resource
-        resource:
-          name: cpu
-          target:
-            type: Utilization
-            averageUtilization: 70
-      - type: Resource
-        resource:
-          name: memory
-          target:
-            type: Utilization
-            averageUtilization: 70
-    behavior:
-      scaleDown:
-        stabilizationWindowSeconds: 300
-        policies:
-          - type: Pods
-            value: 1
-            periodSeconds: 100
-          - type: Percent
-            value: 10
-            periodSeconds: 100
-      scaleUp:
-        stabilizationWindowSeconds: 180
-        policies:
-          - type: Pods
-            value: 1
-            periodSeconds: 30
-          - type: Percent
-            value: 10
-            periodSeconds: 60
-        selectPolicy: Max
-  configMap:
-    enabled: true
-    files:
-      config:
-        config.yaml: |
-          # Get available products from:
-          # https://endoflife.date/api/all.json
-          # and find available cycles in:
-          # https://endoflife.date/api/{product}.json
-          eks:
-            current: '1.30'
-            comment: EKS
-          django:
-            current: '5.1'
-            comment: backend
+
+  # Define the products for which you want to have metrics
+  # Refer to the example file: https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
+  # `current` field must be a valid version as defined in: https://endoflife.date/api/{product}.json
+  # `comment` field is optional, it will be added as a label in the metrics
+  configMap: {}
+    # enabled: true
+    # files:
+    #   config:
+    #     config.yaml: |
+    #       # Get available products from:
+    #       # https://endoflife.date/api/all.json
+    #       # and find available cycles in:
+    #       # https://endoflife.date/api/{product}.json
+    #       eks:
+    #         current: '1.30'
+    #         comment: EKS
+    #       django:
+    #         current: '5.1'
+    #         comment: backend
