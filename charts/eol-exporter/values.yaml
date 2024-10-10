@@ -14,7 +14,7 @@ eol-exporter:
       # Public image is available on:
       # https://hub.docker.com/r/saritasallc/eol-exporter/tags
       repository: saritasallc/eol-exporter
-      tag: prod-843dabc
+      tag: 0.1.0
       digest: ''  # if set to a non empty value, digest takes precedence on the tag
       pullPolicy: IfNotPresent
     initContainers: []

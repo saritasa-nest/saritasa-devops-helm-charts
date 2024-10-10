@@ -1,30 +1,73 @@
 
-# eol-exporter
+# eol-prometheus-exporter
 
-![Version: 0.1.0-dev-11](https://img.shields.io/badge/Version-0.1.0--dev--11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: prod-843dabc](https://img.shields.io/badge/AppVersion-prod--843dabc-informational?style=flat-square)
+![Version: 0.1.0-dev-11](https://img.shields.io/badge/Version-0.1.0--dev--11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
-End of life exporter.
+End of life prometheus exporter.
+
 A Kubernetes's helm chart for a exporter that get information about end of life/support of products in order to be scrapped by Prometheus
 
-You must supply a valid configmap with a list of products with its versions. Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
-for example values.
-Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json
+You must supply a valid configmap with a list of products with its versions:
+
+```yaml
+# Get available products from:
+# https://endoflife.date/api/all.json
+# and find available cycles in:
+# https://endoflife.date/api/{product}.json
+eks:
+  current: '1.30'
+  comment: EKS
+django:
+  current: '5.1'
+  comment: backend
+```
+
+Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
+for more example values.
+
+Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json.
+
 A `comment` field is optional, and it will be added as a label in the metrics.
 
 A Prometheus extra scrape config must be configured in order to be able to watch the metrics in Prometheus.
-The service name will be defined as: $CHART_NAME.$NAMESPACE:$PORT
-By default this is: eol-exporter.prometheus:8080
-An example extraScrapeConfigs is available in: https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/README.md#prometheus-server-config
+
+The service name will be defined as: `$CHART_NAME.$NAMESPACE:$PORT`.
+By default this is: `eol-exporter.prometheus:8080`:
+
+```yaml
+extraScrapeConfigs: |
+- job_name: prometheus-eol-exporter
+  metrics_path: /metrics
+  scrape_interval: 5m
+  scrape_timeout: 30s
+  static_configs:
+    - targets:
+      - eol-exporter.prometheus:8080
+```
+
+Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/README.md#prometheus-server-config for more information
 
 The exporter provides two metrics:
-- endoflife_expiration_timestamp_seconds: Information about end of life (EOL) of products. Metric value is the UNIX timestamp of the eolDate label
-- endoflife_expired: Information about end of life (EOL) of products. Boolean value of 1 for expired products.
+- `endoflife_expiration_timestamp_seconds`: Information about end of life (EOL) of products. Metric value is the UNIX timestamp of the eolDate label
+- `endoflife_expired`: Information about end of life (EOL) of products. Boolean value of 1 for expired products.
+
+Sample query to get if EKS EOL is less than 30 days:
+
+```sh
+(endoflife_expiration_timestamp_seconds{name="eks"} - time()) > ((60*60*24) * 10) and (endoflife_expiration_timestamp_seconds{name="eks"} - time()) <= ((60*60*24) * 30)
+```
+
+Sample query to get if EKS EOL has already happened:
+
+```sh
+endoflife_expired{name="eks"} == 1
+```
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://stakater.github.io/stakater-charts/ | eol-exporter(application) | 5.1.0 |
+| https://stakater.github.io/stakater-charts/ | exporter(application) | 5.1.0 |
 
 ## Values
 
@@ -55,7 +98,7 @@ The exporter provides two metrics:
 | eol-exporter.deployment.image.digest | string | `""` |  |
 | eol-exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | eol-exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| eol-exporter.deployment.image.tag | string | `"prod-843dabc"` |  |
+| eol-exporter.deployment.image.tag | string | `"0.1.0"` |  |
 | eol-exporter.deployment.initContainers | list | `[]` |  |
 | eol-exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | eol-exporter.deployment.livenessProbe.exec | object | `{}` |  |
