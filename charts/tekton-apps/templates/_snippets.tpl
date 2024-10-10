@@ -69,7 +69,7 @@ Create the name for eventlistener
 */}}
 {{- define "tekton-apps.eventlistenerName" -}}
 {{ printf "build-pipeline-event-listener-%s" . | trimSuffix "-" }}
-{{ end -}}
+{{- end -}}
 
 {{- define "tekton-apps.eventlistener.filter" -}}
 ({{ (join " || " (compact (splitList "," (include "tekton-apps.eventlistener._filter" $ )))) }})

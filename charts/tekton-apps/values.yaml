@@ -14,7 +14,7 @@ gitBranchPrefixes:
 storageClassName: gp2
 
 # -- node selector for event listener pod
-nodeSelector: ""
+nodeSelector: {}
 #  ops: 'true'
 
 # -- aws configuration
@@ -42,6 +42,8 @@ argocd:
   rootPath: "/"
 
 eventlistener:
+  # -- should we create eventlistener?
+  create: false
   # -- should we enable eventlistener for tekton triggers?
   enableWebhookSecret: true
   # -- unique suffix (in case there are several eventlisteners in the cluster)
@@ -52,6 +54,8 @@ eventlistener:
     #     expression: "body.head_commit.id.truncate(7)"
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
+  labelSelector: {}
+    # builder: tekton
 
 
 # -- list of projects and the project's apps to be triggered

@@ -1,0 +1,65 @@
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+
+{{/* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+{{/* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
+{{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
+
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment }}
+
+{{- $filter := ternary $component.eventlistener.filter (include "tekton-apps.eventlistener.filter" $gitBranchPrefixes)
+              (hasKey $component.eventlistener "filter") -}}
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  labels:
+    pipeline: {{ $component.pipeline }}
+    {{- $.Values.eventlistener.labelSelector | toYaml | nindent 4 }}
+  name: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "trigger") }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  bindings:
+  - kind: TriggerBinding
+    ref: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "env") }}
+  interceptors:
+  - name: validate secret token of the push, and github event is push, and pusher is the member of the org
+    params:
+    - name: secretRef
+      value:
+        secretKey: secretToken
+        secretName: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "webhook-secret") }}
+    - name: eventTypes
+      value:
+      - push
+    ref:
+      kind: ClusterInterceptor
+      name: github
+  - params:
+    - name: overlays
+      value:
+      - expression: body.head_commit.id.truncate(7)
+        key: truncated_sha
+      - expression: body.ref.split('/')[2]
+        key: branch_name
+      - expression: body.head_commit.timestamp
+        key: commit_timestamp
+
+    - name: "filter"
+      value: {{ $filter }} &&
+             body.head_commit.author.name != "tekton-kustomize" &&
+             body.repository.name == {{ $component.repository | quote }}
+    ref:
+      kind: ClusterInterceptor
+      name: cel
+  template:
+    ref: {{ $component.eventlistener.template }}
+
+{{- end }}  {{/* range component */}}
+{{- end }}  {{/* if project.enabled */}}
+{{- end }}  {{/* range project */}}
