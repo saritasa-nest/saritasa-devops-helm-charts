@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-10-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/137)
+- Tekton pipeline prepare template fix
+
 ## 2024-09-13
 
 [prod]

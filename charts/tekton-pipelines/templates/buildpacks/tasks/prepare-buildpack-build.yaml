@@ -90,7 +90,7 @@ spec:
 
         ENV_PATH=$(workspaces.source.path)/$(params.platform_dir)/env
 
-        if [ -d $ENV_PATH ]; then
+        if [ -d $ENV_PATH ] && [ ! -z `ls -A $ENV_PATH` ]; then
           echo "clean everything from $ENV_PATH"
           rm -f $ENV_PATH/*
         fi
