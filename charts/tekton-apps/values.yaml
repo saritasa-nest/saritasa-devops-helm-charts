@@ -43,7 +43,7 @@ argocd:
 
 eventlistener:
   # -- should we create eventlistener?
-  create: false
+  create: true
   # -- should we enable eventlistener for tekton triggers?
   enableWebhookSecret: true
   # -- unique suffix (in case there are several eventlisteners in the cluster)

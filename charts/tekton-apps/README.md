@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.23-dev.2](https://img.shields.io/badge/Version-0.2.23--dev.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 0.2.23-dev.3](https://img.shields.io/badge/Version-0.2.23--dev.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -1599,7 +1599,7 @@ whitelistIP: |
 | aws | object | `{}` | aws configuration |
 | defaultRegistry | string | `""` | default docker registry ex: XXX.dkr.ecr.us-west-2.amazonaws.com |
 | environment | string | `""` | environment these apps are handling possible values: dev, staging, prod |
-| eventlistener.create | bool | `false` | should we create eventlistener? |
+| eventlistener.create | bool | `true` | should we create eventlistener? |
 | eventlistener.enableWebhookSecret | bool | `true` | should we enable eventlistener for tekton triggers? |
 | eventlistener.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | eventlistener.labelSelector | object | `{}` |  |
