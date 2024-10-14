@@ -1,5 +1,13 @@
 # Changelog
 
+## 2024-10-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/138)
+- Define triggers as standalone entity, not part as EventListener definition.
+  EventListener finds matching triggers by label selector.
+
 ## 2024-09-13
 
 [prod]
