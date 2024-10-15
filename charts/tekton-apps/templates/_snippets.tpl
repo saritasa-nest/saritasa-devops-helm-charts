@@ -76,67 +76,6 @@ Create the name for eventlistener
 {{- end }}
 
 {{/*
-Create an element for eventlistener trigger array items
-*/}}
-{{- define "tekton-apps.eventlistener.trigger" -}}
-{{ $filter := ternary .component.eventlistener.filter (include "tekton-apps.eventlistener.filter" .gitBranchPrefixes)
-              (hasKey .component.eventlistener "filter") -}}
-{{- if and (.component).repository ((.component).eventlistener).template  }}
-- name: {{ include "tekton-apps.resourceName" (set $ "suffix" "listener") }}
-  serviceAccountName: {{ include "tekton-apps.resourceName" (set $ "suffix" "trigger-sa") }}
-  interceptors:
-  - ref:
-      kind: ClusterInterceptor
-      name: "cel"
-    params:
-      - name: "filter"
-        value: {{ $filter }} &&
-               body.head_commit.author.name != "tekton-kustomize" &&
-               body.repository.name == {{ .component.repository | quote }}
-      - name: "overlays"
-        value:
-        - key: truncated_sha
-          expression: "body.head_commit.id.truncate(7)"
-        - key: branch_name
-          expression: "body.ref.split('/')[2]"
-        {{- if .eventlistener.extraOverlays }}
-        {{- toYaml .eventlistener.extraOverlays | nindent 8 }}
-        {{ end }}
-        {{- if .component.eventlistener.extraOverlays }}
-        {{- toYaml .component.eventlistener.extraOverlays | nindent 8 }}
-        {{ end }}
-  - ref:
-      kind: ClusterInterceptor
-      name: "github"
-    params:
-      {{- if hasKey .component.eventlistener "enableWebhookSecret" | ternary .component.eventlistener.enableWebhookSecret .eventlistener.enableWebhookSecret }}
-      - name: "secretRef"
-        value:
-          secretName: {{ include "tekton-apps.resourceName" (set $ "suffix" "webhook-secret") }}
-          secretKey: secret-token
-      {{- end }}
-      - name: "eventTypes"
-        value:
-      {{- if .component.eventlistener.eventTypes }}
-        {{- toYaml .component.eventlistener.eventTypes | nindent 8 }}
-      {{- else }}
-        - "push"
-      {{- end }}
-  bindings:
-  - kind: TriggerBinding
-    name: sha
-    value: $(extensions.truncated_sha)
-  - kind: TriggerBinding
-    ref: {{ include "tekton-apps.resourceName" (set $ "suffix" "env") }}
-  - kind: TriggerBinding
-    ref: github-trigger-binding
-  template:
-    ref: {{ .component.eventlistener.template }}
-{{- end }}
-{{ end }}
-
-
-{{/*
 Create a name of the kubernetes secret containing project component's SSH deploy key
 */}}
 {{- define "tekton-apps.component-repo-deploy-key" -}}

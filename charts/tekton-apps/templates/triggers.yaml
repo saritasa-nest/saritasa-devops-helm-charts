@@ -3,17 +3,17 @@
 {{- range $component := $project.components }}
 
 {{/* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
-{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+{{ $projectEnvironment := coalesce $project.environment $.Values.environment -}}
 
 {{/* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
-{{ $gitBranchPrefixes := ternary $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes (hasKey $component.eventlistener "gitWebhookBranches") -}}
+{{- $gitBranchPrefixes := coalesce $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes -}}
+
+{{- $filter := coalesce $component.eventlistener.filter (include "tekton-apps.eventlistener.filter" $gitBranchPrefixes) -}}
 
 {{- $data := dict "project"           $project
                   "component"         $component
-                  "environment"       $projectEnvironment }}
+                  "environment"       $projectEnvironment -}}
 
-{{- $filter := ternary $component.eventlistener.filter (include "tekton-apps.eventlistener.filter" $gitBranchPrefixes)
-              (hasKey $component.eventlistener "filter") -}}
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
@@ -61,7 +61,7 @@ spec:
         kind: ClusterInterceptor
         name: "github"
       params:
-        {{- if hasKey $component.eventlistener "enableWebhookSecret" | ternary $component.eventlistener.enableWebhookSecret $.Values.eventlistener.enableWebhookSecret }}
+        {{- if coalesce $component.eventlistener.enableWebhookSecret $.Values.eventlistener.enableWebhookSecret }}
         - name: "secretRef"
           value:
             secretName: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "webhook-secret") }}
