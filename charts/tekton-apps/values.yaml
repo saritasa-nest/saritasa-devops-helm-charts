@@ -42,20 +42,16 @@ argocd:
   rootPath: "/"
 
 eventlistener:
-  # -- should we create eventlistener?
-  create: true
-  # -- should we enable eventlistener for tekton triggers?
+  # -- should tekton triggers check secret passed by GitHub webhook?
   enableWebhookSecret: true
-  # -- unique suffix (in case there are several eventlisteners in the cluster)
-  suffix: ""
   # -- should we add additional overlays for each app running under trigger?
   extraOverlays: []
     #   - key: truncated_sha
     #     expression: "body.head_commit.id.truncate(7)"
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
-  labelSelector: {}
-    # builder: tekton
+  labelSelector:
+    builder: tekton
 
 
 # -- list of projects and the project's apps to be triggered

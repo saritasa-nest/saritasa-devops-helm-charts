@@ -102,6 +102,17 @@ webhook:
     #    hosts:
     #      - webhook.site.com
 
+eventlistener:
+  # -- should we create EventListener?
+  create: true
+  # -- unique suffix (in case there are several eventlisteners in the cluster)
+  suffix: ""
+  labelSelector:
+    builder: tekton
+  namespaceSelector: []
+  # - ci
+  # - ci-experiments
+
 # -- list of docker registry secrets to pull images
 imagePullSecrets: []
 # - name: "docker-saritasa-infra-v2-ro"

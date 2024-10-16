@@ -1,0 +1,85 @@
+domainZone: testsite.com
+
+engine:
+  enabled: true
+  config:
+    defaultServiceAccount: "build-bot-sa"
+    defaultTimeoutMinutes: "60"
+    defaultPodTemplate: |
+      nodeSelector:
+        ci: "true"
+
+triggers:
+  enabled: true
+
+dashboard:
+  enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+      nginx.ingress.kubernetes.io/whitelist-source-range: |
+        35.85.92.224/32,
+        35.82.81.78/32
+
+      argocd.argoproj.io/sync-wave: "1"
+    hosts:
+      - host: tekton.testsite.com
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tekton-dashboard
+                port:
+                  number: 9097
+    tls:
+     - hosts:
+         - tekton.testsite.com
+       secretName: tekton.testsite.com-crt
+
+webhook:
+  enabled: true
+  namespace: "ci"
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      argocd.argoproj.io/sync-wave: "10"
+    hosts:
+      - host: webhook.testsite.com
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: el-build-pipeline-event-listener
+                port:
+                  number: 8080
+    tls:
+     - hosts:
+         - webhook.testsite.com
+       secretName: webhook.testsite.com-crt
+
+
+serviceAccount:
+  create: true
+  name: "build-bot-sa"
+
+nodeSelector:
+  ops: "true"
+
+eventlistener:
+  create: true
+  labelSelector:
+    builder: tekton
+  namespaceSelector:
+    - ci
+    - ci-experiments
