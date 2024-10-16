@@ -30,7 +30,7 @@ spec:
   {{- end }}
 
 ---
-kind: Role
+kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
  name: {{ include "tekton.eventlistenerName" "role" }}
@@ -57,14 +57,14 @@ rules:
     verbs:      ["get", "list", "watch", "impersonate"]
 
 ---
-kind: RoleBinding
+kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "tekton.eventlistenerName" "rolebinding" }}
   namespace: {{ $.Release.Namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: Role
+  kind: ClusterRole
   name: {{ include "tekton.eventlistenerName" "role" }}
 subjects:
 - kind: ServiceAccount
