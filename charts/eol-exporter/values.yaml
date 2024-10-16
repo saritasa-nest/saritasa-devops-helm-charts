@@ -1,5 +1,5 @@
 ---
-eol-exporter:
+exporter:
   enabled: true
   namespaceOverride: ''
   applicationName: eol-exporter
