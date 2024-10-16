@@ -11,7 +11,7 @@ gitBranchPrefixes:
   - develop
 
 # -- storage class for PVCs associated with the apps
-storageClassName: gp2
+storageClassName: gp3
 
 # -- node selector for event listener pod
 nodeSelector: {}
@@ -50,6 +50,7 @@ eventlistener:
     #     expression: "body.head_commit.id.truncate(7)"
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
+  # -- labels to set on Triggers - for discovery by EventListener
   labelSelector:
     builder: tekton
 

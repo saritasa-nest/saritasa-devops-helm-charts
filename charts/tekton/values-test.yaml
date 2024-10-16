@@ -1,4 +1,4 @@
-domainZone: testsite.com
+domainZone: site.com
 
 engine:
   enabled: true
@@ -29,7 +29,7 @@ dashboard:
 
       argocd.argoproj.io/sync-wave: "1"
     hosts:
-      - host: tekton.testsite.com
+      - host: tekton.site.com
         paths:
           - path: /
             pathType: Prefix
@@ -40,8 +40,8 @@ dashboard:
                   number: 9097
     tls:
      - hosts:
-         - tekton.testsite.com
-       secretName: tekton.testsite.com-crt
+         - tekton.site.com
+       secretName: tekton.site.com-crt
 
 webhook:
   enabled: true
@@ -54,7 +54,7 @@ webhook:
       cert-manager.io/cluster-issuer: "letsencrypt-prod"
       argocd.argoproj.io/sync-wave: "10"
     hosts:
-      - host: webhook.testsite.com
+      - host: webhook.site.com
         paths:
           - path: /
             pathType: Prefix
@@ -65,16 +65,8 @@ webhook:
                   number: 8080
     tls:
      - hosts:
-         - webhook.testsite.com
-       secretName: webhook.testsite.com-crt
-
-
-serviceAccount:
-  create: true
-  name: "build-bot-sa"
-
-nodeSelector:
-  ops: "true"
+         - webhook.site.com
+       secretName: webhook.site.com-crt
 
 eventlistener:
   create: true
@@ -83,3 +75,10 @@ eventlistener:
   namespaceSelector:
     - ci
     - ci-experiments
+
+serviceAccount:
+  create: true
+  name: "build-bot-sa"
+
+nodeSelector:
+  ops: "true"

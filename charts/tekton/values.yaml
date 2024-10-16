@@ -107,8 +107,10 @@ eventlistener:
   create: true
   # -- unique suffix (in case there are several eventlisteners in the cluster)
   suffix: ""
+  # -- EventListener will look for Triggers with this label
   labelSelector:
     builder: tekton
+  # -- If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace.
   namespaceSelector: []
   # - ci
   # - ci-experiments

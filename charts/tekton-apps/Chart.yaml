@@ -12,7 +12,7 @@ appVersion: "v0.29.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.2.23-dev.4
+version: 0.3.0-dev.1
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -81,6 +81,8 @@ description: |
             server: deploy.staging.site.com
           eventlistener:
             enableWebhookSecret: true
+            labelSelector:
+              builder: tekton
           apps:
             - project: vp
               enabled: true
