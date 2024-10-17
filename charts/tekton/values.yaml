@@ -77,8 +77,6 @@ dashboard:
 webhook:
   # -- enable tekton eventlistener webhook (github trigger)
   enabled: true
-  # -- namespace where this webhook should be installed
-  namespace: "ci"
   # -- webhook ingress configuration
   ingress: {}
     # enabled: true
@@ -111,7 +109,8 @@ eventlistener:
   labelSelector:
     builder: tekton
   # -- If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace.
-  namespaceSelector: []
+  namespaceSelector:
+    - ci
   # - ci
   # - ci-experiments
 
