@@ -70,8 +70,8 @@ subjects:
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
   namespace: {{ $.Release.Namespace }}
 - kind: ServiceAccount
-  name: build-bot-sa
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $.Values.serviceaccount.name }}
+  namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
 
 ---
 kind: RoleBinding
@@ -88,8 +88,8 @@ subjects:
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-sa") }}
   namespace: {{ $.Release.Namespace }}
 - kind: ServiceAccount
-  name: build-bot-sa
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $.Values.serviceaccount.name }}
+  namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
 
 ---
 kind: ClusterRole
@@ -115,8 +115,8 @@ subjects:
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-sa") }}
   namespace: {{ $.Release.Namespace }}
 - kind: ServiceAccount
-  name: build-bot-sa
-  namespace: {{ $.Release.Namespace }}
+  name: {{ $.Values.serviceaccount.name }}
+  namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
 
 ---
 
