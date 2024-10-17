@@ -45,9 +45,9 @@ dashboard:
 
 webhook:
   enabled: true
-  namespace: "ci"
   ingress:
     enabled: true
+    namespace: "tekton-pipelines"
     annotations:
       kubernetes.io/ingress.class: "nginx"
       nginx.ingress.kubernetes.io/proxy-body-size: 100m

@@ -165,3 +165,7 @@ apps:
 # make sure PVCs are bound after the chart is synced
 # by temporarily mount them into short-live job.
 runPostInstallMountPvcJob: true
+
+serviceaccount:
+  name: build-bot-sa
+  namespace: tekton-pipelines

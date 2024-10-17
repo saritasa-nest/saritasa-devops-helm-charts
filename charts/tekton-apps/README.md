@@ -1607,8 +1607,8 @@ whitelistIP: |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
 | nodeSelector | object | `{}` | node selector for event listener pod |
 | runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
-| serviceAccount.create | string | `"true"` |  |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
+| serviceAccount.namespace | string | `""` |  |
 | slack.imagesLocation | string | `"https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com"` | slack notification images (s3 bucket prefix) |
 | slack.prefix | string | `"client"` | channel prefix |
 | slack.suffix | string | `"ci"` | channel suffix |

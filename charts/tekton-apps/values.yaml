@@ -185,8 +185,8 @@ runPostInstallMountPvcJob: false
 serviceAccount:
   # The name of the service account to use.
   name: "build-bot-sa"
-  # If we create several tekton-apps in the cluster we don't want to recreate the service account.
-  create: 'true'
+  # In which namespace service account is defined.
+  namespace: ""
 
 # -- Comma-separated list of IP masks to bypass access limitation
 # (if applicable, ex. for legacy projects protected with basic authentication)
