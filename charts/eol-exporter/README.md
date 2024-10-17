@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 0.1.0-dev-12](https://img.shields.io/badge/Version-0.1.0--dev--12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -47,9 +47,10 @@ extraScrapeConfigs: |
 
 Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/README.md#prometheus-server-config for more information
 
-The exporter provides two metrics:
+The exporter provides three metrics:
 - `endoflife_expiration_timestamp_seconds`: Information about end of life (EOL) of products. Metric value is the UNIX timestamp of the eolDate label
 - `endoflife_expired`: Information about end of life (EOL) of products. Boolean value of 1 for expired products.
+- `endoflife_failed_configs`: Information about end of life (EOL) of products. Boolean value of 1 for products that failed to be fetched.
 
 Sample query to get if EKS EOL is less than 30 days:
 
@@ -61,6 +62,12 @@ Sample query to get if EKS EOL has already happened:
 
 ```sh
 endoflife_expired{name="eks"} == 1
+```
+
+Sample query to check if any product failed be fetched:
+
+```bash
+endoflife_failed_configs{} == 1
 ```
 
 ## Requirements
