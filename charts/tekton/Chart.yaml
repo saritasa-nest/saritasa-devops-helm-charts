@@ -8,8 +8,8 @@ type: application
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "v0.28.2"
-dashboardVersion: "v0.21.0"
-triggersVersions: "v0.16.0"
+# dashboardVersion: "v0.21.0"
+# triggersVersions: "v0.16.0"
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
