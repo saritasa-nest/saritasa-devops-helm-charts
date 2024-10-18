@@ -28,34 +28,6 @@ rules:
     verbs:      ["get", "list", "create"]
 
 ---
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
- name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-role") }}
- # We don't need to use the tekton-apps.set-namespace-from-component-or-project snippet here and below (like we do for wordpress) because these objects are not used in other namespaces
- namespace: {{ $.Release.Namespace }}
-rules:
-  - apiGroups:  ["triggers.tekton.dev"]
-    resources:  ["eventlisteners", "triggerbindings", "triggertemplates", "clusterinterceptors"]
-    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
-
-  - apiGroups:  ["triggers.tekton.dev"]
-    resources:  ["triggers", "clustertriggerbindings"]
-    verbs:      ["get", "list", "watch"]
-
-  - apiGroups:  ["tekton.dev"]
-    resources:  ["pipelineruns", "pipelineresources", "taskruns"]
-    verbs:      ["create"]
-
-  - apiGroups:  ["extensions"]
-    resources:  ["ingresses"]
-    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
-
-  - apiGroups:  [""]
-    resources:  ["configmaps", "secrets", "serviceaccounts"]
-    verbs:      ["get", "list", "watch", "impersonate"]
-
----
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -69,21 +41,6 @@ subjects:
 - kind: ServiceAccount
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
   namespace: {{ $.Release.Namespace }}
-- kind: ServiceAccount
-  name: {{ $.Values.serviceaccount.name }}
-  namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
-
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-role-binding") }}
-  namespace: {{ $.Release.Namespace }}
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-role") }}
-subjects:
 - kind: ServiceAccount
   name: {{ $.Values.serviceaccount.name }}
   namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
