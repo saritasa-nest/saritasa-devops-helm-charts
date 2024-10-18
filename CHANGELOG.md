@@ -1,5 +1,15 @@
 # Changelog
 
+## 2024-10-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/138)
+- Breaking change(!): move EventListener definition from "tekton-apps" to "tekton" helm chart.
+  You must update both these charts for correct work.
+- Define triggers as standalone entity, not part as EventListener definition.
+  EventListener finds matching triggers by label selector.
+
 ## 2024-10-08
 
 [prod]
