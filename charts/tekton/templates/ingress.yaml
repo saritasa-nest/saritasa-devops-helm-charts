@@ -67,7 +67,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: github-webhook
-  namespace: {{ .Values.webhook.ingress.namespace | default "tekton-pipelines" }}
+  namespace: {{ coalesce .Values.webhook.ingress.namespace "tekton-pipelines" }}
   labels:
     {{- include "tekton.labels" . | nindent 4 }}
   {{- with .Values.webhook.ingress.annotations }}

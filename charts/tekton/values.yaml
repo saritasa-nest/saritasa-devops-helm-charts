@@ -113,8 +113,6 @@ eventlistener:
   # -- If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace.
   namespaceSelector:
     - ci
-  # - ci
-  # - ci-experiments
 
 # -- list of docker registry secrets to pull images
 imagePullSecrets: []
