@@ -100,9 +100,9 @@ spec:
         defaultRegistry: xxx.dkr.ecr.us-west-2.amazonaws.com
         argocd:
           server: deploy.staging.site.com
-        eventlistener:
+        trigger:
           enableWebhookSecret: true
-          labelSelector:
+          labels:
             builder: tekton
         apps:
           - project: vp
@@ -358,7 +358,7 @@ spec:
           defaultRegistry: xxx.dkr.ecr.us-west-2.amazonaws.com
           argocd:
             server: deploy.staging.site.com
-          eventlistener:
+          trigger:
             enableWebhookSecret: true
           apps:
             - project: xxx
