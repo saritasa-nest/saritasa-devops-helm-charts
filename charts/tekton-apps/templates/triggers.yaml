@@ -20,7 +20,7 @@ kind: Trigger
 metadata:
   labels:
     pipeline: {{ $component.pipeline }}
-    {{- $.Values.eventlistener.labelSelector | toYaml | nindent 4 }}
+    {{- $.Values.trigger.labels | toYaml | nindent 4 }}
   name: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "trigger") }}
   namespace: {{ $.Release.Namespace }}
 spec:
@@ -46,8 +46,8 @@ spec:
               key: branch_name
             - expression: body.head_commit.timestamp
               key: commit_timestamp
-              {{- if $.Values.eventlistener.extraOverlays }}
-              {{- toYaml $.Values.eventlistener.extraOverlays | nindent 14 }}
+              {{- if $.Values.trigger.extraOverlays }}
+              {{- toYaml $.Values.trigger.extraOverlays | nindent 14 }}
               {{ end }}
               {{- if $component.eventlistener.extraOverlays }}
               {{- toYaml $component.eventlistener.extraOverlays | nindent 14 }}
@@ -61,7 +61,7 @@ spec:
         kind: ClusterInterceptor
         name: "github"
       params:
-        {{- if coalesce $component.eventlistener.enableWebhookSecret $.Values.eventlistener.enableWebhookSecret }}
+        {{- if coalesce $component.eventlistener.enableWebhookSecret $.Values.trigger.enableWebhookSecret }}
         - name: "secretRef"
           value:
             secretName: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "webhook-secret") }}

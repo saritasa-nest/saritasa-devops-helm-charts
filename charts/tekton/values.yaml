@@ -103,6 +103,8 @@ webhook:
 eventlistener:
   # -- should we create EventListener?
   create: true
+  # -- in which namespace EventListener and related roles should be created
+  namespace: ci
   # -- unique suffix (in case there are several eventlisteners in the cluster)
   suffix: ""
   # -- EventListener will look for Triggers with this label

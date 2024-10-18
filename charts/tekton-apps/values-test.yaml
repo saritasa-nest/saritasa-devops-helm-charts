@@ -15,7 +15,7 @@ defaultRegistry: 833737135757.dkr.ecr.us-east-2.amazonaws.com
 argocd:
   server: deploy.proxylegalstaging.com
 
-eventlistener:
+trigger:
   enableWebhookSecret: true
 
 apps:

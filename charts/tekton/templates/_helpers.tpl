@@ -67,3 +67,10 @@ Create the name for eventlistener
 {{- define "tekton.eventlistenerName" -}}
 {{ printf "build-pipeline-event-listener-%s" . | trimSuffix "-" }}
 {{- end -}}
+
+{{/*
+eventlistener and related roles namespace
+*/}}
+{{- define "tekton.eventlistenerNamespace" -}}
+{{ coalesce .Values.eventlistener.namespace .Release.Namespace }}
+{{- end -}}

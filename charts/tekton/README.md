@@ -31,7 +31,7 @@ saritasa-tekton
 
 ## `chart.version`
 
-![Version: 0.2.0-dev.4](https://img.shields.io/badge/Version-0.2.0--dev.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+![Version: 1.0.0-dev.1](https://img.shields.io/badge/Version-1.0.0--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -222,6 +222,7 @@ Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries f
 | engine.enabled | bool | `true` | if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc) |
 | eventlistener.create | bool | `true` | should we create EventListener? |
 | eventlistener.labelSelector | object | `{"builder":"tekton"}` | EventListener will look for Triggers with this label |
+| eventlistener.namespace | string | `"ci"` | in which namespace EventListener and related roles should be created |
 | eventlistener.namespaceSelector | list | `["ci"]` | If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace. |
 | eventlistener.suffix | string | `""` | unique suffix (in case there are several eventlisteners in the cluster) |
 | imagePullSecrets | list | `[]` | list of docker registry secrets to pull images |

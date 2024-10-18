@@ -4,7 +4,7 @@ apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
   name: {{ include "tekton.eventlistenerName" .Values.eventlistener.suffix }}
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ include "tekton.eventlistenerNamespace" . }}
   annotations:
     argocd.argoproj.io/sync-wave: "10"
 spec:
@@ -34,7 +34,7 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
  name: {{ include "tekton.eventlistenerName" "role" }}
- namespace: {{ $.Release.Namespace }}
+ namespace: {{ include "tekton.eventlistenerNamespace" . }}
 rules:
   - apiGroups:  ["triggers.tekton.dev"]
     resources:  ["eventlisteners", "triggerbindings", "triggertemplates", "clusterinterceptors"]
@@ -61,7 +61,7 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "tekton.eventlistenerName" "rolebinding" }}
-  namespace: {{ $.Release.Namespace }}
+  namespace: {{ include "tekton.eventlistenerNamespace" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

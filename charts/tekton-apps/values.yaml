@@ -41,7 +41,7 @@ argocd:
   # -- argocd root path (web URL root path)
   rootPath: "/"
 
-eventlistener:
+trigger:
   # -- should tekton triggers check secret passed by GitHub webhook?
   enableWebhookSecret: true
   # -- should we add additional overlays for each app running under trigger?
@@ -51,9 +51,8 @@ eventlistener:
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
   # -- labels to set on Triggers - for discovery by EventListener
-  labelSelector:
+  labels:
     builder: tekton
-
 
 # -- list of projects and the project's apps to be triggered
 apps: []
