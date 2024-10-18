@@ -15,7 +15,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-role") }}
- namespace: {{ or ((.component).argocd).destinationNamespace $.Release.Namespace }}
+ namespace: {{ coalesce ((.component).argocd).destinationNamespace $.Release.Namespace }}
 rules:
   - apiGroups:  ["extensions", "apps", "batch", ""]
     resources:  ["services", "deployments", "pods", "jobs", "pods/log"]
@@ -85,9 +85,6 @@ roleRef:
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-role") }}
 subjects:
 - kind: ServiceAccount
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-sa") }}
-  namespace: {{ $.Release.Namespace }}
-- kind: ServiceAccount
   name: {{ $.Values.serviceaccount.name }}
   namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
 
@@ -111,9 +108,6 @@ roleRef:
   kind: ClusterRole
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "triggger-cluster-role") }}
 subjects:
-- kind: ServiceAccount
-  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "trigger-sa") }}
-  namespace: {{ $.Release.Namespace }}
 - kind: ServiceAccount
   name: {{ $.Values.serviceaccount.name }}
   namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
