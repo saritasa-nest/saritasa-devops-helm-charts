@@ -54,6 +54,7 @@ apps:
         path: dev/argocd/apps
         repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
         targetRevision: feature/sync-boilerplate
+        kustomizeHelmChart: true
         argocd:
           notifications:
             annotations:
@@ -65,6 +66,8 @@ apps:
         pipeline: buildpack-django-build-pipeline
         applicationURL: https://api.proxylegalstaging.com
         argocd:
+          source:
+            kustomizeHelmChart: true
           syncWave: 210
           notifications:
             annotations:
@@ -118,6 +121,7 @@ apps:
           # ignoreDeploymentReplicasDiff: true
           source:
             targetRevision: 15.2.4
+            # kustomizeHelmChart: true
           notifications:
             annotations:
               notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-nmbl; project-nmbl-alarms
