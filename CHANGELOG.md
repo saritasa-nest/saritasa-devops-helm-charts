@@ -17,6 +17,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/136)
 - Release new `terraform-pod` version with 1.9.7 terraform
 
+## 2024-09-23
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/135)
+- Add EOL exporter helm chart
+
 ## 2024-09-13
 
 [prod]
