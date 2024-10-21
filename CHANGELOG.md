@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-10-21
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/139)
+- Add option to select `kustomize-build-with-helm` plugin in tekton-apps
+
 ## 2024-10-08
 
 [prod]
