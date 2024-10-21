@@ -30,6 +30,10 @@ spec:
     path: {{ $extraApp.path }}
     repoURL: {{ $extraApp.repoUrl | default ($project.kubernetesRepository).url }}
     targetRevision: {{ $extraApp.targetRevision | default ($project.kubernetesRepository).branch }}
+    {{ if (ternary $extraApp.kustomizeHelmChart false (hasKey $extraApp "kustomizeHelmChart")) -}}
+    plugin:
+      name: kustomize-build-with-helm
+    {{- end }}
   ignoreDifferences:
   - group: apps
     kind: Deployment

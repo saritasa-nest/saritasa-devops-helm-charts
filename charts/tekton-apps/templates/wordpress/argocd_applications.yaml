@@ -275,6 +275,10 @@ spec:
 
     repoURL: {{ $argocd.source.repoUrl | default "https://charts.bitnami.com/bitnami" }}
     targetRevision: {{ $argocd.source.targetRevision | default "15.2.40" }}
+    {{ if (ternary $argocd.source.kustomizeHelmChart false (hasKey $argocd.source "kustomizeHelmChart")) -}}
+    plugin:
+      name: kustomize-build-with-helm
+    {{- end }}
 
   syncPolicy:
     automated:
