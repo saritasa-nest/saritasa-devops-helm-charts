@@ -1,0 +1,157 @@
+---
+exporter:
+  enabled: true
+  namespaceOverride: ''
+  applicationName: eol-exporter
+  externalSecrets:
+    enabled: false
+  deployment:
+    enabled: true
+    image:
+      # Image is built and uploaded into private ECR based on source code
+      # Refer to the Readme to know how to push new public tags:
+      # https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
+      # Public image is available on:
+      # https://hub.docker.com/r/saritasallc/eol-exporter/tags
+      repository: saritasallc/eol-exporter
+      tag: 0.1.0
+      digest: ''  # if set to a non empty value, digest takes precedence on the tag
+      pullPolicy: IfNotPresent
+    initContainers: []
+    command: ''
+    args: []
+    envFrom: {}
+    env:
+      # Metrics port for the exporter
+      PORT:
+        value: '8080'
+      # API endpoint for the endoflife.date site
+      EOL_API_ENDPOINT:
+        value: https://endoflife.date/api
+      # File location for the configMap
+      # The filename in the mountPath section of the volume `config` must match this variable
+      CONFIG_YAML_PATH:
+        value: config.yaml
+      # Frequency of the endoflife API calls background job
+      JOB_INTERVAL_HOURS:
+        value: '24'
+    ports:
+      - name: http
+        containerPort: 8080
+        protocol: TCP
+    volumeMounts:
+      config:
+        mountPath: /workspace/app/config.yaml
+        subPath: config.yaml
+    volumes:
+      config:
+        configMap:
+          name: eol-exporter-config
+    startupProbe:
+      enabled: false
+      failureThreshold: 30
+      periodSeconds: 10
+      # Must specify either one of the following field when enabled
+      httpGet: {}
+      exec: {}
+      tcpSocket: {}
+    readinessProbe:
+      enabled: true
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+      initialDelaySeconds: 10
+      # Must specify either one of the following field when enabled
+      httpGet:
+        path: /metrics
+        port: 8080
+      exec: {}
+      tcpSocket: {}
+    livenessProbe:
+      enabled: true
+      failureThreshold: 3
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 1
+      initialDelaySeconds: 10
+      # Must specify either one of the following field when enabled
+      httpGet:
+        path: /metrics
+        port: 8080
+      exec: {}
+      tcpSocket: {}
+    resources:
+      limits:
+        memory: 256Mi
+        cpu: 500m
+      requests:
+        memory: 128Mi
+        cpu: 100m
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1002
+      runAsGroup: 1000
+      fsGroup: 1000
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      privileged: false
+      runAsNonRoot: true
+      runAsUser: 1002
+      runAsGroup: 1000
+      readOnlyRootFilesystem: false
+      capabilities:
+        drop:
+          - ALL
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+    additionalLabels: {}
+    tolerations: []
+    nodeSelector: {}
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+    topologySpreadConstraints: {}
+    revisionHistoryLimit: 5
+  additionalContainers: []
+  service:
+    enabled: true
+    annotations: {}
+    ports:
+      - port: 8080
+        name: http
+        protocol: TCP
+        targetPort: 8080
+    type: ClusterIP
+  pdb:
+    enabled: false
+    minAvailable: 1
+
+  # Define the products for which you want to have metrics
+  # Refer to the example file: https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
+  # `current` field must be a valid version as defined in: https://endoflife.date/api/{product}.json
+  # `comment` field is optional, it will be added as a label in the metrics
+  configMap: {}
+    # enabled: true
+    # files:
+    #   config:
+    #     config.yaml: |
+    #       # Get available products from:
+    #       # https://endoflife.date/api/all.json
+    #       # and find available cycles in:
+    #       # https://endoflife.date/api/{product}.json
+    #       eks:
+    #         current: '1.30'
+    #         comment: EKS
+    #       django:
+    #         current: '5.1'
+    #         comment: backend
