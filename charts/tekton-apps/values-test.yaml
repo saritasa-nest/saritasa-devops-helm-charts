@@ -166,6 +166,6 @@ apps:
 # by temporarily mount them into short-live job.
 runPostInstallMountPvcJob: true
 
-serviceaccount:
+serviceAccount:
   name: build-bot-sa
   namespace: tekton-pipelines

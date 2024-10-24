@@ -42,8 +42,8 @@ subjects:
   name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
   namespace: {{ $.Release.Namespace }}
 - kind: ServiceAccount
-  name: {{ $.Values.serviceaccount.name }}
-  namespace: {{ $.Values.serviceaccount.namespace | default $.Release.Namespace }}
+  name: {{ $.Values.serviceAccount.name }}
+  namespace: {{ $.Values.serviceAccount.namespace | default $.Release.Namespace }}
 
 ---
 
