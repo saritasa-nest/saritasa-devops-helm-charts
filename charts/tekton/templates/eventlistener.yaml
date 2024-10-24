@@ -69,6 +69,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "tekton.serviceAccountName" . }}
-  namespace: {{ $.Release.Namespace }}
+  namespace: {{ include "tekton.eventlistenerNamespace" . }}
 
 {{- end }}
