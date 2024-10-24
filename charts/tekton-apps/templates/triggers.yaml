@@ -1,0 +1,83 @@
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+
+{{/* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
+{{ $projectEnvironment := coalesce $project.environment $.Values.environment -}}
+
+{{/* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
+{{- $gitBranchPrefixes := coalesce $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes -}}
+
+{{- $filter := coalesce $component.eventlistener.filter (include "tekton-apps.eventlistener.filter" $gitBranchPrefixes) -}}
+
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment -}}
+
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  labels:
+    pipeline: {{ $component.pipeline }}
+    {{- $.Values.trigger.labels | toYaml | nindent 4 }}
+  name: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "trigger") }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  bindings:
+    - kind: TriggerBinding
+      ref: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "env") }}
+    - kind: TriggerBinding
+      ref: github-trigger-binding
+    - kind: TriggerBinding
+      name: sha
+      value: $(extensions.truncated_sha)
+
+  interceptors:
+    - ref:
+        kind: ClusterInterceptor
+        name: "cel"
+      params:
+        - name: overlays
+          value:
+            - expression: body.head_commit.id.truncate(7)
+              key: truncated_sha
+            - expression: body.ref.split('/')[2]
+              key: branch_name
+            - expression: body.head_commit.timestamp
+              key: commit_timestamp
+              {{- if $.Values.trigger.extraOverlays }}
+              {{- toYaml $.Values.trigger.extraOverlays | nindent 14 }}
+              {{ end }}
+              {{- if $component.eventlistener.extraOverlays }}
+              {{- toYaml $component.eventlistener.extraOverlays | nindent 14 }}
+              {{ end }}
+        - name: "filter"
+          value: {{ $filter }} &&
+                 body.head_commit.author.name != "tekton-kustomize" &&
+                 body.repository.name == {{ $component.repository | quote }}
+
+    - ref:
+        kind: ClusterInterceptor
+        name: "github"
+      params:
+        {{- if coalesce $component.eventlistener.enableWebhookSecret $.Values.trigger.enableWebhookSecret }}
+        - name: "secretRef"
+          value:
+            secretName: {{ include "tekton-apps.resourceName" (set (deepCopy $data) "suffix" "webhook-secret") }}
+            secretKey: secret-token
+        {{- end }}
+        - name: "eventTypes"
+          value:
+          {{- if $component.eventlistener.eventTypes }}
+            {{- toYaml $component.eventlistener.eventTypes | nindent 12 }}
+          {{- else }}
+            - "push"
+          {{- end }}
+
+  template:
+    ref: {{ $component.eventlistener.template }}
+
+{{- end }}  {{/* range component */}}
+{{- end }}  {{/* if project.enabled */}}
+{{- end }}  {{/* range project */}}

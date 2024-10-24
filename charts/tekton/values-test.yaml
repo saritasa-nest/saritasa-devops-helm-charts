@@ -1,0 +1,85 @@
+domainZone: site.com
+
+engine:
+  enabled: true
+  config:
+    defaultServiceAccount: "build-bot-sa"
+    defaultTimeoutMinutes: "60"
+    defaultPodTemplate: |
+      nodeSelector:
+        ci: "true"
+
+triggers:
+  enabled: true
+
+dashboard:
+  enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      nginx.ingress.kubernetes.io/auth-type: basic
+      nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+      nginx.ingress.kubernetes.io/whitelist-source-range: |
+        35.85.92.224/32,
+        35.82.81.78/32
+
+      argocd.argoproj.io/sync-wave: "1"
+    hosts:
+      - host: tekton.site.com
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: tekton-dashboard
+                port:
+                  number: 9097
+    tls:
+     - hosts:
+         - tekton.site.com
+       secretName: tekton.site.com-crt
+
+webhook:
+  enabled: true
+  ingress:
+    enabled: true
+    namespace: "tekton-pipelines"
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      argocd.argoproj.io/sync-wave: "10"
+    hosts:
+      - host: webhook.site.com
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: el-build-pipeline-event-listener
+                port:
+                  number: 8080
+    tls:
+     - hosts:
+         - webhook.site.com
+       secretName: webhook.site.com-crt
+
+eventlistener:
+  create: true
+  namespace: ci
+  labelSelector:
+    builder: tekton
+  namespaceSelector:
+    - ci
+    - ci-experiments
+
+serviceAccount:
+  create: true
+  name: "build-bot-sa"
+
+nodeSelector:
+  ops: "true"
