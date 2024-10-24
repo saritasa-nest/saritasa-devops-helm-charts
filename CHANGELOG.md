@@ -10,6 +10,11 @@
 - Define triggers as standalone entity, not part as EventListener definition.
   EventListener finds matching triggers by label selector.
 
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/137)
+- Tekton pipeline prepare template fix
+
 ## 2024-10-08
 
 [prod]

@@ -92,7 +92,7 @@ spec:
 
         if [ -d $ENV_PATH ]; then
           echo "clean everything from $ENV_PATH"
-          rm -f $ENV_PATH/*
+          rm -rf $ENV_PATH/* &>/dev/null
         fi
 
     - name: set
