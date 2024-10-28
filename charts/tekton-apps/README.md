@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 0.2.23-dev.1](https://img.shields.io/badge/Version-0.2.23--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -100,8 +100,10 @@ spec:
         defaultRegistry: xxx.dkr.ecr.us-west-2.amazonaws.com
         argocd:
           server: deploy.staging.site.com
-        eventlistener:
+        trigger:
           enableWebhookSecret: true
+          labels:
+            builder: tekton
         apps:
           - project: vp
             enabled: true
@@ -356,7 +358,7 @@ spec:
           defaultRegistry: xxx.dkr.ecr.us-west-2.amazonaws.com
           argocd:
             server: deploy.staging.site.com
-          eventlistener:
+          trigger:
             enableWebhookSecret: true
           apps:
             - project: xxx
@@ -1599,18 +1601,18 @@ whitelistIP: |
 | aws | object | `{}` | aws configuration |
 | defaultRegistry | string | `""` | default docker registry ex: XXX.dkr.ecr.us-west-2.amazonaws.com |
 | environment | string | `""` | environment these apps are handling possible values: dev, staging, prod |
-| eventlistener.enableWebhookSecret | bool | `true` | should we enable eventlistener for tekton triggers? |
-| eventlistener.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
-| eventlistener.suffix | string | `""` | unique suffix (in case there are several eventlisteners in the cluster) |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
-| nodeSelector | string | `""` | node selector for event listener pod |
+| nodeSelector | object | `{}` | node selector for event listener pod |
 | runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
-| serviceAccount.create | string | `"true"` |  |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
+| serviceAccount.namespace | string | `""` |  |
 | slack.imagesLocation | string | `"https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com"` | slack notification images (s3 bucket prefix) |
 | slack.prefix | string | `"client"` | channel prefix |
 | slack.suffix | string | `"ci"` | channel suffix |
-| storageClassName | string | `"gp2"` | storage class for PVCs associated with the apps |
+| storageClassName | string | `"gp3"` | storage class for PVCs associated with the apps |
+| trigger.enableWebhookSecret | bool | `true` | should tekton triggers check secret passed by GitHub webhook? |
+| trigger.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
+| trigger.labels | object | `{"builder":"tekton"}` | labels to set on Triggers - for discovery by EventListener |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
 
 ----------------------------------------------

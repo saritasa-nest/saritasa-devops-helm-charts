@@ -1,0 +1,74 @@
+{{ if .Values.eventlistener.create }}
+
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: {{ include "tekton.eventlistenerName" .Values.eventlistener.suffix }}
+  namespace: {{ include "tekton.eventlistenerNamespace" . }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+spec:
+  serviceAccountName: {{ include "tekton.serviceAccountName" . }}
+  {{- if .Values.nodeSelector }}
+  resources:
+    kubernetesResource:
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              {{- toYaml .Values.nodeSelector | nindent 14 }}
+  {{- end }}
+  {{- if .Values.eventlistener.labelSelector }}
+  labelSelector:
+    matchLabels:
+      {{- .Values.eventlistener.labelSelector | toYaml | nindent 6 }}
+  {{- end }}
+  {{- if .Values.eventlistener.namespaceSelector }}
+  namespaceSelector:
+    matchNames:
+      {{- .Values.eventlistener.namespaceSelector | toYaml | nindent 6 }}
+  {{- end }}
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+ name: {{ include "tekton.eventlistenerName" "role" }}
+ namespace: {{ include "tekton.eventlistenerNamespace" . }}
+rules:
+  - apiGroups:  ["triggers.tekton.dev"]
+    resources:  ["eventlisteners", "triggerbindings", "triggertemplates", "clusterinterceptors"]
+    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  - apiGroups:  ["triggers.tekton.dev"]
+    resources:  ["triggers", "clustertriggerbindings"]
+    verbs:      ["get", "list", "watch"]
+
+  - apiGroups:  ["tekton.dev"]
+    resources:  ["pipelineruns", "pipelineresources", "taskruns"]
+    verbs:      ["create"]
+
+  - apiGroups:  ["extensions"]
+    resources:  ["ingresses"]
+    verbs:      ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  - apiGroups:  [""]
+    resources:  ["configmaps", "secrets", "serviceaccounts"]
+    verbs:      ["get", "list", "watch", "impersonate"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tekton.eventlistenerName" "rolebinding" }}
+  namespace: {{ include "tekton.eventlistenerNamespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "tekton.eventlistenerName" "role" }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "tekton.serviceAccountName" . }}
+  namespace: {{ include "tekton.eventlistenerNamespace" . }}
+
+{{- end }}

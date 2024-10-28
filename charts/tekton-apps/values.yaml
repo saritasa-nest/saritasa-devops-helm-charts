@@ -11,10 +11,10 @@ gitBranchPrefixes:
   - develop
 
 # -- storage class for PVCs associated with the apps
-storageClassName: gp2
+storageClassName: gp3
 
 # -- node selector for event listener pod
-nodeSelector: ""
+nodeSelector: {}
 #  ops: 'true'
 
 # -- aws configuration
@@ -41,18 +41,18 @@ argocd:
   # -- argocd root path (web URL root path)
   rootPath: "/"
 
-eventlistener:
-  # -- should we enable eventlistener for tekton triggers?
+trigger:
+  # -- should tekton triggers check secret passed by GitHub webhook?
   enableWebhookSecret: true
-  # -- unique suffix (in case there are several eventlisteners in the cluster)
-  suffix: ""
   # -- should we add additional overlays for each app running under trigger?
   extraOverlays: []
     #   - key: truncated_sha
     #     expression: "body.head_commit.id.truncate(7)"
     #   - key: branch_name
     #     expression: "body.ref.split('/')[2]"
-
+  # -- labels to set on Triggers - for discovery by EventListener
+  labels:
+    builder: tekton
 
 # -- list of projects and the project's apps to be triggered
 apps: []
@@ -184,8 +184,8 @@ runPostInstallMountPvcJob: false
 serviceAccount:
   # The name of the service account to use.
   name: "build-bot-sa"
-  # If we create several tekton-apps in the cluster we don't want to recreate the service account.
-  create: 'true'
+  # In which namespace service account is defined.
+  namespace: ""
 
 # -- Comma-separated list of IP masks to bypass access limitation
 # (if applicable, ex. for legacy projects protected with basic authentication)

@@ -77,8 +77,6 @@ dashboard:
 webhook:
   # -- enable tekton eventlistener webhook (github trigger)
   enabled: true
-  # -- namespace where this webhook should be installed
-  namespace: "ci"
   # -- webhook ingress configuration
   ingress: {}
     # enabled: true
@@ -101,6 +99,20 @@ webhook:
     #  - secretName: webhook.site.com-crt
     #    hosts:
     #      - webhook.site.com
+
+eventlistener:
+  # -- should we create EventListener?
+  create: true
+  # -- in which namespace EventListener and related roles should be created
+  namespace: ci
+  # -- unique suffix (in case there are several eventlisteners in the cluster)
+  suffix: ""
+  # -- EventListener will look for Triggers with this label
+  labelSelector:
+    builder: tekton
+  # -- If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace.
+  namespaceSelector:
+    - ci
 
 # -- list of docker registry secrets to pull images
 imagePullSecrets: []
