@@ -135,6 +135,8 @@ apps:
             - name: another
               image: fuck2
 
+          priorityClassName: high-priority
+
           resources:
             requests:
               cpu: 100m

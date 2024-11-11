@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-11-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/140)
+- Add option to select `priorityClass` in Wordpress components for tekton-apps
+
 ## 2024-10-21
 
 [prod]

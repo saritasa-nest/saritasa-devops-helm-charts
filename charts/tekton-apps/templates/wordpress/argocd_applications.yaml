@@ -82,6 +82,10 @@ spec:
           pvc: "true"
         {{- end }}
 
+        {{- if .priorityClassName }}
+        priorityClassName: {{ .priorityClassName }}
+        {{- end }}
+
         {{- if .podSecurityContext }}
         podSecurityContext:
           {{- toYaml .podSecurityContext | nindent 10 }}

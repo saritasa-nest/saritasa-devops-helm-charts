@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -285,6 +285,7 @@ spec:
     updateStrategy.rollingUpdate.maxSurge: 0%, updateStrategy.rollingUpdate.maxUnavailable: 100%, i.e. stop old pod and then create a new one)
   - apps[PROJECT].components[NAME].wordpress.replica_count - wordpress deployment replica count (default: 1)
   - apps[PROJECT].components[NAME].wordpress.nodeSelector - wordpress pod node selector params (default: nodeSelector.tech_stack: php, nodeSelector.pvc: "true")
+  - apps[PROJECT].components[NAME].wordpress.priorityClassName - wordpress pod priorityClassName params (default: null)
   - apps[PROJECT].components[NAME].wordpress.podSecurityContext - wordpress pod's security context params (default: bitnami chart defaults)
   - apps[PROJECT].components[NAME].wordpress.containerSecurityContext - wordpress pod container's security context params (default: bitnami chart defaults)
   - apps[PROJECT].components[NAME].wordpress.initContainers - init containers (default: init container for ci/cd purposes)
@@ -1294,6 +1295,7 @@ spec:
                       user: xxx-wordpress-user-dev
                       existingSecret: xxx-wordpress-dev-externaldb
                       database: xxx-wordpress-dev
+                    priorityClassName: high-priority
                     persistence:
                       storageClass: gp3
                   eventlistener:
