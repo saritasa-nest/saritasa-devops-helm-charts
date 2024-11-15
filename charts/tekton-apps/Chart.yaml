@@ -12,7 +12,7 @@ appVersion: "v0.29.0"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.1.1
+version: 1.1.2
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -264,6 +264,7 @@ description: |
       updateStrategy.rollingUpdate.maxSurge: 0%, updateStrategy.rollingUpdate.maxUnavailable: 100%, i.e. stop old pod and then create a new one)
     - apps[PROJECT].components[NAME].wordpress.replica_count - wordpress deployment replica count (default: 1)
     - apps[PROJECT].components[NAME].wordpress.nodeSelector - wordpress pod node selector params (default: nodeSelector.tech_stack: php, nodeSelector.pvc: "true")
+    - apps[PROJECT].components[NAME].wordpress.priorityClassName - wordpress pod priorityClassName params (default: null)
     - apps[PROJECT].components[NAME].wordpress.podSecurityContext - wordpress pod's security context params (default: bitnami chart defaults)
     - apps[PROJECT].components[NAME].wordpress.containerSecurityContext - wordpress pod container's security context params (default: bitnami chart defaults)
     - apps[PROJECT].components[NAME].wordpress.initContainers - init containers (default: init container for ci/cd purposes)
@@ -1273,6 +1274,7 @@ description: |
                         user: xxx-wordpress-user-dev
                         existingSecret: xxx-wordpress-dev-externaldb
                         database: xxx-wordpress-dev
+                      priorityClassName: high-priority
                       persistence:
                         storageClass: gp3
                     eventlistener:
