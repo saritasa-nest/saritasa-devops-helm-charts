@@ -74,8 +74,8 @@ type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.1.0
-appVersion: 0.1.0
+version: 0.1.1
+appVersion: 0.1.1
 
 dependencies:
   # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=5.1.0

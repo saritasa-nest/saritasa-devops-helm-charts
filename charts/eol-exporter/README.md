@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.1](https://img.shields.io/badge/AppVersion-0.1.1-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -105,7 +105,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.image.digest | string | `""` |  |
 | exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| exporter.deployment.image.tag | string | `"0.1.0"` |  |
+| exporter.deployment.image.tag | string | `"0.1.1"` |  |
 | exporter.deployment.initContainers | list | `[]` |  |
 | exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | exporter.deployment.livenessProbe.exec | object | `{}` |  |
