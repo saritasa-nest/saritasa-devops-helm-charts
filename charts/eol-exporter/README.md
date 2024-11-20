@@ -20,6 +20,11 @@ eks:
 django:
   current: '5.1'
   comment: backend
+php:
+  current: '8.3'
+  comment: dashboard application
+  dockerfile: https://hub.docker.com/_/php
+  notes: backend does not support a major version higher than 8
 ```
 
 Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
@@ -27,7 +32,7 @@ for more example values.
 
 Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json.
 
-A `comment` field is optional, and it will be added as a label in the metrics.
+Optionally, you can add any extra field and it will be added as a label in the metrics
 
 A Prometheus extra scrape config must be configured in order to be able to watch the metrics in Prometheus.
 
