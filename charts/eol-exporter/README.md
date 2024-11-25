@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.1](https://img.shields.io/badge/AppVersion-0.1.1-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -20,6 +20,11 @@ eks:
 django:
   current: '5.1'
   comment: backend
+php:
+  current: '8.3'
+  comment: dashboard application
+  dockerfile: https://hub.docker.com/_/php
+  notes: backend does not support a major version higher than 8
 ```
 
 Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
@@ -27,7 +32,7 @@ for more example values.
 
 Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json.
 
-A `comment` field is optional, and it will be added as a label in the metrics.
+Optionally, you can add any extra field and it will be added as a label in the metrics
 
 A Prometheus extra scrape config must be configured in order to be able to watch the metrics in Prometheus.
 
@@ -105,7 +110,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.image.digest | string | `""` |  |
 | exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| exporter.deployment.image.tag | string | `"0.1.0"` |  |
+| exporter.deployment.image.tag | string | `"0.1.1"` |  |
 | exporter.deployment.initContainers | list | `[]` |  |
 | exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | exporter.deployment.livenessProbe.exec | object | `{}` |  |
