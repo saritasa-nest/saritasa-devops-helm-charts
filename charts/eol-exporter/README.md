@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.1](https://img.shields.io/badge/AppVersion-0.1.1-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -15,22 +15,34 @@ You must supply a valid configmap with a list of products with its versions:
 # and find available cycles in:
 # https://endoflife.date/api/{product}.json
 eks:
-  current: '1.30'
+  product: eks
+  version: '1.30'
   comment: EKS
 django:
-  current: '5.1'
+  product: django
+  version: '5.1'
   comment: backend
 php:
-  current: '8.3'
+  product: php
+  version: '8.3'
   comment: dashboard application
   dockerfile: https://hub.docker.com/_/php
   notes: backend does not support a major version higher than 8
+python-allstar-elevator:
+  product: python
+  version: '3.12'
+  dockerfile: https://github.com/saritasa-nest/allstar-elevator-backend/blob/develop/Dockerfile
+python-allstar-elevator-we:
+  product: python
+  version: '3.11'
+  dockerfile: https://github.com/saritasa-nest/allstar-elevator-we-backend/blob/develop/Dockerfile
 ```
 
 Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
 for more example values.
 
-Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json.
+- Each product must have a field `version` with valid version as defined in: https://endoflife.date/api/{product}.json.
+- Each product must have a field `product` with valid product as defined in: https://endoflife.date/api/{product}.json.
 
 Optionally, you can add any extra field and it will be added as a label in the metrics
 
@@ -79,7 +91,7 @@ endoflife_failed_configs{} == 1
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://stakater.github.io/stakater-charts/ | exporter(application) | 5.1.0 |
+| https://stakater.github.io/stakater-charts/ | exporter(application) | 5.3.0 |
 
 ## Values
 
@@ -110,7 +122,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.image.digest | string | `""` |  |
 | exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| exporter.deployment.image.tag | string | `"0.1.1"` |  |
+| exporter.deployment.image.tag | string | `"1.0.0"` |  |
 | exporter.deployment.initContainers | list | `[]` |  |
 | exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | exporter.deployment.livenessProbe.exec | object | `{}` |  |
