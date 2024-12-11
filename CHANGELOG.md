@@ -1,5 +1,12 @@
 # Changelog
 
+## 2024-12-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/143)
+- Release `eol-prometheus-exporter` version `0.1.2`
+
 ## 2024-11-19
 
 [prod]
