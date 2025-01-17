@@ -31,5 +31,8 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: saritasa:sso:developers
+- apiGroup: rbac.authorization.k8s.io # this group is coming from keycloak sso via oidc
+  kind: Group
+  name: developer
 
 {{ end }}

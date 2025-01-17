@@ -27,20 +27,7 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: saritasa:sso:developers
-
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: keycloak:developer
-  namespace: utils
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: saritasa-developers-role
-subjects:
-- apiGroup: rbac.authorization.k8s.io
+- apiGroup: rbac.authorization.k8s.io # this group is coming from keycloak sso via oidc
   kind: Group
   name: developer
-
 {{ end }}
