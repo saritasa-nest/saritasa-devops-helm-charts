@@ -9,7 +9,7 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
 subjects:
-- apiGroup: rbac.authorization.k8s.io
+- apiGroup: rbac.authorization.k8s.io # this group is creating when sso stack applied in infra-v3 and when saritasa-sso module applied in infra-v2
   kind: User
   name: saritasa-devops
 - apiGroup: rbac.authorization.k8s.io
