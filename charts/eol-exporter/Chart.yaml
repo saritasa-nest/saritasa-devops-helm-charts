@@ -13,22 +13,34 @@ description: |
   # and find available cycles in:
   # https://endoflife.date/api/{product}.json
   eks:
-    current: '1.30'
+    product: eks
+    version: '1.30'
     comment: EKS
   django:
-    current: '5.1'
+    product: django
+    version: '5.1'
     comment: backend
   php:
-    current: '8.3'
+    product: php
+    version: '8.3'
     comment: dashboard application
     dockerfile: https://hub.docker.com/_/php
     notes: backend does not support a major version higher than 8
+  python-allstar-elevator:
+    product: python
+    version: '3.12'
+    dockerfile: https://github.com/saritasa-nest/allstar-elevator-backend/blob/develop/Dockerfile
+  python-allstar-elevator-we:
+    product: python
+    version: '3.11'
+    dockerfile: https://github.com/saritasa-nest/allstar-elevator-we-backend/blob/develop/Dockerfile
   ```
 
   Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
   for more example values.
 
-  Each product must have a field `current` with valid version as defined in: https://endoflife.date/api/{product}.json.
+  - Each product must have a field `version` with valid version as defined in: https://endoflife.date/api/{product}.json.
+  - Each product must have a field `product` with valid product as defined in: https://endoflife.date/api/{product}.json.
 
   Optionally, you can add any extra field and it will be added as a label in the metrics
 
@@ -79,12 +91,12 @@ type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.1.1
-appVersion: 0.1.1
+version: 1.0.0
+appVersion: 1.0.0
 
 dependencies:
-  # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=5.1.0
+  # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=5.3.0
   - name: application
-    version: 5.1.0
+    version: 5.3.0
     repository: https://stakater.github.io/stakater-charts/
     alias: exporter
