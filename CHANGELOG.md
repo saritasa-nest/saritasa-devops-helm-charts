@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-03-10
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/148)
+- Release new `terraform-pod` version with postgres variable name fix
+
 ## 2025-03-05
 
 [prod]
