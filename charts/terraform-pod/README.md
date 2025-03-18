@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.34](https://img.shields.io/badge/Version-0.0.34-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.11.2](https://img.shields.io/badge/AppVersion-1.11.2-informational?style=flat-square)
+![Version: 0.0.35](https://img.shields.io/badge/Version-0.0.35-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.11.2](https://img.shields.io/badge/AppVersion-1.11.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -143,16 +143,16 @@ unset creds
 | aws.region | string | `"us-west-2"` | default aws region |
 | aws.secretAccessKey | string | `""` | aws secret access key (optional, should be always a short-term aws cred you get by using aws-vault) if defined takes precedence over iamCredentialsSecret |
 | aws.sessionToken | string | `""` | aws session token for short term creds obtained with aws-vault https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html |
-| databases | object | `{"mssql":{"secret":"saritasa-rocks-mssql","terraformEnvVarName":"TF_VAR_rds_mssql_password"},"mysql":{"secret":"saritasa-rocks-mysql","terraformEnvVarName":"TF_VAR_rds_mysql_password"},"postgres":{"secret":"saritasa-rocks-postgres","terraformEnvVarName":"TF_VAR_rds_postgress_password"}}` | where to obtain database credentials to be used |
+| databases | object | `{"mssql":{"secret":"saritasa-rocks-mssql","terraformEnvVarName":"TF_VAR_rds_mssql_password"},"mysql":{"secret":"saritasa-rocks-mysql","terraformEnvVarName":"TF_VAR_rds_mysql_password"},"postgres":{"secret":"saritasa-rocks-postgres","terraformEnvVarName":"TF_VAR_rds_postgres_password"}}` | where to obtain database credentials to be used |
 | databases.mssql | object | `{"secret":"saritasa-rocks-mssql","terraformEnvVarName":"TF_VAR_rds_mssql_password"}` | rocks mssql |
 | databases.mssql.secret | string | `"saritasa-rocks-mssql"` | secret with "password" value |
 | databases.mssql.terraformEnvVarName | string | `"TF_VAR_rds_mssql_password"` | name of the TF_VAR env variable to be used by the terraform as the password for the database |
 | databases.mysql | object | `{"secret":"saritasa-rocks-mysql","terraformEnvVarName":"TF_VAR_rds_mysql_password"}` | rocks mysql |
 | databases.mysql.secret | string | `"saritasa-rocks-mysql"` | secret with "password" value |
 | databases.mysql.terraformEnvVarName | string | `"TF_VAR_rds_mysql_password"` | name of the TF_VAR env variable to be used by the terraform as the password for the database |
-| databases.postgres | object | `{"secret":"saritasa-rocks-postgres","terraformEnvVarName":"TF_VAR_rds_postgress_password"}` | rocks postgres |
+| databases.postgres | object | `{"secret":"saritasa-rocks-postgres","terraformEnvVarName":"TF_VAR_rds_postgres_password"}` | rocks postgres |
 | databases.postgres.secret | string | `"saritasa-rocks-postgres"` | secret with "password" value |
-| databases.postgres.terraformEnvVarName | string | `"TF_VAR_rds_postgress_password"` | name of the TF_VAR env variable to be used by the terraform as the password for the database |
+| databases.postgres.terraformEnvVarName | string | `"TF_VAR_rds_postgres_password"` | name of the TF_VAR env variable to be used by the terraform as the password for the database |
 | extraEnvVars | list | `[]` | evta env vars |
 | extraVolumeMounts | list | `[]` | extra volume mounts |
 | extraVolumes | list | `[]` | extra volumes |
