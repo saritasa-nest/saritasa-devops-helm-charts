@@ -132,6 +132,14 @@ exporter:
         protocol: TCP
         targetPort: 8080
     type: ClusterIP
+  serviceMonitor:
+    enabled: false
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - interval: 2m
+        path: /metrics
+        port: http
   pdb:
     enabled: false
     minAvailable: 1
