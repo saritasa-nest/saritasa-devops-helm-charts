@@ -140,6 +140,11 @@ exporter:
       - interval: 2m
         path: /metrics
         port: http
+  prometheusRule:
+    enabled: false
+    additionalLabels:
+      release: prometheus
+    groups: []
   pdb:
     enabled: false
     minAvailable: 1
