@@ -5,7 +5,7 @@
 [prod]
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/151)
-- Release new `terraform-pod` version with `1.11.3` terraform (it uses updated base image)
+- Release new `terraform-pod` version with `terraform:1.11.3` (based on `python:3.12.10-alpine3.21`)
 
 ## 2025-03-13
 
