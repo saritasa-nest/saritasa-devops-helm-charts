@@ -132,6 +132,177 @@ exporter:
         protocol: TCP
         targetPort: 8080
     type: ClusterIP
+  serviceMonitor:
+    enabled: false
+    additionalLabels:
+      release: prometheus
+    endpoints:
+      - interval: 2m
+        path: /metrics
+        port: http
+  prometheusRule:
+    enabled: false
+    additionalLabels:
+      release: prometheus
+    groups:
+      - name: eol.alerts
+        rules:
+          - alert: EndOfLifeEks30days
+            expr: |
+              sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
+                (endoflife_expiration_timestamp_seconds{product="eks"} - time())
+                >= ((60 * 60 * 24) * 10)
+                and (endoflife_expiration_timestamp_seconds{product="eks"} - time()) <= ((60 * 60 * 24) * 30)
+              )
+            for: 2h
+            labels:
+              severity: warning
+              eol: 'true'
+              priority: P3
+            annotations:
+              tags: prometheus,kubernetes,eol
+              summary: |
+                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 30d`}}
+              summary_group: EKS EOL less than 30d
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+          - alert: EndOfLifeEks10days
+            expr: |
+              sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
+                (endoflife_expiration_timestamp_seconds{product="eks"} - time())
+                >= (60 * 60 * 24)
+                and (endoflife_expiration_timestamp_seconds{product="eks"} - time()) <= ((60 * 60 * 24) * 10)
+              )
+            for: 2h
+            labels:
+              severity: critical
+              eol: 'true'
+              priority: P2
+            annotations:
+              tags: prometheus,kubernetes,eol
+              summary: |
+                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 10 days`}}
+              summary_group: EKS EOL less than 10days
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+          - alert: EndOfLifeEks1day
+            expr: |
+              sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
+                (endoflife_expiration_timestamp_seconds{product="eks"} - time())
+                > 0
+                and (endoflife_expiration_timestamp_seconds{product="eks"} - time()) <= (60 * 60 * 24)
+              )
+            for: 2h
+            labels:
+              severity: critical
+              eol: 'true'
+              priority: P1
+            annotations:
+              tags: prometheus,kubernetes,eol
+              summary: |
+                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 1 day`}}
+              summary_group: EKS EOL less than 1 day
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is about to end. Consider making an upgrade`}}
+          - alert: EndOfLifeEksReached
+            expr: endoflife_expired{name="eks"} == 1
+            for: 2h
+            labels:
+              severity: critical
+              eol: 'true'
+              priority: P1
+            annotations:
+              tags: prometheus,kubernetes,eol
+              summary: |
+                {{`Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support`}}
+              summary_group: EKS EOL reached
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended. Version has entered in AWS extended support with a cost increase`}}
+          - alert: EndOfLifeExpiration90days
+            expr: |
+              sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
+                (endoflife_expiration_timestamp_seconds{product!="eks"} - time())
+                >= ((60 * 60 * 24) * 30)
+                and (endoflife_expiration_timestamp_seconds{product!="eks"} - time()) <= ((60 * 60 * 24) * 90)
+              )
+            for: 2h
+            labels:
+              severity: warning
+              eol: 'true'
+              priority: P3
+            annotations:
+              tags: prometheus,eol
+              summary: |
+                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 90 days`}}
+              summary_group: Multiple components will become EOL in less than 90 days
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+          - alert: EndOfLifeExpiration30days
+            expr: |
+              sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
+                (endoflife_expiration_timestamp_seconds{product!="eks"} - time())
+                >= (60 * 60 * 24)
+                and (endoflife_expiration_timestamp_seconds{product!="eks"} - time()) <= ((60 * 60 * 24) * 30)
+              )
+            for: 2h
+            labels:
+              severity: warning
+              eol: 'true'
+              priority: P2
+            annotations:
+              tags: prometheus,eol
+              summary: |
+                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 30 days`}}
+              summary_group: Multiple components will become EOL in less than 30 days
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+          - alert: EndOfLifeExpiration1day
+            expr: |
+              sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
+                (endoflife_expiration_timestamp_seconds{product!="eks"} - time())
+                > 0
+                and (endoflife_expiration_timestamp_seconds{product!="eks"} - time()) <= (60 * 60 * 24)
+              )
+            for: 2h
+            labels:
+              severity: critical
+              eol: 'true'
+              priority: P1
+            annotations:
+              tags: prometheus,eol
+              summary: |
+                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 1 day`}}
+              summary_group: Multiple components will become EOL in less than 1 day
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+          - alert: EndOfLifeExpirationReached
+            expr: endoflife_expired{name!="eks"} == 1
+            for: 2h
+            labels:
+              severity: critical
+              eol: 'true'
+              priority: P1
+            annotations:
+              tags: prometheus,eol
+              summary: |
+                {{`Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support`}}
+              summary_group: Multiple components EOL reached
+              description: |
+                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended`}}
+          - alert: EndOfLifeFailedConfigs
+            expr: endoflife_failed_configs == 1
+            for: 2h
+            labels:
+              severity: critical
+              eol: 'true'
+              priority: P1
+            annotations:
+              tags: prometheus,eol
+              summary: |
+                {{`Product *{{ $labels.name }}* *{{ $labels.version }}* failed to be fetched`}}
+              summary_group: Multiple components failed to be fetched
+              description: |
+                {{`There was an error fetching the product *{{ $labels.name }}* version *{{ $labels.version }}*. Please check that the version exists and the product is correctly typed`}}
   pdb:
     enabled: false
     minAvailable: 1

@@ -2,3 +2,5 @@
 *.pub
 .idea
 test.sh
+Chart.lock
+*.tgz

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-04-16
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/150)
+- Add PrometheusRule and ServiceMonitor support to eol-exporter
+
 ## 2025-04-11
 
 [prod]
