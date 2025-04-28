@@ -7,6 +7,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/150)
 - Add PrometheusRule and ServiceMonitor support to eol-exporter
 
+## 2025-04-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/151)
+- Release new `terraform-pod` version with `terraform:1.11.3` (based on `python:3.12.10-alpine3.21`)
+
 ## 2025-03-13
 
 [prod]
