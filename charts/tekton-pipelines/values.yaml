@@ -251,6 +251,17 @@ buildpacks:
               exit 0
             fi
 
+            if [[ -f uv.lock ]]; then
+              echo "'uv.lock' is found, preparing requirements.txt"
+              if [[ "$(params.environment)" == "dev" ]]; then
+                echo "Export with 'dev' targets dependencies"
+                uv export --format requirements-txt --output-file requirements.txt
+                exit 0
+              fi
+              uv export --format requirements-txt --no-dev --output-file requirements.txt
+              exit 0
+            fi
+
             if ls requirements/$(params.environment)*.txt >/dev/null 2>&1; then
               echo "'requirements' folder is found, preparing requirements.txt"
               cp requirements/$(params.environment)*.txt requirements.txt
