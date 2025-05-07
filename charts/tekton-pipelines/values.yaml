@@ -232,7 +232,7 @@ buildpacks:
           securityContext:
             privileged: true
         - name: copy-requirements
-          image: docker.io/saritasallc/poetry:1.8.2
+          image: docker.io/saritasallc/poetry:1.8.3-0.7.2
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
