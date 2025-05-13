@@ -232,7 +232,7 @@ buildpacks:
           securityContext:
             privileged: true
         - name: copy-requirements
-          image: docker.io/saritasallc/poetry:1.8.3-0.7.2
+          image: docker.io/saritasallc/python-ci:0.0.1
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(resources.inputs.app.path)
@@ -241,6 +241,10 @@ buildpacks:
             set -eo pipefail
 
             if [[ -f poetry.lock ]]; then
+              if ! command -v poetry &> /dev/null; then
+                echo "poetry is not installed or not in PATH. Halting execution."
+                exit 1
+              fi
               echo "'poetry.lock' is found, preparing requirements.txt"
               TARGET="main"
               if [[ "$(params.environment)" == "dev" ]]; then
@@ -252,6 +256,10 @@ buildpacks:
             fi
 
             if [[ -f uv.lock ]]; then
+              if ! command -v uv &> /dev/null; then
+                echo "uv is not installed or not in PATH. Halting execution."
+                exit 1
+              fi
               echo "'uv.lock' is found, preparing requirements.txt"
               if [[ "$(params.environment)" == "dev" ]]; then
                 echo "Export with 'dev' targets dependencies"
