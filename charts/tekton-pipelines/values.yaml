@@ -241,7 +241,7 @@ buildpacks:
             set -eo pipefail
 
             if [[ -f poetry.lock ]]; then
-              if ! command -v poetry &> /dev/null; then
+              if [[ ! $(command -v poetry) ]]; then
                 echo "poetry is not installed or not in PATH. Halting execution."
                 exit 1
               fi
@@ -256,7 +256,7 @@ buildpacks:
             fi
 
             if [[ -f uv.lock ]]; then
-              if ! command -v uv &> /dev/null; then
+              if [[ ! $(command -v uv) ]]; then
                 echo "uv is not installed or not in PATH. Halting execution."
                 exit 1
               fi
