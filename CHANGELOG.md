@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-05-07
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/152)
+- Add UV support in Django Tekton pipeline
+
 ## 2025-04-16
 
 [prod]
