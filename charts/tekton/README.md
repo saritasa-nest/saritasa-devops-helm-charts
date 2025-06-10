@@ -1,239 +1,28 @@
+## Pipeline
 
-# saritasa-tekton
+https://github.com/tektoncd/pipeline/releases
+https://storage.googleapis.com/tekton-releases/pipeline/previous/v1.1.0/release.yaml
 
-## `license`
-```
-          ,-.
- ,     ,-.   ,-.
-/ \   (   )-(   )
-\ |  ,.>-(   )-<
- \|,' (   )-(   )
-  Y ___`-'   `-'
-  |/__/   `-'
-  |
-  |
-  |    -hi-
-__|_____________
 
-/* Copyright (C) Saritasa,LLC - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Saritasa Devops Team, April 2022
- */
+## dashboard
 
-```
+https://github.com/tektoncd/dashboard/releases/tag/v0.58.0
+https://storage.googleapis.com/tekton-releases/dashboard/previous/v0.58.0/release.yaml
 
-## `chart.deprecationWarning`
+## Triggers
+https://github.com/tektoncd/triggers/releases/tag/v0.32.0
+https://storage.googleapis.com/tekton-releases/triggers/previous/v0.32.0/release.yaml
 
-## `chart.name`
 
-saritasa-tekton
+# Copied from infra-v3
 
-## `chart.version`
+## Cleanup job:
+https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/cleanup-cronjob.yaml
 
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
+## EventListener
+https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/eventlistener.yaml
 
-## Maintainers
+## ServiceAccount
+https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/serviceaccount.yaml
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Saritasa | <nospam@saritasa.com> | <https://www.saritasa.com/> |
 
-## `chart.description`
-
-A Helm chart for Tekton.
-
-Implements:
-- tekton engine
-- tekton dashboard
-- tekton triggers
-- tekton dashboard ingress
-- webhook ingress
-
-## `example usage with argocd`
-
-Install the chart:
-
-```
-helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-```
-
-then create the manifest and apply:
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: tekton-engine
-  namespace: argo-cd
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-  annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "40"
-spec:
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: tekton-pipelines
-  project: default
-  source:
-    chart: saritasa-tekton
-    helm:
-      values: |
-        domainZone: staging.site.com
-
-        # install engine
-        engine:
-          enabled: true
-          config:
-            defaultServiceAccount: "build-bot-sa"
-            defaultTimeoutMinutes: "60"
-            defaultPodTemplate: |
-              nodeSelector:
-                ci: "true"
-
-        # install triggers
-        triggers:
-          enabled: true
-
-        # install dashboard with a public ingress
-        dashboard:
-          enabled: true
-          ingress:
-            enabled: true
-            annotations:
-              kubernetes.io/ingress.class: "nginx"
-              nginx.ingress.kubernetes.io/proxy-body-size: 100m
-              cert-manager.io/cluster-issuer: "letsencrypt-prod"
-              nginx.ingress.kubernetes.io/auth-type: basic
-              nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth
-              nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
-              argocd.argoproj.io/sync-wave: "1"
-            hosts:
-              - host: tekton.staging.site.com
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: tekton-dashboard
-                        port:
-                          number: 9097
-            tls:
-             - secretName: tekton.staging.site.com-crt
-               hosts:
-                 - tekton.staging.site.com
-
-        # install github webhook ingress that invokes tekton's eventlistener
-        webhook:
-          enabled: true
-          namespace: "ci"
-          ingress:
-            enabled: true
-            annotations:
-              kubernetes.io/ingress.class: "nginx"
-              nginx.ingress.kubernetes.io/proxy-body-size: 100m
-              cert-manager.io/cluster-issuer: "letsencrypt-prod"
-              argocd.argoproj.io/sync-wave: "10"
-            hosts:
-              - host: webhook.staging.site.com
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: el-build-pipeline-event-listener
-                        port:
-                          number: 8080
-            tls:
-             - secretName: webhook.staging.site.com-crt
-               hosts:
-                 - webhook.staging.site.com
-
-        eventlistener:
-          create: true
-          labelSelector:
-            builder: tekton
-          namespaceSelector:
-            - ci
-            - ci-experiments
-
-        serviceAccount:
-          create: true
-          name: "build-bot-sa"
-
-        nodeSelector:
-          tekton_builder: "true"
-
-    repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-    targetRevision: "0.1.4"
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-
-```
-
-Keep in mind that tekton has config-default configmap, an example you can see
-[here](https://github.com/tektoncd/pipeline/blob/main/config/config-defaults.yaml).
-You can customize it values in this map `engine.config: {}`.
-
-Just add keys in the map and they will be added into the tekton-pipelines/config-defaults configmap.
-
-```yaml
-engine:
-  config:
-    defaultServiceAccount: "build-bot-sa"
-    defaultTimeoutMinutes: "60"
-    defaultPodTemplate: |
-      nodeSelector:
-        ci: "true"
-```
-
-If you want to pull images from a private registry (or if you want to skip 200 pulls on dockerhub)
-
-```
-imagePullSecrets:
-  - name: "your-docker-secret-name"
-```
-
-You can generate that secret by doing the following
-
-```
-kubectl create secret -n argo-cd generic docker-saritasa-infra-v2-ro \
-  --from-file=.dockerconfigjson=~/.docker/config.json \
-  --type=kubernetes.io/dockerconfigjson
-```
-
-Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries first.
-
-## `chart.valuesTable`
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| affinity | object | default is to avoid running tekton pods on windows nodes. | affinity for tekton-related pods |
-| dashboard.enabled | bool | `false` | enable tekton dashboard |
-| dashboard.ingress | object | `{}` | tekton ingress configuration |
-| domainZone | string | `"site.com"` | This is required name of the hosted zone. All public services would be created under this hosted zone |
-| engine.config | object | `{}` | tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm |
-| engine.controller | object | use args multiline string to set additional launch arguments for the tekton controller | controller launch arguments |
-| engine.enabled | bool | `true` | if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc) |
-| eventlistener.create | bool | `true` | should we create EventListener? |
-| eventlistener.labelSelector | object | `{"builder":"tekton"}` | EventListener will look for Triggers with this label |
-| eventlistener.namespace | string | `"ci"` | in which namespace EventListener and related roles should be created |
-| eventlistener.namespaceSelector | list | `["ci"]` | If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace. |
-| eventlistener.suffix | string | `""` | unique suffix (in case there are several eventlisteners in the cluster) |
-| imagePullSecrets | list | `[]` | list of docker registry secrets to pull images |
-| nodeSelector | object | `{}` | what node to run tekton related pods |
-| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
-| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
-| serviceAccount.name | string | `"build-bot-sa"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| tolerations | list | `[]` | tolerations for tekton related pods |
-| triggers.enabled | bool | `true` | enable tekton triggers |
-| webhook.enabled | bool | `true` | enable tekton eventlistener webhook (github trigger) |
-| webhook.ingress | object | `{}` | webhook ingress configuration |
-
-----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

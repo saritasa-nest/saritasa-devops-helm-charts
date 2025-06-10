@@ -1,54 +1,725 @@
-# Default values for tekton.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+---
+# -- list of docker registry secrets to pull images
+imagePullSecrets: []
 
-# -- This is required name of the hosted zone.
-# All public services would be created under this hosted zone
-domainZone: "site.com"
+# - name: "docker-saritasa-infra-v2-ro"
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Annotations to add to the service account
+  annotations: {}
+    # eks.amazonaws.com/role-arn: arn:aws:iam::xxx:role/eks-tekton-role
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: build-bot-sa
+  namespace: ci
+  # -- Default access to secrets
+  secrets: []
+    # - name: github-auth-token
+    # - name: argocd
 
-# If you want solution to pull images using a specific docker registry
-# credentials:
-#
-# https://github.com/tektoncd/pipeline/blob/main/docs/podtemplates.md
-# if you need to create dockerhub secrets you can follow the example below
-#
-# kubectl create secret -n argo-cd generic docker-saritasa-infra-v2-ro \
-#     --from-file=.dockerconfigjson=$HOME/.docker/config.json \
-#     --type=kubernetes.io/dockerconfigjson
-#
-
-engine:
-  # -- if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc)
+# https://tekton.dev/docs/pipelines/
+pipelines:
   enabled: true
-  # -- tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm
-  config: {}
-    # defaultServiceAccount: "build-bot-sa"
-    # defaultTimeoutMinutes: "60"
-    # defaultPodTemplate: |
-    #   imagePullSecrets:
-    #     - name: "docker-saritasa-infra-v2-ro"
-    #   nodeSelector:
-    #     ci: "true"
+  config:
+    defaults:
+      # default-timeout-minutes contains the default number of
+      # minutes to use for TaskRun and PipelineRun, if none is specified.
+      default-timeout-minutes: '60'  # 60 minutes
 
-  # -- controller launch arguments
-  # @default -- use args multiline string to set additional launch arguments for the tekton controller
-  controller:
-    args: |
-      performance considerations
-      uncomment 3 lines below if you need it
-      https://github.com/tektoncd/pipeline/blob/main/docs/tekton-controller-performance-configuration.md
-      "-kube-api-qps", "5",
-      "-kube-api-burst", "10",
-      "-threads-per-controller", "20",
+      # default-service-account contains the default service account name
+      # to use for TaskRun and PipelineRun, if none is specified.
+      default-service-account: build-bot-sa
 
+      # default-managed-by-label-value contains the default value given to the
+      # "app.kubernetes.io/managed-by" label applied to all Pods created for
+      # TaskRuns. If a user's requested TaskRun specifies another value for this
+      # label, the user's request supersedes.
+      default-managed-by-label-value: tekton-pipelines
+
+      # default-pod-template contains the default pod template to use for
+      # TaskRun and PipelineRun. If a pod template is specified on the
+      # PipelineRun, the default-pod-template is merged with that one.
+      # default-pod-template: |
+      #   imagePullSecrets:
+      #     - name: "docker-saritasa-infra-v2-ro"
+      #   nodeSelector:
+      #     ci: "true"
+
+      # default-affinity-assistant-pod-template contains the default pod template
+      # to use for affinity assistant pods. If a pod template is specified on the
+      # PipelineRun, the default-affinity-assistant-pod-template is merged with
+      # that one.
+      # default-affinity-assistant-pod-template:
+
+      # default-cloud-events-sink contains the default CloudEvents sink to be
+      # used for TaskRun and PipelineRun, when no sink is specified.
+      # Note that right now it is still not possible to set a PipelineRun or
+      # TaskRun specific sink, so the default is the only option available.
+      # If no sink is specified, no CloudEvent is generated
+      # default-cloud-events-sink:
+
+      # default-task-run-workspace-binding contains the default workspace
+      # configuration provided for any Workspaces that a Task declares
+      # but that a TaskRun does not explicitly provide.
+      # default-task-run-workspace-binding: |
+      #   emptyDir: {}
+
+      # default-max-matrix-combinations-count contains the default maximum number
+      # of combinations from a Matrix, if none is specified.
+      default-max-matrix-combinations-count: '256'
+
+      # default-forbidden-env contains comma separated environment variables that cannot be
+      # overridden by podTemplate.
+      default-forbidden-env: ''
+
+      # default-resolver-type contains the default resolver type to be used in the cluster,
+      # no default-resolver-type is specified by default
+      default-resolver-type: ''
+
+      # default-imagepullbackoff-timeout contains the default duration to wait
+      # before requeuing the TaskRun to retry, specifying 0 here is equivalent to fail fast
+      # possible values could be 1m, 5m, 10s, 1h, etc
+      default-imagepullbackoff-timeout: 5m
+
+      # default-maximum-resolution-timeout specifies the default duration used by the
+      # resolution controller before timing out when exceeded.
+      # Possible values include "1m", "5m", "10s", "1h", etc.
+      default-maximum-resolution-timeout: 1m
+
+      # default-container-resource-requirements allow users to update default resource requirements
+      # to a init-containers and containers of a pods create by the controller
+      # Onet: All the resource requirements are applied to init-containers and containers
+      # only if the existing resource requirements are empty.
+      # default-container-resource-requirements: |
+      #   place-scripts:  # updates resource requirements of a 'place-scripts' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   prepare:  # updates resource requirements of a 'prepare' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "256Mi"
+      #       cpu: "500m"
+      #
+      #   working-dir-initializer:  # updates resource requirements of a 'working-dir-initializer' container
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "512Mi"
+      #       cpu: "500m"
+      #
+      #   prefix-scripts: # updates resource requirements of containers which starts with 'scripts-'
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   prefix-sidecar-scripts: # updates resource requirements of containers which starts with 'sidecar-scripts-'
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "500m"
+      #
+      #   default:  # updates resource requirements of init-containers and containers which has empty resource resource requirements
+      #     requests:
+      #       memory: "64Mi"
+      #       cpu: "250m"
+      #     limits:
+      #       memory: "256Mi"
+      #       cpu: "500m"
+    events:
+      # formats contains a comma separated list of event formats to be used
+      # the only format supported today is "tektonv1". An empty string is not
+      # a valid configuration. To disable events, do not specify the sink.
+      formats: tektonv1
+      # sink contains the event sink to be used for TaskRun, PipelineRun and
+      # CustomRun. If no sink is specified, no CloudEvent is generated.
+      # This setting supersedes the "default-cloud-events-sink" from the
+      # "config-defaults" config map
+      sink: https://events.sink/cdevents
+    feature-flags:
+      # Setting this flag to "true" will prevent Tekton to create an
+      # Affinity Assistant for every TaskRun sharing a PVC workspace
+      #
+      # The default behaviour is for Tekton to create Affinity Assistants
+      #
+      # See more in the Affinity Assistant documentation
+      # https://github.com/tektoncd/pipeline/blob/main/docs/affinityassistants.md
+      # or https://github.com/tektoncd/pipeline/pull/2630 for more info.
+      #
+      # Note: This feature flag is deprecated and will be removed in release v0.60. Consider using `coschedule` feature flag to configure Affinity Assistant behavior.
+      disable-affinity-assistant: 'false'
+      # Setting this flag will determine how PipelineRun Pods are scheduled with Affinity Assistant.
+      # Acceptable values are "workspaces" (default), "pipelineruns", "isolate-pipelinerun", or "disabled".
+      #
+      # Setting it to "workspaces" will schedule all the taskruns sharing the same PVC-based workspace in a pipelinerun to the same node.
+      # Setting it to "pipelineruns" will schedule all the taskruns in a pipelinerun to the same node.
+      # Setting it to "isolate-pipelinerun" will schedule all the taskruns in a pipelinerun to the same node,
+      # and only allows one pipelinerun to run on a node at a time.
+      # Setting it to "disabled" will not apply any coschedule policy.
+      #
+      # See more in the Affinity Assistant documentation
+      # https://github.com/tektoncd/pipeline/blob/main/docs/affinityassistants.md
+      coschedule: workspaces
+      # Setting this flag to "true" will prevent Tekton scanning attached
+      # service accounts and injecting any credentials it finds into your
+      # Steps.
+      #
+      # The default behaviour currently is for Tekton to search service
+      # accounts for secrets matching a specified format and automatically
+      # mount those into your Steps.
+      #
+      # Note: setting this to "true" will prevent PipelineResources from
+      # working.
+      #
+      # See https://github.com/tektoncd/pipeline/issues/2791 for more
+      # info.
+      disable-creds-init: 'false'
+      # Setting this flag to "false" will stop Tekton from waiting for a
+      # TaskRun's sidecar containers to be running before starting the first
+      # step. This will allow Tasks to be run in environments that don't
+      # support the DownwardAPI volume type, but may lead to unintended
+      # behaviour if sidecars are used.
+      #
+      # See https://github.com/tektoncd/pipeline/issues/4937 for more info.
+      await-sidecar-readiness: 'true'
+      # This option should be set to false when Pipelines is running in a
+      # cluster that does not use injected sidecars such as Istio. Setting
+      # it to false should decrease the time it takes for a TaskRun to start
+      # running. For clusters that use injected sidecars, setting this
+      # option to false can lead to unexpected behavior.
+      #
+      # See https://github.com/tektoncd/pipeline/issues/2080 for more info.
+      running-in-environment-with-injected-sidecars: 'true'
+      # Setting this flag to "true" will require that any Git SSH Secret
+      # offered to Tekton must have known_hosts included.
+      #
+      # See https://github.com/tektoncd/pipeline/issues/2981 for more
+      # info.
+      require-git-ssh-secret-known-hosts: 'false'
+      # Setting this flag to "true" enables the use of Tekton OCI bundle.
+      # This is an experimental feature and thus should still be considered
+      # an alpha feature.
+      enable-tekton-oci-bundles: 'false'
+      # Setting this flag will determine which gated features are enabled.
+      # Acceptable values are "stable", "beta", or "alpha".
+      # Set to alpha, so we can have onError attribute in the task declaration of the pipeline manifest.
+      enable-api-fields: alpha
+      # Setting this flag to "true" enables CloudEvents for CustomRuns and Runs, as long as a
+      # CloudEvents sink is configured in the config-defaults config map
+      send-cloudevents-for-runs: 'false'
+      # This flag affects the behavior of taskruns and pipelineruns in cases where no VerificationPolicies match them.
+      # If it is set to "fail", TaskRuns and PipelineRuns will fail verification if no matching policies are found.
+      # If it is set to "warn", TaskRuns and PipelineRuns will run to completion if no matching policies are found, and an error will be logged.
+      # If it is set to "ignore", TaskRuns and PipelineRuns will run to completion if no matching policies are found, and no error will be logged.
+      trusted-resources-verification-no-match-policy: ignore
+      # Setting this flag to "true" enables populating the "provenance" field in TaskRun
+      # and PipelineRun status. This field contains metadata about resources used
+      # in the TaskRun/PipelineRun such as the source from where a remote Task/Pipeline
+      # definition was fetched.
+      enable-provenance-in-status: 'true'
+      # Setting this flag will determine how Tekton pipelines will handle non-falsifiable provenance.
+      # If set to "spire", then SPIRE will be used to ensure non-falsifiable provenance.
+      # If set to "none", then Tekton will not have non-falsifiable provenance.
+      # This is an experimental feature and thus should still be considered an alpha feature.
+      enforce-nonfalsifiability: none
+      # Setting this flag will determine how Tekton pipelines will handle extracting results from the task.
+      # Acceptable values are "termination-message" or "sidecar-logs".
+      # "sidecar-logs" is an experimental feature and thus should still be considered
+      # an alpha feature.
+      results-from: termination-message
+      # Setting this flag will determine the upper limit of each task result
+      # This flag is optional and only associated with the previous flag, results-from
+      # When results-from is set to "sidecar-logs", this flag can be used to configure the upper limit of a task result
+      # max-result-size: "4096"
+      # Setting this flag to "true" will limit privileges for containers injected by Tekton into TaskRuns.
+      # This allows TaskRuns to run in namespaces with "restricted" pod security standards.
+      # Not all Kubernetes implementations support this option.
+      set-security-context: 'false'
+      # Setting this flag to "true" will keep pod on cancellation
+      # allowing examination of the logs on the pods from cancelled taskruns
+      keep-pod-on-cancel: 'false'
+      # Setting this flag to "true" will enable the CEL evaluation in WhenExpression
+      enable-cel-in-whenexpression: 'true'
+      # Setting this flag to "true" will enable the use of StepActions in Steps
+      # Enabled, because it allows us to run Steps conditionally depending on param with `when` construction
+      enable-step-actions: 'true'
+      # Setting this flag to "true" will enable the use of Artifacts in Steps
+      # This feature is in preview mode and not implemented yet. Please check  # 7693 for updates.
+      enable-artifacts: 'false'
+      # Setting this flag to "true" will enable the built-in param input validation via param enum.
+      enable-param-enum: 'true'
+      # Setting this flag to "pipeline,pipelinerun,taskrun" will prevent users from creating
+      # embedded spec Taskruns or Pipelineruns for Pipeline, Pipelinerun and taskrun
+      # respectively. We can specify "pipeline" to disable for Pipeline resource only.
+      # "pipelinerun" for Pipelinerun and "taskrun" for Taskrun. Or a combination of
+      # these.
+      disable-inline-spec: ''
+      # Setting this flag to "true" will enable the use of concise resolver syntax
+      enable-concise-resolver-syntax: 'false'
+      # Setthing this flag to "true" will enable native Kubernetes Sidecar support
+      enable-kubernetes-sidecar: 'true'
+    leader-election-controller:
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: 60s
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: 40s
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: 10s
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: '1'
+    leader-election-events:
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: 60s
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: 40s
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: 10s
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: '1'
+    leader-election-webhook:
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: 60s
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: 40s
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: 10s
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: '1'
+    logging:
+      zap-logger-config: |
+        {
+          "level": "info",
+          "development": false,
+          "sampling": {
+            "initial": 100,
+            "thereafter": 100
+          },
+          "outputPaths": ["stdout"],
+          "errorOutputPaths": ["stderr"],
+          "encoding": "json",
+          "encoderConfig": {
+            "timeKey": "timestamp",
+            "levelKey": "severity",
+            "nameKey": "logger",
+            "callerKey": "caller",
+            "messageKey": "message",
+            "stacktraceKey": "stacktrace",
+            "lineEnding": "",
+            "levelEncoder": "",
+            "timeEncoder": "iso8601",
+            "durationEncoder": "",
+            "callerEncoder": ""
+          }
+        }
+      # Log level overrides
+      loglevel.controller: info
+      loglevel.webhook: info
+    observability:
+      # metrics.backend-destination field specifies the system metrics destination.
+      # It supports either prometheus (the default) or stackdriver.
+      # Note: Using Stackdriver will incur additional charges.
+      metrics.backend-destination: prometheus
+
+      # metrics.stackdriver-project-id field specifies the Stackdriver project ID. This
+      # field is optional. When running on GCE, application default credentials will be
+      # used and metrics will be sent to the cluster's project if this field is
+      # not provided.
+      # metrics.stackdriver-project-id: "<your stackdriver project id>"
+
+      # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed
+      # to send metrics to Stackdriver using "global" resource type and custom
+      # metric type. Setting this flag to "true" could cause extra Stackdriver
+      # charge.  If metrics.backend-destination is not Stackdriver, this is
+      # ignored.
+      metrics.allow-stackdriver-custom-metrics: 'false'
+      metrics.taskrun.level: task
+      metrics.taskrun.duration-type: histogram
+      metrics.pipelinerun.level: pipeline
+      metrics.pipelinerun.duration-type: histogram
+      metrics.count.enable-reason: 'false'
+      metrics.running-pipelinerun.level: ''
+    spire: {}
+    # spire-trust-domain specifies the SPIRE trust domain to use.
+    # spire-trust-domain: "example.org"
+    #
+    # spire-socket-path specifies the SPIRE agent socket for SPIFFE workload API.
+    # spire-socket-path: "unix:///spiffe-workload-api/spire-agent.sock"
+    #
+    # spire-server-addr specifies the SPIRE server address for workload/node registration.
+    # spire-server-addr: "spire-server.spire.svc.cluster.local:8081"
+    #
+    # spire-node-alias-prefix specifies the SPIRE node alias prefix to use.
+    # spire-node-alias-prefix: "/tekton-node/"
+    tracing:
+      # Enable sending traces to defined endpoint by setting this to true
+      enabled: 'false'
+      #
+      # API endpoint to send the traces to
+      # (optional): The default value is given below
+      endpoint: http://jaeger-collector.jaeger.svc.cluster.local:14268/api/traces
+      # (optional) Name of the k8s secret which contains basic auth credentials
+      credentialsSecret: jaeger-creds
+    bundleresolver-config:
+      # the default service account name to use for bundle requests.
+      default-service-account: default
+      # The default layer kind in the bundle image.
+      default-kind: task
+    cluster-resolver-config:
+      # The default kind to fetch.
+      default-kind: task
+      # The default namespace to look for resources in.
+      default-namespace: ''
+      # An optional comma-separated list of namespaces which the resolver is allowed to access. Defaults to empty, meaning all namespaces are allowed.
+      allowed-namespaces: ''
+      # An optional comma-separated list of namespaces which the resolver is blocked from accessing. Defaults to empty, meaning all namespaces are allowed.
+      blocked-namespaces: ''
+    resolvers-feature-flags:
+      # Setting this flag to "true" enables remote resolution of Tekton OCI bundles.
+      enable-bundles-resolver: 'true'
+      # Setting this flag to "true" enables remote resolution of tasks and pipelines via the Tekton Hub.
+      enable-hub-resolver: 'true'
+      # Setting this flag to "true" enables remote resolution of tasks and pipelines from Git repositories.
+      enable-git-resolver: 'true'
+      # Setting this flag to "true" enables remote resolution of tasks and pipelines from other namespaces within the cluster.
+      enable-cluster-resolver: 'true'
+    leader-election-resolvers:
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: 60s
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: 40s
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: 10s
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: '1'
+    git-resolver-config:
+      # The maximum amount of time a single anonymous cloning resolution may take.
+      fetch-timeout: 1m
+      # The git url to fetch the remote resource from when using anonymous cloning.
+      default-url: https://github.com/tektoncd/catalog.git
+      # The git revision to fetch the remote resource from with either anonymous cloning or the authenticated API.
+      default-revision: main
+      # The SCM type to use with the authenticated API. Can be github, gitlab, gitea, bitbucketserver, bitbucketcloud
+      scm-type: github
+      # The SCM server URL to use with the authenticated API. Not needed when using github.com, gitlab.com, or BitBucket Cloud
+      server-url: ''
+      # The Kubernetes secret containing the API token for the SCM provider. Required when using the authenticated API.
+      api-token-secret-name: ''
+      # The key in the API token secret containing the actual token. Required when using the authenticated API.
+      api-token-secret-key: ''
+      # The namespace containing the API token secret. Defaults to "default".
+      api-token-secret-namespace: default
+      # The default organization to look for repositories under when using the authenticated API,
+      # if not specified in the resolver parameters. Optional.
+      default-org: saritasa-nest
+    http-resolver-config:
+      # The maximum amount of time the http resolver will wait for a response from the server.
+      fetch-timeout: 1m
+    hubresolver-config:
+      # the default Tekton Hub catalog from where to pull the resource.
+      default-tekton-hub-catalog: Tekton
+      # the default Artifact Hub Task catalog from where to pull the resource.
+      default-artifact-hub-task-catalog: tekton-catalog-tasks
+      # the default Artifact Hub Pipeline catalog from where to pull the resource.
+      default-artifact-hub-pipeline-catalog: tekton-catalog-pipelines
+      # the default layer kind in the hub image.
+      default-kind: task
+      # the default hub source to pull the resource from.
+      default-type: artifact
+  pipelinesController:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: NotIn
+                  values:
+                    - windows
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 100Mi
+      # requests:
+      #   cpu: 10m
+      #   memory: 100Mi
+  eventsController:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: NotIn
+                  values:
+                    - windows
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 100Mi
+      # requests:
+      #   cpu: 10m
+      #   memory: 100Mi
+  remoteResolvers:
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: resolvers
+                  app.kubernetes.io/component: resolvers
+                  app.kubernetes.io/instance: default
+                  app.kubernetes.io/part-of: tekton-pipelines
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: {}
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 100Mi
+      # requests:
+      #   cpu: 10m
+      #   memory: 100Mi
+  webhook:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/os
+                  operator: NotIn
+                  values:
+                    - windows
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: webhook
+                  app.kubernetes.io/component: webhook
+                  app.kubernetes.io/instance: default
+                  app.kubernetes.io/part-of: tekton-pipelines
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: {}
+    resources: {}
+      # limits:
+      #   cpu: 500m
+      #   memory: 500Mi
+      # requests:
+      #   cpu: 10m
+      #   memory: 128Mi
+
+# https://tekton.dev/docs/triggers/
 triggers:
-  # -- enable tekton triggers
   enabled: true
+  config:
+    defaults:
+      # default-service-account contains the default service account name
+      # to use for TaskRun and PipelineRun, if none is specified.
+      default-service-account: build-bot-sa
+      default-run-as-user: '65532'
+      default-run-as-group: '65532'
+      default-fs-group: '65532'
+      default-run-as-non-root: 'true'  # allowed values are true and false
+    feature-flags:
+      # Setting this flag will determine which gated features are enabled.
+      # Acceptable values are "stable" or "alpha".
+      enable-api-fields: stable
+      # Setting this field with valid regex pattern matching the pattern will exclude labels from
+      # getting added to resources created by the EventListener such as the deployment
+      labels-exclusion-pattern: ''
+    leader-election-triggers-controller:
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: 60s
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: 40s
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: 10s
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: '1'
+    leader-election-triggers-webhook:
+      # lease-duration is how long non-leaders will wait to try to acquire the
+      # lock; 15 seconds is the value used by core kubernetes controllers.
+      lease-duration: 60s
+      # renew-deadline is how long a leader will try to renew the lease before
+      # giving up; 10 seconds is the value used by core kubernetes controllers.
+      renew-deadline: 40s
+      # retry-period is how long the leader election client waits between tries of
+      # actions; 2 seconds is the value used by core kubernetes controllers.
+      retry-period: 10s
+      # buckets is the number of buckets used to partition key space of each
+      # Reconciler. If this number is M and the replica number of the controller
+      # is N, the N replicas will compete for the M buckets. The owner of a
+      # bucket will take care of the reconciling for the keys partitioned into
+      # that bucket.
+      buckets: '1'
+    logging:
+      # Common configuration for all knative codebase
+      zap-logger-config: |
+        {
+          "level": "info",
+          "development": false,
+          "disableStacktrace": true,
+          "sampling": {
+            "initial": 100,
+            "thereafter": 100
+          },
+          "outputPaths": ["stdout"],
+          "errorOutputPaths": ["stderr"],
+          "encoding": "json",
+          "encoderConfig": {
+            "timeKey": "timestamp",
+            "levelKey": "severity",
+            "nameKey": "logger",
+            "callerKey": "caller",
+            "messageKey": "message",
+            "stacktraceKey": "stacktrace",
+            "lineEnding": "",
+            "levelEncoder": "",
+            "timeEncoder": "iso8601",
+            "durationEncoder": "",
+            "callerEncoder": ""
+          }
+        }
+      # Log level overrides
+      loglevel.controller: info
+      loglevel.webhook: info
+      loglevel.eventlistener: info
+    observability:
+      # metrics.backend-destination field specifies the system metrics destination.
+      # It supports either prometheus (the default) or stackdriver.
+      # Note: Using stackdriver will incur additional charges
+      metrics.backend-destination: prometheus
 
+      # metrics.stackdriver-project-id field specifies the stackdriver project ID. This
+      # field is optional. When running on GCE, application default credentials will be
+      # used if this field is not provided.
+      # metrics.stackdriver-project-id: "<your stackdriver project id>"
+
+      # metrics.allow-stackdriver-custom-metrics indicates whether it is allowed to send metrics to
+      # Stackdriver using "global" resource type and custom metric type if the
+      # metrics are not supported by "knative_revision" resource type. Setting this
+      # flag to "true" could cause extra Stackdriver charge.
+      # If metrics.backend-destination is not Stackdriver, this is ignored.
+      metrics.allow-stackdriver-custom-metrics: 'false'
+  controller:
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: {}
+    resources: {}
+      # limits:
+      #   cpu: 500m
+      #   memory: 500Mi
+      # requests:
+      #   cpu: 10m
+      #   memory: 100Mi
+  webhook:
+    ingress: {}
+    affinity: {}
+    nodeSelector: {}
+    tolerations: []
+    topologySpreadConstraints: {}
+    resources: {}
+      # limits:
+      #   cpu: 500m
+      #   memory: 500Mi
+      # requests:
+      #   cpu: 10m
+      #   memory: 100Mi
+
+# https://tekton.dev/docs/dashboard/
 dashboard:
-  # -- enable tekton dashboard
-  enabled: false
-  # -- tekton ingress configuration
+  enabled: true
+  # define whether Tekton dashboard is available in `write` mode
+  readOnly: true
+  # define namespaces that should allow Tekton Dashboard to manage TaskRuns in
+  taskRuns:
+    namespaces: []
+  # define namespaces that should allow Tekton Dashboard to manage PipelineRuns in
+  pipelineRuns:
+    namespaces: []
+  # at this time there is no configmaps that we may want to customize
+  config: {}
+  extensions: {}
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                  - linux
+  nodeSelector: {}
+  tolerations: []
+  topologySpreadConstraints: {}
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 500Mi
+    # requests:
+    #   cpu: 10m
+    #   memory: 100Mi
   ingress: {}
     # enabled: true
     # annotations:
@@ -74,74 +745,101 @@ dashboard:
     #    hosts:
     #      - tekton.site.com
 
-webhook:
-  # -- enable tekton eventlistener webhook (github trigger)
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: "nginx"
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+      argocd.argoproj.io/sync-wave: "10"
+    hosts:
+      - host: webhook.site.com
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: el-build-pipeline-event-listener
+                port:
+                  number: 8080
+    tls:
+     - secretName: tekton.site.com-crt
+       hosts:
+         - tekton.site.com
+
+# https://tekton.dev/docs/triggers/eventlisteners/#specifying-interceptors
+interceptors:
   enabled: true
-  # -- webhook ingress configuration
-  ingress: {}
-    # enabled: true
-    # annotations:
-    #   kubernetes.io/ingress.class: "nginx"
-    #   nginx.ingress.kubernetes.io/proxy-body-size: 100m
-    #   cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    #   argocd.argoproj.io/sync-wave: "10"
-    # hosts:
-    #   - host: webhook.site.com
-    #     paths:
-    #       - path: /
-    #         pathType: Prefix
-    #         backend:
-    #           service:
-    #             name: el-build-pipeline-event-listener
-    #             port:
-    #               number: 8080
-    # tls:
-    #  - secretName: webhook.site.com-crt
-    #    hosts:
-    #      - webhook.site.com
+  # at this time there is no configmaps that we may want to customize
+  config: {}
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                  - linux
+  nodeSelector: {}
+  tolerations: []
+  topologySpreadConstraints: {}
+  resources: {}
+    # limits:
+    #   cpu: 200m
+    #   memory: 1Gi
+    # requests:
+    #   cpu: 10m
+    #   memory: 100Mi
 
+# https://tekton.dev/docs/triggers/eventlisteners/
 eventlistener:
-  # -- should we create EventListener?
-  create: true
-  # -- in which namespace EventListener and related roles should be created
+  enabled: true
+  name: el
   namespace: ci
-  # -- unique suffix (in case there are several eventlisteners in the cluster)
-  suffix: ""
-  # -- EventListener will look for Triggers with this label
+  # https://tekton.dev/docs/triggers/eventlisteners/#specifying-a-kubernetesresource-object
+  resources:
+    kubernetesResource:
+      replicas: 1
+      spec:
+        template:
+          spec:
+            nodeSelector:
+              ops: 'true'
+  # https://tekton.dev/docs/triggers/eventlisteners/#constraining-eventlisteners-to-specific-namespaces
   labelSelector:
-    builder: tekton
-  # -- If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace.
+    matchLabels:
+      builder: tekton
+  # https://tekton.dev/docs/triggers/eventlisteners/#constraining-eventlisteners-to-specific-namespaces
   namespaceSelector:
-    - ci
+    matchNames:
+      - '*'
 
-# -- list of docker registry secrets to pull images
-imagePullSecrets: []
-# - name: "docker-saritasa-infra-v2-ro"
+  # if we want to enable public facing ingress for the eventlistener
+  # in the case we push webhook events from github to el as an example
+  ingress:
+    enabled: false
+    name: tekton-github-webhook
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    hostname: tekton-webhook.site.com
 
-serviceAccount:
-  # -- Specifies whether a service account should be created
-  create: true
-  # -- Annotations to add to the service account
-  annotations: {}
-  # -- The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: "build-bot-sa"
-
-# -- what node to run tekton related pods
-nodeSelector: {}
-#  tekton_builder: "true"
-
-# -- tolerations for tekton related pods
-tolerations: []
-
-# -- affinity for tekton-related pods
-# @default -- default is to avoid running tekton pods on windows nodes.
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/os
-              operator: NotIn
-              values:
-                - windows
+pipelinerunsCleaner:
+  enabled: true
+  namespace: ci
+  schedule: 0 0 * * *  # run every day at 00:00
+  retentionPeriod: 10days
+  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 3
+  serviceAccount: ''
+  # not restart job on failure
+  backoffLimit: 0
+  restartPolicy: Never
+  image:
+    # -- default docker registry
+    repository: bitnami/kubectl
+    # -- pull policy
+    pullPolicy: Always
+    # -- Overrides the image tag whose default is the chart appVersion.
+    tag: latest
