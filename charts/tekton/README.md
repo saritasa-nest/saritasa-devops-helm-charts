@@ -1,28 +1,226 @@
-## Pipeline
+# saritasa-tekton
 
-https://github.com/tektoncd/pipeline/releases
-https://storage.googleapis.com/tekton-releases/pipeline/previous/v1.1.0/release.yaml
+![Version: 2.0.0-dev.1](https://img.shields.io/badge/Version-2.0.0--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
+A Helm chart for tekton
 
-## dashboard
+## Values
 
-https://github.com/tektoncd/dashboard/releases/tag/v0.58.0
-https://storage.googleapis.com/tekton-releases/dashboard/previous/v0.58.0/release.yaml
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| dashboard.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| dashboard.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| dashboard.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"linux"` |  |
+| dashboard.config | object | `{}` |  |
+| dashboard.enabled | bool | `true` |  |
+| dashboard.extensions | object | `{}` |  |
+| dashboard.ingress | object | `{}` |  |
+| dashboard.nodeSelector | object | `{}` |  |
+| dashboard.pipelineRuns.namespaces | list | `[]` |  |
+| dashboard.readOnly | bool | `true` |  |
+| dashboard.resources | object | `{}` |  |
+| dashboard.taskRuns.namespaces | list | `[]` |  |
+| dashboard.tolerations | list | `[]` |  |
+| dashboard.topologySpreadConstraints | object | `{}` |  |
+| eventlistener.enabled | bool | `true` |  |
+| eventlistener.ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
+| eventlistener.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
+| eventlistener.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"100m"` |  |
+| eventlistener.ingress.enabled | bool | `false` |  |
+| eventlistener.ingress.hostname | string | `"tekton-webhook.site.com"` |  |
+| eventlistener.ingress.name | string | `"tekton-github-webhook"` |  |
+| eventlistener.labelSelector.matchLabels.builder | string | `"tekton"` |  |
+| eventlistener.name | string | `"el"` |  |
+| eventlistener.namespace | string | `"ci"` |  |
+| eventlistener.namespaceSelector.matchNames[0] | string | `"*"` |  |
+| eventlistener.resources.kubernetesResource.replicas | int | `1` |  |
+| eventlistener.resources.kubernetesResource.spec.template.spec.nodeSelector.ops | string | `"true"` |  |
+| imagePullSecrets | list | `[]` | list of docker registry secrets to pull images |
+| interceptors.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| interceptors.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| interceptors.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"linux"` |  |
+| interceptors.config | object | `{}` |  |
+| interceptors.enabled | bool | `true` |  |
+| interceptors.nodeSelector | object | `{}` |  |
+| interceptors.resources | object | `{}` |  |
+| interceptors.tolerations | list | `[]` |  |
+| interceptors.topologySpreadConstraints | object | `{}` |  |
+| pipelinerunsCleaner.backoffLimit | int | `0` |  |
+| pipelinerunsCleaner.enabled | bool | `true` |  |
+| pipelinerunsCleaner.failedJobsHistoryLimit | int | `3` |  |
+| pipelinerunsCleaner.image.pullPolicy | string | `"Always"` | pull policy |
+| pipelinerunsCleaner.image.repository | string | `"bitnami/kubectl"` | default docker registry |
+| pipelinerunsCleaner.image.tag | string | `"latest"` | Overrides the image tag whose default is the chart appVersion. |
+| pipelinerunsCleaner.namespace | string | `"ci"` |  |
+| pipelinerunsCleaner.restartPolicy | string | `"Never"` |  |
+| pipelinerunsCleaner.retentionPeriod | string | `"10days"` |  |
+| pipelinerunsCleaner.schedule | string | `"0 0 * * *"` |  |
+| pipelinerunsCleaner.serviceAccount | string | `""` |  |
+| pipelinerunsCleaner.successfulJobsHistoryLimit | int | `3` |  |
+| pipelines.config.bundleresolver-config.default-kind | string | `"task"` |  |
+| pipelines.config.bundleresolver-config.default-service-account | string | `"default"` |  |
+| pipelines.config.cluster-resolver-config.allowed-namespaces | string | `""` |  |
+| pipelines.config.cluster-resolver-config.blocked-namespaces | string | `""` |  |
+| pipelines.config.cluster-resolver-config.default-kind | string | `"task"` |  |
+| pipelines.config.cluster-resolver-config.default-namespace | string | `""` |  |
+| pipelines.config.defaults.default-forbidden-env | string | `""` |  |
+| pipelines.config.defaults.default-imagepullbackoff-timeout | string | `"5m"` |  |
+| pipelines.config.defaults.default-managed-by-label-value | string | `"tekton-pipelines"` |  |
+| pipelines.config.defaults.default-max-matrix-combinations-count | string | `"256"` |  |
+| pipelines.config.defaults.default-maximum-resolution-timeout | string | `"1m"` |  |
+| pipelines.config.defaults.default-resolver-type | string | `""` |  |
+| pipelines.config.defaults.default-service-account | string | `"build-bot-sa"` |  |
+| pipelines.config.defaults.default-timeout-minutes | string | `"60"` |  |
+| pipelines.config.events.formats | string | `"tektonv1"` |  |
+| pipelines.config.events.sink | string | `"https://events.sink/cdevents"` |  |
+| pipelines.config.feature-flags.await-sidecar-readiness | string | `"true"` |  |
+| pipelines.config.feature-flags.coschedule | string | `"workspaces"` |  |
+| pipelines.config.feature-flags.disable-affinity-assistant | string | `"false"` |  |
+| pipelines.config.feature-flags.disable-creds-init | string | `"false"` |  |
+| pipelines.config.feature-flags.disable-inline-spec | string | `""` |  |
+| pipelines.config.feature-flags.enable-api-fields | string | `"alpha"` |  |
+| pipelines.config.feature-flags.enable-artifacts | string | `"false"` |  |
+| pipelines.config.feature-flags.enable-cel-in-whenexpression | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-concise-resolver-syntax | string | `"false"` |  |
+| pipelines.config.feature-flags.enable-kubernetes-sidecar | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-param-enum | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-provenance-in-status | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-step-actions | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-tekton-oci-bundles | string | `"false"` |  |
+| pipelines.config.feature-flags.enforce-nonfalsifiability | string | `"none"` |  |
+| pipelines.config.feature-flags.keep-pod-on-cancel | string | `"false"` |  |
+| pipelines.config.feature-flags.require-git-ssh-secret-known-hosts | string | `"false"` |  |
+| pipelines.config.feature-flags.results-from | string | `"termination-message"` |  |
+| pipelines.config.feature-flags.running-in-environment-with-injected-sidecars | string | `"true"` |  |
+| pipelines.config.feature-flags.send-cloudevents-for-runs | string | `"false"` |  |
+| pipelines.config.feature-flags.set-security-context | string | `"false"` |  |
+| pipelines.config.feature-flags.trusted-resources-verification-no-match-policy | string | `"ignore"` |  |
+| pipelines.config.git-resolver-config.api-token-secret-key | string | `""` |  |
+| pipelines.config.git-resolver-config.api-token-secret-name | string | `""` |  |
+| pipelines.config.git-resolver-config.api-token-secret-namespace | string | `"default"` |  |
+| pipelines.config.git-resolver-config.default-org | string | `"saritasa-nest"` |  |
+| pipelines.config.git-resolver-config.default-revision | string | `"main"` |  |
+| pipelines.config.git-resolver-config.default-url | string | `"https://github.com/tektoncd/catalog.git"` |  |
+| pipelines.config.git-resolver-config.fetch-timeout | string | `"1m"` |  |
+| pipelines.config.git-resolver-config.scm-type | string | `"github"` |  |
+| pipelines.config.git-resolver-config.server-url | string | `""` |  |
+| pipelines.config.http-resolver-config.fetch-timeout | string | `"1m"` |  |
+| pipelines.config.hubresolver-config.default-artifact-hub-pipeline-catalog | string | `"tekton-catalog-pipelines"` |  |
+| pipelines.config.hubresolver-config.default-artifact-hub-task-catalog | string | `"tekton-catalog-tasks"` |  |
+| pipelines.config.hubresolver-config.default-kind | string | `"task"` |  |
+| pipelines.config.hubresolver-config.default-tekton-hub-catalog | string | `"Tekton"` |  |
+| pipelines.config.hubresolver-config.default-type | string | `"artifact"` |  |
+| pipelines.config.leader-election-controller.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-controller.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-controller.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-controller.retry-period | string | `"10s"` |  |
+| pipelines.config.leader-election-events.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-events.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-events.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-events.retry-period | string | `"10s"` |  |
+| pipelines.config.leader-election-resolvers.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-resolvers.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-resolvers.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-resolvers.retry-period | string | `"10s"` |  |
+| pipelines.config.leader-election-webhook.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-webhook.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-webhook.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-webhook.retry-period | string | `"10s"` |  |
+| pipelines.config.logging."loglevel.controller" | string | `"info"` |  |
+| pipelines.config.logging."loglevel.webhook" | string | `"info"` |  |
+| pipelines.config.logging.zap-logger-config | string | `"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"timestamp\",\n    \"levelKey\": \"severity\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"message\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"` |  |
+| pipelines.config.observability."metrics.allow-stackdriver-custom-metrics" | string | `"false"` |  |
+| pipelines.config.observability."metrics.backend-destination" | string | `"prometheus"` |  |
+| pipelines.config.observability."metrics.count.enable-reason" | string | `"false"` |  |
+| pipelines.config.observability."metrics.pipelinerun.duration-type" | string | `"histogram"` |  |
+| pipelines.config.observability."metrics.pipelinerun.level" | string | `"pipeline"` |  |
+| pipelines.config.observability."metrics.running-pipelinerun.level" | string | `""` |  |
+| pipelines.config.observability."metrics.taskrun.duration-type" | string | `"histogram"` |  |
+| pipelines.config.observability."metrics.taskrun.level" | string | `"task"` |  |
+| pipelines.config.resolvers-feature-flags.enable-bundles-resolver | string | `"true"` |  |
+| pipelines.config.resolvers-feature-flags.enable-cluster-resolver | string | `"true"` |  |
+| pipelines.config.resolvers-feature-flags.enable-git-resolver | string | `"true"` |  |
+| pipelines.config.resolvers-feature-flags.enable-hub-resolver | string | `"true"` |  |
+| pipelines.config.spire | object | `{}` |  |
+| pipelines.config.tracing.credentialsSecret | string | `"jaeger-creds"` |  |
+| pipelines.config.tracing.enabled | string | `"false"` |  |
+| pipelines.config.tracing.endpoint | string | `"http://jaeger-collector.jaeger.svc.cluster.local:14268/api/traces"` |  |
+| pipelines.enabled | bool | `true` |  |
+| pipelines.eventsController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| pipelines.eventsController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"NotIn"` |  |
+| pipelines.eventsController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"windows"` |  |
+| pipelines.eventsController.nodeSelector | object | `{}` |  |
+| pipelines.eventsController.resources | object | `{}` |  |
+| pipelines.eventsController.tolerations | list | `[]` |  |
+| pipelines.eventsController.topologySpreadConstraints | object | `{}` |  |
+| pipelines.pipelinesController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| pipelines.pipelinesController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"NotIn"` |  |
+| pipelines.pipelinesController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"windows"` |  |
+| pipelines.pipelinesController.nodeSelector | object | `{}` |  |
+| pipelines.pipelinesController.resources | object | `{}` |  |
+| pipelines.pipelinesController.tolerations | list | `[]` |  |
+| pipelines.pipelinesController.topologySpreadConstraints | object | `{}` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/component" | string | `"resolvers"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/instance" | string | `"default"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/name" | string | `"resolvers"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/part-of" | string | `"tekton-pipelines"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
+| pipelines.remoteResolvers.nodeSelector | object | `{}` |  |
+| pipelines.remoteResolvers.resources | object | `{}` |  |
+| pipelines.remoteResolvers.tolerations | list | `[]` |  |
+| pipelines.remoteResolvers.topologySpreadConstraints | object | `{}` |  |
+| pipelines.webhook.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| pipelines.webhook.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"NotIn"` |  |
+| pipelines.webhook.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"windows"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/component" | string | `"webhook"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/instance" | string | `"default"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/name" | string | `"webhook"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/part-of" | string | `"tekton-pipelines"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
+| pipelines.webhook.nodeSelector | object | `{}` |  |
+| pipelines.webhook.resources | object | `{}` |  |
+| pipelines.webhook.tolerations | list | `[]` |  |
+| pipelines.webhook.topologySpreadConstraints | object | `{}` |  |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
+| serviceAccount.name | string | `"build-bot-sa"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| serviceAccount.namespace | string | `"ci"` |  |
+| serviceAccount.secrets | list | `[]` | Default access to secrets |
+| triggers.config.defaults.default-fs-group | string | `"65532"` |  |
+| triggers.config.defaults.default-run-as-group | string | `"65532"` |  |
+| triggers.config.defaults.default-run-as-non-root | string | `"true"` |  |
+| triggers.config.defaults.default-run-as-user | string | `"65532"` |  |
+| triggers.config.defaults.default-service-account | string | `"build-bot-sa"` |  |
+| triggers.config.feature-flags.enable-api-fields | string | `"stable"` |  |
+| triggers.config.feature-flags.labels-exclusion-pattern | string | `""` |  |
+| triggers.config.leader-election-triggers-controller.buckets | string | `"1"` |  |
+| triggers.config.leader-election-triggers-controller.lease-duration | string | `"60s"` |  |
+| triggers.config.leader-election-triggers-controller.renew-deadline | string | `"40s"` |  |
+| triggers.config.leader-election-triggers-controller.retry-period | string | `"10s"` |  |
+| triggers.config.leader-election-triggers-webhook.buckets | string | `"1"` |  |
+| triggers.config.leader-election-triggers-webhook.lease-duration | string | `"60s"` |  |
+| triggers.config.leader-election-triggers-webhook.renew-deadline | string | `"40s"` |  |
+| triggers.config.leader-election-triggers-webhook.retry-period | string | `"10s"` |  |
+| triggers.config.logging."loglevel.controller" | string | `"info"` |  |
+| triggers.config.logging."loglevel.eventlistener" | string | `"info"` |  |
+| triggers.config.logging."loglevel.webhook" | string | `"info"` |  |
+| triggers.config.logging.zap-logger-config | string | `"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"disableStacktrace\": true,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"timestamp\",\n    \"levelKey\": \"severity\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"message\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"` |  |
+| triggers.config.observability."metrics.allow-stackdriver-custom-metrics" | string | `"false"` |  |
+| triggers.config.observability."metrics.backend-destination" | string | `"prometheus"` |  |
+| triggers.controller.affinity | object | `{}` |  |
+| triggers.controller.nodeSelector | object | `{}` |  |
+| triggers.controller.resources | object | `{}` |  |
+| triggers.controller.tolerations | list | `[]` |  |
+| triggers.controller.topologySpreadConstraints | object | `{}` |  |
+| triggers.enabled | bool | `true` |  |
+| triggers.webhook.affinity | object | `{}` |  |
+| triggers.webhook.ingress | object | `{}` |  |
+| triggers.webhook.nodeSelector | object | `{}` |  |
+| triggers.webhook.resources | object | `{}` |  |
+| triggers.webhook.tolerations | list | `[]` |  |
+| triggers.webhook.topologySpreadConstraints | object | `{}` |  |
 
-## Triggers
-https://github.com/tektoncd/triggers/releases/tag/v0.32.0
-https://storage.googleapis.com/tekton-releases/triggers/previous/v0.32.0/release.yaml
-
-
-# Copied from infra-v3
-
-## Cleanup job:
-https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/cleanup-cronjob.yaml
-
-## EventListener
-https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/eventlistener.yaml
-
-## ServiceAccount
-https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/serviceaccount.yaml
-
-
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
