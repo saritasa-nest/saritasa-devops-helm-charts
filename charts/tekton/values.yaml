@@ -796,7 +796,7 @@ eventlistener:
   # if we want to enable public facing ingress for the eventlistener
   # in the case we push webhook events from github to el as an example
   ingress:
-    enabled: false
+    enabled: true
     name: tekton-github-webhook
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
