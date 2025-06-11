@@ -691,7 +691,7 @@ triggers:
 dashboard:
   enabled: true
   # define whether Tekton dashboard is available in `write` mode
-  readOnly: true
+  readOnly: false
   # define namespaces that should allow Tekton Dashboard to manage TaskRuns in
   taskRuns:
     namespaces: []
