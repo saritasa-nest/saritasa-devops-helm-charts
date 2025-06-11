@@ -691,7 +691,7 @@ triggers:
 dashboard:
   enabled: true
   # define whether Tekton dashboard is available in `write` mode
-  readOnly: true
+  readOnly: false
   # define namespaces that should allow Tekton Dashboard to manage TaskRuns in
   taskRuns:
     namespaces: []
@@ -796,8 +796,8 @@ eventlistener:
   # if we want to enable public facing ingress for the eventlistener
   # in the case we push webhook events from github to el as an example
   ingress:
-    enabled: false
-    name: tekton-github-webhook
+    enabled: true
+    name: github-webhook
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       kubernetes.io/ingress.class: nginx
