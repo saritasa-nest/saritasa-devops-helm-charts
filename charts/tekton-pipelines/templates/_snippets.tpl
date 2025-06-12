@@ -247,10 +247,13 @@ finally:
         value: "$(params.pusher_avatar)"
       - name: pusher_url
         value: "$(params.pusher_url)"
-      - name: repository_url
-        value: "$(params.repository_url)"
-      - name: branch
-        value: "$(params.branch)"
+
+      ## TODO: check if we need to remove this or not
+      # - name: repository_url
+      #   value: "$(params.repository_url)"
+      # - name: branch
+      #   value: "$(params.branch)"
+      ###
       - name: environment
         value: "$(params.environment)"
       - name: status
