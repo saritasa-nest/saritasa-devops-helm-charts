@@ -1,0 +1,143 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    Clone github repository (and submodules) using PAT tokens authentication.
+    FUTURE CONSIDERATION:
+      ---------------------
+      At this time the private npm dependencies are evaluated properly if they're
+      referenced by
+      https protocol (not git + ssh).
+      If in the future that breaks, see this
+      https://github.com/npm/cli/issues/2631
+      As our solution is using the PAT tokens for github auth, we may want to use
+      this command in the git-clone task
+      git config --global url."https://${GITHUB_TOKEN}@github.com".insteadOf "https://github.com"
+      you can get PAT token from the secret github-auth-token.stringData.password
+    # specify podTemplate for specific task
+    # https://tekton.dev/docs/pipelines/pipelineruns/#specifying-taskrunspecs
+  podTemplate: {}
+  workspaces:
+    - name: output
+      description: The git repo will be cloned onto the volume backing this Workspace.
+  params:
+    - name: repository
+      type: object
+      properties:
+        url: {type: string}
+        revision: {type: string}
+      default:
+        revision: main
+
+    - name: git_url
+      type: string
+      description: git repository ssh url
+
+    - name: git_revision
+      type: string
+      description: git repository revision
+
+    - name: repository_submodules
+      description: Initialize and fetch git submodules.
+      type: string
+      default: 'true'
+    - name: checkout_directory
+      description: Subdirectory inside the `output` Workspace to clone the repo into.
+      type: string
+    - name: checkout_folders
+      description: Define the directory patterns to match or exclude when performing a sparse checkout.
+      type: string
+      default: ''
+    - name: depth
+      description: Perform a shallow clone, fetching only the most recent N commits.
+      type: string
+      default: '1'
+    - name: cleanup
+      description: Clean out the contents of the destination directory if it already exists before cloning.
+      type: string
+      default: 'true'
+  results:
+    - name: commit
+      description: The precise commit SHA that was fetched by this Task.
+    - name: url
+      description: The precise URL that was fetched by this Task.
+    - name: committer-date
+      description: The epoch timestamp of the commit that was fetched by this Task.
+    - name: committer-date-human
+      description: The human readable timestamp of the commit that was fetched by this Task.
+  steps:
+    - name: checkout
+      image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.44.5
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 65532
+        runAsGroup: 65532
+        privileged: false
+        allowPrivilegeEscalation: false
+      env:
+        - name: repository_url
+          value: $(params.git_url)
+        - name: checkout_revision
+          value: $(params.git_revision)
+        - name: repository_submodules
+          value: $(params.repository_submodules)
+        - name: checkout_dir
+          value: $(workspaces.output.path)/$(params.checkout_directory)
+        - name: checkout_folders
+          value: $(params.checkout_folders)
+        - name: checkout_depth
+          value: $(params.depth)
+        - name: cleanup
+          value: $(params.cleanup)
+      script: |
+        #!/usr/bin/env sh
+        set -eu
+        cleandir() {
+          # Delete any existing contents of the repo directory if it exists.
+          #
+          # We don't just "rm -rf ${CHECKOUT_DIR}" because ${CHECKOUT_DIR} might be "/"
+          # or the root of a mounted volume.
+          if [ -d "${checkout_dir}" ] ; then
+            # Delete non-hidden files and directories
+            rm -rf "${checkout_dir:?}"/*
+            # Delete files and directories starting with . but excluding ..
+            rm -rf "${checkout_dir}"/.[!.]*
+            # Delete files and directories starting with .. plus any other character
+            rm -rf "${checkout_dir}"/..?*
+          fi
+        }
+        if [ "${cleanup}" = "true" ] ; then
+          cleandir || true
+        fi
+        git config --global --add safe.directory "${checkout_dir}"
+        /ko-app/git-init \
+          -url="${repository_url}" \
+          -revision="${checkout_revision}" \
+          -path="${checkout_dir}" \
+          -depth=${checkout_depth} \
+          -sparseCheckoutDirectories="${checkout_folders}" \
+          -submodules=false
+        cd ${checkout_dir}
+        if [[ $? -eq 0 \
+              && "${repository_submodules}" = "true" \
+              && -f .gitmodules ]]; then
+          # perform submodule checkout this way because
+          # we use token-based authentication and therefore
+          # we need to replace git ssh urls to https urls for
+          # token-based authentication to work.
+          git submodule init
+          sed -i "s/git@github.com:saritasa-nest/https:\/\/github.com\/saritasa-nest/g" .git/config
+          git submodule update
+        fi
+
+        # export various data to results of the task
+        result_sha="$(git rev-parse HEAD)"
+        result_committer_date="$(git log -1 --pretty=%ct)"
+        result_committer_date_human=$(date -d @$result_committer_date)
+        printf "%s" "${result_committer_date}" > "$(results.committer-date.path)"
+        printf "%s" "${result_committer_date_human}" > "$(results.committer-date-human.path)"
+        printf "%s" "${result_sha}" > "$(results.commit.path)"
+        printf "%s" "${repository_url}" > "$(results.url.path)"
