@@ -32,6 +32,9 @@ spec:
     - name: kubernetes_repository_ssh_url
       description: git repository ssh url for kubernetes manifests repo
 
+    - name: kubernetes_branch
+      description: git repository branch for kubernetes manifests repo
+
     - name: buildpack_builder_image
       description: the image on which builds will run (must include lifecycle and compatible buildpacks).
 
@@ -114,6 +117,10 @@ spec:
           value: "$(tt.params.buildpack_cnb_platform_api)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
+        - name: kubernetes_repository_ssh_url
+          value: "$(tt.params.kubernetes_repository_ssh_url)"
+        - name: kubernetes_branch
+          value: "$(tt.params.kubernetes_branch)"
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
