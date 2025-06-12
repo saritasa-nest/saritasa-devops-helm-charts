@@ -102,12 +102,14 @@ spec:
       taskRef:
         name: git-clone
       params:
-        - name: git_url
-          value: $(params.git_url)
-        - name: git_revision
-          value: $(params.git_revision)
-        - name: repository_submodules
+        - name: repository
+          value:
+            url: $(params.git_url)
+            revision: $(params.git_revision)
+        - name: checkout_submodules
           value: $(params.repository_submodules)
+        - name: checkout_directory
+          value: ""
       workspaces:
         - name: source
           workspace: source

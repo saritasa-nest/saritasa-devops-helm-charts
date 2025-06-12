@@ -34,16 +34,7 @@ spec:
         revision: {type: string}
       default:
         revision: main
-
-    - name: git_url
-      type: string
-      description: git repository ssh url
-
-    - name: git_revision
-      type: string
-      description: git repository revision
-
-    - name: repository_submodules
+    - name: checkout_submodules
       description: Initialize and fetch git submodules.
       type: string
       default: 'true'
@@ -82,11 +73,11 @@ spec:
         allowPrivilegeEscalation: false
       env:
         - name: repository_url
-          value: $(params.git_url)
+          value: $(params.repository.url)
         - name: checkout_revision
-          value: $(params.git_revision)
-        - name: repository_submodules
-          value: $(params.repository_submodules)
+          value: $(params.repository.revision)
+        - name: checkout_submodules
+          value: $(params.checkout_submodules)
         - name: checkout_dir
           value: $(workspaces.output.path)/$(params.checkout_directory)
         - name: checkout_folders
@@ -125,7 +116,7 @@ spec:
           -submodules=false
         cd ${checkout_dir}
         if [[ $? -eq 0 \
-              && "${repository_submodules}" = "true" \
+              && "${checkout_submodules}" = "true" \
               && -f .gitmodules ]]; then
           # perform submodule checkout this way because
           # we use token-based authentication and therefore
