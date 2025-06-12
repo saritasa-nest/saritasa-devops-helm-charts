@@ -49,6 +49,9 @@ spec:
         component: $(tt.params.component)
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
+
+      ## TODO: Does this work?
+      # W0612 18:45:40.715860       1 warnings.go:70] unknown field "spec.serviceAccountNames"
       serviceAccountNames:
         - taskName: kustomize
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
