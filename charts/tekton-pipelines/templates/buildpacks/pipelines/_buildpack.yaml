@@ -189,11 +189,11 @@ spec:
       taskRef:
         name: git-clone
       params:
-        - name: url
-          value: $(params.kubernetes_repository_ssh_url)
-        - name: revision
-          value: $(params.kubernetes_branch)
-        - name: submodules
+        - name: repository
+          value:
+            url: $(params.kubernetes_repository_ssh_url)
+            revision: $(params.kubernetes_branch)
+        - name: checkout_submodules
           value: $(params.repository_submodules)
       workspaces:
         - name: source
