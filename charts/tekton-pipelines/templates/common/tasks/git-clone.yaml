@@ -19,7 +19,10 @@ spec:
       you can get PAT token from the secret github-auth-token.stringData.password
     # specify podTemplate for specific task
     # https://tekton.dev/docs/pipelines/pipelineruns/#specifying-taskrunspecs
-  podTemplate: {}
+
+  ## commented because argocd won't sync otherwise
+  # podTemplate: {}
+  ###
   workspaces:
     - name: output
       description: The git repo will be cloned onto the volume backing this Workspace.
