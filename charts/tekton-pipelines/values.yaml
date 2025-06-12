@@ -562,6 +562,10 @@ podTemplate:
       value: 'true'
       effect: NoSchedule
 
+  # Ensure workspace PVC is group-writable by git-clone (runs as GID 65532)
+  securityContext:
+    fsGroup: 65532
+
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ Install the saritasa-tekton helm chart (tekton engine, triggers, dashboard, webhooks etc)                            │

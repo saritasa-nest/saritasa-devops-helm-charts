@@ -133,6 +133,8 @@ spec:
       workspaces:
         - name: source
           workspace: source
+      runAfter:
+        - git-clone-catalog
 
     - name: detect-nodejs-version
       taskRef:
@@ -202,6 +204,8 @@ spec:
       workspaces:
         - name: source
           workspace: source
+      runAfter:
+        - {{ .pipeline.buildTaskName }}
 
     - name: kustomize
       taskRef:
@@ -218,7 +222,7 @@ spec:
         - name: environment
           value: "$(params.environment)"
       runAfter:
-        - {{ .pipeline.buildTaskName }}
+        - git-clone-kubernetes
 
   {{- if (.pipeline).preDeployTaskSteps }}
   {{ include "pipeline.preDeploy" (dict "name" (printf "%s-pre-deploy" .pipeline.name)) | nindent 4 }}
