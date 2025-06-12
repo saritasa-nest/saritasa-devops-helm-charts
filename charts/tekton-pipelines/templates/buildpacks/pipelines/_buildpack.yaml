@@ -90,21 +90,33 @@ spec:
 
 
   tasks:
-    - name: git-clone
+    # - name: git-clone
+    #   taskRef:
+    #     name: git-clone
+    #   params:
+    #     - name: repository
+    #       value:
+    #         url: $(params.repository_url)
+    #         revision: $(params.branch)
+    #     - name: checkout_submodules
+    #       value: $(params.repository_submodules)
+    #     - name: checkout_directory
+    #       value: "."
+    #   workspaces:
+    #     - name: output
+    #       workspace: source
+
+    - name: git-clone-catalog
       taskRef:
-        name: git-clone
-      params:
-        - name: repository
-          value:
-            url: $(params.repository_url)
-            revision: $(params.branch)
-        - name: checkout_submodules
-          value: $(params.repository_submodules)
-        - name: checkout_directory
-          value: "."
+        name: git-clone-catalog
       workspaces:
-        - name: output
-          workspace: source
+      - name: output
+        workspace: source
+      params:
+      - name: url
+        value: $(params.repository_url)
+      - name: revision
+        value: $(params.branch)
 
     - name: prepare-build
       taskRef:
