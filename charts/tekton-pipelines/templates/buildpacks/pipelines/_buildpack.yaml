@@ -101,9 +101,9 @@ spec:
         - name: checkout_submodules
           value: $(params.repository_submodules)
         - name: checkout_directory
-          value: ""
+          value: "."
       workspaces:
-        - name: source
+        - name: output
           workspace: source
 
     - name: prepare-build
@@ -227,7 +227,9 @@ spec:
 
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
 
+  {{/*
+  # Comment slack notif until the pipe works
   {{ include "pipeline.finalNotification" . | nindent 2 }}
-
+  */}}
 ---
 {{- end }}
