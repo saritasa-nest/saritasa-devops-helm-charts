@@ -92,13 +92,6 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    - name: app
-      type: git
-    - name: kubernetes-repo
-      type: git
-    - name: image
-      type: image
 
   tasks:
     - name: git-clone
@@ -118,10 +111,6 @@ spec:
     - name: prepare-build
       taskRef:
         name: buildpack-prepare-build
-      resources:
-        inputs:
-          - name: app
-            resource: app
       params:
         - name: application
           value: "$(params.application)"
@@ -138,10 +127,6 @@ spec:
     - name: detect-nodejs-version
       taskRef:
         name: detect-nodejs-version
-      resources:
-        inputs:
-          - name: app
-            resource: app
       params:
         - name: default_version
           value: "14"
@@ -151,13 +136,6 @@ spec:
     - name: {{ .pipeline.buildTaskName }}
       taskRef:
         name: {{ .pipeline.buildTaskName }}
-      resources:
-          inputs:
-            - name: app
-              resource: app
-          outputs:
-              - name: image
-                resource: image
       params:
         - name: application
           value: "$(params.application)"
@@ -201,13 +179,23 @@ spec:
       runAfter:
         - detect-nodejs-version
 
+    - name: git-clone-kubernetes
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+        - name: submodules
+          value: $(params.repository_submodules)
+      workspaces:
+        - name: source
+          workspace: source
+
     - name: kustomize
       taskRef:
         name: kustomize
-      resources:
-        inputs:
-          - name: kubernetes-repo
-            resource: kubernetes-repo
       params:
         - name: application
           value: "$(params.application)"
