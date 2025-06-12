@@ -1,5 +1,5 @@
 {{- define "trigger-template.buildpack" -}}
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: {{ .pipeline.name }}-trigger-template
@@ -77,9 +77,11 @@ spec:
         component: $(tt.params.component)
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
-      serviceAccountNames:
-        - taskName: kustomize
-          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+      taskRunSpecs:
+        - pipelineTaskName: kustomize
+          taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+        - pipelineTaskName: git-clone-kubernetes
+          taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: {{ .pipeline.name }}
       params:
@@ -88,6 +90,12 @@ spec:
           value: "$(tt.params.project)"
         - name: namespace
           value: "$(tt.params.namespace)"
+        - name: git_url
+          value: "$(tt.params.repository_url)"
+        - name: repository_ssh_url
+          value: "$(tt.params.repository_ssh_url)"
+        - name: git_revision
+          value: "$(tt.params.head_commit)"
         - name: buildpack_builder_image
           value: "$(tt.params.buildpack_builder_image)"
         - name: buildpack_runner_image
@@ -110,9 +118,8 @@ spec:
           value: "$(tt.params.buildpack_cnb_platform_api)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
-
-      resources:
-        {{- include "pipeline.defaultResources" . | nindent 8 }}
+        - name: kubernetes_repository_ssh_url
+          value: "$(tt.params.kubernetes_repository_ssh_url)"
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}

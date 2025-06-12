@@ -20,10 +20,18 @@ spec:
       type: string
       description: project's namespace
 
+    - name: repository_ssh_url
+      type: string
+      description: git repository ssh url
+
     - name: repository_submodules
       type: string
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
+
+    - name: kubernetes_repository_ssh_url
+      type: string
+      description: git repository ssh url for kubernetes manifests repo
 
     - name: add_tag_latest
       type: string
@@ -84,22 +92,22 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    - name: app
-      type: git
-    - name: kubernetes-repo
-      type: git
-    - name: image
-      type: image
-
   tasks:
+    - name: git-clone-catalog
+      taskRef:
+        name: git-clone-catalog
+      workspaces:
+      - name: output
+        workspace: source
+      params:
+      - name: url
+        value: $(params.repository_ssh_url)
+      - name: revision
+        value: $(params.branch)
+
     - name: prepare-build
       taskRef:
         name: buildpack-prepare-build
-      resources:
-        inputs:
-          - name: app
-            resource: app
       params:
         - name: application
           value: "$(params.application)"
@@ -112,30 +120,24 @@ spec:
       workspaces:
         - name: source
           workspace: source
+      runAfter:
+        - git-clone-catalog
 
     - name: detect-nodejs-version
       taskRef:
         name: detect-nodejs-version
-      resources:
-        inputs:
-          - name: app
-            resource: app
       params:
         - name: default_version
           value: "14"
+      workspaces:
+        - name: source
+          workspace: source
       runAfter:
         - prepare-build
 
     - name: {{ .pipeline.buildTaskName }}
       taskRef:
         name: {{ .pipeline.buildTaskName }}
-      resources:
-          inputs:
-            - name: app
-              resource: app
-          outputs:
-              - name: image
-                resource: image
       params:
         - name: application
           value: "$(params.application)"
@@ -173,19 +175,31 @@ spec:
           value: "$(params.environment)"
         - name: sourcemaps_dir
           value: "$(params.sourcemaps_dir)"
+        - name: image
+          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
       workspaces:
-        - name: source
+        - name: app
           workspace: source
       runAfter:
         - detect-nodejs-version
 
+    - name: git-clone-kubernetes
+      taskRef:
+        name: git-clone-catalog
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+      workspaces:
+        - name: output
+          workspace: source
+      runAfter:
+        - {{ .pipeline.buildTaskName }}
+
     - name: kustomize
       taskRef:
         name: kustomize
-      resources:
-        inputs:
-          - name: kubernetes-repo
-            resource: kubernetes-repo
       params:
         - name: application
           value: "$(params.application)"
@@ -197,8 +211,11 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
+      workspaces:
+        - name: source
+          workspace: source
       runAfter:
-        - {{ .pipeline.buildTaskName }}
+        - git-clone-kubernetes
 
   {{- if (.pipeline).preDeployTaskSteps }}
   {{ include "pipeline.preDeploy" (dict "name" (printf "%s-pre-deploy" .pipeline.name)) | nindent 4 }}
@@ -220,6 +237,5 @@ spec:
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
-
 ---
 {{- end }}
