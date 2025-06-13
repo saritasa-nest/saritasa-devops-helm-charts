@@ -1,0 +1,122 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  labels:
+    app: rma-drsign-staging
+    argocd.argoproj.io/instance: tekton-pipelines
+    component: drsign
+    environment: staging
+    project: rma
+    tekton.dev/pipeline: buildpack-dotnet-build-pipeline
+    triggers.tekton.dev/eventlistener: el
+    triggers.tekton.dev/trigger: rma-drsign-staging-trigger
+    triggers.tekton.dev/triggers-eventid: f808ef47-8046-4060-abb3-1fc95db50f91
+  name: test5
+  namespace: ci
+spec:
+  params:
+  - name: application
+    value: rma-drsign-staging
+  - name: sha
+    value: b55622e
+  - name: head_commit
+    value: b55622e0d9a4cc7b4af814cebfd4e2c450dd1cbd
+  - name: head_commit_message
+    value: |-
+      Merge pull request #595 from saritasa-nest/feature/RMASUP-1232-add-new-report-type
+
+      Add new report types to ReportType enum RMASUP-1232
+  - name: pusher_name
+    value: Toan Pham
+  - name: pusher_email
+    value: 138420556+toanphamsaritasa@users.noreply.github.com
+  - name: pusher_avatar
+    value: https://avatars.githubusercontent.com/u/138420556?v=4
+  - name: pusher_url
+    value: https://github.com/toanphamsaritasa
+  - name: repository_url
+    value: https://github.com/saritasa-nest/rma-authentication
+  - name: branch
+    value: refs/heads/staging
+  - name: docker_registry
+    value: 822501895924.dkr.ecr.us-west-2.amazonaws.com
+  - name: docker_registry_repository
+    value: 822501895924.dkr.ecr.us-west-2.amazonaws.com/rma/staging/authentication-drsign
+  - name: kubernetes_repository_kustomize_path
+    value: apps/drsign/manifests/staging
+  - name: kubernetes_branch
+    value: main
+  - name: environment
+    value: staging
+  - name: project
+    value: rma
+  - name: namespace
+    value: staging
+  - name: git_url
+    value: https://github.com/saritasa-nest/rma-authentication
+  - name: repository_ssh_url
+    value: git@github.com:saritasa-nest/rma-authentication.git
+  - name: git_revision
+    value: b55622e0d9a4cc7b4af814cebfd4e2c450dd1cbd
+  - name: buildpack_builder_image
+    value: 822501895924.dkr.ecr.us-west-2.amazonaws.com/rma/staging/buildpacks/paketo/builder:0.3.428-full
+  - name: buildpack_runner_image
+    value: 822501895924.dkr.ecr.us-west-2.amazonaws.com/rma/staging/buildpacks/paketo/runner:0.1.65-jammy
+  - name: source_subpath
+    value: .
+  - name: repository_submodules
+    value: "true"
+  - name: add_tag_latest
+    value: "false"
+  - name: buildpack_config_filename
+    value: buildpack-drsign.yml
+  - name: project_config_filename
+    value: buildpack-drsign.toml
+  - name: user_id
+    value: "1001"
+  - name: group_id
+    value: "1000"
+  - name: buildpack_cnb_platform_api
+    value: "0.10"
+  - name: sentry_project_name
+    value: rma-drsign
+  - name: kubernetes_repository_ssh_url
+    value: git@github.com:saritasa-nest/rma-kubernetes-aws.git
+  pipelineRef:
+    name: buildpack-dotnet-build-pipeline
+  taskRunSpecs:
+  - pipelineTaskName: kustomize
+    serviceAccountName: rma-drsign-staging-build-pipeline-kustomize-sa
+  - pipelineTaskName: git-clone-kubernetes
+    serviceAccountName: rma-drsign-staging-build-pipeline-kustomize-sa
+  taskRunTemplate:
+    podTemplate:
+      nodeSelector:
+        ci: "true"
+      securityContext:
+        fsGroup: 65532
+      tolerations:
+      - effect: NoSchedule
+        key: ci
+        operator: Equal
+        value: "true"
+      volumes:
+      - name: rma-drsign-staging-buildpacks-cache
+        persistentVolumeClaim:
+          claimName: rma-drsign-staging-buildpacks-cache-pvc
+      - downwardAPI:
+          items:
+          - fieldRef:
+              fieldPath: metadata.labels
+            path: labels
+          - fieldRef:
+              fieldPath: metadata.annotations
+            path: annotations
+        name: podinfo
+    serviceAccountName: rma-drsign-staging-build-pipeline-sa
+  timeouts:
+    pipeline: 1h0m0s
+  workspaces:
+  - name: source
+    persistentVolumeClaim:
+      claimName: rma-drsign-staging-workspace-pvc
