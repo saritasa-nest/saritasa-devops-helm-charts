@@ -228,6 +228,9 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
+      workspaces:
+        - name: source
+          workspace: source
       runAfter:
         - git-clone-kubernetes
 

@@ -294,10 +294,6 @@ finally:
 - name: pre-deploy
   taskRef:
     name:  {{ .name }}
-  resources:
-    inputs:
-      - name: app
-        resource: app
   params:
     - name: application
       value: "$(params.application)"
