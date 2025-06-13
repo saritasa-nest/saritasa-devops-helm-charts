@@ -11,14 +11,6 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    inputs:
-      - name: app
-        type: git
-    outputs:
-      - name: image
-        type: image
-
   params:
     - name: application
       type: string
@@ -190,10 +182,10 @@ spec:
           -gid=$(params.group_id) \
           -process-type=$(params.process_type) \
           -skip-restore=$(params.skip_restore) \
-          -previous-image=$(resources.outputs.image.url) \
+          -previous-image=$(params.docker_registry_repository) \
           -run-image=$(params.run_image) \
           ${ADDITIONAL_TAG} \
-          $(resources.outputs.image.url)
+          $(params.docker_registry_repository)
 
       volumeMounts:
         - name: layers-dir
