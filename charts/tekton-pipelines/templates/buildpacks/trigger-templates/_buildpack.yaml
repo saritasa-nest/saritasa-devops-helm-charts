@@ -89,6 +89,8 @@ spec:
         - name: namespace
           value: "$(tt.params.namespace)"
         - name: git_url
+          value: "$(tt.params.repository_url)"
+        - name: repository_ssh_url
           value: "$(tt.params.repository_ssh_url)"
         - name: git_revision
           value: "$(tt.params.head_commit)"
