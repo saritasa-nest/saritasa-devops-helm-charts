@@ -1,5 +1,5 @@
 {{ if .Values.kaniko.enabled }}
-apiVersion: triggers.tekton.dev/v1alpha1
+apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
   name: kaniko-build-pipeline-trigger-template
@@ -50,11 +50,12 @@ spec:
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
 
-      ## TODO: Does this work?
-      # W0612 18:45:40.715860       1 warnings.go:70] unknown field "spec.serviceAccountNames"
       taskRunSpecs:
         - pipelineTaskName: kustomize
-          serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+          # There is a mispelling in
+          # https://tekton.dev/docs/pipelines/pipelineruns/#mapping-serviceaccount-credentials-to-tasks
+          # The docs say to use `serviceAccountName` but it is `taskServiceAccountName`
+          taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: kaniko-build-pipeline
       params:
