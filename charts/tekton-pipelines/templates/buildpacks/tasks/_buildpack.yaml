@@ -141,8 +141,7 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
           chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-          chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
-          chmod -R g+w "$(resources.inputs.app.path)"
+          chmod -R g+w "$(workspaces.source.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -168,7 +167,7 @@ spec:
       image: $(params.builder_image)
       imagePullPolicy: {{ .imagePullPolicy }}
       resources: {}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       script: |
         #!/bin/bash
 

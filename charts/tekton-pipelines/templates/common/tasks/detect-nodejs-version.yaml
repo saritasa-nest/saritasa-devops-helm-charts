@@ -8,7 +8,7 @@ spec:
     Nodejs version detected from package.json
 
   workspaces:
-    - name: output
+    - name: source
       description: The git repo will be cloned onto the volume backing this Workspace.
 
   params:
@@ -24,7 +24,7 @@ spec:
     - name: get-nodejs-version
       image: cfmanteiga/alpine-bash-curl-jq
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.output.path)
+      workingDir: $(workspaces.source.path)
       script: |
         #!/usr/bin/env bash
         set -Eeo pipefail
