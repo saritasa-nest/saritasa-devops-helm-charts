@@ -114,7 +114,7 @@ spec:
         workspace: source
       params:
       - name: url
-        value: $(params.repository_url)
+        value: $(params.repository_ssh_url)
       - name: revision
         value: $(params.branch)
 
