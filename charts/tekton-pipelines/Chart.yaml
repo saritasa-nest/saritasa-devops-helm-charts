@@ -15,7 +15,7 @@ maintainers:
 dependencies:
   - name: saritasa-tekton
     repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-    version: ~2.0.x
+    version: ~0.1.x
     condition: saritasa-tekton.enabled
 
 description: |
