@@ -52,8 +52,8 @@ spec:
 
       ## TODO: Does this work?
       # W0612 18:45:40.715860       1 warnings.go:70] unknown field "spec.serviceAccountNames"
-      serviceAccountNames:
-        - taskName: kustomize
+      taskRunSpecs:
+        - pipelineTaskName: kustomize
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: kaniko-build-pipeline

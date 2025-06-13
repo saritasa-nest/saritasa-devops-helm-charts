@@ -77,8 +77,8 @@ spec:
         component: $(tt.params.component)
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
-      serviceAccountNames:
-        - taskName: kustomize
+      taskRunSpecs:
+        - pipelineTaskName: kustomize
           serviceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: {{ .pipeline.name }}
