@@ -63,6 +63,8 @@ spec:
           value: "$(tt.params.project)"
         - name: namespace
           value: "$(tt.params.namespace)"
+        - name: repository_ssh_url
+          value: "$(tt.params.repository_ssh_url)"
         - name: docker_file
           value: "$(tt.params.docker_file)"
         - name: docker_context
