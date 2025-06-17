@@ -261,7 +261,7 @@ Create the name of the service account to use
 {{- $messages = append $messages (include "terraform-pod.validateValues.github" .) -}}
 {{- $messages = append $messages (include "terraform-pod.validateValues.terraform" .) -}}
 {{- $messages = append $messages (include "terraform-pod.validateValues.aws" .) -}}
-{{- $messages = append $messages (include "terraform-pod.validateValues.gitCryptKey" .) -}}
+{{/* {{- $messages = append $messages (include "terraform-pod.validateValues.gitCryptKey" .) -}} */}}
 {{- $messages = append $messages (include "terraform-pod.validateValues.slack" .) -}}
 {{- $messages = without $messages "" -}}
 {{- $message := join "\n" $messages -}}
