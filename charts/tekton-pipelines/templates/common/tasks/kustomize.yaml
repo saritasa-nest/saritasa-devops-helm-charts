@@ -39,7 +39,7 @@ spec:
     - name: git-set-user
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/app
       script: |
         git config user.email "$DEVOPS_GROUP_EMAIL"
         git config user.name "tekton-kustomize"
@@ -47,7 +47,7 @@ spec:
     - name: update-image
       image: {{ .Values.images.kustomize | default "registry.k8s.io/kustomize/kustomize:v5.0.0"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/app
       script: |
         app=$(params.application)
         env=$(params.environment)
@@ -58,7 +58,7 @@ spec:
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/app
       script: |
         CONFIG=/workdir/yamlfix.toml
         if [ -f .yamlfix.toml ]; then
@@ -70,7 +70,7 @@ spec:
     - name: kubeval
       image: {{ .Values.images.kubeval | default "public.ecr.aws/saritasa/kubeval:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/app
       script: |
         APISERVER=https://kubernetes.default.svc
         SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
@@ -85,7 +85,7 @@ spec:
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/app
       script: |
         set +x
         git checkout $(params.kubernetes_branch)
