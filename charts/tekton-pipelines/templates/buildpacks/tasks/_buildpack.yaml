@@ -113,11 +113,6 @@ spec:
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
 
-    - name: commit
-      type: string
-      description: commit SHA of the source code
-      default: ""
-
     - name: image
       type: string
       description: new image for the application
