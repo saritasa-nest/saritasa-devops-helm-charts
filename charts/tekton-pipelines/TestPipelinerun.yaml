@@ -11,7 +11,7 @@ metadata:
     triggers.tekton.dev/eventlistener: el
     triggers.tekton.dev/trigger: rma-drsign-staging-trigger
     triggers.tekton.dev/triggers-eventid: f808ef47-8046-4060-abb3-1fc95db50f91
-  name: test5
+  name: test7
   namespace: ci
 spec:
   params:
