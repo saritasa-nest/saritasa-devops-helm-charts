@@ -191,6 +191,8 @@ spec:
           value: "$(params.environment)"
         - name: sourcemaps_dir
           value: "$(params.sourcemaps_dir)"
+        - name: commit
+          value: "$(tasks.git-clone-catalog.results.commit)"
       workspaces:
         - name: source
           workspace: source

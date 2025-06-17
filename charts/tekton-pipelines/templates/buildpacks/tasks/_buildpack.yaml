@@ -113,6 +113,11 @@ spec:
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
 
+    - name: commit
+      type: string
+      description: commit SHA of the source code
+      default: ""
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
@@ -185,7 +190,7 @@ spec:
           -previous-image=$(params.docker_registry_repository) \
           -run-image=$(params.run_image) \
           ${ADDITIONAL_TAG} \
-          $(params.docker_registry_repository)
+          $(params.docker_registry_repository):$(params.environment)-$(params.commit)
 
       volumeMounts:
         - name: layers-dir
