@@ -94,7 +94,7 @@ spec:
 
     - name: git-clone-kubernetes
       taskRef:
-        name: git-clone
+        name: git-clone-catalog
       params:
         - name: repository
           value:

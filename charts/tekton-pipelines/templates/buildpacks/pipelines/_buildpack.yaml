@@ -187,12 +187,10 @@ spec:
       taskRef:
         name: git-clone-catalog
       params:
-        - name: repository
-          value:
-            url: $(params.kubernetes_repository_ssh_url)
-            revision: $(params.kubernetes_branch)
-        - name: checkout_submodules
-          value: $(params.repository_submodules)
+        - name: url
+          value: $(params.repository_ssh_url)
+        - name: revision
+          value: $(params.branch)
       workspaces:
         - name: output
           workspace: source
