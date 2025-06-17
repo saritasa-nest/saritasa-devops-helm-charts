@@ -9,7 +9,7 @@ spec:
     {{- .pipeline.description | default (printf "The Buildpacks %s task builds source into a container image and pushes it to a AWS ECR registry, using Cloud Native Buildpacks" (.pipeline.buildTaskName)) | nindent 4}}
 
   workspaces:
-    - name: source
+    - name: app
 
   params:
     - name: application
@@ -136,8 +136,8 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/tekton/home" &&
           chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
-          chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-          chmod -R g+w "$(workspaces.source.path)"
+          chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
+          chmod -R g+w "$(workspaces.app.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -163,7 +163,7 @@ spec:
       image: $(params.builder_image)
       imagePullPolicy: {{ .imagePullPolicy }}
       resources: {}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.app.path)
       script: |
         #!/bin/bash
 
@@ -179,7 +179,7 @@ spec:
           -project-metadata=project.toml \
           -cache-dir=/cache \
           -layers=/layers \
-          -platform=$(workspaces.source.path)/$(params.platform_dir) \
+          -platform=$(workspaces.app.path)/$(params.platform_dir) \
           -report=/layers/report.toml \
           -cache-image=$(params.cache_image) \
           -uid=$(params.user_id) \
