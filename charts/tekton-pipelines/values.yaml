@@ -68,7 +68,7 @@ buildpacks:
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             set -o pipefail
@@ -78,7 +78,7 @@ buildpacks:
             else
               echo "Installing node.js dependencies"
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
               if [[ $? -ne 0 ]]; then
                 echo "unable to install dependencies, exit_code: $?"
@@ -117,7 +117,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -151,7 +151,7 @@ buildpacks:
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/bin/bash
             set -e
@@ -159,7 +159,7 @@ buildpacks:
               echo "install node.js dependencies"
 
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
 
               npm run build:$(params.environment) || echo "unable to build $(params.environment)"
@@ -172,7 +172,7 @@ buildpacks:
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             # workaround to fix no PHP detection, when package.json presents
@@ -186,7 +186,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -215,7 +215,7 @@ buildpacks:
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/bin/bash
             set -e
@@ -223,7 +223,7 @@ buildpacks:
               echo "install node.js dependencies"
 
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
 
               npm run build:$(params.environment) || echo "unable to build $(params.environment)"
@@ -235,7 +235,7 @@ buildpacks:
           image: docker.io/saritasallc/python-ci:0.0.1
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
@@ -290,7 +290,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(workspaces.source.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -442,7 +442,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -468,7 +468,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -494,7 +494,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -520,7 +520,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -534,7 +534,7 @@ kaniko:
   # - name: pre-deploy-hello-world
   #   image: node:22
   #   imagePullPolicy: IfNotPresent
-  #   workingDir: $(resources.inputs.app.path)
+  #   workingDir: $(workspaces.app.path)
   #   script: |
   #     #!/bin/bash
   #     echo "hello world"

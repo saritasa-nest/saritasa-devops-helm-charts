@@ -93,22 +93,6 @@ spec:
     - name: source
 
   tasks:
-    # - name: git-clone
-    #   taskRef:
-    #     name: git-clone
-    #   params:
-    #     - name: repository
-    #       value:
-    #         url: $(params.repository_url)
-    #         revision: $(params.branch)
-    #     - name: checkout_submodules
-    #       value: $(params.repository_submodules)
-    #     - name: checkout_directory
-    #       value: "."
-    #   workspaces:
-    #     - name: output
-    #       workspace: source
-
     - name: git-clone-catalog
       taskRef:
         name: git-clone-catalog
@@ -254,9 +238,6 @@ spec:
 
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
 
-  {{/*
-  # Comment slack notif until the pipe works
   {{ include "pipeline.finalNotification" . | nindent 2 }}
-  */}}
 ---
 {{- end }}

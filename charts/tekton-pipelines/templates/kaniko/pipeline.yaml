@@ -57,16 +57,21 @@ spec:
       type: image
 
   tasks:
+    - name: git-clone-catalog
+      taskRef:
+        name: git-clone-catalog
+      workspaces:
+      - name: output
+        workspace: source
+      params:
+      - name: url
+        value: $(params.repository_ssh_url)
+      - name: revision
+        value: $(params.branch)
+
     - name: kaniko
       taskRef:
         name: kaniko
-      resources:
-          inputs:
-            - name: app
-              resource: app
-          outputs:
-              - name: image
-                resource: image
       params:
         - name: application
           value: "$(params.application)"
@@ -84,14 +89,28 @@ spec:
       workspaces:
         - name: source
           workspace: source
+      runAfter:
+        - git-clone-catalog
+
+    - name: git-clone-kubernetes
+      taskRef:
+        name: git-clone
+      params:
+        - name: repository
+          value:
+            url: $(params.kubernetes_repository_ssh_url)
+            revision: $(params.kubernetes_branch)
+        - name: checkout_submodules
+          value: $(params.repository_submodules)
+      workspaces:
+        - name: output
+          workspace: source
+      runAfter:
+        - kaniko
 
     - name: kustomize
       taskRef:
         name: kustomize
-      resources:
-        inputs:
-          - name: kubernetes-repo
-            resource: kubernetes-repo
       params:
         - name: application
           value: "$(params.application)"
@@ -104,7 +123,7 @@ spec:
         - name: environment
           value: "$(params.environment)"
       runAfter:
-        - kaniko
+        - git-clone-kubernetes
 
   {{- if (.Values.kaniko).preDeployTaskSteps }}
   {{ include "pipeline.preDeploy" (dict "name" (printf "kaniko-pre-deploy")) | nindent 4 }}
