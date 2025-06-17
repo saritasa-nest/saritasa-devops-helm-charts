@@ -91,7 +91,6 @@ spec:
 
   workspaces:
     - name: source
-    - name: kubernetes
 
   tasks:
     # - name: git-clone
@@ -152,51 +151,51 @@ spec:
       runAfter:
         - prepare-build
 
-    # - name: {{ .pipeline.buildTaskName }}
-    #   taskRef:
-    #     name: {{ .pipeline.buildTaskName }}
-    #   params:
-    #     - name: application
-    #       value: "$(params.application)"
-    #     - name: branch
-    #       value: "$(params.branch)"
-    #     - name: builder_image
-    #       value: "$(params.buildpack_builder_image)"
-    #     - name: run_image
-    #       value: "$(params.buildpack_runner_image)"
-    #     - name: docker_registry
-    #       value: $(params.docker_registry)
-    #     - name: cache
-    #       value: $(params.application)-buildpacks-cache
-    #     - name: source_subpath
-    #       value: "$(params.source_subpath)"
-    #     - name: add_tag_latest
-    #       value: "$(params.add_tag_latest)"
-    #     - name: docker_registry_repository
-    #       value: "$(params.docker_registry_repository)"
-    #     - name: platform_dir
-    #       value: "$(params.platform_dir)"
-    #     - name: buildpack_config_filename
-    #       value: "$(params.buildpack_config_filename)"
-    #     - name: project_config_filename
-    #       value: "$(params.project_config_filename)"
-    #     - name: user_id
-    #       value: "$(params.user_id)"
-    #     - name: group_id
-    #       value: "$(params.group_id)"
-    #     - name: buildpack_cnb_platform_api
-    #       value: "$(params.buildpack_cnb_platform_api)"
-    #     - name: node_version
-    #       value: "$(tasks.detect-nodejs-version.results.node-version)"
-    #     - name: environment
-    #       value: "$(params.environment)"
-    #     - name: sourcemaps_dir
-    #       value: "$(params.sourcemaps_dir)"
-    #   workspaces:
-    #     - name: source
-    #       workspace: source
-    #   runAfter:
-    #     - detect-nodejs-version
+    - name: {{ .pipeline.buildTaskName }}
+      taskRef:
+        name: {{ .pipeline.buildTaskName }}
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: branch
+          value: "$(params.branch)"
+        - name: builder_image
+          value: "$(params.buildpack_builder_image)"
+        - name: run_image
+          value: "$(params.buildpack_runner_image)"
+        - name: docker_registry
+          value: $(params.docker_registry)
+        - name: cache
+          value: $(params.application)-buildpacks-cache
+        - name: source_subpath
+          value: "$(params.source_subpath)"
+        - name: add_tag_latest
+          value: "$(params.add_tag_latest)"
+        - name: docker_registry_repository
+          value: "$(params.docker_registry_repository)"
+        - name: platform_dir
+          value: "$(params.platform_dir)"
+        - name: buildpack_config_filename
+          value: "$(params.buildpack_config_filename)"
+        - name: project_config_filename
+          value: "$(params.project_config_filename)"
+        - name: user_id
+          value: "$(params.user_id)"
+        - name: group_id
+          value: "$(params.group_id)"
+        - name: buildpack_cnb_platform_api
+          value: "$(params.buildpack_cnb_platform_api)"
+        - name: node_version
+          value: "$(tasks.detect-nodejs-version.results.node-version)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: sourcemaps_dir
+          value: "$(params.sourcemaps_dir)"
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - detect-nodejs-version
 
     - name: git-clone-kubernetes
       taskRef:
@@ -210,10 +209,9 @@ spec:
           value: $(params.repository_submodules)
       workspaces:
         - name: output
-          workspace: kubernetes
+          workspace: source
       runAfter:
-        # - {{ .pipeline.buildTaskName }}
-        - detect-nodejs-version
+        - {{ .pipeline.buildTaskName }}
 
     - name: kustomize
       taskRef:
