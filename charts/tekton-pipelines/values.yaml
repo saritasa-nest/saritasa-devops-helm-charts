@@ -319,7 +319,7 @@ buildpacks:
           image: alpine/git:v2.32.0
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           script: |
             git fetch --tags --unshallow
           securityContext:
@@ -327,7 +327,7 @@ buildpacks:
             runAsUser: 0
 
         - name: get-semantic-version
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
           imagePullPolicy: IfNotPresent
           resources: {}
@@ -356,25 +356,25 @@ buildpacks:
 
             /tools/dotnet-gitversion /updateprojectfiles
             git status
-            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
             echo "semantic version updated"
 
         - name: remove-dcproj-files
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           image: docker.io/library/bash:5.1.8
           imagePullPolicy: IfNotPresent
           resources: {}
           script: |
             #!/usr/bin/env bash
             # clean `.dcproj` files related to local development docker .NET project
-            cd $(workspaces.source.path)
+            cd $(workspaces.app.path)
             find . -name '*.dcproj' -type f -delete
 
         - name: build-static
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(workspaces.source.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/bin/bash
             set -Eeo pipefail
@@ -400,11 +400,11 @@ buildpacks:
               echo "install node.js dependencies"
 
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
 
               (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
-              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
+              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
             } || echo "No package.json found"
 
             echo "done"
