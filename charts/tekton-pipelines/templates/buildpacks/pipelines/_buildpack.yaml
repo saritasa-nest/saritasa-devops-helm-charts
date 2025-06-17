@@ -188,9 +188,9 @@ spec:
         name: git-clone-catalog
       params:
         - name: url
-          value: $(params.repository_ssh_url)
+          value: $(params.kubernetes_repository_ssh_url)
         - name: revision
-          value: $(params.branch)
+          value: $(params.kubernetes_branch)
       workspaces:
         - name: output
           workspace: source
