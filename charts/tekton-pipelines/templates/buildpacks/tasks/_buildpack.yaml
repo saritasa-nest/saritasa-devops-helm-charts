@@ -118,6 +118,10 @@ spec:
       description: commit SHA of the source code
       default: ""
 
+    - name: image
+      type: string
+      description: new image for the application
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
@@ -190,7 +194,7 @@ spec:
           -previous-image=$(params.docker_registry_repository) \
           -run-image=$(params.run_image) \
           ${ADDITIONAL_TAG} \
-          $(params.docker_registry_repository):$(params.environment)-$(params.commit)
+          $(params.image)
 
       volumeMounts:
         - name: layers-dir
