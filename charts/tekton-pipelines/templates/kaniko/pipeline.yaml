@@ -88,7 +88,6 @@ spec:
             - $(params.kaniko_extra_args)
         - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
-
       workspaces:
         - name: source
           workspace: source

@@ -233,10 +233,6 @@ finally:
 - name: sentry-release
   taskRef:
     name:  sentry-release
-  resources:
-    inputs:
-      - name: app
-        resource: app
   params:
     - name: environment
       value: "$(params.environment)"
