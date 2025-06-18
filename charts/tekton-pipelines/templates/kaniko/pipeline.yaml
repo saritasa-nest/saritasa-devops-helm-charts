@@ -48,14 +48,6 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    - name: app
-      type: git
-    - name: kubernetes-repo
-      type: git
-    - name: image
-      type: image
-
   tasks:
     - name: git-clone-catalog
       taskRef:
