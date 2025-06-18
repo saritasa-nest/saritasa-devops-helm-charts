@@ -43,6 +43,10 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
+    - name: image
+      type: string
+      description: new image for the application
+
   results:
     - name: password
       description: The password to authenticate to ecr registry.
@@ -75,7 +79,7 @@ spec:
         - --build-arg=ENVIRONMENT=$(params.environment)
         - --dockerfile=$(workspaces.source.path)/$(params.docker_file)
         - --context=$(workspaces.source.path)/$(params.docker_context)
-        - --destination=$(resources.outputs.image.url)
+        - --destination=$(params.image)
         # - --verbosity=debug
 
       # kaniko assumes it is running as root, which means this example fails on platforms
