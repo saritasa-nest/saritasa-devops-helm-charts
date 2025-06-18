@@ -79,9 +79,6 @@ spec:
         - name: kubernetes_repository_ssh_url
           value: "$(tt.params.kubernetes_repository_ssh_url)"
 
-      resources:
-        {{- include "pipeline.defaultResources" . | nindent 8 }}
-
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
 
