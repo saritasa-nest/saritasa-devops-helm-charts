@@ -9,15 +9,7 @@ spec:
     {{- .pipeline.description | default (printf "The Buildpacks %s task builds source into a container image and pushes it to a AWS ECR registry, using Cloud Native Buildpacks" (.pipeline.buildTaskName)) | nindent 4}}
 
   workspaces:
-    - name: source
-
-  resources:
-    inputs:
-      - name: app
-        type: git
-    outputs:
-      - name: image
-        type: image
+    - name: app
 
   params:
     - name: application
@@ -121,6 +113,10 @@ spec:
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
 
+    - name: image
+      type: string
+      description: new image for the application
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
@@ -140,9 +136,8 @@ spec:
           chown -R "$(params.user_id):$(params.group_id)" "/tekton/home" &&
           chown -R "$(params.user_id):$(params.group_id)" "/layers" &&
           chown -R "$(params.user_id):$(params.group_id)" "/cache" &&
-          chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-          chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
-          chmod -R g+w "$(resources.inputs.app.path)"
+          chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
+          chmod -R g+w "$(workspaces.app.path)"
       volumeMounts:
         - name: layers-dir
           mountPath: /layers
@@ -168,7 +163,7 @@ spec:
       image: $(params.builder_image)
       imagePullPolicy: {{ .imagePullPolicy }}
       resources: {}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.app.path)
       script: |
         #!/bin/bash
 
@@ -184,17 +179,17 @@ spec:
           -project-metadata=project.toml \
           -cache-dir=/cache \
           -layers=/layers \
-          -platform=$(workspaces.source.path)/$(params.platform_dir) \
+          -platform=$(workspaces.app.path)/$(params.platform_dir) \
           -report=/layers/report.toml \
           -cache-image=$(params.cache_image) \
           -uid=$(params.user_id) \
           -gid=$(params.group_id) \
           -process-type=$(params.process_type) \
           -skip-restore=$(params.skip_restore) \
-          -previous-image=$(resources.outputs.image.url) \
+          -previous-image=$(params.docker_registry_repository) \
           -run-image=$(params.run_image) \
           ${ADDITIONAL_TAG} \
-          $(resources.outputs.image.url)
+          $(params.image)
 
       volumeMounts:
         - name: layers-dir

@@ -13,14 +13,6 @@ spec:
   workspaces:
     - name: source
 
-  resources:
-    inputs:
-      - name: app
-        type: git
-    outputs:
-      - name: image
-        type: image
-
   params:
     - name: application
       type: string
@@ -51,6 +43,10 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
+    - name: image
+      type: string
+      description: new image for the application
+
   results:
     - name: password
       description: The password to authenticate to ecr registry.
@@ -64,7 +60,7 @@ spec:
     - name: authenticate
       image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       script: |
         #!/bin/bash
         aws ecr get-login-password --region $AWS_REGION > $(results.password.path)
@@ -72,7 +68,7 @@ spec:
     - name: build
       image: {{ .Values.images.kaniko | default "gcr.io/kaniko-project/executor:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(resources.inputs.app.path)
+      workingDir: $(workspaces.source.path)
       env:
         - name: "DOCKER_CONFIG"
           value: "/tekton/home/.docker/"
@@ -81,9 +77,9 @@ spec:
       args:
         - $(params.extra_args[*])
         - --build-arg=ENVIRONMENT=$(params.environment)
-        - --dockerfile=$(resources.inputs.app.path)/$(params.docker_file)
-        - --context=$(resources.inputs.app.path)/$(params.docker_context)
-        - --destination=$(resources.outputs.image.url)
+        - --dockerfile=$(workspaces.source.path)/$(params.docker_file)
+        - --context=$(workspaces.source.path)/$(params.docker_context)
+        - --destination=$(params.image)
         # - --verbosity=debug
 
       # kaniko assumes it is running as root, which means this example fails on platforms
