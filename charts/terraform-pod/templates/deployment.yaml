@@ -38,7 +38,9 @@ spec:
               gh repo clone {{ .Values.github.repository }} ~/workspace
               git checkout {{ .Values.github.branch }}
               cp -r ~/git-crypt-key git-crypt-key
-              # git-crypt unlock git-crypt-key
+              if [[ -s git-crypt-key ]]; then
+                git-crypt unlock git-crypt-key
+              fi
               pre-commit install
               slack_notificaton
 

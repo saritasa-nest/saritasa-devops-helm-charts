@@ -68,8 +68,8 @@ _get_git_info() {
 		gh pr comment --body "$prPodStartedCommentBody"
 	fi
 
-	# check if we have a local git-crypt-key in the folder
-	if [[ -f git-crypt-key ]]; then
+	# check if we have a non-empty git-crypt-key
+	if [[ -s git-crypt-key ]]; then
 		GIT_CRYPT_KEY_PRESENT="YES"
 	else
 		GIT_CRYPT_KEY_PRESENT="NO!"
