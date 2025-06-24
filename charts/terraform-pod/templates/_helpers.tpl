@@ -299,7 +299,7 @@ github.email:
 {{/* Validate the value of gitCryptKey */}}
 {{- define "terraform-pod.validateValues.gitCryptKey" -}}
 {{- if and
-      (ne .Values.github.username "saritasa-renovatebot[bot]")
+      (ne .Values.github.username "github-actions[bot]")
       (not (and .Values.gitCryptKey (kindIs "string" .Values.gitCryptKey)))
 -}}
 gitCryptKey:
