@@ -1,51 +1,5 @@
-{{- if and .Values.engine.enabled  .Values.triggers.enabled -}}
-# Copyright 2019 The Tekton Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-{{- if .Capabilities.APIVersions.Has "policy/v1beta1/PodSecurityPolicy" }}
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: tekton-triggers
-  labels:
-    app.kubernetes.io/instance: default
-    app.kubernetes.io/part-of: tekton-triggers
-spec:
-  privileged: false
-  allowPrivilegeEscalation: false
-  volumes:
-    - 'emptyDir'
-    - 'configMap'
-    - 'secret'
-  hostNetwork: false
-  hostIPC: false
-  hostPID: false
-  runAsUser:
-    rule: 'MustRunAsNonRoot'
-  seLinux:
-    rule: 'RunAsAny'
-  supplementalGroups:
-    rule: 'MustRunAs'
-    ranges:
-      - min: 1
-        max: 65535
-  fsGroup:
-    rule: 'MustRunAs'
-    ranges:
-      - min: 1
-        max: 65535
-{{- end }}
----
+{{- with .Values.triggers }}
+{{- if .enabled }}
 # Copyright 2019 The Tekton Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,10 +32,10 @@ rules:
     resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["triggers.tekton.dev"]
-    resources: ["clustertriggerbindings", "clusterinterceptors", "eventlisteners", "triggerbindings", "triggertemplates", "triggers", "eventlisteners/finalizers"]
+    resources: ["clustertriggerbindings", "clusterinterceptors", "interceptors", "eventlisteners", "triggerbindings", "triggertemplates", "triggers", "eventlisteners/finalizers"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["triggers.tekton.dev"]
-    resources: ["clustertriggerbindings/status", "clusterinterceptors/status", "eventlisteners/status", "triggerbindings/status", "triggertemplates/status", "triggers/status"]
+    resources: ["clustertriggerbindings/status", "clusterinterceptors/status", "interceptors/status", "eventlisteners/status", "triggerbindings/status", "triggertemplates/status", "triggers/status"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   # We uses leases for leaderelection
   - apiGroups: ["coordination.k8s.io"]
@@ -96,6 +50,12 @@ rules:
     # The webhook configured the namespace as the OwnerRef on various cluster-scoped resources,
     # which requires we can Get the system namespace.
     resourceNames: ["tekton-pipelines"]
+  - apiGroups: [""]
+    resources: ["namespaces/finalizers"]
+    verbs: ["update"]
+    # The webhook configured the namespace as the OwnerRef on various cluster-scoped resources,
+    # which requires we can update the system namespace finalizers.
+    resourceNames: ["tekton-pipelines"]
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -109,6 +69,22 @@ rules:
     resources: ["secrets"]
     verbs: ["get", "list", "watch"]
 ---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: tekton-triggers-core-interceptors-secrets
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+rules:
+  - apiGroups: ["triggers.tekton.dev"]
+    resources: ["clusterinterceptors"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list", "watch", "update"]
+    resourceNames: ["tekton-triggers-core-interceptors-certs"]
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -118,7 +94,7 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
 rules:
   - apiGroups: ["triggers.tekton.dev"]
-    resources: ["eventlisteners", "triggerbindings", "triggertemplates", "triggers"]
+    resources: ["eventlisteners", "triggerbindings", "interceptors", "triggertemplates", "triggers"]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -129,10 +105,9 @@ rules:
   - apiGroups: [""]
     resources: ["serviceaccounts"]
     verbs: ["impersonate"]
-  - apiGroups: ["policy"]
-    resources: ["podsecuritypolicies"]
-    resourceNames: ["tekton-triggers"]
-    verbs: ["use"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch"]
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -144,6 +119,9 @@ metadata:
 rules:
   - apiGroups: ["triggers.tekton.dev"]
     resources: ["clustertriggerbindings", "clusterinterceptors"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
     verbs: ["get", "list", "watch"]
 
 ---
@@ -170,30 +148,12 @@ rules:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: tekton-triggers-admin
-  namespace: tekton-pipelines
-  labels:
-    app.kubernetes.io/instance: default
-    app.kubernetes.io/part-of: tekton-triggers
-rules:
-  - apiGroups: ["policy"]
-    resources: ["podsecuritypolicies"]
-    resourceNames: ["tekton-triggers"]
-    verbs: ["use"]
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
   name: tekton-triggers-admin-webhook
   namespace: tekton-pipelines
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
 rules:
-  - apiGroups: ["policy"]
-    resources: ["podsecuritypolicies"]
-    resourceNames: ["tekton-triggers"]
-    verbs: ["use"]
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
@@ -207,10 +167,6 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
 rules:
-  - apiGroups: ["policy"]
-    resources: ["podsecuritypolicies"]
-    resourceNames: ["tekton-triggers"]
-    verbs: ["use"]
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get", "list", "watch"]
@@ -337,6 +293,22 @@ roleRef:
   kind: ClusterRole
   name: tekton-triggers-core-interceptors
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tekton-triggers-core-interceptors-secrets
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+subjects:
+  - kind: ServiceAccount
+    name: tekton-triggers-core-interceptors
+    namespace: tekton-pipelines
+roleRef:
+  kind: ClusterRole
+  name: tekton-triggers-core-interceptors-secrets
+  apiGroup: rbac.authorization.k8s.io
 
 ---
 # Copyright 2020 The Tekton Authors
@@ -353,23 +325,6 @@ roleRef:
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: tekton-triggers-controller-admin
-  namespace: tekton-pipelines
-  labels:
-    app.kubernetes.io/instance: default
-    app.kubernetes.io/part-of: tekton-triggers
-subjects:
-  - kind: ServiceAccount
-    name: tekton-triggers-controller
-    namespace: tekton-pipelines
-roleRef:
-  kind: Role
-  name: tekton-triggers-admin
-  apiGroup: rbac.authorization.k8s.io
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -445,10 +400,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
-  annotations:
-    "helm.sh/hook": "pre-install"
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
 spec:
   group: triggers.tekton.dev
   scope: Cluster
@@ -503,10 +456,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
-  annotations:
-    "helm.sh/hook": "pre-install"
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
 spec:
   group: triggers.tekton.dev
   scope: Cluster
@@ -575,10 +526,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
-  annotations:
-    "helm.sh/hook": "pre-install"
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -662,6 +611,62 @@ spec:
           jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
 
 ---
+# Copyright 2022 The Tekton Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: interceptors.triggers.tekton.dev
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
+spec:
+  group: triggers.tekton.dev
+  scope: Namespaced
+  names:
+    kind: Interceptor
+    plural: interceptors
+    singular: interceptor
+    shortNames:
+      - ni
+    categories:
+      - tekton
+      - tekton-triggers
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          # One can use x-kubernetes-preserve-unknown-fields: true
+          # at the root of the schema (and inside any properties, additionalProperties)
+          # to get the traditional CRD behaviour that nothing is pruned, despite
+          # setting spec.preserveUnknownProperties: false.
+          #
+          # See https://kubernetes.io/blog/2019/06/20/crd-structural-schema/
+          # See issue: https://github.com/knative/serving/issues/912
+          x-kubernetes-preserve-unknown-fields: true
+      # Opt into the status subresource so metadata.generation
+      # starts to increment
+      subresources:
+        status: {}
+
+---
 # Copyright 2019 The Tekton Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -683,10 +688,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
-  annotations:
-    "helm.sh/hook": "pre-install"
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -757,10 +760,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
-  annotations:
-    "helm.sh/hook": "pre-install"
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -833,10 +834,8 @@ metadata:
   labels:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
-    version: "v0.16.0"
-  annotations:
-    "helm.sh/hook": "pre-install"
+    triggers.tekton.dev/release: "v0.32.0"
+    version: "v0.32.0"
 spec:
   group: triggers.tekton.dev
   scope: Namespaced
@@ -911,7 +910,7 @@ metadata:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
 # The data is populated at install time.
 ---
 apiVersion: admissionregistration.k8s.io/v1
@@ -922,10 +921,9 @@ metadata:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
 webhooks:
   - admissionReviewVersions:
-      - v1beta1
       - v1
     clientConfig:
       service:
@@ -943,10 +941,9 @@ metadata:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
 webhooks:
   - admissionReviewVersions:
-      - v1beta1
       - v1
     clientConfig:
       service:
@@ -964,10 +961,9 @@ metadata:
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
 webhooks:
   - admissionReviewVersions:
-      - v1beta1
       - v1
     clientConfig:
       service:
@@ -1012,6 +1008,7 @@ rules:
       - clustertriggerbindings
       - clusterinterceptors
       - eventlisteners
+      - interceptors
       - triggers
       - triggerbindings
       - triggertemplates
@@ -1055,6 +1052,7 @@ rules:
       - clustertriggerbindings
       - clusterinterceptors
       - eventlisteners
+      - interceptors
       - triggers
       - triggerbindings
       - triggertemplates
@@ -1087,6 +1085,10 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
 data:
+  {{- if .config.defaults }}
+  {{ toYaml .config.defaults | nindent 2 -}}
+  {{- end }}
+
   _example: |
     ################################
     #                              #
@@ -1106,6 +1108,10 @@ data:
     # default-service-account contains the default service account name
     # to use for TaskRun and PipelineRun, if none is specified.
     default-service-account: "default"
+    default-run-as-user: "65532"
+    default-run-as-group: "65532"
+    default-fs-group: "65532"
+    default-run-as-non-root: "true" # allowed values are true and false
 
 ---
 # Copyright 2021 The Tekton Authors
@@ -1131,9 +1137,23 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
-  # Setting this flag will determine which gated features are enabled.
-  # Acceptable values are "stable" or "alpha".
-  enable-api-fields: "stable"
+  {{- if index .config "feature-flags" }}
+  {{ toYaml (index .config "feature-flags") | nindent 2 -}}
+  {{- end }}
+
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+
+    # Setting this flag will determine which gated features are enabled.
+    # Acceptable values are "stable" or "alpha".
+    enable-api-fields: "stable"
+    # Setting this field with valid regex pattern matching the pattern will exclude labels from
+    # getting added to resources created by the EventListener such as the deployment
+    labels-exclusion-pattern: ""
 
 ---
 # Copyright 2021 The Tekton Authors
@@ -1164,7 +1184,123 @@ data:
   # this ConfigMap such that even if we don't have access to
   # other resources in the namespace we still can have access to
   # this ConfigMap.
-  version: "v0.16.0"
+  version: "v0.32.0"
+
+---
+# Copyright 2023 Tekton Authors LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-leader-election-triggers-controller
+  namespace: tekton-pipelines
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+data:
+  {{- if index .config "leader-election-triggers-controller" }}
+  {{ toYaml (index .config "leader-election-triggers-controller") | nindent 2 -}}
+  {{- end }}
+
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+    # This block is not actually functional configuration,
+    # but serves to illustrate the available configuration
+    # options and document them in a way that is accessible
+    # to users that `kubectl edit` this config map.
+    #
+    # These sample configuration options may be copied out of
+    # this example block and unindented to be in the data block
+    # to actually change the configuration.
+    # lease-duration is how long non-leaders will wait to try to acquire the
+    # lock; 15 seconds is the value used by core kubernetes controllers.
+    lease-duration: "60s"
+    # renew-deadline is how long a leader will try to renew the lease before
+    # giving up; 10 seconds is the value used by core kubernetes controllers.
+    renew-deadline: "40s"
+    # retry-period is how long the leader election client waits between tries of
+    # actions; 2 seconds is the value used by core kubernetes controllers.
+    retry-period: "10s"
+    # buckets is the number of buckets used to partition key space of each
+    # Reconciler. If this number is M and the replica number of the controller
+    # is N, the N replicas will compete for the M buckets. The owner of a
+    # bucket will take care of the reconciling for the keys partitioned into
+    # that bucket.
+    buckets: "1"
+
+---
+# Copyright 2023 Tekton Authors LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-leader-election-triggers-webhook
+  namespace: tekton-pipelines
+  labels:
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/part-of: tekton-triggers
+data:
+  {{- if index .config "leader-election-triggers-webhook" }}
+  {{ toYaml (index .config "leader-election-triggers-webhook") | nindent 2 -}}
+  {{- end }}
+
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+    # This block is not actually functional configuration,
+    # but serves to illustrate the available configuration
+    # options and document them in a way that is accessible
+    # to users that `kubectl edit` this config map.
+    #
+    # These sample configuration options may be copied out of
+    # this example block and unindented to be in the data block
+    # to actually change the configuration.
+    # lease-duration is how long non-leaders will wait to try to acquire the
+    # lock; 15 seconds is the value used by core kubernetes controllers.
+    lease-duration: "60s"
+    # renew-deadline is how long a leader will try to renew the lease before
+    # giving up; 10 seconds is the value used by core kubernetes controllers.
+    renew-deadline: "40s"
+    # retry-period is how long the leader election client waits between tries of
+    # actions; 2 seconds is the value used by core kubernetes controllers.
+    retry-period: "10s"
+    # buckets is the number of buckets used to partition key space of each
+    # Reconciler. If this number is M and the replica number of the controller
+    # is N, the N replicas will compete for the M buckets. The owner of a
+    # bucket will take care of the reconciling for the keys partitioned into
+    # that bucket.
+    buckets: "1"
 
 ---
 # Copyright 2019 Tekton Authors LLC
@@ -1190,36 +1326,48 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
 data:
-  # Common configuration for all knative codebase
-  zap-logger-config: |
-    {
-      "level": "info",
-      "development": false,
-      "sampling": {
-        "initial": 100,
-        "thereafter": 100
-      },
-      "outputPaths": ["stdout"],
-      "errorOutputPaths": ["stderr"],
-      "encoding": "json",
-      "encoderConfig": {
-        "timeKey": "ts",
-        "levelKey": "level",
-        "nameKey": "logger",
-        "callerKey": "caller",
-        "messageKey": "msg",
-        "stacktraceKey": "stacktrace",
-        "lineEnding": "",
-        "levelEncoder": "",
-        "timeEncoder": "iso8601",
-        "durationEncoder": "",
-        "callerEncoder": ""
+  {{- if .config.logging }}
+  {{ toYaml .config.logging | nindent 2 -}}
+  {{- end }}
+
+  _example: |
+    ################################
+    #                              #
+    #    EXAMPLE CONFIGURATION     #
+    #                              #
+    ################################
+
+    # Common configuration for all knative codebase
+    zap-logger-config: |
+      {
+        "level": "info",
+        "development": false,
+        "disableStacktrace": true,
+        "sampling": {
+          "initial": 100,
+          "thereafter": 100
+        },
+        "outputPaths": ["stdout"],
+        "errorOutputPaths": ["stderr"],
+        "encoding": "json",
+        "encoderConfig": {
+          "timeKey": "timestamp",
+          "levelKey": "severity",
+          "nameKey": "logger",
+          "callerKey": "caller",
+          "messageKey": "message",
+          "stacktraceKey": "stacktrace",
+          "lineEnding": "",
+          "levelEncoder": "",
+          "timeEncoder": "iso8601",
+          "durationEncoder": "",
+          "callerEncoder": ""
+        }
       }
-    }
-  # Log level overrides
-  loglevel.controller: "info"
-  loglevel.webhook: "info"
-  loglevel.eventlistener: "info"
+    # Log level overrides
+    loglevel.controller: "info"
+    loglevel.webhook: "info"
+    loglevel.eventlistener: "info"
 
 ---
 # Copyright 2019 The Tekton Authors
@@ -1245,6 +1393,10 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
 data:
+  {{- if .config.observability }}
+  {{ toYaml .config.observability | nindent 2 -}}
+  {{- end }}
+
   _example: |
     ################################
     #                              #
@@ -1300,11 +1452,11 @@ metadata:
     app.kubernetes.io/name: controller
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: default
-    app.kubernetes.io/version: "v0.16.0"
+    app.kubernetes.io/version: "v0.32.0"
     app.kubernetes.io/part-of: tekton-triggers
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
     app: tekton-triggers-controller
-    version: "v0.16.0"
+    version: "v0.32.0"
   name: tekton-triggers-controller
   namespace: tekton-pipelines
 spec:
@@ -1343,10 +1495,10 @@ metadata:
     app.kubernetes.io/name: controller
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: default
-    app.kubernetes.io/version: "v0.16.0"
+    app.kubernetes.io/version: "v0.32.0"
     app.kubernetes.io/part-of: tekton-triggers
     # tekton.dev/release value replaced with inputs.params.versionTag in triggers/tekton/publish.yaml
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
 spec:
   replicas: 1
   selector:
@@ -1361,30 +1513,34 @@ spec:
         app.kubernetes.io/name: controller
         app.kubernetes.io/component: controller
         app.kubernetes.io/instance: default
-        app.kubernetes.io/version: "v0.16.0"
+        app.kubernetes.io/version: "v0.32.0"
         app.kubernetes.io/part-of: tekton-triggers
         app: tekton-triggers-controller
-        triggers.tekton.dev/release: "v0.16.0"
+        triggers.tekton.dev/release: "v0.32.0"
         # version value replaced with inputs.params.versionTag in triggers/tekton/publish.yaml
-        version: "v0.16.0"
+        version: "v0.32.0"
     spec:
-      serviceAccountName: tekton-triggers-controller
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
+      {{- if .controller.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+      {{ toYaml .controller.affinity | nindent 8 -}}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- if .controller.nodeSelector }}
+      nodeSelector:
+      {{ toYaml .controller.nodeSelector | nindent 8 -}}
+      {{- end }}
+      {{- if .controller.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
+      {{ toYaml .controller.tolerations | nindent 8 -}}
       {{- end }}
+      {{- if .controller.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{ toYaml .controller.topologySpreadConstraints | nindent 8 -}}
+      {{- end }}
+      serviceAccountName: tekton-triggers-controller
       containers:
         - name: tekton-triggers-controller
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller:v0.16.0@sha256:6d23285b419b29cfe1934fc2d09e680c3deee3f3bebc4e97ba66d140f448ce4d"
-          args: ["-logtostderr", "-stderrthreshold", "INFO", "-el-image", "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.16.0@sha256:97bcbbce4f592c6bf15c8811adf445d028f58ff5b38e24467d30d727dd919638", "-el-port", "8080", "-el-security-context=true", "-el-readtimeout", "5", "-el-writetimeout", "40", "-el-idletimeout", "120", "-el-timeouthandler", "30", "-period-seconds", "10", "-failure-threshold", "1"]
+          image: "ghcr.io/tektoncd/triggers/controller-f656ca31de179ab913fa76abc255c315:v0.32.0@sha256:92f074a2dd84a41506d52b30a6b8707913b1173855698fd2a65ba06676ba0715"
+          args: ["-logtostderr", "-stderrthreshold", "INFO", "-el-image", "ghcr.io/tektoncd/triggers/eventlistenersink-7ad1faa98cddbcb0c24990303b220bb8:v0.32.0@sha256:a8ca55521de081a0fbc2234e2d8151ad4fd47b09031786bd2743e23b28e7833a", "-el-port", "8080", "-el-security-context=true", "-el-read-only-root-filesystem=true", "-el-events", "disable", "-el-readtimeout", "5", "-el-writetimeout", "40", "-el-idletimeout", "120", "-el-timeouthandler", "30", "-el-httpclient-readtimeout", "30", "-el-httpclient-keep-alive", "30", "-el-httpclient-tlshandshaketimeout", "10", "-el-httpclient-responseheadertimeout", "10", "-el-httpclient-expectcontinuetimeout", "1", "-period-seconds", "10", "-failure-threshold", "3"]
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
@@ -1400,11 +1556,26 @@ spec:
               value: tekton.dev/triggers
             - name: METRICS_PROMETHEUS_PORT
               value: "9000"
+            - name: CONFIG_LEADERELECTION_NAME
+              value: config-leader-election-triggers-controllers
+            - name: KUBERNETES_MIN_VERSION
+              value: "v1.28.0"
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - "ALL"
             # User 65532 is the distroless nonroot user ID
             runAsUser: 65532
-
+            runAsGroup: 65532
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .controller.resources }}
+          resources:
+            {{ toYaml .controller.resources | nindent 12 -}}
+          {{- end }}
 ---
 # Copyright 2019 The Tekton Authors
 #
@@ -1429,11 +1600,11 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
-    app.kubernetes.io/version: "v0.16.0"
+    app.kubernetes.io/version: "v0.32.0"
     app.kubernetes.io/part-of: tekton-triggers
     app: tekton-triggers-webhook
-    version: "v0.16.0"
-    triggers.tekton.dev/release: "v0.16.0"
+    version: "v0.32.0"
+    triggers.tekton.dev/release: "v0.32.0"
 spec:
   ports:
     - name: https-webhook
@@ -1469,10 +1640,10 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/component: webhook
     app.kubernetes.io/instance: default
-    app.kubernetes.io/version: "v0.16.0"
+    app.kubernetes.io/version: "v0.32.0"
     app.kubernetes.io/part-of: tekton-triggers
     # tekton.dev/release value replaced with inputs.params.versionTag in triggers/tekton/publish.yaml
-    triggers.tekton.dev/release: "v0.16.0"
+    triggers.tekton.dev/release: "v0.32.0"
 spec:
   replicas: 1
   selector:
@@ -1487,31 +1658,35 @@ spec:
         app.kubernetes.io/name: webhook
         app.kubernetes.io/component: webhook
         app.kubernetes.io/instance: default
-        app.kubernetes.io/version: "v0.16.0"
+        app.kubernetes.io/version: "v0.32.0"
         app.kubernetes.io/part-of: tekton-triggers
         app: tekton-triggers-webhook
-        triggers.tekton.dev/release: "v0.16.0"
+        triggers.tekton.dev/release: "v0.32.0"
         # version value replaced with inputs.params.versionTag in triggers/tekton/publish.yaml
-        version: "v0.16.0"
+        version: "v0.32.0"
     spec:
-      serviceAccountName: tekton-triggers-webhook
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
+      {{- if .webhook.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+      {{ toYaml .webhook.affinity | nindent 8 -}}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- if .webhook.nodeSelector }}
+      nodeSelector:
+      {{ toYaml .webhook.nodeSelector | nindent 8 -}}
+      {{- end }}
+      {{- if .webhook.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
+      {{ toYaml .webhook.tolerations | nindent 8 -}}
       {{- end }}
+      {{- if .webhook.topologySpreadConstraints }}
+      topologySpreadConstraints:
+      {{ toYaml .webhook.topologySpreadConstraints | nindent 8 -}}
+      {{- end }}
+      serviceAccountName: tekton-triggers-webhook
       containers:
         - name: webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook:v0.16.0@sha256:8b7dae4129dcae154fdcd5870fd4c242fc1ba2aa952ef71cb94c753b0f868324"
+          image: "ghcr.io/tektoncd/triggers/webhook-dd1edc925ee1772a9f76e2c1bc291ef6:v0.32.0@sha256:c2d7b5bcdde08b61fc5d8d79c29aa9fc8d9a9e0e272f6d14a0dc52279ab7d319"
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
@@ -1525,6 +1700,10 @@ spec:
               value: triggers-webhook-certs
             - name: METRICS_DOMAIN
               value: tekton.dev/triggers
+            - name: CONFIG_LEADERELECTION_NAME
+              value: config-leader-election-triggers-webhook
+            - name: KUBERNETES_MIN_VERSION
+              value: "v1.28.0"
           ports:
             - name: metrics
               containerPort: 9000
@@ -1534,8 +1713,21 @@ spec:
               containerPort: 8443
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             # User 65532 is the distroless nonroot user ID
             runAsUser: 65532
+            runAsGroup: 65532
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - "ALL"
+            seccompProfile:
+              type: RuntimeDefault
+          {{- if .webhook.resources }}
+          resources:
+            {{ toYaml .webhook.resources | nindent 14 -}}
+          {{- end }}
 
 ---
-{{end}}
+{{- end }}
+{{- end }}

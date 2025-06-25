@@ -1,5 +1,17 @@
 # Changelog
 
+## 2025-06-24
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/154)
+- Update tekton:
+  - Pipelines:    "1.1.0"
+  - Triggers:     "0.32.0"
+  - Interceptors: "0.32.0"
+  - Dashboard:    "0.58.0"
+- Breaking change: must also update tekton-pipelines to latest
+
 ## 2025-05-26
 
 [prod]
