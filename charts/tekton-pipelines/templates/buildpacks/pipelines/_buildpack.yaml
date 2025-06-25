@@ -93,9 +93,9 @@ spec:
     - name: source
 
   tasks:
-    - name: git-clone-catalog
+    - name: git-clone
       taskRef:
-        name: git-clone-catalog
+        name: git-clone
       workspaces:
       - name: output
         workspace: source
@@ -121,14 +121,14 @@ spec:
         - name: source
           workspace: source
       runAfter:
-        - git-clone-catalog
+        - git-clone
 
     - name: detect-nodejs-version
       taskRef:
         name: detect-nodejs-version
       params:
         - name: default_version
-          value: "14"
+          value: "22"
       workspaces:
         - name: source
           workspace: source
@@ -183,9 +183,9 @@ spec:
       runAfter:
         - detect-nodejs-version
 
-    - name: git-clone-kubernetes
+    - name: git-clone-gitops-repository
       taskRef:
-        name: git-clone-catalog
+        name: git-clone
       params:
         - name: url
           value: $(params.kubernetes_repository_ssh_url)
@@ -215,7 +215,7 @@ spec:
         - name: source
           workspace: source
       runAfter:
-        - git-clone-kubernetes
+        - git-clone-gitops-repository
 
   {{- if (.pipeline).preDeployTaskSteps }}
   {{ include "pipeline.preDeploy" (dict "name" (printf "%s-pre-deploy" .pipeline.name)) | nindent 4 }}

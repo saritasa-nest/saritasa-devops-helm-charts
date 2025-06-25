@@ -35,8 +35,8 @@ spec:
           exit 0
         fi
 
-        # if no engine is defined we use node:14 as the default image
-        node_ver=$(cat package.json | jq -r ".engines.node // 14" | sed 's/[\^>~=]//g')
+        # if no engine is defined we use node:$(params.default_version) as the default image
+        node_ver=$(cat package.json | jq -r ".engines.node // $(params.default_version)" | sed 's/[\^>~=]//g')
 
         # store in the results
         # which we will use as the image:"node:version" in build task
