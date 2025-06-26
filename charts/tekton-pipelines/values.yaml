@@ -321,6 +321,10 @@ buildpacks:
           resources: {}
           workingDir: $(workspaces.app.path)
           script: |
+            # Git 2.36+ added a new security feature that prevents Git from accessing repositories that are not owned by the user
+            # unless it's added as safe directory
+            # https://github.blog/open-source/git/highlights-from-git-2-36/#stricter-repository-ownership-checks
+            git config --global --add safe.directory /workspace/app
             git fetch --tags --unshallow
           securityContext:
             privileged: true
