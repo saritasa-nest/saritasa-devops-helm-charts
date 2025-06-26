@@ -20,7 +20,7 @@ images:
   # -- kubectl cli
   kubectl: bitnami/kubectl:1.33.1
   # -- slack notifier
-  slack: cloudposse/slack-notifier:0.10.0
+  slack: cloudposse/slack-notifier:0.4.0
   # -- python image
   python: saritasallc/python3:0.4     # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
   # -- yamlfix image - format yaml files
