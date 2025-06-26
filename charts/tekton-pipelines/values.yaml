@@ -6,21 +6,21 @@
 # @default -- See below
 images:
   # -- argocd cli downdload URL
-  argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64
+  argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.14.15/argocd-linux-amd64
   # -- bash image (used for various ops in steps)
-  bash: docker.io/library/bash:5.1.8
+  bash: docker.io/library/bash:5.2.37
   # -- aws cli image (used for aws ecr auth)
   awscli: docker.io/amazon/aws-cli:2.7.4
-  # -- kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022
-  kaniko: gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650
+  # -- kaniko image used to build containers containing docker files - v1.24.0, uploaded May 23 2025
+  kaniko: gcr.io/kaniko-project/executor@sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698
   # -- git image
-  git: alpine/git:v2.32.0
+  git: alpine/git:v2.49.0
   # -- kustomize cli
-  kustomize: registry.k8s.io/kustomize/kustomize:v5.0.0  # https://kubectl.docs.kubernetes.io/installation/kustomize/docker/
+  kustomize: registry.k8s.io/kustomize/kustomize:v5.6.0  # https://kubectl.docs.kubernetes.io/installation/kustomize/docker/
   # -- kubectl cli
-  kubectl: bitnami/kubectl:1.22.10
+  kubectl: bitnami/kubectl:1.33.1
   # -- slack notifier
-  slack: cloudposse/slack-notifier:0.4.0
+  slack: cloudposse/slack-notifier:0.10.0
   # -- python image
   python: saritasallc/python3:0.4     # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
   # -- yamlfix image - format yaml files
@@ -28,7 +28,7 @@ images:
   # -- kubeval image - validate Kubernetes manifests
   kubeval: public.ecr.aws/saritasa/kubeval:0.16.1    # https://kubeval.instrumenta.dev/
   # -- sentry cli image - needs to prepare Sentry releases
-  sentry_cli: getsentry/sentry-cli:2.19.1    # https://github.com/getsentry/sentry-cli/
+  sentry_cli: getsentry/sentry-cli:2.46.0    # https://github.com/getsentry/sentry-cli/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -41,7 +41,7 @@ buildpacks:
   enabled: false
   # -- cnb (cloud native buildpacks) platform API to support
   # see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md)
-  cnbPlatformAPI: '0.4'
+  cnbPlatformAPI: '0.10'
   generate:
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: FRONTEND                                                                                                  │
@@ -169,7 +169,7 @@ buildpacks:
             privileged: true
 
         - name: fix-php-detection
-          image: docker.io/library/bash:5.1.8
+          image: docker.io/library/bash:5.2.37
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(workspaces.app.path)
@@ -316,7 +316,7 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: git-fetch-tags
-          image: alpine/git:v2.32.0
+          image: alpine/git:v2.49.0
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(workspaces.app.path)
@@ -361,7 +361,7 @@ buildpacks:
 
         - name: remove-dcproj-files
           workingDir: $(workspaces.app.path)
-          image: docker.io/library/bash:5.1.8
+          image: docker.io/library/bash:5.2.37
           imagePullPolicy: IfNotPresent
           resources: {}
           script: |
