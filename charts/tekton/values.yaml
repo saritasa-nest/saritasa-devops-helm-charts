@@ -745,6 +745,119 @@ dashboard:
     #    hosts:
     #      - tekton.site.com
 
+# enables persistent logs into s3 bucket utilizing logging-operator
+# https://kube-logging.dev
+### Remember that you need to create S3 and IAM role in infra-aws repo before enabling this!
+### Example PR: https://github.com/saritasa/ats-dart-infra-aws/pull/24
+logsOperator:
+  enabled: false  # if you enable it, you also need to enable monitoring/logging-operator addon
+  logging:
+    controlNamespace: ci
+    fluentd:
+      labels:
+        app.kubernetes.io/part-of: tekton
+        app.kubernetes.io/created-by: logging-operator
+      serviceAccount:
+        metadata:
+          annotations:
+            eks.amazonaws.com/role-arn: ''
+      scaling:
+        drain:
+          enabled: true
+      bufferStorageVolume:
+        pvc:
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 5Gi
+            storageClassName: gp3
+    fluentbit:
+      labels:
+        app.kubernetes.io/part-of: tekton
+        app.kubernetes.io/created-by: logging-operator
+      # where to place fluentbit pods
+      # we should select our karpenter provisioned ephimeral nodes only
+      # as the logs are lost if these nodes are gone, that's why we persist the logs
+      # in the s3 bucket
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: ci
+                    operator: In
+                    values:
+                      - 'true'
+      # our karpenter nodes have taints
+      # so we should place them here to schedule fluentbit agents on such nodes
+      tolerations:
+        - key: ci
+          operator: Equal
+          value: 'true'
+          effect: NoSchedule
+  output:
+    s3_bucket: ''  # client-prod-eks-tekton-logs
+    s3_region: ''  # us-east-1
+    s3_object_key_format: '%{path}%{time_slice}_%{index}.log'
+    store_as: text
+    path: ${tag}/  # the actual value is formed in the Flow crd, under filters.tag_normalizer and is equal to ${namespace_name}/${pod_name}/${container_name}
+    buffer:
+      timekey: 1m
+      timekey_wait: 1m
+      timekey_use_utc: true
+    format:
+      type: single_value
+      message_key: message
+  flow:
+    # select pods by label that will be scraped by the fluentbit
+    # these should be only the tekton provision pods
+    match:
+      - select:
+          labels:
+            tekton: 'true'  # this label is set to all tekton pods that is added in build-pipeline values via extraLabels arg
+
+# stream files in s3 for tekton dashboard
+# when ci nodes are kubernetes based logs have to be persistent to external
+# location (s3). This streamer gives HTTP endpoints to read tekton logs from S3.
+logsServer:
+  enabled: false
+  name: tekton-logs-server
+  certificate:
+    issuer: ''  # name of the internal ca-issuer within the cluster, i.e. client-ca-issuer, provisioned in the cert-manager addon
+    duration: 43800h  # 5 years
+    renewBefore: 720h  # 30 days
+  serviceAccount:
+    metadata:
+      annotations:
+        eks.amazonaws.com/role-arn: ''  # this role should give access to s3 bucket for read ops.
+  image: python:3.12-alpine
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 250m
+    requests:
+      memory: 100Mi
+      cpu: 50m
+  securityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - all
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                  - linux
+  nodeSelector: {}
+  tolerations: []
+
 # https://tekton.dev/docs/triggers/eventlisteners/#specifying-interceptors
 interceptors:
   enabled: true
