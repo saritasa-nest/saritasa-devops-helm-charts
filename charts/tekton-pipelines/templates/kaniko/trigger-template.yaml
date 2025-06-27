@@ -53,7 +53,7 @@ spec:
       taskRunSpecs:
         - pipelineTaskName: kustomize
           taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
-        - pipelineTaskName: git-clone-kubernetes
+        - pipelineTaskName: git-clone-gitops-repository
           taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: kaniko-build-pipeline
