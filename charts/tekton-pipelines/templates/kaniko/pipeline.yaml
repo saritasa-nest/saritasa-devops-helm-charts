@@ -21,6 +21,10 @@ spec:
       type: string
       description: project's namespace
 
+    - name: repository_ssh_url
+      type: string
+      description: git repository ssh url
+
     - name: docker_file
       type: string
       default: Dockerfile
@@ -45,28 +49,29 @@ spec:
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
 
+    - name: kubernetes_repository_ssh_url
+      type: string
+      description: git repository ssh url for kubernetes manifests repo
+
   workspaces:
     - name: source
 
-  resources:
-    - name: app
-      type: git
-    - name: kubernetes-repo
-      type: git
-    - name: image
-      type: image
-
   tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: source
+      params:
+      - name: url
+        value: $(params.repository_ssh_url)
+      - name: revision
+        value: $(params.branch)
+
     - name: kaniko
       taskRef:
         name: kaniko
-      resources:
-          inputs:
-            - name: app
-              resource: app
-          outputs:
-              - name: image
-                resource: image
       params:
         - name: application
           value: "$(params.application)"
@@ -81,17 +86,31 @@ spec:
         - name: extra_args
           value:
             - $(params.kaniko_extra_args)
+        - name: image
+          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
       workspaces:
         - name: source
           workspace: source
+      runAfter:
+        - git-clone
+
+    - name: git-clone-gitops-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+      workspaces:
+        - name: output
+          workspace: source
+      runAfter:
+        - kaniko
 
     - name: kustomize
       taskRef:
         name: kustomize
-      resources:
-        inputs:
-          - name: kubernetes-repo
-            resource: kubernetes-repo
       params:
         - name: application
           value: "$(params.application)"
@@ -103,8 +122,11 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
+      workspaces:
+        - name: source
+          workspace: source
       runAfter:
-        - kaniko
+        - git-clone-gitops-repository
 
   {{- if (.Values.kaniko).preDeployTaskSteps }}
   {{ include "pipeline.preDeploy" (dict "name" (printf "kaniko-pre-deploy")) | nindent 4 }}

@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
+![Version: 2.0.0-dev.1](https://img.shields.io/badge/Version-2.0.0--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.0](https://img.shields.io/badge/AppVersion-v0.29.0-informational?style=flat-square)
 
 ## Maintainers
 
@@ -1604,10 +1604,9 @@ whitelistIP: |
 | defaultRegistry | string | `""` | default docker registry ex: XXX.dkr.ecr.us-west-2.amazonaws.com |
 | environment | string | `""` | environment these apps are handling possible values: dev, staging, prod |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
-| nodeSelector | object | `{}` | node selector for event listener pod |
 | runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
-| serviceAccount.namespace | string | `""` |  |
+| serviceAccount.namespace | string | `"ci"` |  |
 | slack.imagesLocation | string | `"https://saritasa-rocks-ci.s3.us-west-2.amazonaws.com"` | slack notification images (s3 bucket prefix) |
 | slack.prefix | string | `"client"` | channel prefix |
 | slack.suffix | string | `"ci"` | channel suffix |

@@ -4,6 +4,12 @@
 
 [prod]
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/155)
+- Update tekton-pipelines:
+  - Removed resources blocks as they are deprecated
+  - Add new git-clone task from tekton catalog
+  - update all pipelines to use new versions and tasks
+
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/154)
 - Update tekton:
   - Pipelines:    "1.1.0"
