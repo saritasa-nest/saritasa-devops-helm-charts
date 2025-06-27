@@ -4,6 +4,8 @@ kind: Pipeline
 metadata:
   name: kaniko-build-pipeline
   namespace: {{ .Release.Namespace }}
+  labels:
+    tekton: 'true'
 spec:
   description: >-
     Pipeline will only build the image utilizing dockerfile using kaniko and then send notification via slack.
