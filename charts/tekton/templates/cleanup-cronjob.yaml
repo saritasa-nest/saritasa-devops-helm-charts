@@ -1,0 +1,52 @@
+{{- with .Values.pipelinerunsCleaner }}
+{{- if .enabled }}
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: {{ .name | default "pipelineruns-cleaner" }}
+  namespace: {{ .namespace }}
+spec:
+  schedule: {{ .schedule  }}
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: {{ .failedJobsHistoryLimit }}
+  successfulJobsHistoryLimit: {{ .successfulJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      backoffLimit: {{ .backoffLimit }}
+      template:
+        spec:
+          restartPolicy: {{ .restartPolicy }}
+          {{ if ne .serviceAccount ""}}
+          serviceAccount: {{ .serviceAccount }}
+          {{ else if $.Values.serviceAccount.create }}
+          serviceAccount: {{ $.Values.serviceAccount.name }}
+          {{ end }}
+          containers:
+            - name: kubectl
+              image: {{ .image.repository }}:{{ .image.tag }}
+              imagePullPolicy: {{ .image.pullPolicy }}
+              env:
+                - name: RETENTION_PERIOD
+                  value: "{{ .retentionPeriod }}"
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -eo pipefail
+
+                  age=$(date -d"now-${RETENTION_PERIOD}" -Ins --utc)
+                  custom_columns=':status.completionTime,:metadata.name,:metadata.namespace'
+
+                  aged_pipelineruns=$(
+                    kubectl get pipelinerun -A --no-headers -o custom-columns=$custom_columns \
+                    | sort \
+                    | awk '$1 <= "'$age'" { print $2 " " $3}'
+                  )
+
+                  [[ -n $aged_pipelineruns ]] \
+                    && echo "$aged_pipelineruns" | awk '{print $1 " -n=" $2}' | xargs kubectl delete pipelinerun \
+                    || echo "No pipelines found older than ${RETENTION_PERIOD}"
+
+                  echo "Done!"
+{{- end }}
+{{- end }}

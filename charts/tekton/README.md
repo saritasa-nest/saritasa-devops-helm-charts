@@ -1,239 +1,226 @@
-
 # saritasa-tekton
 
-## `license`
-```
-          ,-.
- ,     ,-.   ,-.
-/ \   (   )-(   )
-\ |  ,.>-(   )-<
- \|,' (   )-(   )
-  Y ___`-'   `-'
-  |/__/   `-'
-  |
-  |
-  |    -hi-
-__|_____________
+![Version: 2.0.0-dev.1](https://img.shields.io/badge/Version-2.0.0--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
-/* Copyright (C) Saritasa,LLC - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Saritasa Devops Team, April 2022
- */
+A Helm chart for tekton
 
-```
-
-## `chart.deprecationWarning`
-
-## `chart.name`
-
-saritasa-tekton
-
-## `chart.version`
-
-![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.28.2](https://img.shields.io/badge/AppVersion-v0.28.2-informational?style=flat-square)
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Saritasa | <nospam@saritasa.com> | <https://www.saritasa.com/> |
-
-## `chart.description`
-
-A Helm chart for Tekton.
-
-Implements:
-- tekton engine
-- tekton dashboard
-- tekton triggers
-- tekton dashboard ingress
-- webhook ingress
-
-## `example usage with argocd`
-
-Install the chart:
-
-```
-helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-```
-
-then create the manifest and apply:
-
-```yaml
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: tekton-engine
-  namespace: argo-cd
-  finalizers:
-  - resources-finalizer.argocd.argoproj.io
-  annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-    argocd.argoproj.io/sync-wave: "40"
-spec:
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: tekton-pipelines
-  project: default
-  source:
-    chart: saritasa-tekton
-    helm:
-      values: |
-        domainZone: staging.site.com
-
-        # install engine
-        engine:
-          enabled: true
-          config:
-            defaultServiceAccount: "build-bot-sa"
-            defaultTimeoutMinutes: "60"
-            defaultPodTemplate: |
-              nodeSelector:
-                ci: "true"
-
-        # install triggers
-        triggers:
-          enabled: true
-
-        # install dashboard with a public ingress
-        dashboard:
-          enabled: true
-          ingress:
-            enabled: true
-            annotations:
-              kubernetes.io/ingress.class: "nginx"
-              nginx.ingress.kubernetes.io/proxy-body-size: 100m
-              cert-manager.io/cluster-issuer: "letsencrypt-prod"
-              nginx.ingress.kubernetes.io/auth-type: basic
-              nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth
-              nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
-              argocd.argoproj.io/sync-wave: "1"
-            hosts:
-              - host: tekton.staging.site.com
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: tekton-dashboard
-                        port:
-                          number: 9097
-            tls:
-             - secretName: tekton.staging.site.com-crt
-               hosts:
-                 - tekton.staging.site.com
-
-        # install github webhook ingress that invokes tekton's eventlistener
-        webhook:
-          enabled: true
-          namespace: "ci"
-          ingress:
-            enabled: true
-            annotations:
-              kubernetes.io/ingress.class: "nginx"
-              nginx.ingress.kubernetes.io/proxy-body-size: 100m
-              cert-manager.io/cluster-issuer: "letsencrypt-prod"
-              argocd.argoproj.io/sync-wave: "10"
-            hosts:
-              - host: webhook.staging.site.com
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: el-build-pipeline-event-listener
-                        port:
-                          number: 8080
-            tls:
-             - secretName: webhook.staging.site.com-crt
-               hosts:
-                 - webhook.staging.site.com
-
-        eventlistener:
-          create: true
-          labelSelector:
-            builder: tekton
-          namespaceSelector:
-            - ci
-            - ci-experiments
-
-        serviceAccount:
-          create: true
-          name: "build-bot-sa"
-
-        nodeSelector:
-          tekton_builder: "true"
-
-    repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-    targetRevision: "0.1.4"
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-
-```
-
-Keep in mind that tekton has config-default configmap, an example you can see
-[here](https://github.com/tektoncd/pipeline/blob/main/config/config-defaults.yaml).
-You can customize it values in this map `engine.config: {}`.
-
-Just add keys in the map and they will be added into the tekton-pipelines/config-defaults configmap.
-
-```yaml
-engine:
-  config:
-    defaultServiceAccount: "build-bot-sa"
-    defaultTimeoutMinutes: "60"
-    defaultPodTemplate: |
-      nodeSelector:
-        ci: "true"
-```
-
-If you want to pull images from a private registry (or if you want to skip 200 pulls on dockerhub)
-
-```
-imagePullSecrets:
-  - name: "your-docker-secret-name"
-```
-
-You can generate that secret by doing the following
-
-```
-kubectl create secret -n argo-cd generic docker-saritasa-infra-v2-ro \
-  --from-file=.dockerconfigjson=~/.docker/config.json \
-  --type=kubernetes.io/dockerconfigjson
-```
-
-Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries first.
-
-## `chart.valuesTable`
+## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | default is to avoid running tekton pods on windows nodes. | affinity for tekton-related pods |
-| dashboard.enabled | bool | `false` | enable tekton dashboard |
-| dashboard.ingress | object | `{}` | tekton ingress configuration |
-| domainZone | string | `"site.com"` | This is required name of the hosted zone. All public services would be created under this hosted zone |
-| engine.config | object | `{}` | tekton-defaults configuration which will be added into tekton-pipelines/config-defaults cm |
-| engine.controller | object | use args multiline string to set additional launch arguments for the tekton controller | controller launch arguments |
-| engine.enabled | bool | `true` | if you want to enable the tekton engine (pipelines, pipelineruns, tasks, taskruns etc) |
-| eventlistener.create | bool | `true` | should we create EventListener? |
-| eventlistener.labelSelector | object | `{"builder":"tekton"}` | EventListener will look for Triggers with this label |
-| eventlistener.namespace | string | `"ci"` | in which namespace EventListener and related roles should be created |
-| eventlistener.namespaceSelector | list | `["ci"]` | If specified, EventListener will look for triggers in these namespaces. Otherwise, only in its own namespace. |
-| eventlistener.suffix | string | `""` | unique suffix (in case there are several eventlisteners in the cluster) |
+| dashboard.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| dashboard.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| dashboard.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"linux"` |  |
+| dashboard.config | object | `{}` |  |
+| dashboard.enabled | bool | `true` |  |
+| dashboard.extensions | object | `{}` |  |
+| dashboard.ingress | object | `{}` |  |
+| dashboard.nodeSelector | object | `{}` |  |
+| dashboard.pipelineRuns.namespaces | list | `[]` |  |
+| dashboard.readOnly | bool | `true` |  |
+| dashboard.resources | object | `{}` |  |
+| dashboard.taskRuns.namespaces | list | `[]` |  |
+| dashboard.tolerations | list | `[]` |  |
+| dashboard.topologySpreadConstraints | object | `{}` |  |
+| eventlistener.enabled | bool | `true` |  |
+| eventlistener.ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
+| eventlistener.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
+| eventlistener.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"100m"` |  |
+| eventlistener.ingress.enabled | bool | `false` |  |
+| eventlistener.ingress.hostname | string | `"tekton-webhook.site.com"` |  |
+| eventlistener.ingress.name | string | `"tekton-github-webhook"` |  |
+| eventlistener.labelSelector.matchLabels.builder | string | `"tekton"` |  |
+| eventlistener.name | string | `"el"` |  |
+| eventlistener.namespace | string | `"ci"` |  |
+| eventlistener.namespaceSelector.matchNames[0] | string | `"*"` |  |
+| eventlistener.resources.kubernetesResource.replicas | int | `1` |  |
+| eventlistener.resources.kubernetesResource.spec.template.spec.nodeSelector.ops | string | `"true"` |  |
 | imagePullSecrets | list | `[]` | list of docker registry secrets to pull images |
-| nodeSelector | object | `{}` | what node to run tekton related pods |
+| interceptors.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| interceptors.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| interceptors.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"linux"` |  |
+| interceptors.config | object | `{}` |  |
+| interceptors.enabled | bool | `true` |  |
+| interceptors.nodeSelector | object | `{}` |  |
+| interceptors.resources | object | `{}` |  |
+| interceptors.tolerations | list | `[]` |  |
+| interceptors.topologySpreadConstraints | object | `{}` |  |
+| pipelinerunsCleaner.backoffLimit | int | `0` |  |
+| pipelinerunsCleaner.enabled | bool | `true` |  |
+| pipelinerunsCleaner.failedJobsHistoryLimit | int | `3` |  |
+| pipelinerunsCleaner.image.pullPolicy | string | `"Always"` | pull policy |
+| pipelinerunsCleaner.image.repository | string | `"bitnami/kubectl"` | default docker registry |
+| pipelinerunsCleaner.image.tag | string | `"latest"` | Overrides the image tag whose default is the chart appVersion. |
+| pipelinerunsCleaner.namespace | string | `"ci"` |  |
+| pipelinerunsCleaner.restartPolicy | string | `"Never"` |  |
+| pipelinerunsCleaner.retentionPeriod | string | `"10days"` |  |
+| pipelinerunsCleaner.schedule | string | `"0 0 * * *"` |  |
+| pipelinerunsCleaner.serviceAccount | string | `""` |  |
+| pipelinerunsCleaner.successfulJobsHistoryLimit | int | `3` |  |
+| pipelines.config.bundleresolver-config.default-kind | string | `"task"` |  |
+| pipelines.config.bundleresolver-config.default-service-account | string | `"default"` |  |
+| pipelines.config.cluster-resolver-config.allowed-namespaces | string | `""` |  |
+| pipelines.config.cluster-resolver-config.blocked-namespaces | string | `""` |  |
+| pipelines.config.cluster-resolver-config.default-kind | string | `"task"` |  |
+| pipelines.config.cluster-resolver-config.default-namespace | string | `""` |  |
+| pipelines.config.defaults.default-forbidden-env | string | `""` |  |
+| pipelines.config.defaults.default-imagepullbackoff-timeout | string | `"5m"` |  |
+| pipelines.config.defaults.default-managed-by-label-value | string | `"tekton-pipelines"` |  |
+| pipelines.config.defaults.default-max-matrix-combinations-count | string | `"256"` |  |
+| pipelines.config.defaults.default-maximum-resolution-timeout | string | `"1m"` |  |
+| pipelines.config.defaults.default-resolver-type | string | `""` |  |
+| pipelines.config.defaults.default-service-account | string | `"build-bot-sa"` |  |
+| pipelines.config.defaults.default-timeout-minutes | string | `"60"` |  |
+| pipelines.config.events.formats | string | `"tektonv1"` |  |
+| pipelines.config.events.sink | string | `"https://events.sink/cdevents"` |  |
+| pipelines.config.feature-flags.await-sidecar-readiness | string | `"true"` |  |
+| pipelines.config.feature-flags.coschedule | string | `"workspaces"` |  |
+| pipelines.config.feature-flags.disable-affinity-assistant | string | `"false"` |  |
+| pipelines.config.feature-flags.disable-creds-init | string | `"false"` |  |
+| pipelines.config.feature-flags.disable-inline-spec | string | `""` |  |
+| pipelines.config.feature-flags.enable-api-fields | string | `"alpha"` |  |
+| pipelines.config.feature-flags.enable-artifacts | string | `"false"` |  |
+| pipelines.config.feature-flags.enable-cel-in-whenexpression | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-concise-resolver-syntax | string | `"false"` |  |
+| pipelines.config.feature-flags.enable-kubernetes-sidecar | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-param-enum | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-provenance-in-status | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-step-actions | string | `"true"` |  |
+| pipelines.config.feature-flags.enable-tekton-oci-bundles | string | `"false"` |  |
+| pipelines.config.feature-flags.enforce-nonfalsifiability | string | `"none"` |  |
+| pipelines.config.feature-flags.keep-pod-on-cancel | string | `"false"` |  |
+| pipelines.config.feature-flags.require-git-ssh-secret-known-hosts | string | `"false"` |  |
+| pipelines.config.feature-flags.results-from | string | `"termination-message"` |  |
+| pipelines.config.feature-flags.running-in-environment-with-injected-sidecars | string | `"true"` |  |
+| pipelines.config.feature-flags.send-cloudevents-for-runs | string | `"false"` |  |
+| pipelines.config.feature-flags.set-security-context | string | `"false"` |  |
+| pipelines.config.feature-flags.trusted-resources-verification-no-match-policy | string | `"ignore"` |  |
+| pipelines.config.git-resolver-config.api-token-secret-key | string | `""` |  |
+| pipelines.config.git-resolver-config.api-token-secret-name | string | `""` |  |
+| pipelines.config.git-resolver-config.api-token-secret-namespace | string | `"default"` |  |
+| pipelines.config.git-resolver-config.default-org | string | `"saritasa-nest"` |  |
+| pipelines.config.git-resolver-config.default-revision | string | `"main"` |  |
+| pipelines.config.git-resolver-config.default-url | string | `"https://github.com/tektoncd/catalog.git"` |  |
+| pipelines.config.git-resolver-config.fetch-timeout | string | `"1m"` |  |
+| pipelines.config.git-resolver-config.scm-type | string | `"github"` |  |
+| pipelines.config.git-resolver-config.server-url | string | `""` |  |
+| pipelines.config.http-resolver-config.fetch-timeout | string | `"1m"` |  |
+| pipelines.config.hubresolver-config.default-artifact-hub-pipeline-catalog | string | `"tekton-catalog-pipelines"` |  |
+| pipelines.config.hubresolver-config.default-artifact-hub-task-catalog | string | `"tekton-catalog-tasks"` |  |
+| pipelines.config.hubresolver-config.default-kind | string | `"task"` |  |
+| pipelines.config.hubresolver-config.default-tekton-hub-catalog | string | `"Tekton"` |  |
+| pipelines.config.hubresolver-config.default-type | string | `"artifact"` |  |
+| pipelines.config.leader-election-controller.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-controller.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-controller.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-controller.retry-period | string | `"10s"` |  |
+| pipelines.config.leader-election-events.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-events.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-events.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-events.retry-period | string | `"10s"` |  |
+| pipelines.config.leader-election-resolvers.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-resolvers.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-resolvers.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-resolvers.retry-period | string | `"10s"` |  |
+| pipelines.config.leader-election-webhook.buckets | string | `"1"` |  |
+| pipelines.config.leader-election-webhook.lease-duration | string | `"60s"` |  |
+| pipelines.config.leader-election-webhook.renew-deadline | string | `"40s"` |  |
+| pipelines.config.leader-election-webhook.retry-period | string | `"10s"` |  |
+| pipelines.config.logging."loglevel.controller" | string | `"info"` |  |
+| pipelines.config.logging."loglevel.webhook" | string | `"info"` |  |
+| pipelines.config.logging.zap-logger-config | string | `"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"timestamp\",\n    \"levelKey\": \"severity\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"message\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"` |  |
+| pipelines.config.observability."metrics.allow-stackdriver-custom-metrics" | string | `"false"` |  |
+| pipelines.config.observability."metrics.backend-destination" | string | `"prometheus"` |  |
+| pipelines.config.observability."metrics.count.enable-reason" | string | `"false"` |  |
+| pipelines.config.observability."metrics.pipelinerun.duration-type" | string | `"histogram"` |  |
+| pipelines.config.observability."metrics.pipelinerun.level" | string | `"pipeline"` |  |
+| pipelines.config.observability."metrics.running-pipelinerun.level" | string | `""` |  |
+| pipelines.config.observability."metrics.taskrun.duration-type" | string | `"histogram"` |  |
+| pipelines.config.observability."metrics.taskrun.level" | string | `"task"` |  |
+| pipelines.config.resolvers-feature-flags.enable-bundles-resolver | string | `"true"` |  |
+| pipelines.config.resolvers-feature-flags.enable-cluster-resolver | string | `"true"` |  |
+| pipelines.config.resolvers-feature-flags.enable-git-resolver | string | `"true"` |  |
+| pipelines.config.resolvers-feature-flags.enable-hub-resolver | string | `"true"` |  |
+| pipelines.config.spire | object | `{}` |  |
+| pipelines.config.tracing.credentialsSecret | string | `"jaeger-creds"` |  |
+| pipelines.config.tracing.enabled | string | `"false"` |  |
+| pipelines.config.tracing.endpoint | string | `"http://jaeger-collector.jaeger.svc.cluster.local:14268/api/traces"` |  |
+| pipelines.enabled | bool | `true` |  |
+| pipelines.eventsController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| pipelines.eventsController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"NotIn"` |  |
+| pipelines.eventsController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"windows"` |  |
+| pipelines.eventsController.nodeSelector | object | `{}` |  |
+| pipelines.eventsController.resources | object | `{}` |  |
+| pipelines.eventsController.tolerations | list | `[]` |  |
+| pipelines.eventsController.topologySpreadConstraints | object | `{}` |  |
+| pipelines.pipelinesController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| pipelines.pipelinesController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"NotIn"` |  |
+| pipelines.pipelinesController.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"windows"` |  |
+| pipelines.pipelinesController.nodeSelector | object | `{}` |  |
+| pipelines.pipelinesController.resources | object | `{}` |  |
+| pipelines.pipelinesController.tolerations | list | `[]` |  |
+| pipelines.pipelinesController.topologySpreadConstraints | object | `{}` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/component" | string | `"resolvers"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/instance" | string | `"default"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/name" | string | `"resolvers"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/part-of" | string | `"tekton-pipelines"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
+| pipelines.remoteResolvers.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
+| pipelines.remoteResolvers.nodeSelector | object | `{}` |  |
+| pipelines.remoteResolvers.resources | object | `{}` |  |
+| pipelines.remoteResolvers.tolerations | list | `[]` |  |
+| pipelines.remoteResolvers.topologySpreadConstraints | object | `{}` |  |
+| pipelines.webhook.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| pipelines.webhook.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"NotIn"` |  |
+| pipelines.webhook.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"windows"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/component" | string | `"webhook"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/instance" | string | `"default"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/name" | string | `"webhook"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels."app.kubernetes.io/part-of" | string | `"tekton-pipelines"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
+| pipelines.webhook.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
+| pipelines.webhook.nodeSelector | object | `{}` |  |
+| pipelines.webhook.resources | object | `{}` |  |
+| pipelines.webhook.tolerations | list | `[]` |  |
+| pipelines.webhook.topologySpreadConstraints | object | `{}` |  |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `"build-bot-sa"` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| tolerations | list | `[]` | tolerations for tekton related pods |
-| triggers.enabled | bool | `true` | enable tekton triggers |
-| webhook.enabled | bool | `true` | enable tekton eventlistener webhook (github trigger) |
-| webhook.ingress | object | `{}` | webhook ingress configuration |
+| serviceAccount.namespace | string | `"ci"` |  |
+| serviceAccount.secrets | list | `[]` | Default access to secrets |
+| triggers.config.defaults.default-fs-group | string | `"65532"` |  |
+| triggers.config.defaults.default-run-as-group | string | `"65532"` |  |
+| triggers.config.defaults.default-run-as-non-root | string | `"true"` |  |
+| triggers.config.defaults.default-run-as-user | string | `"65532"` |  |
+| triggers.config.defaults.default-service-account | string | `"build-bot-sa"` |  |
+| triggers.config.feature-flags.enable-api-fields | string | `"stable"` |  |
+| triggers.config.feature-flags.labels-exclusion-pattern | string | `""` |  |
+| triggers.config.leader-election-triggers-controller.buckets | string | `"1"` |  |
+| triggers.config.leader-election-triggers-controller.lease-duration | string | `"60s"` |  |
+| triggers.config.leader-election-triggers-controller.renew-deadline | string | `"40s"` |  |
+| triggers.config.leader-election-triggers-controller.retry-period | string | `"10s"` |  |
+| triggers.config.leader-election-triggers-webhook.buckets | string | `"1"` |  |
+| triggers.config.leader-election-triggers-webhook.lease-duration | string | `"60s"` |  |
+| triggers.config.leader-election-triggers-webhook.renew-deadline | string | `"40s"` |  |
+| triggers.config.leader-election-triggers-webhook.retry-period | string | `"10s"` |  |
+| triggers.config.logging."loglevel.controller" | string | `"info"` |  |
+| triggers.config.logging."loglevel.eventlistener" | string | `"info"` |  |
+| triggers.config.logging."loglevel.webhook" | string | `"info"` |  |
+| triggers.config.logging.zap-logger-config | string | `"{\n  \"level\": \"info\",\n  \"development\": false,\n  \"disableStacktrace\": true,\n  \"sampling\": {\n    \"initial\": 100,\n    \"thereafter\": 100\n  },\n  \"outputPaths\": [\"stdout\"],\n  \"errorOutputPaths\": [\"stderr\"],\n  \"encoding\": \"json\",\n  \"encoderConfig\": {\n    \"timeKey\": \"timestamp\",\n    \"levelKey\": \"severity\",\n    \"nameKey\": \"logger\",\n    \"callerKey\": \"caller\",\n    \"messageKey\": \"message\",\n    \"stacktraceKey\": \"stacktrace\",\n    \"lineEnding\": \"\",\n    \"levelEncoder\": \"\",\n    \"timeEncoder\": \"iso8601\",\n    \"durationEncoder\": \"\",\n    \"callerEncoder\": \"\"\n  }\n}\n"` |  |
+| triggers.config.observability."metrics.allow-stackdriver-custom-metrics" | string | `"false"` |  |
+| triggers.config.observability."metrics.backend-destination" | string | `"prometheus"` |  |
+| triggers.controller.affinity | object | `{}` |  |
+| triggers.controller.nodeSelector | object | `{}` |  |
+| triggers.controller.resources | object | `{}` |  |
+| triggers.controller.tolerations | list | `[]` |  |
+| triggers.controller.topologySpreadConstraints | object | `{}` |  |
+| triggers.enabled | bool | `true` |  |
+| triggers.webhook.affinity | object | `{}` |  |
+| triggers.webhook.ingress | object | `{}` |  |
+| triggers.webhook.nodeSelector | object | `{}` |  |
+| triggers.webhook.resources | object | `{}` |  |
+| triggers.webhook.tolerations | list | `[]` |  |
+| triggers.webhook.topologySpreadConstraints | object | `{}` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
