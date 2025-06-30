@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.0.0-dev.55
+version: 2.0.0
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -15,7 +15,7 @@ maintainers:
 dependencies:
   - name: saritasa-tekton
     repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-    version: ~0.1.x # TODO: update once tekton chart is released
+    version: ~2.0.x
     condition: saritasa-tekton.enabled
 
 description: |

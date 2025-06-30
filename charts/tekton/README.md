@@ -1,7 +1,7 @@
 
 # saritasa-tekton
 
-![Version: 2.0.0-dev.7](https://img.shields.io/badge/Version-2.0.0--dev.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 2.1.0-dev.3](https://img.shields.io/badge/Version-2.1.0--dev.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 A Helm chart for tekton
 
@@ -46,6 +46,54 @@ A Helm chart for tekton
 | interceptors.resources | object | `{}` |  |
 | interceptors.tolerations | list | `[]` |  |
 | interceptors.topologySpreadConstraints | object | `{}` |  |
+| logsOperator.enabled | bool | `false` |  |
+| logsOperator.flow.match[0].select.labels.tekton | string | `"true"` |  |
+| logsOperator.logging.controlNamespace | string | `"ci"` |  |
+| logsOperator.logging.fluentbit.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"ci"` |  |
+| logsOperator.logging.fluentbit.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| logsOperator.logging.fluentbit.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"true"` |  |
+| logsOperator.logging.fluentbit.labels."app.kubernetes.io/created-by" | string | `"logging-operator"` |  |
+| logsOperator.logging.fluentbit.labels."app.kubernetes.io/part-of" | string | `"tekton"` |  |
+| logsOperator.logging.fluentbit.tolerations[0].effect | string | `"NoSchedule"` |  |
+| logsOperator.logging.fluentbit.tolerations[0].key | string | `"ci"` |  |
+| logsOperator.logging.fluentbit.tolerations[0].operator | string | `"Equal"` |  |
+| logsOperator.logging.fluentbit.tolerations[0].value | string | `"true"` |  |
+| logsOperator.logging.fluentd.bufferStorageVolume.pvc.spec.accessModes[0] | string | `"ReadWriteOnce"` |  |
+| logsOperator.logging.fluentd.bufferStorageVolume.pvc.spec.resources.requests.storage | string | `"5Gi"` |  |
+| logsOperator.logging.fluentd.bufferStorageVolume.pvc.spec.storageClassName | string | `"gp3"` |  |
+| logsOperator.logging.fluentd.labels."app.kubernetes.io/created-by" | string | `"logging-operator"` |  |
+| logsOperator.logging.fluentd.labels."app.kubernetes.io/part-of" | string | `"tekton"` |  |
+| logsOperator.logging.fluentd.scaling.drain.enabled | bool | `true` |  |
+| logsOperator.logging.fluentd.serviceAccount.metadata.annotations."eks.amazonaws.com/role-arn" | string | `""` |  |
+| logsOperator.output.buffer.timekey | string | `"1m"` |  |
+| logsOperator.output.buffer.timekey_use_utc | bool | `true` |  |
+| logsOperator.output.buffer.timekey_wait | string | `"1m"` |  |
+| logsOperator.output.format.message_key | string | `"message"` |  |
+| logsOperator.output.format.type | string | `"single_value"` |  |
+| logsOperator.output.path | string | `"${tag}/"` |  |
+| logsOperator.output.s3_bucket | string | `""` |  |
+| logsOperator.output.s3_object_key_format | string | `"%{path}%{time_slice}_%{index}.log"` |  |
+| logsOperator.output.s3_region | string | `""` |  |
+| logsOperator.output.store_as | string | `"text"` |  |
+| logsServer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
+| logsServer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| logsServer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"linux"` |  |
+| logsServer.certificate.duration | string | `"43800h"` |  |
+| logsServer.certificate.issuer | string | `""` |  |
+| logsServer.certificate.renewBefore | string | `"720h"` |  |
+| logsServer.enabled | bool | `false` |  |
+| logsServer.image | string | `"python:3.12-alpine"` |  |
+| logsServer.name | string | `"tekton-logs-server"` |  |
+| logsServer.nodeSelector | object | `{}` |  |
+| logsServer.resources.limits.cpu | string | `"250m"` |  |
+| logsServer.resources.limits.memory | string | `"256Mi"` |  |
+| logsServer.resources.requests.cpu | string | `"50m"` |  |
+| logsServer.resources.requests.memory | string | `"100Mi"` |  |
+| logsServer.securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| logsServer.securityContext.capabilities.drop[0] | string | `"all"` |  |
+| logsServer.securityContext.privileged | bool | `false` |  |
+| logsServer.serviceAccount.metadata.annotations."eks.amazonaws.com/role-arn" | string | `""` |  |
+| logsServer.tolerations | list | `[]` |  |
 | pipelinerunsCleaner.backoffLimit | int | `0` |  |
 | pipelinerunsCleaner.enabled | bool | `true` |  |
 | pipelinerunsCleaner.failedJobsHistoryLimit | int | `3` |  |
