@@ -6,19 +6,19 @@
 # @default -- See below
 images:
   # -- argocd cli downdload URL
-  argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64
+  argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.14.15/argocd-linux-amd64
   # -- bash image (used for various ops in steps)
-  bash: docker.io/library/bash:5.1.8
+  bash: docker.io/library/bash:5.2.37
   # -- aws cli image (used for aws ecr auth)
   awscli: docker.io/amazon/aws-cli:2.7.4
-  # -- kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022
-  kaniko: gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650
+  # -- kaniko image used to build containers containing docker files - v1.24.0, uploaded May 23 2025
+  kaniko: gcr.io/kaniko-project/executor@sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698
   # -- git image
-  git: alpine/git:v2.32.0
+  git: alpine/git:v2.49.0
   # -- kustomize cli
-  kustomize: registry.k8s.io/kustomize/kustomize:v5.0.0  # https://kubectl.docs.kubernetes.io/installation/kustomize/docker/
+  kustomize: registry.k8s.io/kustomize/kustomize:v5.6.0  # https://kubectl.docs.kubernetes.io/installation/kustomize/docker/
   # -- kubectl cli
-  kubectl: bitnami/kubectl:1.22.10
+  kubectl: bitnami/kubectl:1.33.1
   # -- slack notifier
   slack: cloudposse/slack-notifier:0.4.0
   # -- python image
@@ -28,7 +28,7 @@ images:
   # -- kubeval image - validate Kubernetes manifests
   kubeval: public.ecr.aws/saritasa/kubeval:0.16.1    # https://kubeval.instrumenta.dev/
   # -- sentry cli image - needs to prepare Sentry releases
-  sentry_cli: getsentry/sentry-cli:2.19.1    # https://github.com/getsentry/sentry-cli/
+  sentry_cli: getsentry/sentry-cli:2.46.0    # https://github.com/getsentry/sentry-cli/
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -41,7 +41,7 @@ buildpacks:
   enabled: false
   # -- cnb (cloud native buildpacks) platform API to support
   # see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md)
-  cnbPlatformAPI: '0.4'
+  cnbPlatformAPI: '0.10'
   generate:
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: FRONTEND                                                                                                  │
@@ -68,7 +68,7 @@ buildpacks:
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             set -o pipefail
@@ -78,7 +78,7 @@ buildpacks:
             else
               echo "Installing node.js dependencies"
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
               if [[ $? -ne 0 ]]; then
                 echo "unable to install dependencies, exit_code: $?"
@@ -117,7 +117,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -151,7 +151,7 @@ buildpacks:
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/bin/bash
             set -e
@@ -159,7 +159,7 @@ buildpacks:
               echo "install node.js dependencies"
 
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
 
               npm run build:$(params.environment) || echo "unable to build $(params.environment)"
@@ -169,10 +169,10 @@ buildpacks:
             privileged: true
 
         - name: fix-php-detection
-          image: docker.io/library/bash:5.1.8
+          image: docker.io/library/bash:5.2.37
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             # workaround to fix no PHP detection, when package.json presents
@@ -186,7 +186,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -215,7 +215,7 @@ buildpacks:
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/bin/bash
             set -e
@@ -223,7 +223,7 @@ buildpacks:
               echo "install node.js dependencies"
 
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
 
               npm run build:$(params.environment) || echo "unable to build $(params.environment)"
@@ -235,7 +235,7 @@ buildpacks:
           image: docker.io/saritasallc/python-ci:0.0.1
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
@@ -290,7 +290,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -316,18 +316,22 @@ buildpacks:
       # @default -- see values.yaml for the default values of it
       buildTaskSteps:
         - name: git-fetch-tags
-          image: alpine/git:v2.32.0
+          image: alpine/git:v2.49.0
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
+            # Git 2.36+ added a new security feature that prevents Git from accessing repositories that are not owned by the user
+            # unless it's added as safe directory
+            # https://github.blog/open-source/git/highlights-from-git-2-36/#stricter-repository-ownership-checks
+            git config --global --add safe.directory /workspace/app
             git fetch --tags --unshallow
           securityContext:
             privileged: true
             runAsUser: 0
 
         - name: get-semantic-version
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
           imagePullPolicy: IfNotPresent
           resources: {}
@@ -356,26 +360,25 @@ buildpacks:
 
             /tools/dotnet-gitversion /updateprojectfiles
             git status
-            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-            chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
             echo "semantic version updated"
 
         - name: remove-dcproj-files
-          workingDir: $(resources.inputs.app.path)
-          image: docker.io/library/bash:5.1.8
+          workingDir: $(workspaces.app.path)
+          image: docker.io/library/bash:5.2.37
           imagePullPolicy: IfNotPresent
           resources: {}
           script: |
             #!/usr/bin/env bash
             # clean `.dcproj` files related to local development docker .NET project
-            cd $(resources.inputs.app.path)
+            cd $(workspaces.app.path)
             find . -name '*.dcproj' -type f -delete
 
         - name: build-static
           image: node:$(params.node_version)
           imagePullPolicy: IfNotPresent
           resources: {}
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.app.path)
           script: |
             #!/bin/bash
             set -Eeo pipefail
@@ -401,12 +404,11 @@ buildpacks:
               echo "install node.js dependencies"
 
               # set cache
-              npm config set cache $(workspaces.source.path)/.npm --global
+              npm config set cache $(workspaces.app.path)/.npm --global
               npm ci
 
               (npm run build:$(params.environment) && rm -rf node_modules && echo "remove node_modules dir") || (echo "unable to build $(params.environment)" && exit 1)
-              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.source.path)"
-              chown -R "$(params.user_id):$(params.group_id)" "$(resources.inputs.app.path)"
+              chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
             } || echo "No package.json found"
 
             echo "done"
@@ -418,7 +420,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.source.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -444,7 +446,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -470,7 +472,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -496,7 +498,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -522,7 +524,7 @@ buildpacks:
       # - name: pre-deploy-hello-world
       #   image: node:22
       #   imagePullPolicy: IfNotPresent
-      #   workingDir: $(resources.inputs.app.path)
+      #   workingDir: $(workspaces.app.path)
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
@@ -536,7 +538,7 @@ kaniko:
   # - name: pre-deploy-hello-world
   #   image: node:22
   #   imagePullPolicy: IfNotPresent
-  #   workingDir: $(resources.inputs.app.path)
+  #   workingDir: $(workspaces.app.path)
   #   script: |
   #     #!/bin/bash
   #     echo "hello world"
@@ -561,6 +563,10 @@ podTemplate:
       operator: Equal
       value: 'true'
       effect: NoSchedule
+
+  # Ensure workspace PVC is group-writable by git-clone (runs as GID 65532)
+  securityContext:
+    fsGroup: 65532
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐

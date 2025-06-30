@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.1.49
+version: 2.0.0
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -15,7 +15,7 @@ maintainers:
 dependencies:
   - name: saritasa-tekton
     repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-    version: ~0.1.x
+    version: ~2.0.x
     condition: saritasa-tekton.enabled
 
 description: |
@@ -98,7 +98,7 @@ description: |
           - name: build-hello-world
             image: node:22
             imagePullPolicy: IfNotPresent
-            workingDir: $(resources.inputs.app.path)
+            workingDir: $(workspaces.source.path)
             script: |
               #!/bin/bash
               echo "hello world"
@@ -106,7 +106,7 @@ description: |
           - name: pre-deploy-hello-world
             image: node:22
             imagePullPolicy: IfNotPresent
-            workingDir: $(resources.inputs.app.path)
+            workingDir: $(workspaces.source.path)
             script: |
               #!/bin/bash
               echo "hello world"
@@ -114,7 +114,7 @@ description: |
           - name: post-deploy-hello-world
             image: node:22
             imagePullPolicy: IfNotPresent
-            workingDir: $(resources.inputs.app.path)
+            workingDir: $(workspaces.source.path)
             script: |
               #!/bin/bash
               echo "hello world"
@@ -136,7 +136,7 @@ description: |
           name: build
           image: node:22
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             az login --identity --username <managed-indentity>
@@ -153,15 +153,15 @@ description: |
               -gid=$(params.group_id) \
               -process-type=$(params.process_type) \
               -skip-restore=$(params.skip_restore) \
-              -previous-image=$(resources.outputs.image.url) \
+              -previous-image=$(params.docker_registry_repository) \
               -run-image=$(params.run_image) \
-              $(resources.outputs.image.url)
+              $(params.image)
 
         buildTaskSteps:
           - name: build-hello-world
             image: node:22
             imagePullPolicy: IfNotPresent
-            workingDir: $(resources.inputs.app.path)
+            workingDir: $(workspaces.source.path)
             script: |
               #!/bin/bash
               echo "hello world"

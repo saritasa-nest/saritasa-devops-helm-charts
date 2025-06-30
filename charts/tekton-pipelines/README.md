@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 0.1.49](https://img.shields.io/badge/Version-0.1.49-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -120,7 +120,7 @@ buildpacks:
         - name: build-hello-world
           image: node:22
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world"
@@ -128,7 +128,7 @@ buildpacks:
         - name: pre-deploy-hello-world
           image: node:22
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world"
@@ -136,7 +136,7 @@ buildpacks:
         - name: post-deploy-hello-world
           image: node:22
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world"
@@ -158,7 +158,7 @@ buildpacks:
         name: build
         image: node:22
         imagePullPolicy: IfNotPresent
-        workingDir: $(resources.inputs.app.path)
+        workingDir: $(workspaces.source.path)
         script: |
           #!/bin/bash
           az login --identity --username <managed-indentity>
@@ -175,15 +175,15 @@ buildpacks:
             -gid=$(params.group_id) \
             -process-type=$(params.process_type) \
             -skip-restore=$(params.skip_restore) \
-            -previous-image=$(resources.outputs.image.url) \
+            -previous-image=$(params.docker_registry_repository) \
             -run-image=$(params.run_image) \
-            $(resources.outputs.image.url)
+            $(params.image)
 
       buildTaskSteps:
         - name: build-hello-world
           image: node:22
           imagePullPolicy: IfNotPresent
-          workingDir: $(resources.inputs.app.path)
+          workingDir: $(workspaces.source.path)
           script: |
             #!/bin/bash
             echo "hello world"
@@ -214,7 +214,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| buildpacks.cnbPlatformAPI | string | `"0.4"` | cnb (cloud native buildpacks) platform API to support see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md) |
+| buildpacks.cnbPlatformAPI | string | `"0.10"` | cnb (cloud native buildpacks) platform API to support see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md) |
 | buildpacks.enabled | bool | `false` | should we enable buildpack based pipelines |
 | buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskName | string | `"buildpack-django"` | the generated name of the tekton task implementing the "build" step |
 | buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskSteps | list | see values.yaml for the default values of it | steps to run in the `buildpack-django` task prior to executing /cnb/lifecycle/creator CLI |
@@ -263,16 +263,16 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | buildpacks.generate.buildpackRubyBuildPipeline.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | imagePullPolicy | string | `"IfNotPresent"` | default imagePullPolicy to be used for images pulled in tekton task steps |
 | images | object | See below | default images used in our solution |
-| images.argocd_cli | string | `"https://github.com/argoproj/argo-cd/releases/download/v2.3.4/argocd-linux-amd64"` | argocd cli downdload URL |
+| images.argocd_cli | string | `"https://github.com/argoproj/argo-cd/releases/download/v2.14.15/argocd-linux-amd64"` | argocd cli downdload URL |
 | images.awscli | string | `"docker.io/amazon/aws-cli:2.7.4"` | aws cli image (used for aws ecr auth) |
-| images.bash | string | `"docker.io/library/bash:5.1.8"` | bash image (used for various ops in steps) |
-| images.git | string | `"alpine/git:v2.32.0"` | git image |
-| images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:b44b0744b450e731b5a5213058792cd8d3a6a14c119cf6b1f143704f22a7c650"` | kaniko image used to build containers containing docker files - v1.8.1, uploaded April 5 2022 |
-| images.kubectl | string | `"bitnami/kubectl:1.22.10"` | kubectl cli |
+| images.bash | string | `"docker.io/library/bash:5.2.37"` | bash image (used for various ops in steps) |
+| images.git | string | `"alpine/git:v2.49.0"` | git image |
+| images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698"` | kaniko image used to build containers containing docker files - v1.24.0, uploaded May 23 2025 |
+| images.kubectl | string | `"bitnami/kubectl:1.33.1"` | kubectl cli |
 | images.kubeval | string | `"public.ecr.aws/saritasa/kubeval:0.16.1"` | kubeval image - validate Kubernetes manifests |
-| images.kustomize | string | `"registry.k8s.io/kustomize/kustomize:v5.0.0"` | kustomize cli |
+| images.kustomize | string | `"registry.k8s.io/kustomize/kustomize:v5.6.0"` | kustomize cli |
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
-| images.sentry_cli | string | `"getsentry/sentry-cli:2.19.1"` | sentry cli image - needs to prepare Sentry releases |
+| images.sentry_cli | string | `"getsentry/sentry-cli:2.46.0"` | sentry cli image - needs to prepare Sentry releases |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
 | kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
