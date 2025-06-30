@@ -821,6 +821,8 @@ logsOperator:
 # stream files in s3 for tekton dashboard
 # when ci nodes are kubernetes based logs have to be persistent to external
 # location (s3). This streamer gives HTTP endpoints to read tekton logs from S3.
+### Remember that you need to create S3 and IAM role in infra-aws repo before enabling this!
+### Example PR: https://github.com/saritasa/ats-dart-infra-aws/pull/24
 logsServer:
   enabled: false
   name: tekton-logs-server
