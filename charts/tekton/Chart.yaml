@@ -1,193 +1,51 @@
 apiVersion: v2
 name: saritasa-tekton
+description: A Helm chart for tekton
 
 type: application
 
-# This is the version number of the tekton engine application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
-appVersion: "v0.28.2"
-# dashboardVersion: "v0.21.0"
-# triggersVersions: "v0.16.0"
-
-# This is the chart version. This version number should be incremented each time you make changes
+# The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.1.0
+version: 2.0.0
 
-maintainers:
-  - url: https://www.saritasa.com/
-    name: Saritasa
-    email: nospam@saritasa.com
+# Version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+appVersion: "1.1.0"
 
+# NOTE: 😼 Versions of components
+# ------------------------------------------------------------------------------
+# Pipelines:    "1.1.0"
+# Triggers:     "0.32.0"
+# Interceptors: "0.32.0"
+# Dashboard:    "0.58.0"
 
-description: |
-  A Helm chart for Tekton.
+# NOTE: 😼 How to perform future updates to this chart from tekton YAML sources
+# ------------------------------------------------------------------------------
+#
+# This chart was assembled from the following yaml files from the official documentation:
+#
+#
+## Pipeline
+# https://github.com/tektoncd/pipeline/releases
+# https://storage.googleapis.com/tekton-releases/pipeline/previous/v1.1.0/release.yaml
+## Dashboard (in write mode)
+# https://github.com/tektoncd/dashboard/releases/tag/v0.58.0
+# https://storage.googleapis.com/tekton-releases/dashboard/previous/v0.58.0/release-full.yaml
+## Triggers
+# https://github.com/tektoncd/triggers/releases/tag/v0.32.0
+# https://storage.googleapis.com/tekton-releases/triggers/previous/v0.32.0/release.yaml
+## Interceptors
+# https://github.com/tektoncd/triggers/releases/tag/v0.32.0
+# https://storage.googleapis.com/tekton-releases/triggers/previous/v0.32.0/interceptors.yaml
 
-  Implements:
-  - tekton engine
-  - tekton dashboard
-  - tekton triggers
-  - tekton dashboard ingress
-  - webhook ingress
+### Copied from infra-v3
+## Cleanup job:
+# https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/cleanup-cronjob.yaml
+## EventListener
+# https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/eventlistener.yaml
+## ServiceAccount
+# https://github.com/saritasa-nest/usummit-kubernetes-aws/blob/19f57d8bf555e04b19faeefcc82cbb20a42b8837/config/addons/cicd/tekton/templates/serviceaccount.yaml
 
-  ## `example usage with argocd`
-
-  Install the chart:
-
-  ```
-  helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-  ```
-
-  then create the manifest and apply:
-
-
-  ```yaml
-  apiVersion: argoproj.io/v1alpha1
-  kind: Application
-  metadata:
-    name: tekton-engine
-    namespace: argo-cd
-    finalizers:
-    - resources-finalizer.argocd.argoproj.io
-    annotations:
-      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
-      argocd.argoproj.io/sync-wave: "40"
-  spec:
-    destination:
-      server: https://kubernetes.default.svc
-      namespace: tekton-pipelines
-    project: default
-    source:
-      chart: saritasa-tekton
-      helm:
-        values: |
-          domainZone: staging.site.com
-
-          # install engine
-          engine:
-            enabled: true
-            config:
-              defaultServiceAccount: "build-bot-sa"
-              defaultTimeoutMinutes: "60"
-              defaultPodTemplate: |
-                nodeSelector:
-                  ci: "true"
-
-          # install triggers
-          triggers:
-            enabled: true
-
-          # install dashboard with a public ingress
-          dashboard:
-            enabled: true
-            ingress:
-              enabled: true
-              annotations:
-                kubernetes.io/ingress.class: "nginx"
-                nginx.ingress.kubernetes.io/proxy-body-size: 100m
-                cert-manager.io/cluster-issuer: "letsencrypt-prod"
-                nginx.ingress.kubernetes.io/auth-type: basic
-                nginx.ingress.kubernetes.io/auth-secret: tekton-basic-auth
-                nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
-                argocd.argoproj.io/sync-wave: "1"
-              hosts:
-                - host: tekton.staging.site.com
-                  paths:
-                    - path: /
-                      pathType: Prefix
-                      backend:
-                        service:
-                          name: tekton-dashboard
-                          port:
-                            number: 9097
-              tls:
-               - secretName: tekton.staging.site.com-crt
-                 hosts:
-                   - tekton.staging.site.com
-
-          # install github webhook ingress that invokes tekton's eventlistener
-          webhook:
-            enabled: true
-            namespace: "ci"
-            ingress:
-              enabled: true
-              annotations:
-                kubernetes.io/ingress.class: "nginx"
-                nginx.ingress.kubernetes.io/proxy-body-size: 100m
-                cert-manager.io/cluster-issuer: "letsencrypt-prod"
-                argocd.argoproj.io/sync-wave: "10"
-              hosts:
-                - host: webhook.staging.site.com
-                  paths:
-                    - path: /
-                      pathType: Prefix
-                      backend:
-                        service:
-                          name: el-build-pipeline-event-listener
-                          port:
-                            number: 8080
-              tls:
-               - secretName: webhook.staging.site.com-crt
-                 hosts:
-                   - webhook.staging.site.com
-
-          eventlistener:
-            create: true
-            labelSelector:
-              builder: tekton
-            namespaceSelector:
-              - ci
-              - ci-experiments
-
-          serviceAccount:
-            create: true
-            name: "build-bot-sa"
-
-          nodeSelector:
-            tekton_builder: "true"
-
-      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
-      targetRevision: "0.1.4"
-    syncPolicy:
-      automated:
-        prune: true
-        selfHeal: true
-      syncOptions:
-        - CreateNamespace=true
-
-  ```
-
-  Keep in mind that tekton has config-default configmap, an example you can see
-  [here](https://github.com/tektoncd/pipeline/blob/main/config/config-defaults.yaml).
-  You can customize it values in this map `engine.config: {}`.
-
-  Just add keys in the map and they will be added into the tekton-pipelines/config-defaults configmap.
-
-  ```yaml
-  engine:
-    config:
-      defaultServiceAccount: "build-bot-sa"
-      defaultTimeoutMinutes: "60"
-      defaultPodTemplate: |
-        nodeSelector:
-          ci: "true"
-  ```
-
-  If you want to pull images from a private registry (or if you want to skip 200 pulls on dockerhub)
-
-  ```
-  imagePullSecrets:
-    - name: "your-docker-secret-name"
-  ```
-
-  You can generate that secret by doing the following
-
-  ```
-  kubectl create secret -n argo-cd generic docker-saritasa-infra-v2-ro \
-    --from-file=.dockerconfigjson=~/.docker/config.json \
-    --type=kubernetes.io/dockerconfigjson
-  ```
-
-  Make dure this `~/.docker/config.json` is cleaned from non-infra-v2 registries first.
+## Removed from infra-v3:
+# - logsServer
+# - logsOperator

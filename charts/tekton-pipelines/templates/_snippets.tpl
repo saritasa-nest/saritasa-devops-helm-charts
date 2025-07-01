@@ -175,41 +175,6 @@
   value: "$(tt.params.environment)"
 {{- end}}
 
-
-# ┌──────────────────────────────────────────────────────────────────────────────┐
-# │ Default resources for the pipeline run. Defined in trigger template          │
-# │ - app: our git repository with the code we're building                       │
-# │ - kubernetes-repo: out git repo containing kube manifests                    │
-# │ - image: docker registry image                                               │
-# │                                                                              │
-# └──────────────────────────────────────────────────────────────────────────────┘
-{{- define "pipeline.defaultResources" -}}
-- name: app
-  resourceSpec:
-    type: git
-    params:
-      - name: url
-        value: $(tt.params.repository_ssh_url)
-      - name: revision
-        value: $(tt.params.head_commit)
-      - name: submodules
-        value: $(tt.params.repository_submodules)
-- name: kubernetes-repo
-  resourceSpec:
-    type: git
-    params:
-      - name: url
-        value: $(tt.params.kubernetes_repository_ssh_url)
-      - name: revision
-        value: $(tt.params.kubernetes_branch)
-- name: image
-  resourceSpec:
-    type: image
-    params:
-      - name: url
-        value: $(tt.params.docker_registry_repository):$(tt.params.environment)-$(tt.params.sha)
-{{- end}}
-
 # ┌──────────────────────────────────────────────────────────────────────────────┐
 # │ Default workspaces associated with tekton pipeline runs                      │
 # │ - source: contains app git repo source code cloned by tekton                 │
@@ -265,10 +230,6 @@ finally:
 - name: sentry-release
   taskRef:
     name:  sentry-release
-  resources:
-    inputs:
-      - name: app
-        resource: app
   params:
     - name: environment
       value: "$(params.environment)"
@@ -291,10 +252,6 @@ finally:
 - name: pre-deploy
   taskRef:
     name:  {{ .name }}
-  resources:
-    inputs:
-      - name: app
-        resource: app
   params:
     - name: application
       value: "$(params.application)"

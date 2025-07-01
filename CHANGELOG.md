@@ -1,5 +1,79 @@
 # Changelog
 
+## 2025-06-24
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/155)
+- Update tekton-pipelines:
+  - Removed resources blocks as they are deprecated
+  - Add new git-clone task from tekton catalog
+  - update all pipelines to use new versions and tasks
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/154)
+- Update tekton:
+  - Pipelines:    "1.1.0"
+  - Triggers:     "0.32.0"
+  - Interceptors: "0.32.0"
+  - Dashboard:    "0.58.0"
+- Breaking change: must also update tekton-pipelines to latest
+
+## 2025-05-26
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/153)
+- Release new `terraform-pod` version with `1.12.1` terraform
+
+## 2025-05-07
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/152)
+- Add UV support in Django Tekton pipeline
+
+## 2025-04-16
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/150)
+- Add PrometheusRule and ServiceMonitor support to eol-exporter
+
+## 2025-04-11
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/151)
+- Release new `terraform-pod` version with `terraform:1.11.3` (based on `python:3.12.10-alpine3.21`)
+
+## 2025-03-13
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/149)
+- Release new `terraform-pod` version with `1.11.2` terraform
+
+## 2025-03-10
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/148)
+- Release new `terraform-pod` version with postgres variable name fix
+
+## 2025-03-05
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/147)
+- Release new `terraform-pod` version with `1.11.0` terraform
+
+## 2024-01-27
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/146)
+- Release `eol-prometheus-exporter` version `1.0.0`
+
 ## 2025-01-24
 
 [prod]
