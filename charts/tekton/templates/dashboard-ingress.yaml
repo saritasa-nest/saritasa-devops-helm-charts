@@ -11,7 +11,7 @@ metadata:
   {{- end }}
 spec:
   rules:
-    - host: {{ .ingress.hostname }}
+    - host: {{ .Values.dashboard.ingress.hostname }}
       http:
         paths:
           - backend:
@@ -23,7 +23,7 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - {{ .ingress.hostname }}
-      secretName: {{ .ingress.hostname }}-crt
+        - {{ .Values.dashboard.ingress.hostname }}
+      secretName: {{ .Values.dashboard.ingress.hostname }}-crt
 ---
 {{- end }}
