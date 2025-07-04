@@ -4,6 +4,8 @@ kind: Pipeline
 metadata:
   name: {{ .pipeline.name }}
   namespace: {{.namespace }}
+  labels:
+    tekton: 'true'
 spec:
   description: |-
     {{- .pipeline.description | default (printf "Pipeline will only build the image utilizing %s task and then send notification via slack. The deployment is done via argocd" (.pipeline.buildTaskName)) | nindent 4}}

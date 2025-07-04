@@ -1,5 +1,14 @@
 # Changelog
 
+## 2025-06-26
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/156)
+- Add persistent logs for tekton:
+  - Remember to first create S3 bucket and IAM role in infra-aws repo
+  - Remember to first add logging-operator addon to cluster
+
 ## 2025-06-24
 
 [prod]

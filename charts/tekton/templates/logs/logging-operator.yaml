@@ -1,0 +1,55 @@
+{{- if and (.Values.logsOperator.enabled)
+           (.Capabilities.APIVersions.Has "logging.banzaicloud.io/v1beta1")
+}}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Logging
+metadata:
+  name: tekton-logs
+  namespace: {{ .Values.logsOperator.logging.controlNamespace | default "ci" }}
+  labels:
+    app.kubernetes.io/part-of: tekton
+  annotations:
+    explanation: |
+      This resource creates
+      - fluentd statefulset to write aggregated logs to s3 bucket
+      - fluentbit daemonset to collect logs from containers identified by the flow below
+spec:
+  {{ .Values.logsOperator.logging | toYaml | nindent 2 }}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Output
+metadata:
+ name: tekton-logs-s3
+ namespace: {{ .Values.logsOperator.logging.controlNamespace | default "ci" }}
+ labels:
+   app.kubernetes.io/part-of: tekton
+ annotations:
+   explanation: |
+     This resource defines configuration of the fluentd that will write the data to the s3 bucket
+     We need to store tekton logs on s3 bucket, in the case we provision ci nodes using karpenter,
+     as such nodes are ephemeral by nature.
+spec:
+ s3:
+   {{ .Values.logsOperator.output | toYaml | nindent 4 }}
+---
+apiVersion: logging.banzaicloud.io/v1beta1
+kind: Flow
+metadata:
+  name: tekton-logs
+  namespace: {{ .Values.logsOperator.logging.controlNamespace | default "ci" }}
+  labels:
+    app.kubernetes.io/part-of: tekton
+  annotations:
+    explanation: |
+      This resource identifies what log streams to collect (by label in the spec.match) and where to send them
+      spec.localOutputRefs.
+spec:
+  filters:
+    - tag_normaliser:
+        format: ${namespace_name}/${pod_name}/${container_name}
+  match:
+    {{ .Values.logsOperator.flow.match | toYaml | nindent 4 }}
+  localOutputRefs:
+    - tekton-logs-s3
+{{- end }}
