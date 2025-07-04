@@ -39,6 +39,8 @@ apps:
           # In staging/prod client cluster use webhook integration:
           notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
       syncWave: 200
+    serviceAccount:
+      eks.amazonaws.com/role-arn: arn:aws:iam::833737135757:role/nmbl-staging-eks-tekton-role
     mailList: nmbl@saritasa.com
     devopsMailList: devops+nmbl@saritasa.com
     jiraURL: https://saritasa.atlassian.net/browse/NMBLCLD

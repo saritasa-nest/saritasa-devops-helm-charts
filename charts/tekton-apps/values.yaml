@@ -62,6 +62,8 @@ apps: []
   #       pm: xxx
   #       tm: xxx
   #     namespace: test
+  #   serviceAccount:
+  #     eks.amazonaws.com/role-arn: arn:aws:iam::$AWS_ACCOUNT_NAME:role/$AWS_EKS_ROLE_NAME
   #   mailList: xxx@saritasa.com
   #   devopsMailList: devops+xxx@saritasa.com
   #   jiraURL: https://saritasa.atlassian.net/browse/xxx
