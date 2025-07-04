@@ -63,7 +63,7 @@ apps: []
   #       tm: xxx
   #     namespace: test
   #   serviceAccount:
-  #     eks.amazonaws.com/role-arn: arn:aws:iam::$AWS_ACCOUNT_NAME:role/$AWS_EKS_ROLE_NAME
+  #     eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/client-environment-eks-tekton-role
   #   mailList: xxx@saritasa.com
   #   devopsMailList: devops+xxx@saritasa.com
   #   jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -76,7 +76,7 @@ apps: []
 
   #   extraApps:
   #     - path: dev/argocd/apps
-  #       repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+  #       repoUrl: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
   #       targetRevision: main
   #       argocd:
   #         destinationNamespace: extra
