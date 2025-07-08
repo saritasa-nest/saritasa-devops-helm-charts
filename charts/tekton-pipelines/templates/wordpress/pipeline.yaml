@@ -4,6 +4,8 @@ kind: Pipeline
 metadata:
   name: wordpress-build-pipeline
   namespace: {{ .Release.Namespace }}
+  labels:
+    tekton: 'true'
 spec:
   description: >-
     Pipeline will trigger redeployments of the POD of the deployment managed by the bitnami wordpress HELM

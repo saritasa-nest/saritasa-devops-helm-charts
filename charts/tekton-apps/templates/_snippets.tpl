@@ -100,6 +100,9 @@ metadata:
   namespace: {{ .namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+    {{- with .project.serviceAccount }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 secrets:
 {{- if .secret }}
 - name: {{ .secret }}

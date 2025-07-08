@@ -1,0 +1,26 @@
+{{- if and (.Values.dashboard.enabled)
+           (.Values.logsOperator.enabled)
+           (.Values.logsServer.enabled)
+           (.Capabilities.APIVersions.Has "cert-manager.io/v1")
+}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.logsServer.name }}-crt
+  namespace: {{ .Values.logsOperator.logging.controlNamespace | default "ci" }}
+spec:
+  secretName: {{ .Values.logsServer.name }}-tls
+  duration: {{ .Values.logsServer.certificate.duration }}
+  renewBefore: {{ .Values.logsServer.certificate.renewBefore }}
+  commonName: {{ .Values.logsServer.name }}
+  secretTemplate:
+    annotations:
+      replicator.v1.mittwald.de/replicate-to: {{ .Release.Namespace }}
+  dnsNames:
+    - {{ .Values.logsServer.name }}
+    - {{ .Values.logsServer.name }}.{{ .Values.logsOperator.logging.controlNamespace  }}.svc
+    - {{ .Values.logsServer.name }}.{{ .Values.logsOperator.logging.controlNamespace  }}.svc.cluster.local
+  issuerRef:
+    name: {{ .Values.logsServer.certificate.issuer }}
+    kind: ClusterIssuer
+{{- end }}
