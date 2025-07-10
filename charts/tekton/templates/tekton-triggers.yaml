@@ -1383,8 +1383,8 @@ spec:
       {{- end }}
       containers:
         - name: tekton-triggers-controller
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller:v0.16.0@sha256:6d23285b419b29cfe1934fc2d09e680c3deee3f3bebc4e97ba66d140f448ce4d"
-          args: ["-logtostderr", "-stderrthreshold", "INFO", "-el-image", "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.16.0@sha256:97bcbbce4f592c6bf15c8811adf445d028f58ff5b38e24467d30d727dd919638", "-el-port", "8080", "-el-security-context=true", "-el-readtimeout", "5", "-el-writetimeout", "40", "-el-idletimeout", "120", "-el-timeouthandler", "30", "-period-seconds", "10", "-failure-threshold", "1"]
+          image: "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/controller:v0.16.0@sha256:6d23285b419b29cfe1934fc2d09e680c3deee3f3bebc4e97ba66d140f448ce4d"
+          args: ["-logtostderr", "-stderrthreshold", "INFO", "-el-image", "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.16.0@sha256:97bcbbce4f592c6bf15c8811adf445d028f58ff5b38e24467d30d727dd919638", "-el-port", "8080", "-el-security-context=true", "-el-readtimeout", "5", "-el-writetimeout", "40", "-el-idletimeout", "120", "-el-timeouthandler", "30", "-period-seconds", "10", "-failure-threshold", "1"]
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
@@ -1511,7 +1511,7 @@ spec:
         - name: webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook:v0.16.0@sha256:8b7dae4129dcae154fdcd5870fd4c242fc1ba2aa952ef71cb94c753b0f868324"
+          image: "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/webhook:v0.16.0@sha256:8b7dae4129dcae154fdcd5870fd4c242fc1ba2aa952ef71cb94c753b0f868324"
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
