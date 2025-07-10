@@ -30,6 +30,11 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
+    - name: subdirectory
+      description: Subdirectory inside the `output` Workspace to clone the repo into.
+      type: string
+      default: ""
+
   stepTemplate:
     envFrom:
       - configMapRef:
@@ -39,7 +44,7 @@ spec:
     - name: git-set-user
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         git config --global --add safe.directory $(workspaces.source.path)
         git config user.email "$DEVOPS_GROUP_EMAIL"
@@ -48,7 +53,7 @@ spec:
     - name: update-image
       image: {{ .Values.images.kustomize | default "registry.k8s.io/kustomize/kustomize:v5.6.0"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         app=$(params.application)
         env=$(params.environment)
@@ -59,7 +64,7 @@ spec:
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         CONFIG=/workdir/yamlfix.toml
         if [ -f .yamlfix.toml ]; then
@@ -71,7 +76,7 @@ spec:
     - name: kubeval
       image: {{ .Values.images.kubeval | default "public.ecr.aws/saritasa/kubeval:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         APISERVER=https://kubernetes.default.svc
         SERVICEACCOUNT=/var/run/secrets/kubernetes.io/serviceaccount
@@ -86,7 +91,7 @@ spec:
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         set +x
         git config --global --add safe.directory $(workspaces.source.path)
