@@ -46,7 +46,7 @@ spec:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
-        git config --global --add safe.directory $(workspaces.source.path)
+        git config --global --add safe.directory $(workspaces.source.path)/$(params.subdirectory)
         git config user.email "$DEVOPS_GROUP_EMAIL"
         git config user.name "tekton-kustomize"
 
@@ -94,7 +94,7 @@ spec:
       workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         set +x
-        git config --global --add safe.directory $(workspaces.source.path)
+        git config --global --add safe.directory $(workspaces.source.path)/$(params.subdirectory)
         git checkout $(params.kubernetes_branch)
 
         # apply changes only if it exists, otherwise do nothing
