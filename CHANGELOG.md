@@ -6,6 +6,8 @@
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/158)
 - Hotfix: change gcr to ghcr image repository in tekton-pipeline
+- Fix: add prepare step to Sentry task to fix permission errors
+- Move git clone gitops output to: `/workspace/app/gitops`
 
 ## 2025-07-01
 
