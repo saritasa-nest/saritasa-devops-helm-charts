@@ -193,6 +193,8 @@ spec:
           value: $(params.kubernetes_repository_ssh_url)
         - name: revision
           value: $(params.kubernetes_branch)
+        - name: subdirectory
+          value: gitops
       workspaces:
         - name: output
           workspace: source
@@ -213,6 +215,8 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
+        - name: subdirectory
+          value: gitops
       workspaces:
         - name: source
           workspace: source

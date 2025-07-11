@@ -98,8 +98,8 @@ buildpacks:
 
               # copy built dir to workspace for further usage in sentry-release task (source maps release)
               echo "Save source maps"
-              mkdir -p $(workspaces.source.path)/$(params.sourcemaps_dir)
-              cp -rf $(params.source_subpath)/. $(workspaces.source.path)/$(params.sourcemaps_dir)
+              mkdir -p "$(workspaces.app.path)/$(params.sourcemaps_dir)"
+              cp -rf "$(params.source_subpath)/." "$(workspaces.app.path)/$(params.sourcemaps_dir)"
 
               # needs to clean up created source maps for envs != `dev` to not show it on `staging` and `prod` envs,
               # so now to be able to upload source maps to Sentry for all existing envs, `frontend` should be ALWAYS
