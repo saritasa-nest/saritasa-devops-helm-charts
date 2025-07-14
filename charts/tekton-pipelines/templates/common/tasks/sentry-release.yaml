@@ -98,6 +98,7 @@ spec:
         # they are generated and saved to `/workspace/source/sourcemaps/` dir at the end of `build-static` step
         if [[ -d "$(workspaces.source.path)/$(params.sourcemaps_dir)" ]]; then
           echo "Upload source maps for 'frontend' project"
+          export SENTRY_PROJECT=${PROJECT_NAME}
           # https://docs.sentry.io/platforms/node/guides/connect/sourcemaps/uploading/cli/
           sentry-cli sourcemaps inject $(workspaces.source.path)/$(params.sourcemaps_dir)
           sentry-cli sourcemaps upload \
