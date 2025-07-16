@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-07-16
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/159)
+- Use tag: latest for terraform image in `terraform-pod`
+
 ## 2025-07-01
 
 [prod]
