@@ -40,9 +40,39 @@ spec:
         value: {{ .Values.sentry.url }}
 
   steps:
+    - name: prepare
+      image: {{ .Values.images.sentry_cli }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        privileged: false
+        allowPrivilegeEscalation: false
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env sh
+        set -eu
+        echo "sentry prepare step"
+        ls -la
+        # sentry-cli has a very weird check that the repository should be owned by the current user
+        # which is dumb, and not container-friendly
+        # so we had to make a hack here to convert . to root and then back to original owner.
+        original_uid=$(ls -nd . | awk '{print $3}')
+        original_gid=$(ls -nd . | awk '{print $4}')
+        cat << SCRIPT > cleanup.sh
+        chown -R ${original_uid}:${original_gid} .
+        SCRIPT
+        chown -R root:root .
     - name: release
       image: {{ .Values.images.sentry_cli }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        privileged: false
+        allowPrivilegeEscalation: false
       workingDir: $(workspaces.source.path)
       script: |
         #!/usr/bin/env sh
@@ -68,7 +98,13 @@ spec:
         # they are generated and saved to `/workspace/source/sourcemaps/` dir at the end of `build-static` step
         if [[ -d "$(workspaces.source.path)/$(params.sourcemaps_dir)" ]]; then
           echo "Upload source maps for 'frontend' project"
-          sentry-cli releases files -p ${PROJECT_NAME} ${VERSION} upload-sourcemaps $(workspaces.source.path)/$(params.sourcemaps_dir)
+          export SENTRY_PROJECT=${PROJECT_NAME}
+          # https://docs.sentry.io/platforms/node/guides/connect/sourcemaps/uploading/cli/
+          sentry-cli sourcemaps inject $(workspaces.source.path)/$(params.sourcemaps_dir)
+          sentry-cli sourcemaps upload \
+            --release=${VERSION} \
+            --wait \
+            $(workspaces.source.path)/$(params.sourcemaps_dir)
         else
           echo "That is not 'frontend' project, no source maps should be uploaded"
         fi
@@ -78,4 +114,22 @@ spec:
         # mark release as finalized and released, before this step it is marked as `unreleased`
         # https://docs.sentry.io/product/cli/releases/#finalizing-releases
         sentry-cli releases finalize -p ${PROJECT_NAME} ${VERSION}
+
+    - name: cleanup
+      image: {{ .Values.images.sentry_cli }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        privileged: false
+        allowPrivilegeEscalation: false
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env sh
+        set -eu
+        echo "sentry cleanup step (restore folder uid/gid)"
+        source cleanup.sh
+        rm -rf cleanup.sh
+
 {{ end }}

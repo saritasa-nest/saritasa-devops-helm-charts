@@ -78,7 +78,8 @@ spec:
         # https://tekton.dev/docs/pipelines/labels/
         # so we can easily extract items
         # podinfo is mounted in TriggerTemplate
-        pipelinerun_name=$(awk -F= '/tekton.dev\/pipelineRun/ {gsub(/"/, "", $2);print $2}' /etc/podinfo/labels)
+        # extract tekton.dev/pipelineRun from pod labels
+        pipelinerun_name=$(awk -F= '$1 == "tekton.dev/pipelineRun" {gsub(/"/, "", $2); print $2}' /etc/podinfo/labels)
         status="`echo $(params.status) | tr '[:upper:]' '[:lower:]'`"
 
         echo "result: $status"
