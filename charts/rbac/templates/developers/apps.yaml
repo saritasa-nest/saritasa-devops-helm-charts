@@ -40,8 +40,12 @@ roleRef:
   kind: Role
   name: saritasa-developers-readonly-role
 subjects:
+# this group is creating when sso stack applied in infra-v3 and when saritasa-sso module applied in infra-v2
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
   name: saritasa:sso:developers
-
+# this group is coming from keycloak sso via oidc
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: developer
 {{ end }}
