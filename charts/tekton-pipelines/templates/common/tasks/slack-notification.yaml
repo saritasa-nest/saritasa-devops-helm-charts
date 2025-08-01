@@ -71,6 +71,9 @@ spec:
     - name: notification
       image: {{ .Values.images.slack | default "cloudposse/slack-notifier:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
+      env:
+        - name: head_commit_message
+          value: $(params.head_commit_message)
       script: |
         #!/bin/sh
 
@@ -88,7 +91,6 @@ spec:
           color="good"
           thumb_url="$(params.pusher_avatar)"
           text_status="The latest changes to $(params.environment) have been deployed successfully"
-
         else
           color="danger"
           thumb_url="$SLACK_FAILURE_ICON_URL"
@@ -105,16 +107,14 @@ spec:
 
         # Preparing jira links
         # We are using grep as ash doesn't support regex test
-        jira_task=$(echo "$(params.head_commit_message)" | grep -oE '[A-Z0-9]+-[0-9]+' | head -n 1 )
+        jira_task=$(echo "$head_commit_message" | grep -oE '[A-Z0-9]+-[0-9]+' | head -n 1 )
         if [ "$jira_task" != "" ];
         then
           echo "Found $jira_task jira task, preparing link"
-          head_commit_message=$(echo "$(params.head_commit_message)" | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
+          head_commit_message=$(echo "$head_commit_message" | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
         else
           echo "No jira task found";
-          head_commit_message="$(params.head_commit_message)"
         fi
-
 
         slack-notifier \
         -user_name "Tekton" \
