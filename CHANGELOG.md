@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-08-01
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160)
+- Remove shell code injection from slack-notification task in tekton-pipelines chart
+
 ## 2025-07-16
 
 [prod]
