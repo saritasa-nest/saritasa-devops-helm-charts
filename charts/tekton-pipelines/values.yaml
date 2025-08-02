@@ -242,7 +242,7 @@ buildpacks:
             - name: platform_dir
               value: $(params.platform_dir)
             - name: source_path
-              value: $(workspaces.source.path)
+              value: $(workspaces.app.path)
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
