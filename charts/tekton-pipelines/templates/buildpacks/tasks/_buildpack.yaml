@@ -29,6 +29,11 @@ spec:
       description: reference to a run image to use
       default: ""
 
+    - name: buildpack_env_vars
+      type: string
+      description: environment variables that should be passed to buildpack
+      default: ""
+
     - name: docker_registry
       type: string
       description: private docker registry address
