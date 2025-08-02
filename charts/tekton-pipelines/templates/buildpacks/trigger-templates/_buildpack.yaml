@@ -38,6 +38,10 @@ spec:
     - name: buildpack_runner_image
       description: reference to a run image to use
 
+    - name: buildpack_env_vars
+      description: environment variables that should be passed to buildpack
+      default: ""
+
     - name: source_subpath
       description: a subpath within the `source` input where the source to build is located.
       default: ""
@@ -100,6 +104,8 @@ spec:
           value: "$(tt.params.buildpack_builder_image)"
         - name: buildpack_runner_image
           value: "$(tt.params.buildpack_runner_image)"
+        - name: buildpack_env_vars
+          value: "$(tt.params.buildpack_env_vars)"
         - name: source_subpath
           value: "$(tt.params.source_subpath)"
         - name: repository_submodules
