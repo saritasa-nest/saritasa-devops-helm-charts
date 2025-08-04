@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-08-04
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160)
+- Add external-secrets/allow label to argocd applications
+
 ## 2025-07-16
 
 [prod]

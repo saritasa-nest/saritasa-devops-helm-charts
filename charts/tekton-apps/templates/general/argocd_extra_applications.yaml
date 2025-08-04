@@ -46,6 +46,9 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+    managedNamespaceMetadata:
+      labels:
+        external-secrets/allow: 'yes'
 ---
 {{- end }} # range extraApp
 {{- end }} # if project.enabled

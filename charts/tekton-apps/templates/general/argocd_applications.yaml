@@ -55,6 +55,9 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ApplyOutOfSyncOnly=true
+    managedNamespaceMetadata:
+      labels:
+        external-secrets/allow: 'yes'
 ---
 {{- end }} # if not component.wordpress
 {{- end }} # range component
