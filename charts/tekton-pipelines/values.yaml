@@ -270,6 +270,40 @@ buildpacks:
               echo "Creating ${env_dir}/${key} with value: ${value}"
               echo "$value" > "${env_dir}/${key}"
             done
+        - name: copy-requirements
+          image: docker.io/saritasallc/python-ci:0.0.1
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(workspaces.app.path)
+          script: |
+            #!/usr/bin/env bash
+            set -eo pipefail
+
+            if [[ -f uv.lock ]]; then
+              if [[ ! $(command -v uv) ]]; then
+                echo "uv is not installed or not in PATH. Halting execution."
+                exit 1
+              fi
+              echo "'uv.lock' is found, preparing requirements.txt"
+              if [[ "$(params.environment)" == "dev" ]]; then
+                echo "Export with 'dev' targets dependencies"
+                uv export --format requirements-txt --output-file requirements.txt
+                exit 0
+              fi
+              uv export --format requirements-txt --no-dev --output-file requirements.txt
+              exit 0
+            fi
+
+            if ls requirements/$(params.environment)*.txt >/dev/null 2>&1; then
+              echo "'requirements' folder is found, preparing requirements.txt"
+              cp requirements/$(params.environment)*.txt requirements.txt
+              exit 0
+            fi
+
+            if [[ -f requirements.txt ]]; then
+              echo "'requirements.txt' found"
+              exit 0
+            fi
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []

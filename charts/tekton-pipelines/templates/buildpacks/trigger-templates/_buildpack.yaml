@@ -39,7 +39,9 @@ spec:
       description: reference to a run image to use
 
     - name: buildpack_env_vars
-      description: environment variables that should be passed to buildpack
+      description: |-
+        environment variables that should be passed to buildpack
+        expected string format: 'BP_POETRY_INSTALL_ONLY=main,dev;BP_OCI_VENDOR=saritasa'
       default: ""
 
     - name: source_subpath
