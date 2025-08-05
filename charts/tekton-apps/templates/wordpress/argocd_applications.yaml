@@ -292,7 +292,7 @@ spec:
       - CreateNamespace=true
     managedNamespaceMetadata:
       labels:
-        external-secrets/allow: 'yes'
+        external-secrets/allow: 'true'
 ---
 {{- end }} # with component.wordpress
 {{- end }} # range component
