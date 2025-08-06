@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-08-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/163)
+- Add when condition `buildpack_env_vars=DISABLE_GIT_VERSION` for `git-fetch-tags` step in Dotnet pipeline
+
 ## 2025-08-02
 
 [prod]
