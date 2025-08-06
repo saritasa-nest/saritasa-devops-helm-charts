@@ -4,6 +4,9 @@
 
 [dev]
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/164)
+- Add `git-clone-sentry` task to dotnet pipelines (fixes error dotnet sentry release)
+
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/163)
 - Add when condition `buildpack_env_vars=DISABLE_GIT_VERSION` for `git-fetch-tags` step in Dotnet pipeline
 
