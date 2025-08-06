@@ -71,11 +71,17 @@ spec:
     - name: notification
       image: {{ .Values.images.slack | default "cloudposse/slack-notifier:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      env:
-        - name: head_commit_message
-          value: $(params.head_commit_message)
+      args:
+        - $(params.head_commit_message)
       script: |
         #!/bin/sh
+
+        # The commit message is provided as a script argument to avoid
+        # parameter interpolation which can result in code injection
+        # when the value is controlled by a user:
+        # - https://github.com/tektoncd/catalog/blob/main/recommendations.md#dont-use-interpolation-in-scripts-or-string-arguments
+        # - https://github.com/tektoncd/community/blob/main/teps/0146-parameters-in-script.md
+        readonly head_commit_message="$1"
 
         # tekton injects these labels into pods
         # https://tekton.dev/docs/pipelines/labels/
