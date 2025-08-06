@@ -346,6 +346,7 @@ buildpacks:
             # https://github.blog/open-source/git/highlights-from-git-2-36/#stricter-repository-ownership-checks
             git config --global --add safe.directory /workspace/app
             git fetch --tags --unshallow
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
           securityContext:
             privileged: true
             runAsUser: 0
