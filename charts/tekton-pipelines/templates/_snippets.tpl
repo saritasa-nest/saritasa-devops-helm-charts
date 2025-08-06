@@ -237,11 +237,13 @@ finally:
       value: "$(params.sentry_project_name)"
     - name: sourcemaps_dir
       value: "$(params.sourcemaps_dir)"
+    - name: subdirectory
+      value: sentry
   workspaces:
     - name: source
       workspace: source
   runAfter:
-    - deploy
+    - git-clone-sentry
 {{- end }}
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
