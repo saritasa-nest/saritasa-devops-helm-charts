@@ -238,12 +238,12 @@ finally:
     - name: sourcemaps_dir
       value: "$(params.sourcemaps_dir)"
     - name: subdirectory
-      value: sentry
+      value: {{ default "." .subdirectory | quote }}
   workspaces:
     - name: source
       workspace: source
   runAfter:
-    - git-clone-sentry
+    - {{ if eq .pipeline.name "buildpack-dotnet-build-pipeline" }} git-clone-sentry {{ else }} deploy {{ end }}
 {{- end }}
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐

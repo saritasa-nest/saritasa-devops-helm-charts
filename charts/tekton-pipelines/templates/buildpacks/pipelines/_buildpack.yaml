@@ -247,6 +247,7 @@ spec:
 
   {{ if .sentry.enabled }}
 
+    {{ if eq .pipeline.name "buildpack-dotnet-build-pipeline" }}
     # Dotnet tasks remove the source code from the workspace, so we need to clone it again
     - name: git-clone-sentry
       taskRef:
@@ -264,7 +265,12 @@ spec:
       runAfter:
         - deploy
 
+    {{ include "pipeline.sentryRelease" (merge (dict "subdirectory" "sentry") .) | nindent 4 }}
+
+    {{- end }}
+
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
+
   {{ end }}
 
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
