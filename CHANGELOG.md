@@ -4,7 +4,7 @@
 
 [prod]
 
-- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160)
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/162)
 - Add external-secrets/allow label to argocd applications
 
 ## 2025-07-16
