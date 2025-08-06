@@ -243,7 +243,7 @@ finally:
     - name: source
       workspace: source
   runAfter:
-    - {{ if eq .pipeline.name "buildpack-dotnet-build-pipeline" }} git-clone-sentry {{ else }} deploy {{ end }}
+    - {{ if eq (.pipeline).name "buildpack-dotnet-build-pipeline" }} git-clone-sentry {{ else }} deploy {{ end }}
 {{- end }}
 
 # ┌──────────────────────────────────────────────────────────────────────────────┐
