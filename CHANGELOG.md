@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-08-02
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/161)
+- Add step `set-env-vars` to set environment variables for buildpack
+
 ## 2025-08-01
 
 [prod]

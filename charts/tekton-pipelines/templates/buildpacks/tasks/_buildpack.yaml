@@ -29,6 +29,13 @@ spec:
       description: reference to a run image to use
       default: ""
 
+    - name: buildpack_env_vars
+      type: string
+      description: |-
+        environment variables that should be passed to buildpack
+        expected string format: 'BP_POETRY_INSTALL_ONLY=main,dev;BP_OCI_VENDOR=saritasa'
+      default: ""
+
     - name: docker_registry
       type: string
       description: private docker registry address
