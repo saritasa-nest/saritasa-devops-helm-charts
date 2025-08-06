@@ -260,6 +260,8 @@ spec:
         value: $(params.repository_ssh_url)
       - name: revision
         value: $(params.branch)
+      runAfter:
+        - deploy
     {{ end }}
 
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
