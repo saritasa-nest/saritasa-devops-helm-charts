@@ -358,10 +358,10 @@ buildpacks:
           when:
             # For some projects, devs don't want to use gitversion to automatically update all the *.csproj <Version> tags with it
             # Instead, they want to manually define the version in the *.csproj files themselves
-            - input: $(params.USE_GIT_VERSION)
+            - input: $(params.buildpack_env_vars)
               operator: notin
               values:
-                - true
+                - "DISABLE_GIT_VERSION"
           script: |
             #!/usr/bin/env ash
             # so we are making a hack, that if we try to merge hotfix branch into main we should
