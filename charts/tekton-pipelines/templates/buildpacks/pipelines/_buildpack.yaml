@@ -266,11 +266,9 @@ spec:
         - deploy
 
     {{ include "pipeline.sentryRelease" (merge (dict "subdirectory" "sentry") .) | nindent 4 }}
-
-    {{- end }}
-
+    {{- else }}
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
-
+    {{- end }}
   {{ end }}
 
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
