@@ -81,7 +81,7 @@ spec:
         # when the value is controlled by a user:
         # - https://github.com/tektoncd/catalog/blob/main/recommendations.md#dont-use-interpolation-in-scripts-or-string-arguments
         # - https://github.com/tektoncd/community/blob/main/teps/0146-parameters-in-script.md
-        declare head_commit_message="$1"
+        head_commit_message="$1"
 
         # tekton injects these labels into pods
         # https://tekton.dev/docs/pipelines/labels/
