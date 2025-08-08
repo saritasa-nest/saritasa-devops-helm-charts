@@ -290,6 +290,10 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+    # We add `external-secrets/allow=true` label to each namespace so that the external-secrets-operator can get secrets from the AWS SecretManager in the application namespace.
+    managedNamespaceMetadata:
+      labels:
+        external-secrets/allow: 'true'
 ---
 {{- end }} # with component.wordpress
 {{- end }} # range component

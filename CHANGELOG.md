@@ -10,6 +10,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/163)
 - Add when condition `buildpack_env_vars=DISABLE_GIT_VERSION` for `git-fetch-tags` step in Dotnet pipeline
 
+## 2025-08-04
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/162)
+- Add external-secrets/allow label to argocd applications
+
 ## 2025-08-02
 
 [prod]
