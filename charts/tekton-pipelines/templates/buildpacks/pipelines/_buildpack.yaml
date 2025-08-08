@@ -48,6 +48,13 @@ spec:
       type: string
       description: reference to a run image to use
 
+    - name: buildpack_env_vars
+      type: string
+      description: |-
+        environment variables that should be passed to buildpack
+        expected string format: 'BP_POETRY_INSTALL_ONLY=main,dev;BP_OCI_VENDOR=saritasa'
+      default: ""
+
     - name: source_subpath
       type: string
       description: a subpath within the `source` input where the source to build is located.
@@ -149,6 +156,8 @@ spec:
           value: "$(params.buildpack_builder_image)"
         - name: run_image
           value: "$(params.buildpack_runner_image)"
+        - name: buildpack_env_vars
+          value: "$(params.buildpack_env_vars)"
         - name: docker_registry
           value: $(params.docker_registry)
         - name: cache

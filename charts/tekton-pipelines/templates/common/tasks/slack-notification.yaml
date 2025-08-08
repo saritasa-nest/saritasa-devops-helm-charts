@@ -71,6 +71,13 @@ spec:
     - name: notification
       image: {{ .Values.images.slack | default "cloudposse/slack-notifier:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
+      args:
+        # The commit message is provided as a script argument to avoid
+        # parameter interpolation which can result in code injection
+        # when the value is controlled by a user:
+        # - https://github.com/tektoncd/catalog/blob/main/recommendations.md#dont-use-interpolation-in-scripts-or-string-arguments
+        # - https://github.com/tektoncd/community/blob/main/teps/0146-parameters-in-script.md
+        - $(params.head_commit_message)
       script: |
         #!/bin/sh
 
@@ -88,7 +95,6 @@ spec:
           color="good"
           thumb_url="$(params.pusher_avatar)"
           text_status="The latest changes to $(params.environment) have been deployed successfully"
-
         else
           color="danger"
           thumb_url="$SLACK_FAILURE_ICON_URL"
@@ -103,18 +109,20 @@ spec:
         argo_app_url=$(echo $argo_app_url | sed 's/\/\//\//g')
         argo_app_url="https://$argo_app_url"
 
+        # Get the value from a script argument (avoiding code injection, see the comment for step's `args`)
+        # History: https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160
+        head_commit_message="$1"
+
         # Preparing jira links
         # We are using grep as ash doesn't support regex test
-        jira_task=$(echo "$(params.head_commit_message)" | grep -oE '[A-Z0-9]+-[0-9]+' | head -n 1 )
+        jira_task=$(echo "$head_commit_message" | grep -oE '[A-Z0-9]+-[0-9]+' | head -n 1 )
         if [ "$jira_task" != "" ];
         then
           echo "Found $jira_task jira task, preparing link"
-          head_commit_message=$(echo "$(params.head_commit_message)" | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
+          head_commit_message=$(echo "$head_commit_message" | sed "s|$jira_task|\<https://saritasa.atlassian.net/browse/$jira_task/\|$jira_task\>|")
         else
           echo "No jira task found";
-          head_commit_message="$(params.head_commit_message)"
         fi
-
 
         slack-notifier \
         -user_name "Tekton" \

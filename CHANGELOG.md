@@ -7,6 +7,20 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/162)
 - Add external-secrets/allow label to argocd applications
 
+## 2025-08-02
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/161)
+- Add step `set-env-vars` to set environment variables for buildpack
+
+## 2025-08-01
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160)
+- Remove shell code injection from slack-notification task in tekton-pipelines chart
+
 ## 2025-07-16
 
 [prod]
