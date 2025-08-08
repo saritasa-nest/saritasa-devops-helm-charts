@@ -346,15 +346,20 @@ buildpacks:
             # https://github.blog/open-source/git/highlights-from-git-2-36/#stricter-repository-ownership-checks
             git config --global --add safe.directory /workspace/app
             git fetch --tags --unshallow
-          securityContext:
-            privileged: true
-            runAsUser: 0
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
 
         - name: get-semantic-version
           workingDir: $(workspaces.app.path)
           image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
           imagePullPolicy: IfNotPresent
           resources: {}
+          when:
+            # For some projects, devs don't want to use gitversion to automatically update all the *.csproj <Version> tags with it
+            # Instead, they want to manually define the version in the *.csproj files themselves
+            - input: $(params.buildpack_env_vars)
+              operator: notin
+              values:
+                - "DISABLE_GIT_VERSION"
           script: |
             #!/usr/bin/env ash
             # so we are making a hack, that if we try to merge hotfix branch into main we should
