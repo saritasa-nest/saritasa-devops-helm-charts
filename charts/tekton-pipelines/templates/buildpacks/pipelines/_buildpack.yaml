@@ -246,7 +246,29 @@ spec:
         - {{ if (.pipeline).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 
   {{ if .sentry.enabled }}
+
+    {{ if eq .pipeline.name "buildpack-dotnet-build-pipeline" }}
+    # Dotnet tasks remove the source code from the workspace, so we need to clone it again
+    - name: git-clone-sentry
+      taskRef:
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: source
+      params:
+      - name: url
+        value: $(params.repository_ssh_url)
+      - name: revision
+        value: $(params.branch)
+      - name: subdirectory
+        value: sentry
+      runAfter:
+        - deploy
+
+    {{ include "pipeline.sentryRelease" (merge (dict "subdirectory" "sentry") .) | nindent 4 }}
+    {{- else }}
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
+    {{- end }}
   {{ end }}
 
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}

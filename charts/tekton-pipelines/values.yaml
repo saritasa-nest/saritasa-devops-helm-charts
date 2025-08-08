@@ -556,7 +556,7 @@ buildpacks:
 
 kaniko:
   # -- should we enable the kaniko pipeline
-  enabled: false
+  enabled: true
   # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
   # can be useful to prepare different backups and tests before real deploy
   preDeployTaskSteps: []
@@ -608,7 +608,7 @@ saritasa-tekton:
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 sentry:
-  enabled: false
+  enabled: true
   authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API
   authTokenSecretKey: "auth-token"
   org: "saritasa"

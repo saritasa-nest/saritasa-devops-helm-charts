@@ -27,6 +27,11 @@ spec:
       description: name of the dir where frontend sourcemaps would be stored in workspace
       default: "sourcemaps"
 
+    - name: subdirectory
+      type: string
+      description: Working dir subdirectory
+      default: ""
+
   stepTemplate:
     env:
       - name: SENTRY_AUTH_TOKEN
@@ -49,7 +54,7 @@ spec:
         runAsNonRoot: false
         privileged: false
         allowPrivilegeEscalation: false
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         #!/usr/bin/env sh
         set -eu
@@ -73,7 +78,7 @@ spec:
         runAsNonRoot: false
         privileged: false
         allowPrivilegeEscalation: false
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         #!/usr/bin/env sh
         set +x
@@ -124,7 +129,7 @@ spec:
         runAsNonRoot: false
         privileged: false
         allowPrivilegeEscalation: false
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         #!/usr/bin/env sh
         set -eu
