@@ -72,16 +72,14 @@ spec:
       image: {{ .Values.images.slack | default "cloudposse/slack-notifier:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       args:
-        - $(params.head_commit_message)
-      script: |
-        #!/bin/sh
-
         # The commit message is provided as a script argument to avoid
         # parameter interpolation which can result in code injection
         # when the value is controlled by a user:
         # - https://github.com/tektoncd/catalog/blob/main/recommendations.md#dont-use-interpolation-in-scripts-or-string-arguments
         # - https://github.com/tektoncd/community/blob/main/teps/0146-parameters-in-script.md
-        head_commit_message="$1"
+        - $(params.head_commit_message)
+      script: |
+        #!/bin/sh
 
         # tekton injects these labels into pods
         # https://tekton.dev/docs/pipelines/labels/
@@ -110,6 +108,10 @@ spec:
         argo_app_url="$ARGOCD_SERVER/$ARGOCD_ROOT_PATH/applications/$(params.application)"
         argo_app_url=$(echo $argo_app_url | sed 's/\/\//\//g')
         argo_app_url="https://$argo_app_url"
+
+        # Get the value from a script argument (avoiding code injection, see the comment for step's `args`)
+        # History: https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160
+        head_commit_message="$1"
 
         # Preparing jira links
         # We are using grep as ash doesn't support regex test
