@@ -50,6 +50,23 @@ spec:
         git config user.email "$DEVOPS_GROUP_EMAIL"
         git config user.name "tekton-kustomize"
 
+    - name: update-image-yq
+      image: {{ .Values.images.yq | default "mikefarah/yq:4.47.1"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
+      onError: continue
+      script: |
+        app=$(params.application)
+        env=$(params.environment)
+        img=$(params.image)
+        export application=${app%-$env}
+        export newname="${img%%:*}"
+        export tag="${img##*:}"
+
+        cd $(params.kustomize_overlay_path)
+        yq -i '.images[0].name = strenv(application) | .images[0].newName = strenv(newname) | .images[0].newTag = strenv(tag)' kustomization.yaml
+        cat kustomization.yaml
+
     - name: update-image
       image: {{ .Values.images.kustomize | default "registry.k8s.io/kustomize/kustomize:v5.6.0"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -67,8 +84,8 @@ spec:
       workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
         CONFIG=/workdir/yamlfix.toml
-        if [ -f .yamlfix.toml ]; then
-          CONFIG=$(realpath .yamlfix.toml)
+        if [ -f .yamlfix.values.toml ]; then
+          CONFIG=$(realpath .yamlfix.values.toml)
         fi
 
         find $(params.kustomize_overlay_path) -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
