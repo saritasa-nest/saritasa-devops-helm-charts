@@ -1,5 +1,13 @@
 # Changelog
 
+## 2025-08-14
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/165)
+- Update kustomize `update-image` step to use yq, instead of kustomize edit
+- Update kustomize `yamlfix` step to look for `.yamlfix.values.toml` config
+
 ## 2025-08-06
 
 [dev]
