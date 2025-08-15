@@ -73,6 +73,8 @@ spec:
         CONFIG=/workdir/yamlfix.toml
         if [ -f .yamlfix.values.toml ]; then
           CONFIG=$(realpath .yamlfix.values.toml)
+        elif [ -f .yamlfix.toml ]; then
+          CONFIG=$(realpath .yamlfix.toml)
         fi
 
         find $(params.kustomize_overlay_path) -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
