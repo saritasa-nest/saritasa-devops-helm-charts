@@ -144,6 +144,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/145)
 - Release new `terraform-pod` version with `1.10.5` terraform
 
+## 2025-01-17
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/144)
+- Release new `saritasa-rbac` chart version `0.1.13`
+
 ## 2024-12-05
 
 [prod]
