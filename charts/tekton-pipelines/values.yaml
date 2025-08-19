@@ -98,8 +98,8 @@ buildpacks:
 
               # copy built dir to workspace for further usage in sentry-release task (source maps release)
               echo "Save source maps"
-              mkdir -p $(workspaces.source.path)/$(params.sourcemaps_dir)
-              cp -rf $(params.source_subpath)/. $(workspaces.source.path)/$(params.sourcemaps_dir)
+              mkdir -p "$(workspaces.app.path)/$(params.sourcemaps_dir)"
+              cp -rf "$(params.source_subpath)/." "$(workspaces.app.path)/$(params.sourcemaps_dir)"
 
               # needs to clean up created source maps for envs != `dev` to not show it on `staging` and `prod` envs,
               # so now to be able to upload source maps to Sentry for all existing envs, `frontend` should be ALWAYS
@@ -231,6 +231,45 @@ buildpacks:
             } || echo "No package.json found"
           securityContext:
             privileged: true
+        - name: set-env-vars
+          image: saritasallc/tekton:1.0.8
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          workingDir: $(workspaces.app.path)
+          env:
+            - name: environment
+              value: $(params.environment)
+            - name: platform_dir
+              value: $(params.platform_dir)
+            - name: source_path
+              value: $(workspaces.app.path)
+          script: |
+            #!/usr/bin/env bash
+            set -eo pipefail
+            buildpack_env_vars="$(params.buildpack_env_vars)"
+            env_dir="${source_path}/${platform_dir}/env"
+            mkdir -p ${env_dir}
+
+            # Add `BP_POETRY_INSTALL_ONLY` variable that specifies
+            # which package groups should be installed during build
+            if ! echo "${buildpack_env_vars}" | grep -q "BP_POETRY_INSTALL_ONLY"; then
+              echo "Adding BP_POETRY_INSTALL_ONLY environment variable"
+              bp_poetry_install_only="main"
+              if [[ "${environment}" == "dev" ]]; then
+                bp_poetry_install_only="${bp_poetry_install_only},dev"
+              fi
+              buildpack_env_vars="BP_POETRY_INSTALL_ONLY=${bp_poetry_install_only};${buildpack_env_vars}"
+              echo "Added BP_POETRY_INSTALL_ONLY=${bp_poetry_install_only}"
+            fi
+
+            # parse environment variables and add them to the platform directory
+            IFS=';' read -ra env_vars <<< "${buildpack_env_vars}"
+            for env_var in "${env_vars[@]}"; do
+              key=$(echo ${env_var} | cut -d'=' -f1)
+              value=$(echo ${env_var} | cut -d'=' -f2-)
+              echo "Creating ${env_dir}/${key} with value: ${value}"
+              echo "$value" > "${env_dir}/${key}"
+            done
         - name: copy-requirements
           image: docker.io/saritasallc/python-ci:0.0.1
           imagePullPolicy: IfNotPresent
@@ -239,21 +278,6 @@ buildpacks:
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
-
-            if [[ -f poetry.lock ]]; then
-              if [[ ! $(command -v poetry) ]]; then
-                echo "poetry is not installed or not in PATH. Halting execution."
-                exit 1
-              fi
-              echo "'poetry.lock' is found, preparing requirements.txt"
-              TARGET="main"
-              if [[ "$(params.environment)" == "dev" ]]; then
-                TARGET="${TARGET},dev"
-              fi
-              echo "Export '${TARGET}' targets dependencies"
-              poetry export --without-hashes --with ${TARGET} --output requirements.txt
-              exit 0
-            fi
 
             if [[ -f uv.lock ]]; then
               if [[ ! $(command -v uv) ]]; then
@@ -280,10 +304,6 @@ buildpacks:
               echo "'requirements.txt' found"
               exit 0
             fi
-
-            # otherwise raise error, because no requirements were found
-            echo "requirements.txt is not found! Halting execution."
-            exit 1
       # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
       # can be useful to prepare different backups and tests before real deploy
       preDeployTaskSteps: []
@@ -326,15 +346,20 @@ buildpacks:
             # https://github.blog/open-source/git/highlights-from-git-2-36/#stricter-repository-ownership-checks
             git config --global --add safe.directory /workspace/app
             git fetch --tags --unshallow
-          securityContext:
-            privileged: true
-            runAsUser: 0
+            chown -R "$(params.user_id):$(params.group_id)" "$(workspaces.app.path)"
 
         - name: get-semantic-version
           workingDir: $(workspaces.app.path)
           image: gittools/gitversion:5.8.3-alpine.3.12-5.0-amd64
           imagePullPolicy: IfNotPresent
           resources: {}
+          when:
+            # For some projects, devs don't want to use gitversion to automatically update all the *.csproj <Version> tags with it
+            # Instead, they want to manually define the version in the *.csproj files themselves
+            - input: $(params.buildpack_env_vars)
+              operator: notin
+              values:
+                - "DISABLE_GIT_VERSION"
           script: |
             #!/usr/bin/env ash
             # so we are making a hack, that if we try to merge hotfix branch into main we should
@@ -531,7 +556,7 @@ buildpacks:
 
 kaniko:
   # -- should we enable the kaniko pipeline
-  enabled: false
+  enabled: true
   # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
   # can be useful to prepare different backups and tests before real deploy
   preDeployTaskSteps: []
@@ -583,7 +608,7 @@ saritasa-tekton:
 # │                                                                                                                      │
 # └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 sentry:
-  enabled: false
+  enabled: true
   authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry API
   authTokenSecretKey: "auth-token"
   org: "saritasa"

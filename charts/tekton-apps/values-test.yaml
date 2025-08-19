@@ -10,7 +10,7 @@ aws:
   region: "us-east-2"
   dns: proxylegalstaging.com
 
-defaultRegistry: 833737135757.dkr.ecr.us-east-2.amazonaws.com
+defaultRegistry: 111111111111.dkr.ecr.us-east-2.amazonaws.com
 
 argocd:
   server: deploy.proxylegalstaging.com
@@ -19,7 +19,7 @@ trigger:
   enableWebhookSecret: true
 
 apps:
-  - project: nmbl
+  - project: test-project
     enabled: true
     argocd:
       labels:
@@ -32,37 +32,39 @@ apps:
       notifications:
         annotations:
           # In rocks/cloud cluster use slack-token integration:
-          notifications.argoproj.io/subscribe.on-health-degraded.slack: project-nmbl; project-nmbl-alarms
-          notifications.argoproj.io/subscribe.on-sync-failed.slack: project-nmbl-ci; project-nmbl-alarms
-          notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-nmbl; project-nmbl-alarms
-          notifications.argoproj.io/subscribe.on-deployed.slack: project-nmbl-ci
+          notifications.argoproj.io/subscribe.on-health-degraded.slack: project-test-project; project-test-project-alarms
+          notifications.argoproj.io/subscribe.on-sync-failed.slack: project-test-project-ci; project-test-project-alarms
+          notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-test-project; project-test-project-alarms
+          notifications.argoproj.io/subscribe.on-deployed.slack: project-test-project-ci
           # In staging/prod client cluster use webhook integration:
           notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
       syncWave: 200
-    mailList: nmbl@saritasa.com
-    devopsMailList: devops+nmbl@saritasa.com
-    jiraURL: https://saritasa.atlassian.net/browse/NMBLCLD
+    serviceAccount:
+      eks.amazonaws.com/role-arn: arn:aws:iam::111111111111:role/test-project-staging-eks-tekton-role
+    mailList: test-project@saritasa.com
+    devopsMailList: devops+test-project@saritasa.com
+    jiraURL: https://saritasa.atlassian.net/browse/test-projectCLD
     tektonURL: https://tekton.proxylegalstaging.com/#/namespaces/ci/pipelineruns
-    slack: client-nmbl-ci
+    slack: client-test-project-ci
     kubernetesRepository:
-      name: nmbl-kubernetes-aws
+      name: test-project-kubernetes-aws
       branch: feature/add-staging
-      url: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+      url: git@github.com:saritasa-nest/test-project-kubernetes-aws.git
 
     extraApps:
-      - name: nmbl-extra-apps
+      - name: test-project-extra-apps
         path: dev/argocd/apps
-        repoUrl: git@github.com:saritasa-nest/nmbl-kubernetes-aws.git
+        repoUrl: git@github.com:saritasa-nest/test-project-kubernetes-aws.git
         targetRevision: feature/sync-boilerplate
         kustomizeHelmChart: true
         argocd:
           notifications:
             annotations:
-              notifications.argoproj.io/subscribe.on-deployed.slack: project-nmbl-ci
+              notifications.argoproj.io/subscribe.on-deployed.slack: project-test-project-ci
 
     components:
       - name: backend
-        repository: nmbl-backend
+        repository: test-project-backend
         pipeline: buildpack-django-build-pipeline
         applicationURL: https://api.proxylegalstaging.com
         argocd:
@@ -71,21 +73,21 @@ apps:
           syncWave: 210
           notifications:
             annotations:
-              notifications.argoproj.io/subscribe.on-sync-failed.slack: project-nmbl-ci
+              notifications.argoproj.io/subscribe.on-sync-failed.slack: project-test-project-ci
         eventlistener:
           template: buildpack-django-build-pipeline-trigger-template
         triggerBinding:
           - name: docker_registry_repository
-            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/backend
+            value: 111111111111.dkr.ecr.us-east-2.amazonaws.com/test-project/staging/backend
           - name: buildpack_builder_image
-            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/google/builder:latest
+            value: 111111111111.dkr.ecr.us-east-2.amazonaws.com/test-project/staging/buildpacks/google/builder:latest
           - name: buildpack_runner_image
-            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/google/runner:latest
+            value: 111111111111.dkr.ecr.us-east-2.amazonaws.com/test-project/staging/buildpacks/google/runner:latest
           - name: kubernetes_branch
             value: feature/add-staging
 
       - name: frontend
-        repository: nmbl-frontend
+        repository: test-project-frontend
         pipeline: buildpack-frontend-build-pipeline
         applicationURL: https://proxylegalstaging.com
         argocd:
@@ -96,16 +98,16 @@ apps:
         eventlistener:
           template: buildpack-frontend-build-pipeline-trigger-template
           # TODO: Ksusha - pls fix once you finalize the PR
-          # https://github.com/saritasa-nest/nmbl-frontend/pull/1#pullrequestreview-962791245
+          # https://github.com/saritasa-nest/nmbl-project-frontend/pull/1#pullrequestreview-962791245
           gitWebhookBranches:
             - feature/add-ci-cd
         triggerBinding:
           - name: docker_registry_repository
-            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/frontend
+            value: 111111111111.dkr.ecr.us-east-2.amazonaws.com/test-project/staging/frontend
           - name: buildpack_builder_image
-            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/paketo/builder:latest
+            value: 111111111111.dkr.ecr.us-east-2.amazonaws.com/test-project/staging/buildpacks/paketo/builder:latest
           - name: buildpack_runner_image
-            value: 833737135757.dkr.ecr.us-east-2.amazonaws.com/nmbl/staging/buildpacks/paketo/runner:latest
+            value: 111111111111.dkr.ecr.us-east-2.amazonaws.com/test-project/staging/buildpacks/paketo/runner:latest
           - name: source_subpath
             value: dist
           - name: kubernetes_branch
@@ -124,7 +126,7 @@ apps:
             # kustomizeHelmChart: true
           notifications:
             annotations:
-              notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-nmbl; project-nmbl-alarms
+              notifications.argoproj.io/subscribe.on-sync-status-unknown.slack: project-test-project; project-test-project-alarms
         wordpress:
           imageTag: 6.0.2
           repositorySshUrl: ssh://

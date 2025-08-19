@@ -1,5 +1,68 @@
 # Changelog
 
+## 2025-08-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/164)
+- Add `git-clone-sentry` task to dotnet pipelines (fixes error dotnet sentry release)
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/163)
+- Add when condition `buildpack_env_vars=DISABLE_GIT_VERSION` for `git-fetch-tags` step in Dotnet pipeline
+
+## 2025-08-04
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/162)
+- Add external-secrets/allow label to argocd applications
+
+## 2025-08-02
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/161)
+- Add step `set-env-vars` to set environment variables for buildpack
+
+## 2025-08-01
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/160)
+- Remove shell code injection from slack-notification task in tekton-pipelines chart
+
+## 2025-07-16
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/159)
+- Use tag: latest for terraform image in `terraform-pod`
+
+## 2025-07-10
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/158)
+- Hotfix: change gcr to ghcr image repository in tekton-pipeline
+- Fix: add prepare step to Sentry task to fix permission errors
+- Move git clone gitops output to: `/workspace/app/gitops`
+
+## 2025-07-01
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/157)
+- Release new `terraform-pod` version with `1.12.2` terraform
+
+## 2025-06-26
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/156)
+- Add persistent logs for tekton:
+  - Remember to first create S3 bucket and IAM role in infra-aws repo
+  - Remember to first add logging-operator addon to cluster
+
 ## 2025-06-24
 
 [prod]

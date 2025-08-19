@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 2.0.0](https://img.shields.io/badge/Version-2.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.6](https://img.shields.io/badge/Version-2.2.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -275,7 +275,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.sentry_cli | string | `"getsentry/sentry-cli:2.46.0"` | sentry cli image - needs to prepare Sentry releases |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
-| kaniko.enabled | bool | `false` | should we enable the kaniko pipeline |
+| kaniko.enabled | bool | `true` | should we enable the kaniko pipeline |
 | kaniko.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | podTemplate | object | see values.yaml | default configuration to be added into each pod created by tekton engine we want to plave them in a specific node with added tolerations/taints. |
 | podTemplate.nodeSelector | object | `{"ci":"true"}` | node selector for pods spawned by tekton |
@@ -283,7 +283,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | saritasa-tekton.enabled | bool | `false` | should we configure dependency chart here. |
 | sentry.authTokenSecret | string | `"sentry-auth-token"` |  |
 | sentry.authTokenSecretKey | string | `"auth-token"` |  |
-| sentry.enabled | bool | `false` |  |
+| sentry.enabled | bool | `true` |  |
 | sentry.org | string | `"saritasa"` |  |
 | sentry.url | string | `"https://sentry.saritasa.rocks/"` |  |
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |

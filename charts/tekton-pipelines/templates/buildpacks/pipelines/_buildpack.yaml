@@ -4,6 +4,8 @@ kind: Pipeline
 metadata:
   name: {{ .pipeline.name }}
   namespace: {{.namespace }}
+  labels:
+    tekton: 'true'
 spec:
   description: |-
     {{- .pipeline.description | default (printf "Pipeline will only build the image utilizing %s task and then send notification via slack. The deployment is done via argocd" (.pipeline.buildTaskName)) | nindent 4}}
@@ -45,6 +47,13 @@ spec:
     - name: buildpack_runner_image
       type: string
       description: reference to a run image to use
+
+    - name: buildpack_env_vars
+      type: string
+      description: |-
+        environment variables that should be passed to buildpack
+        expected string format: 'BP_POETRY_INSTALL_ONLY=main,dev;BP_OCI_VENDOR=saritasa'
+      default: ""
 
     - name: source_subpath
       type: string
@@ -147,6 +156,8 @@ spec:
           value: "$(params.buildpack_builder_image)"
         - name: run_image
           value: "$(params.buildpack_runner_image)"
+        - name: buildpack_env_vars
+          value: "$(params.buildpack_env_vars)"
         - name: docker_registry
           value: $(params.docker_registry)
         - name: cache
@@ -191,6 +202,8 @@ spec:
           value: $(params.kubernetes_repository_ssh_url)
         - name: revision
           value: $(params.kubernetes_branch)
+        - name: subdirectory
+          value: gitops
       workspaces:
         - name: output
           workspace: source
@@ -211,6 +224,8 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
+        - name: subdirectory
+          value: gitops
       workspaces:
         - name: source
           workspace: source
@@ -231,7 +246,29 @@ spec:
         - {{ if (.pipeline).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 
   {{ if .sentry.enabled }}
+
+    {{ if eq .pipeline.name "buildpack-dotnet-build-pipeline" }}
+    # Dotnet tasks remove the source code from the workspace, so we need to clone it again
+    - name: git-clone-sentry
+      taskRef:
+        name: git-clone
+      workspaces:
+      - name: output
+        workspace: source
+      params:
+      - name: url
+        value: $(params.repository_ssh_url)
+      - name: revision
+        value: $(params.branch)
+      - name: subdirectory
+        value: sentry
+      runAfter:
+        - deploy
+
+    {{ include "pipeline.sentryRelease" (merge (dict "subdirectory" "sentry") .) | nindent 4 }}
+    {{- else }}
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
+    {{- end }}
   {{ end }}
 
   {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
