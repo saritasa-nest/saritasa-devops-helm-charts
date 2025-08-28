@@ -63,7 +63,10 @@ spec:
         export tag="${img##*:}"
 
         cd $(params.kustomize_overlay_path)
-        yq -i '.images[0].name = strenv(application) | .images[0].newName = strenv(newname) | .images[0].newTag = strenv(tag)' kustomization.yaml
+        yq -i '
+          (.images[] | select(.name == strenv(application))) |=
+            (.newName = strenv(newname) | .newTag = strenv(tag))
+        ' kustomization.yaml
 
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
