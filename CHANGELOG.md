@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-08-28
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/166)
+- Update kustomize `update-image` step to use yq selecting the element of the array by name
+
 ## 2025-08-14
 
 [dev]
