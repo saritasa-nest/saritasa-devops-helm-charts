@@ -63,6 +63,12 @@ spec:
         export tag="${img##*:}"
 
         cd $(params.kustomize_overlay_path)
+        # Use yq to update ECR image tag in kustomization.yaml file
+        # select the element by name and update the image name and tag
+        # We don't just pick the 1st element of the array in case there are more than one
+        # this is the case for projects where multiple envs are hosted in the same EKS cluster
+        # Example:
+        # https://github.com/saritasa-nest/saritasa-cryptoratt-kubernetes-aws/blob/8aaa53277427dbab981c1f2341916b90a43909cc/apps/backend/manifests/staging/kustomization.yaml#L61
         yq -i '
           (.images[] | select(.name == strenv(application))) |=
             (.newName = strenv(newname) | .newTag = strenv(tag))
