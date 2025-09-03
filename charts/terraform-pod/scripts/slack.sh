@@ -59,13 +59,16 @@ _get_git_info() {
 		[[ "$GITHUB_PR_DECISION" == "APPROVED" ]] && export COLOR=$COLOR_GREEN || export COLOR=$COLOR_RED
 
 		# send PR comment that the terraform pod was started
+		# unless the author is saritasa-renovatebot
 		prPodStartedCommentBody=$(
 			cat <<-EOF
 				# $POD_NAME
 				$GITHUB_PR_AUTHOR just created terraform pod on $(date)
 			EOF
 		)
-		gh pr comment --body "$prPodStartedCommentBody"
+		if [[ "$GITHUB_PR_AUTHOR" != "app/saritasa-renovatebot" ]]; then
+			gh pr comment --body "$prPodStartedCommentBody"
+		fi
 	fi
 
 	# check if we have a non-empty git-crypt-key
