@@ -298,7 +298,10 @@ github.email:
 
 {{/* Validate the value of gitCryptKey */}}
 {{- define "terraform-pod.validateValues.gitCryptKey" -}}
-{{- if not (and .Values.gitCryptKey (kindIs "string" .Values.gitCryptKey)) -}}
+{{- if and
+      (ne .Values.github.username "saritasa-renovatebot[bot]")
+      (not (and .Values.gitCryptKey (kindIs "string" .Values.gitCryptKey)))
+-}}
 gitCryptKey:
     `gitCryptKey` is required and should be a non-empty base64 string. It should contain the content of the git-crypt-key file in base64 format.
 {{- end -}}
