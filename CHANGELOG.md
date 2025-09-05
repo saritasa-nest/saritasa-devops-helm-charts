@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-09-05
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/167)
+- Added secret to terraform-pod for delmar rds instance
+
 ## 2025-08-28
 
 [dev]
