@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-09-05
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/168)
+- Update default repository for wordpress to `bitnamilegacy/wordpress`
+
 ## 2025-08-28
 
 [dev]
