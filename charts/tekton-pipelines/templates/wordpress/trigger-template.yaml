@@ -11,6 +11,9 @@ spec:
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
+    - name: branch_name
+      description: git branch name extracted from webhook
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -29,6 +32,8 @@ spec:
         {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
+        - name: branch
+          value: "$(tt.params.branch_name)"
       podTemplate:
         volumes:
         - name: podinfo

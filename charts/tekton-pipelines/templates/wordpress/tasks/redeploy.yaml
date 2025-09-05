@@ -12,11 +12,18 @@ spec:
       description: The name of the argocd application being built
     - name: kubernetes_namespace
       description: Namespace in which we need to redeploy
+    - name: branch
+      description: Git branch name to deploy
+      default: "main"
   steps:
     - name: deploy
       image: {{ .Values.images.kubectl | default "bitnami/kubectl:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
+        # Update deployment with new branch via environment variable
+        kubectl -n $(params.kubernetes_namespace) patch deployment $(params.application) -p '{"spec":{"template":{"spec":{"initContainers":[{"name":"wordpress-clone","env":[{"name":"REVISION","value":"$(params.branch)"}]}]}}}}'
+
+        # Force pod restart to pick up new branch
         kubectl -n $(params.kubernetes_namespace) delete pod -l "app.kubernetes.io/instance=$(params.application)"
         kubectl -n $(params.kubernetes_namespace) rollout status deployment $(params.application) -w
 

@@ -18,6 +18,11 @@ spec:
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
+    - name: branch
+      type: string
+      description: git branch name to deploy
+      default: "main"
+
 
   tasks:
     - name: deploy
@@ -28,6 +33,8 @@ spec:
           value: "$(params.application)"
         - name: kubernetes_namespace
           value: "$(params.kubernetes_namespace)"
+        - name: branch
+          value: "$(params.branch)"
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 
