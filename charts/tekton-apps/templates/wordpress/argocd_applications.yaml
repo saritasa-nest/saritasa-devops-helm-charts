@@ -44,7 +44,7 @@ spec:
     helm:
       values: |
         image:
-          repository: bitnami/wordpress
+          repository: bitnamilegacy/wordpress
           tag: {{ (.image).tag | default "6.1.1" }}
           debug: {{ (.image).debug | default "true" }}
 
