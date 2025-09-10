@@ -277,7 +277,7 @@ spec:
         {{- end }}
 
 
-    repoURL: {{ $argocd.source.repoUrl | default "https://charts.bitnami.com/bitnami" }}
+    repoURL: {{ $argocd.source.repoUrl | default "registry-1.docker.io/bitnamicharts" }}
     targetRevision: {{ $argocd.source.targetRevision | default "15.2.40" }}
     {{ if (ternary $argocd.source.kustomizeHelmChart false (hasKey $argocd.source "kustomizeHelmChart")) -}}
     plugin:
