@@ -18,11 +18,27 @@ spec:
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
+    - name: gitRevision
+      type: string
+      description: git branch/tag to deploy
+      default: develop
 
   tasks:
+    - name: update-argocd-app
+      taskRef:
+        name: argocd-task-sync-and-wait
+      params:
+        - name: application-name
+          value: "$(params.application)"
+        - name: revision
+          value: "$(params.gitRevision)"
+        - name: flags
+          value: "--helm-set-string wordpress.repositoryRevision=$(params.gitRevision)"
     - name: deploy
       taskRef:
         name: redeploy
+      runAfter:
+        - update-argocd-app
       params:
         - name: application
           value: "$(params.application)"

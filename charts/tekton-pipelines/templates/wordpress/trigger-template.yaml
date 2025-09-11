@@ -11,6 +11,9 @@ spec:
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
+    - name: gitRevision
+      description: git branch/tag to deploy
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -29,6 +32,8 @@ spec:
         {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
+        - name: gitRevision
+          value: "$(tt.params.gitRevision)"
       podTemplate:
         volumes:
         - name: podinfo
