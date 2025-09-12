@@ -37,6 +37,7 @@ spec:
               source ~/scripts/slack.sh
               gh repo clone {{ .Values.github.repository }} ~/workspace
               git checkout {{ .Values.github.branch }}
+              TERRAFORM_VERSION="$(< .terraform-version)"
               cp -r ~/git-crypt-key git-crypt-key
               if [[ -s git-crypt-key ]]; then
                 git-crypt unlock git-crypt-key
