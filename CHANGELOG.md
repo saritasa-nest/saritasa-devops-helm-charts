@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-09-17
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/169)
+- Migrate bitnami kubectl to bitnamilegacy
+
 ## 2025-09-05
 
 [dev]
