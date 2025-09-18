@@ -234,7 +234,7 @@ spec:
   - apps[PROJECT].components[NAME].argocd.source.path - path to directory responsible for kubernetes resources creation of the ArgoCD Application (default: kubernetes repo path for basic
     projects "apps/<apps[PROJECT].components[NAME].name>/manifests/<environment>" or "null" for wordpress projects)
   - apps[PROJECT].components[NAME].argocd.source.repoUrl - url of repository which should be used for ArgoCD Application (default: kubernetes repo for basic projects
-    "<apps[PROJECT].kubernetesRepository.url>" or `https://charts.bitnami.com/bitnami` for wordpress projects)
+    "<apps[PROJECT].kubernetesRepository.url>" or `https://registry-1.docker.io/bitnamicharts` for wordpress projects)
   - apps[PROJECT].components[NAME].argocd.source.targetRevision - tag or branch in the repository for ArgoCD Application (default: kubernetes branch for basic projects
     "<apps[PROJECT].kubernetesRepository.branch>" or "11.0.14" for wordpress projects)
   - apps[PROJECT].components[NAME].argocd.ignoreDeploymentReplicasDiff - flag whether this exact ArgoCD application should ignore `Replicas` count differences for deployments. It may be needed for `staging` and `prod` environments which use HPA (default: false)
@@ -1272,7 +1272,7 @@ spec:
                     # In staging/prod client cluster use webhook integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
-                  - https://charts.bitnami.com/bitnami
+                  - https://registry-1.docker.io/bitnamicharts
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -1352,7 +1352,7 @@ spec:
                     # In staging/prod client cluster use webhook integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
-                  - https://charts.bitnami.com/bitnami
+                  - https://registry-1.docker.io/bitnamicharts
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -1435,7 +1435,7 @@ spec:
                     # In staging/prod client cluster use webhook integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
-                  - https://charts.bitnami.com/bitnami
+                  - https://registry-1.docker.io/bitnamicharts
                   - git@github.com:saritasa-nest/xxx-kubernetes-aws.git
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
