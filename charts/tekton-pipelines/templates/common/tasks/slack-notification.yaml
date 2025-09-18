@@ -44,7 +44,7 @@ spec:
 
   steps:
     - name: get-failed-info
-      image: {{ .Values.images.kubectl | default "bitnami/kubectl:latest"}}
+      image: {{ .Values.images.kubectl | default "bitnamilegacy/kubectl:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         #!/bin/sh
