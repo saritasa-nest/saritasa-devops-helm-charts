@@ -933,7 +933,7 @@ pipelinerunsCleaner:
   restartPolicy: Never
   image:
     # -- default docker registry
-    repository: bitnami/kubectl
+    repository: bitnamilegacy/kubectl
     # -- pull policy
     pullPolicy: Always
     # -- Overrides the image tag whose default is the chart appVersion.

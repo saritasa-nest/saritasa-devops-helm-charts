@@ -1,7 +1,7 @@
 
 # saritasa-tekton
 
-![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 2.1.3](https://img.shields.io/badge/Version-2.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 A Helm chart for tekton
 
@@ -98,7 +98,7 @@ A Helm chart for tekton
 | pipelinerunsCleaner.enabled | bool | `true` |  |
 | pipelinerunsCleaner.failedJobsHistoryLimit | int | `3` |  |
 | pipelinerunsCleaner.image.pullPolicy | string | `"Always"` | pull policy |
-| pipelinerunsCleaner.image.repository | string | `"bitnami/kubectl"` | default docker registry |
+| pipelinerunsCleaner.image.repository | string | `"bitnamilegacy/kubectl"` | default docker registry |
 | pipelinerunsCleaner.image.tag | string | `"latest"` | Overrides the image tag whose default is the chart appVersion. |
 | pipelinerunsCleaner.namespace | string | `"ci"` |  |
 | pipelinerunsCleaner.restartPolicy | string | `"Never"` |  |
