@@ -12,7 +12,7 @@
 [dev]
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/170)
-- Bump chart versions for 12 modules to fix GitHub Action lint check failures (capacity-prometheus-exporter, demo, eol-prometheus-exporter, jitsi-meet, maintenance-page, opsgenie-heartbeat, prometheus-xrstf-github-exporter, saritasa-rbac, saritasa-tekton-apps, saritasa-tekton-pipelines, saritasa-tekton, terraform-pod)
+- Release new `saritasa-tekton-apps` chart version `2.1.2`
 
 ## 2025-09-05
 
