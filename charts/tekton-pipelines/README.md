@@ -268,7 +268,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.bash | string | `"docker.io/library/bash:5.2.37"` | bash image (used for various ops in steps) |
 | images.git | string | `"alpine/git:v2.49.0"` | git image |
 | images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698"` | kaniko image used to build containers containing docker files - v1.24.0, uploaded May 23 2025 |
-| images.kubectl | string | `"bitnami/kubectl:1.33.1"` | kubectl cli |
+| images.kubectl | string | `"bitnamilegacy/kubectl:1.33.1"` | kubectl cli |
 | images.kubeval | string | `"public.ecr.aws/saritasa/kubeval:0.16.1"` | kubeval image - validate Kubernetes manifests |
 | images.kustomize | string | `"registry.k8s.io/kustomize/kustomize:v5.6.0"` | kustomize cli |
 | images.python | string | `"saritasallc/python3:0.4"` | python image |

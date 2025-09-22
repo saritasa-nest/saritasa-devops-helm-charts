@@ -14,7 +14,7 @@ spec:
       description: Namespace in which we need to redeploy
   steps:
     - name: deploy
-      image: {{ .Values.images.kubectl | default "bitnami/kubectl:latest" }}
+      image: {{ .Values.images.kubectl | default "bitnamilegacy/kubectl:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         kubectl -n $(params.kubernetes_namespace) delete pod -l "app.kubernetes.io/instance=$(params.application)"
