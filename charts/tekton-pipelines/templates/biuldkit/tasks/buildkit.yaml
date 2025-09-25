@@ -85,7 +85,7 @@ spec:
         - --opt=build-arg:ENVIRONMENT=$(params.environment)
         - $(params.extra_args[*])
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        privileged: false
+        runAsNonRoot: false
+        privileged: true
+        allowPrivilegeEscalation: true
 {{ end }}
