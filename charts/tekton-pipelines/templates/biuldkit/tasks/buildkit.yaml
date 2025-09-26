@@ -1,0 +1,105 @@
+{{ if .Values.buildkit.enabled }}
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: buildkit
+  namespace: {{ .Release.Namespace }}
+
+spec:
+  description: >-
+    This is task for Saritasa projects written with Dockerfile, compilation is done by using BuildKit
+    https://github.com/moby/buildkit
+
+  workspaces:
+    - name: source
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application we're going to deploy/sync
+
+    - name: docker_file
+      type: string
+      description: name of the dockerfile
+      default: "Dockerfile"
+
+    - name: docker_context
+      type: string
+      description: |
+         The build context used by Builder
+      default: "."
+
+    - name: extra_args
+      type: array
+      description: extra args to be passed into builkit builder
+      default: []
+
+    - name: environment
+      type: string
+      description: environment name of the app being built, i.e. dev/staging/prod
+
+    - name: image
+      type: string
+      description: new image for the application
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config # project specific values
+
+  steps:
+    - name: authenticate
+      image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)
+      securityContext:
+        runAsNonRoot: false
+        privileged: true
+        allowPrivilegeEscalation: true
+        capabilities:
+          drop:
+            - ALL
+      script: |
+        #!/bin/sh
+        set -e
+        ecr_registry=$(echo "$(params.image)" | cut -d/ -f1)
+        ecr_region=$(echo "$ecr_registry" | sed -n 's/.*\.ecr\.\(.*\)\.amazonaws\.com.*/\1/p')
+        password=$(aws ecr get-login-password --region $ecr_region)
+        auth=$(echo -n "AWS:${password}" | base64 | tr -d '\n')
+
+        mkdir -p $(workspaces.source.path)/docker
+        cat > $(workspaces.source.path)/docker/config.json <<EOF
+        {
+          "auths": {
+            "${ecr_registry}": {
+              "auth": "${auth}"
+            }
+          }
+        }
+        EOF
+
+    - name: build
+      image: {{ .Values.images.buildkit | default "moby/buildkit:master-rootless"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: BUILDKITD_FLAGS
+          value: --oci-worker-no-process-sandbox
+        - name: DOCKER_CONFIG
+          value: $(workspaces.source.path)/docker
+      command:
+        - buildctl-daemonless.sh
+      args:
+        - build
+        - --frontend=dockerfile.v0
+        - --local=context=$(workspaces.source.path)/$(params.docker_context)
+        - --local=dockerfile=$(workspaces.source.path)
+        - --opt=filename=$(params.docker_file)
+        - --output=type=image,name=$(params.image),push=true
+        - --opt=build-arg:ENVIRONMENT=$(params.environment)
+        - $(params.extra_args[*])
+      securityContext:
+        runAsNonRoot: false
+        privileged: true
+        allowPrivilegeEscalation: true
+{{ end }}
