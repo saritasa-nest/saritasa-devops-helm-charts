@@ -77,8 +77,6 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: docker_registry
-          value: $(params.docker_registry)
         - name: environment
           value: "$(params.environment)"
         - name: docker_file

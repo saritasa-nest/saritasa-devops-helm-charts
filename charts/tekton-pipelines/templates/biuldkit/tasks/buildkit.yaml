@@ -18,10 +18,6 @@ spec:
       type: string
       description: name of the argocd application we're going to deploy/sync
 
-    - name: docker_registry
-      type: string
-      description: aws private ecr registry address
-
     - name: docker_file
       type: string
       description: name of the dockerfile
@@ -45,10 +41,6 @@ spec:
     - name: image
       type: string
       description: new image for the application
-
-  results:
-    - name: password
-      description: The password to authenticate to ecr registry.
 
   stepTemplate:
     envFrom:
