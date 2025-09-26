@@ -59,7 +59,7 @@ spec:
     - name: authenticate
       image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
-      imagePullPolicy: IfNotPresent
+      workingDir: $(workspaces.source.path)
       securityContext:
         runAsNonRoot: false
         privileged: true
@@ -70,10 +70,11 @@ spec:
       script: |
         #!/bin/sh
         set -e
-        ecr_registry=$(echo "$(params.app_image)" | cut -d/ -f1)
+        ecr_registry=$(echo "$(params.image)" | cut -d/ -f1)
         ecr_region=$(echo "$ecr_registry" | sed -n 's/.*\.ecr\.\(.*\)\.amazonaws\.com.*/\1/p')
         password=$(aws ecr get-login-password --region $ecr_region)
         auth=$(echo -n "AWS:${password}" | base64 | tr -d '\n')
+
         mkdir -p $(workspaces.source.path)/docker
         cat > $(workspaces.source.path)/docker/config.json <<EOF
         {
