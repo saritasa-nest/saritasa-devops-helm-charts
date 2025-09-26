@@ -31,7 +31,7 @@ spec:
 
     - name: extra_args
       type: array
-      description: extra args to be passed into builkit builder
+      description: extra args to be passed into buildkit builder
       default: []
 
     - name: environment
@@ -41,6 +41,12 @@ spec:
     - name: image
       type: string
       description: new image for the application
+
+  results:
+    - name: app_image_url
+      description: URL собранного образа
+    - name: app_image_digest
+      description: Digest собранного образа
 
   stepTemplate:
     envFrom:
@@ -95,11 +101,30 @@ spec:
         - --local=context=$(workspaces.source.path)/$(params.docker_context)
         - --local=dockerfile=$(workspaces.source.path)
         - --opt=filename=$(params.docker_file)
-        - --output=type=image,name=$(params.image),push=true
-        - --opt=build-arg:ENVIRONMENT=$(params.environment)
+        - --output=type=image,name=$(params.image),push=true,buildinfo-attrs=true
+        - --metadata-file=$(workspaces.source.path)/build-metadata.json
         - $(params.extra_args[*])
       securityContext:
         runAsNonRoot: false
         privileged: true
         allowPrivilegeEscalation: true
+
+    - name: results
+      image: saritasallc/tekton:1.0.8
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        privileged: false
+        allowPrivilegeEscalation: false
+      env:
+        - name: app_image
+          value: $(params.image)
+      script: |
+        #!/usr/bin/env bash
+        set -eu
+        echo -n "${app_image}" \
+          | tee "$(results.app_image_url.path)"
+        echo -n "$(jq -r '.["containerimage.digest"]' $(workspaces.source.path)/build-metadata.json)" \
+          | tee "$(results.app_image_digest.path)"
 {{ end }}

@@ -117,7 +117,9 @@ spec:
         - name: application
           value: "$(params.application)"
         - name: image
-          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+          value: "$(tasks.buildkit.results.app_image_url)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.app_image_digest)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch
@@ -140,8 +142,10 @@ spec:
       taskRef:
         name: argocd-deploy
       params:
-        - name : application
+        - name: application
           value: "$(params.application)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.app_image_digest)"
       runAfter:
         - {{ if (.Values.buildkit).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 
