@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-09-26
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/170)
+- Add `buildkit`
+
 ## 2025-09-17
 
 [prod]

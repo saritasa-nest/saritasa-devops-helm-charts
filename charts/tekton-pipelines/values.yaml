@@ -570,6 +570,20 @@ kaniko:
   #     #!/bin/bash
   #     echo "hello world"
 
+buildkit:
+  # -- should we enable the buildkit pipeline
+  enabled: true
+  # -- steps to run in the `pre-deploy` task prior to ArgoCD sync command
+  # can be useful to prepare different backups and tests before real deploy
+  preDeployTaskSteps: []
+  # - name: pre-deploy-hello-world
+  #   image: node:22
+  #   imagePullPolicy: IfNotPresent
+  #   workingDir: $(workspaces.app.path)
+  #   script: |
+  #     #!/bin/bash
+  #     echo "hello world"
+
 wordpress:
   # -- should we enable the wordpress pipeline
   enabled: false
