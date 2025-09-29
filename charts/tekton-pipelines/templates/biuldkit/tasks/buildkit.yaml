@@ -109,6 +109,11 @@ spec:
         runAsNonRoot: false
         privileged: true
         allowPrivilegeEscalation: true
+    
+    - name: debug
+      image: busybox
+      script: |
+        cat $(workspaces.source.path)/build-metadata.json
 
     - name: results
       image: saritasallc/tekton:1.0.8
