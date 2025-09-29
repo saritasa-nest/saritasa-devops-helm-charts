@@ -117,9 +117,9 @@ spec:
         - name: application
           value: "$(params.application)"
         - name: image
-          value: "$(tasks.buildkit.results.app_image_url)"
+          value: "$(tasks.buildkit.results.image_url)"
         - name: image_digest
-          value: "$(tasks.buildkit.results.app_image_digest)"
+          value: "$(tasks.buildkit.results.image_digest)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch
@@ -145,7 +145,7 @@ spec:
         - name: application
           value: "$(params.application)"
         - name: image_digest
-          value: "$(tasks.buildkit.results.app_image_digest)"
+          value: "$(tasks.buildkit.results.image_digest)"
       runAfter:
         - {{ if (.Values.buildkit).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 

@@ -43,10 +43,10 @@ spec:
       description: new image for the application
 
   results:
-    - name: app_image_url
-      description: URL собранного образа
-    - name: app_image_digest
-      description: Digest собранного образа
+    - name: image_digest
+      description: the digest of the built `image`
+    - name: image_url
+      description: the url sof the built `image`
 
   stepTemplate:
     envFrom:
@@ -98,9 +98,10 @@ spec:
       args:
         - build
         - --frontend=dockerfile.v0
-        - --local=context=$(workspaces.source.path)/$(params.docker_context)
-        - --local=dockerfile=$(workspaces.source.path)
-        - --opt=filename=$(params.docker_file)
+        - --local=context=$(workspaces.source.path)/$(params.docker_context) # directory with source files for COPY/ADD
+        - --local=dockerfile=$(workspaces.source.path)/$(params.docker_context) # directory with Dockerfile
+        - --opt=filename=$(params.docker_file) # name of the Dockerfile if it's not the default "Dockerfile"
+        - --opt=build-arg:ENVIRONMENT=$(params.environment) 
         - --output=type=image,name=$(params.image),push=true,buildinfo-attrs=true
         - --metadata-file=$(workspaces.source.path)/build-metadata.json
         - $(params.extra_args[*])
@@ -117,14 +118,11 @@ spec:
         runAsGroup: 1000
         privileged: false
         allowPrivilegeEscalation: false
-      env:
-        - name: app_image
-          value: $(params.image)
       script: |
         #!/usr/bin/env bash
         set -eu
-        echo -n "${app_image}" \
-          | tee "$(results.app_image_url.path)"
+        echo -n "$(params.image)" \
+          | tee "$(results.image_url.path)"
         echo -n "$(jq -r '.["containerimage.digest"]' $(workspaces.source.path)/build-metadata.json)" \
-          | tee "$(results.app_image_digest.path)"
+          | tee "$(results.image_digest.path)"
 {{ end }}
