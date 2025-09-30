@@ -4,7 +4,7 @@
 
 [dev]
 
-- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/170)
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/171)
 - Add `buildkit`
 
 ## 2025-09-17
