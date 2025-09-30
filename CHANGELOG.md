@@ -7,6 +7,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/169)
 - Migrate bitnami kubectl to bitnamilegacy
 
+## 2025-09-15
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/170)
+- Release new `saritasa-tekton-apps` chart version `2.1.2`
+
 ## 2025-09-05
 
 [dev]
