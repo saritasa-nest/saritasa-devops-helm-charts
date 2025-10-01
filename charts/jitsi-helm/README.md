@@ -140,4 +140,3 @@ A Helm chart for Kubernetes
 | xmpp.guestDomain | string | `nil` |  |
 | xmpp.internalMucDomain | string | `nil` |  |
 | xmpp.mucDomain | string | `nil` |  |
-

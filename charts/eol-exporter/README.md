@@ -292,4 +292,3 @@ endoflife_failed_configs{} == 1
 | exporter.serviceMonitor.endpoints[0].interval | string | `"2m"` |  |
 | exporter.serviceMonitor.endpoints[0].path | string | `"/metrics"` |  |
 | exporter.serviceMonitor.endpoints[0].port | string | `"http"` |  |
-

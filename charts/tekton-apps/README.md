@@ -1611,4 +1611,3 @@ whitelistIP: |
 | trigger.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | trigger.labels | object | `{"builder":"tekton"}` | labels to set on Triggers - for discovery by EventListener |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
-

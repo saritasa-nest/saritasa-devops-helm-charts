@@ -78,4 +78,3 @@ Keep in mind that the name of your heartbeat in opsgenie should be the exact nam
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` |  |
-

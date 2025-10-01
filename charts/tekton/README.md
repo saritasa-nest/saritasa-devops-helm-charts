@@ -270,4 +270,3 @@ A Helm chart for tekton
 | triggers.webhook.resources | object | `{}` |  |
 | triggers.webhook.tolerations | list | `[]` |  |
 | triggers.webhook.topologySpreadConstraints | object | `{}` |  |
-

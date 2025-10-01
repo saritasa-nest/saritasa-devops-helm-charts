@@ -192,4 +192,3 @@ unset creds
 | terraform.token | string | `""` | terraform api token value (optional, if passed - takes precedence over tokenSecret) |
 | terraform.tokenSecret | string | `"terraform-cli-token-saritasa-team"` | secret name containing terraform team API token name (optional) |
 | tolerations | list | `[]` | tolerations |
-

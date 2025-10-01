@@ -170,4 +170,3 @@ extraRbac: |
 | rbac.developers.ingressNginx | bool | `false` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
 | rbac.developers.utils | bool | `false` | should we add utils (cli tools, port-forwarder for dbs) namespace access to client team members |
 | rbac.devops | bool | `false` | should we create cluster role/binding for devops team |
-

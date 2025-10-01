@@ -73,4 +73,3 @@ kubectl -n prometheus create secret generic github-token \
 | securityContext | object | `{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | security options for the running pod |
 | service | object | `{"port":9162,"type":"ClusterIP"}` | type of the service to create |
 | tolerations | list | `[]` |  |
-
