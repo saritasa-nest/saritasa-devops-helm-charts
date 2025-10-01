@@ -66,21 +66,11 @@ spec:
           # Get current Application spec
           kubectl get application $(params.application) -n argo-cd -o json > /tmp/app.json
 
-          # Update REVISION in values using jq and create patch
+          # Update REVISION in values using jq
           NEW_VALUES=$(jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' /tmp/app.json)
 
-          # Create strategic merge patch
-          cat > /tmp/patch.json <<EOF
-{
-  "spec": {
-    "source": {
-      "helm": {
-        "values": $(echo "$NEW_VALUES" | jq -Rs .)
-      }
-    }
-  }
-}
-EOF
+          # Create patch JSON using jq (avoids heredoc issues in YAML)
+          echo "$NEW_VALUES" | jq -Rs . | jq -n --arg values "$(cat)" '{spec: {source: {helm: {values: $values}}}}' > /tmp/patch.json
 
           # Apply patch using kubectl
           echo "Updating Application with new values..."
