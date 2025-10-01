@@ -50,20 +50,32 @@ spec:
           --password $ARGOCD_PASSWORD \
           --http-retry-max 3
 
-        # Update application parameters if flags are provided
-        if [ -n "$(params.flags)" ]; then
+        # Update application values if flags contain helm-set-string for repositoryRevision
+        if [ -n "$(params.flags)" ] && echo "$(params.flags)" | grep -q "wordpress.repositoryRevision"; then
+          # Extract the branch value from flags
+          BRANCH=$(echo "$(params.flags)" | sed -n 's/.*wordpress.repositoryRevision=\([^ ]*\).*/\1/p')
+          echo "Updating WordPress repositoryRevision to: $BRANCH"
+
+          # Get current values
+          CURRENT_VALUES=$(argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | jq -r '.spec.source.helm.values')
+
+          # Replace REVISION value in the values
+          NEW_VALUES=$(echo "$CURRENT_VALUES" | sed "s/REVISION=\"[^\"]*\"/REVISION=\"$BRANCH\"/g")
+
+          # Create patch JSON
+          PATCH_JSON=$(jq -n --arg values "$NEW_VALUES" '{spec: {source: {helm: {values: $values}}}}')
+
+          # Apply patch
+          echo "$PATCH_JSON" | argocd app patch $(params.application) --server=argo-cd-argocd-server.argo-cd --patch-file /dev/stdin
+        elif [ -n "$(params.flags)" ]; then
+          # For other flags, use app set
           SET_CMD="argocd app set $(params.application) --server=argo-cd-argocd-server.argo-cd $(params.flags)"
           echo "Executing: $SET_CMD"
           eval $SET_CMD
         fi
 
-        # Build sync command with optional revision
+        # Build sync command
         SYNC_CMD="argocd app sync $(params.application) --server=argo-cd-argocd-server.argo-cd --force"
-
-        # Add revision if provided
-        if [ -n "$(params.revision)" ]; then
-          SYNC_CMD="$SYNC_CMD --revision $(params.revision)"
-        fi
 
         echo "Executing: $SYNC_CMD"
         eval $SYNC_CMD
