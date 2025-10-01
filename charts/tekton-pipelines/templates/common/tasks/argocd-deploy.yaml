@@ -50,17 +50,19 @@ spec:
           --password $ARGOCD_PASSWORD \
           --http-retry-max 3
 
-        # Build sync command with optional parameters
+        # Update application parameters if flags are provided
+        if [ -n "$(params.flags)" ]; then
+          SET_CMD="argocd app set $(params.application) --server=argo-cd-argocd-server.argo-cd $(params.flags)"
+          echo "Executing: $SET_CMD"
+          eval $SET_CMD
+        fi
+
+        # Build sync command with optional revision
         SYNC_CMD="argocd app sync $(params.application) --server=argo-cd-argocd-server.argo-cd"
 
         # Add revision if provided
         if [ -n "$(params.revision)" ]; then
           SYNC_CMD="$SYNC_CMD --revision $(params.revision)"
-        fi
-
-        # Add additional flags if provided
-        if [ -n "$(params.flags)" ]; then
-          SYNC_CMD="$SYNC_CMD $(params.flags)"
         fi
 
         echo "Executing: $SYNC_CMD"
