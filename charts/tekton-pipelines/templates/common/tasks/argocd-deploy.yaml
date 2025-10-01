@@ -62,11 +62,10 @@ spec:
           # Replace REVISION value in the values
           NEW_VALUES=$(echo "$CURRENT_VALUES" | sed "s/REVISION=\"[^\"]*\"/REVISION=\"$BRANCH\"/g")
 
-          # Create patch JSON and apply using kubectl
+          # Create patch JSON and apply using argocd with stdin
           PATCH_JSON=$(jq -n --arg values "$NEW_VALUES" '{spec: {source: {helm: {values: $values}}}}')
           echo "Applying patch to update REVISION in values..."
-          echo "$PATCH_JSON" > /tmp/patch.json
-          kubectl patch application $(params.application) -n argo-cd --type=merge --patch-file=/tmp/patch.json
+          echo "$PATCH_JSON" | argocd app patch $(params.application) --server=argo-cd-argocd-server.argo-cd --patch /dev/stdin --type merge
           echo "Patch applied successfully"
         elif [ -n "$(params.flags)" ]; then
           # For other flags, use app set
