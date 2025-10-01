@@ -178,3 +178,4 @@ spec:
           | tee "$(results.app_image_url.path)"
         echo -n "$(jq -r '.["containerimage.digest"]' $(workspaces.source.path)/build-metadata.json)" \
           | tee "$(results.app_image_digest.path)"
+{{ end }}
