@@ -62,11 +62,10 @@ spec:
           # Replace REVISION value in the values
           NEW_VALUES=$(echo "$CURRENT_VALUES" | sed "s/REVISION=\"[^\"]*\"/REVISION=\"$BRANCH\"/g")
 
-          # Create patch JSON
+          # Create patch JSON and apply
           PATCH_JSON=$(jq -n --arg values "$NEW_VALUES" '{spec: {source: {helm: {values: $values}}}}')
-
-          # Apply patch
-          echo "$PATCH_JSON" | argocd app patch $(params.application) --server=argo-cd-argocd-server.argo-cd --patch-file /dev/stdin
+          echo "Applying patch to update REVISION in values..."
+          argocd app patch $(params.application) --server=argo-cd-argocd-server.argo-cd --patch "$PATCH_JSON" --type merge
         elif [ -n "$(params.flags)" ]; then
           # For other flags, use app set
           SET_CMD="argocd app set $(params.application) --server=argo-cd-argocd-server.argo-cd $(params.flags)"
