@@ -587,6 +587,7 @@ buildkit:
   #   script: |
   #     #!/bin/bash
   #     echo "hello world"
+  build_args: []
 
 wordpress:
   # -- should we enable the wordpress pipeline

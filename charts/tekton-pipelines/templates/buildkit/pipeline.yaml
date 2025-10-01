@@ -37,10 +37,10 @@ spec:
       default: "."
       description: dockerfile context path
 
-    - name: extra_args
-      type: string
+    - name: build_args
+      type: array
       description: extra args to be passed into buildkit builder
-      default: ''
+      default: []
 
     - name: sentry_project_name
       type: string
@@ -84,7 +84,7 @@ spec:
         - name: docker_context
           value: "$(params.docker_context)"
         - name: extra_args
-          value: $(params.extra_args)
+          value: $(params.build_args[*])
         - name: app_image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
       workspaces:
