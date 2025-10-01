@@ -7,6 +7,9 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/174)
 - Bump chart versions
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/175)
+- Update metrics server image in Wordpress chart to use bitnamilegacy
+
 ## 2025-09-17
 
 [prod]
