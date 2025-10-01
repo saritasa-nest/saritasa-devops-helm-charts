@@ -38,11 +38,6 @@ spec:
         #!/usr/bin/env bash
         set +x
 
-        # Install kubectl
-        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        mv kubectl /usr/local/bin/
-
         # Install argocd CLI
         curl --silent --location -o /usr/local/bin/argocd {{ .Values.images.argocd_cli }}
         chmod +x /usr/local/bin/argocd
@@ -63,18 +58,15 @@ spec:
           BRANCH=$(echo "$(params.flags)" | sed -n 's/.*wordpress.repositoryRevision=\([^ ]*\).*/\1/p')
           echo "Updating WordPress repositoryRevision to: $BRANCH"
 
-          # Get current Application spec
-          kubectl get application $(params.application) -n argo-cd -o json > /tmp/app.json
+          # Get current values and update REVISION
+          argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | \
+            jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' > /tmp/values.yaml
 
-          # Update REVISION in values using jq
-          NEW_VALUES=$(jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' /tmp/app.json)
-
-          # Create patch JSON using jq (avoids heredoc issues in YAML)
-          echo "$NEW_VALUES" | jq -Rs . | jq -n --arg values "$(cat)" '{spec: {source: {helm: {values: $values}}}}' > /tmp/patch.json
-
-          # Apply patch using kubectl
+          # Update Application values using argocd app set with values from stdin
           echo "Updating Application with new values..."
-          kubectl patch application $(params.application) -n argo-cd --type=merge --patch-file=/tmp/patch.json
+          argocd app set $(params.application) \
+            --server=argo-cd-argocd-server.argo-cd \
+            --values /tmp/values.yaml
           echo "Application updated successfully"
         elif [ -n "$(params.flags)" ]; then
           # For other flags, use app set
