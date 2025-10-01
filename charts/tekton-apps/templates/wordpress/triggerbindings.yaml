@@ -33,6 +33,8 @@ spec:
   - name: namespace
     value: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
+  - name: gitRevision
+    value: $(extensions.branch_name)
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_namespace" "default" ( include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project) ) ) | nindent 2 }}
   {{- if hasKey $component "triggerBinding" }}
   {{- toYaml $component.triggerBinding | nindent 2 }}
