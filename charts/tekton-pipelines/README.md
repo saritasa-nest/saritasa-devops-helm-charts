@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 2.2.11-dev.14](https://img.shields.io/badge/Version-2.2.11--dev.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.11-dev.15](https://img.shields.io/badge/Version-2.2.11--dev.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 

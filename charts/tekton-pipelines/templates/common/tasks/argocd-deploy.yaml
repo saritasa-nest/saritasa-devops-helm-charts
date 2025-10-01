@@ -59,14 +59,14 @@ spec:
           echo "Updating WordPress repositoryRevision to: $BRANCH"
 
           # Get current values and update REVISION
-          argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | \
-            jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' > /tmp/values.yaml
+          NEW_VALUES=$(argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | \
+            jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")')
 
-          # Update Application values using argocd app set with values from stdin
+          # Update Application values using argocd app set with values-literal
           echo "Updating Application with new values..."
-          argocd app set $(params.application) \
+          echo "$NEW_VALUES" | argocd app set $(params.application) \
             --server=argo-cd-argocd-server.argo-cd \
-            --values /tmp/values.yaml
+            --values -
           echo "Application updated successfully"
         elif [ -n "$(params.flags)" ]; then
           # For other flags, use app set
