@@ -37,10 +37,10 @@ spec:
       default: "."
       description: dockerfile context path
 
-    - name: buildkit_extra_args
-      type: string
+    - name: extra_args
+      type: array
       description: extra args to be passed into buildkit builder
-      default: ''
+      default: []
 
     - name: sentry_project_name
       type: string
@@ -84,8 +84,7 @@ spec:
         - name: docker_context
           value: "$(params.docker_context)"
         - name: extra_args
-          value:
-            - $(params.buildkit_extra_args)
+          value: $(params.extra_args)
         - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
       workspaces:
@@ -116,10 +115,10 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: image
-          value: "$(tasks.buildkit.results.image_url)"
-        - name: image_digest
-          value: "$(tasks.buildkit.results.image_digest)"
+        - name: app_image
+          value: "$(tasks.buildkit.results.app_image_url)"
+        - name: app_image_digest
+          value: "$(tasks.buildkit.results.app_image_digest)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch
@@ -144,8 +143,8 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: image_digest
-          value: "$(tasks.buildkit.results.image_digest)"
+        - name: app_image_digest
+          value: "$(tasks.buildkit.results.app_image_digest)"
       runAfter:
         - {{ if (.Values.buildkit).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 
