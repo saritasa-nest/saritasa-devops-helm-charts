@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-10-01
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/174)
+- Bump chart versions
+
 ## 2025-09-17
 
 [prod]
