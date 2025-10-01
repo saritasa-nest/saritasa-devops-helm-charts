@@ -6,13 +6,23 @@ metadata:
 
 spec:
   description: >-
-    The task parses project.toml file and stores its environment variables
-    values to platform dir for further processing by buildpack task.
+    This task syncs an ArgoCD application with optional revision and flags
+    (e.g., helm-set-string) and waits for the sync to complete.
 
   params:
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
+
+    - name: revision
+      type: string
+      description: the revision to sync to (optional)
+      default: ""
+
+    - name: flags
+      type: string
+      description: additional flags to pass to argocd app sync command (optional)
+      default: ""
 
   stepTemplate:
     envFrom:
@@ -40,8 +50,21 @@ spec:
           --password $ARGOCD_PASSWORD \
           --http-retry-max 3
 
-        argocd app sync $(params.application) \
-          --server=argo-cd-argocd-server.argo-cd
+        # Build sync command with optional parameters
+        SYNC_CMD="argocd app sync $(params.application) --server=argo-cd-argocd-server.argo-cd"
+
+        # Add revision if provided
+        if [ -n "$(params.revision)" ]; then
+          SYNC_CMD="$SYNC_CMD --revision $(params.revision)"
+        fi
+
+        # Add additional flags if provided
+        if [ -n "$(params.flags)" ]; then
+          SYNC_CMD="$SYNC_CMD $(params.flags)"
+        fi
+
+        echo "Executing: $SYNC_CMD"
+        eval $SYNC_CMD
 
         argocd app wait $(params.application) \
           --server=argo-cd-argocd-server.argo-cd \

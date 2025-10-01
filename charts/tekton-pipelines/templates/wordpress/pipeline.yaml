@@ -26,9 +26,9 @@ spec:
   tasks:
     - name: update-argocd-app
       taskRef:
-        name: argocd-task-sync-and-wait
+        name: argocd-deploy
       params:
-        - name: application-name
+        - name: application
           value: "$(params.application)"
         - name: revision
           value: "$(params.gitRevision)"
