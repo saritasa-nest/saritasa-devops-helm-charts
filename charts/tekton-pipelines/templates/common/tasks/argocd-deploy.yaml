@@ -56,14 +56,16 @@ spec:
           BRANCH=$(echo "$(params.flags)" | sed -n 's/.*wordpress.repositoryRevision=\([^ ]*\).*/\1/p')
           echo "Updating WordPress repositoryRevision to: $BRANCH"
 
-          # Get current values
-          CURRENT_VALUES=$(argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json | jq -r '.spec.source.helm.values')
+          # Get current Application spec
+          argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json > /tmp/app.json
 
-          # Replace REVISION value in the values
-          NEW_VALUES=$(echo "$CURRENT_VALUES" | sed "s/REVISION=\"[^\"]*\"/REVISION=\"$BRANCH\"/g")
+          # Extract and update values using jq
+          jq --arg branch "$BRANCH" '.spec.source.helm.values |= (. | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\""))' /tmp/app.json > /tmp/app-updated.json
 
-          # Create patch JSON and apply using argocd with stdin
-          PATCH_JSON=$(jq -n --arg values "$NEW_VALUES" '{spec: {source: {helm: {values: $values}}}}')
+          # Create patch with only the values field
+          PATCH_JSON=$(jq '{spec: {source: {helm: {values: .spec.source.helm.values}}}}' /tmp/app-updated.json)
+
+          # Apply patch using kubectl (argocd patch has issues with large JSON)
           echo "Applying patch to update REVISION in values..."
           echo "$PATCH_JSON" | argocd app patch $(params.application) --server=argo-cd-argocd-server.argo-cd --patch /dev/stdin --type merge
           echo "Patch applied successfully"
