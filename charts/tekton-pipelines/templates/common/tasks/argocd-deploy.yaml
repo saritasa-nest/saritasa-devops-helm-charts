@@ -56,19 +56,26 @@ spec:
           BRANCH=$(echo "$(params.flags)" | sed -n 's/.*wordpress.repositoryRevision=\([^ ]*\).*/\1/p')
           echo "Updating WordPress repositoryRevision to: $BRANCH"
 
-          # Get current Application spec
+          # Get current Application spec and extract values
           argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json > /tmp/app.json
 
-          # Extract and update values using jq
-          jq --arg branch "$BRANCH" '.spec.source.helm.values |= (. | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\""))' /tmp/app.json > /tmp/app-updated.json
+          # Update REVISION in values and save to file
+          jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' /tmp/app.json > /tmp/values.yaml
 
-          # Create patch with only the values field
-          PATCH_JSON=$(jq '{spec: {source: {helm: {values: .spec.source.helm.values}}}}' /tmp/app-updated.json)
+          # Get other Application parameters
+          REPO_URL=$(jq -r '.spec.source.repoURL' /tmp/app.json)
+          CHART=$(jq -r '.spec.source.chart' /tmp/app.json)
+          TARGET_REVISION=$(jq -r '.spec.source.targetRevision' /tmp/app.json)
+          DEST_SERVER=$(jq -r '.spec.destination.server' /tmp/app.json)
+          DEST_NAMESPACE=$(jq -r '.spec.destination.namespace' /tmp/app.json)
+          PROJECT=$(jq -r '.spec.project' /tmp/app.json)
 
-          # Apply patch using kubectl (argocd patch has issues with large JSON)
-          echo "Applying patch to update REVISION in values..."
-          echo "$PATCH_JSON" | argocd app patch $(params.application) --server=argo-cd-argocd-server.argo-cd --patch /dev/stdin --type merge
-          echo "Patch applied successfully"
+          # Update Application with new values using argocd app set
+          echo "Updating Application with new values..."
+          argocd app set $(params.application) \
+            --server=argo-cd-argocd-server.argo-cd \
+            --values-literal-file /tmp/values.yaml
+          echo "Application updated successfully"
         elif [ -n "$(params.flags)" ]; then
           # For other flags, use app set
           SET_CMD="argocd app set $(params.application) --server=argo-cd-argocd-server.argo-cd $(params.flags)"
