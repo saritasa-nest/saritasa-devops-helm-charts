@@ -9,6 +9,8 @@ images:
   argocd_cli: https://github.com/argoproj/argo-cd/releases/download/v2.14.15/argocd-linux-amd64
   # -- bash image (used for various ops in steps)
   bash: docker.io/library/bash:5.2.37
+  # -- buildkit image (used for building containers containing docker files)
+  buildkit: moby/buildkit:master-rootless
   # -- aws cli image (used for aws ecr auth)
   awscli: docker.io/amazon/aws-cli:2.7.4
   # -- kaniko image used to build containers containing docker files - v1.24.0, uploaded May 23 2025

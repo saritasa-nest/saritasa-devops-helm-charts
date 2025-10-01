@@ -46,7 +46,11 @@ spec:
     - name: image_digest
       description: the digest of the built `image`
     - name: image_url
-      description: the url sof the built `image`
+      description: the url of the built `image`
+    - name: destination_args
+      description: the destination args to pass to the build task
+    - name: extra_args
+      description: the extra args to pass to the build task
 
   stepTemplate:
     envFrom:
@@ -54,8 +58,12 @@ spec:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
-    - name: authenticate
-      image: {{ .Values.images.awscli | default "amazon/aws-cli:latest"}}
+    # Buildkit can't push to AWS ECR with AWS IRSA only, it needs docker-like credentials
+    # https://github.com/moby/buildkit/issues/3947
+    # Docker credentials file is created in manual way to avoid creating custom Docker image
+    # with awscli and docker packages both installed
+    - name: get-ecr-credentials
+      image: {{ .Values.images.awscli }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(workspaces.source.path)
       securityContext:
@@ -67,7 +75,7 @@ spec:
             - ALL
       script: |
         #!/bin/sh
-        set -e
+        set -euo pipefail
         ecr_registry=$(echo "$(params.image)" | cut -d/ -f1)
         ecr_region=$(echo "$ecr_registry" | sed -n 's/.*\.ecr\.\(.*\)\.amazonaws\.com.*/\1/p')
         password=$(aws ecr get-login-password --region $ecr_region)
@@ -84,31 +92,73 @@ spec:
         }
         EOF
 
+    - name: get-extra-args
+      image: saritasallc/tekton:1.0.8
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        privileged: false
+        allowPrivilegeEscalation: false
+      args:
+        - $(params.extra_args)
+      script: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+        echo "Extra args: $@"
+
+        # Parse extra arguments to collect the `--destination` args separately from the
+        # rest ones to use later in the build task, cause it accepts multiple tags only in such a format:
+        # --output type=image,\"name=303629721857.dkr.ecr.us-east-1.amazonaws.com/usummit/prod/locust:latest,303629721857.dkr.ecr.us-east-1.amazonaws.com/usummit/prod/locust:test\",push=true,buildinfo-attrs=true
+        destination_args="name=$(params.image)"
+        extra_args=""
+        for arg in "$@"; do
+          case "$arg" in
+            --destination=*) destination="${arg#--destination=}"
+                    destination_args="${destination_args:+$destination_args,}$destination" ;;
+            *)      extra_args="$extra_args $arg" ;;
+          esac
+        done
+
+        echo "Destination args: $destination_args"
+        echo "Extra args: $extra_args"
+        echo "${destination_args}" > "$(results.destination_args.path)"
+        echo "${extra_args}" > "$(results.extra_args.path)"
+
     - name: build
-      image: {{ .Values.images.buildkit | default "moby/buildkit:master-rootless"}}
+      image: {{ .Values.images.buildkit }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
+      securityContext:
+        runAsNonRoot: false
+        privileged: true
+        allowPrivilegeEscalation: true
+        capabilities:
+          drop:
+            - ALL
       workingDir: $(workspaces.source.path)
       env:
         - name: BUILDKITD_FLAGS
           value: --oci-worker-no-process-sandbox
         - name: DOCKER_CONFIG
           value: $(workspaces.source.path)/docker
-      command:
-        - buildctl-daemonless.sh
-      args:
-        - build
-        - --frontend=dockerfile.v0
-        - --local=context=$(workspaces.source.path)/$(params.docker_context) # directory with source files for COPY/ADD
-        - --local=dockerfile=$(workspaces.source.path)/$(params.docker_context) # directory with Dockerfile
-        - --opt=filename=$(params.docker_file) # name of the Dockerfile if it's not the default "Dockerfile"
-        - --opt=build-arg:ENVIRONMENT=$(params.environment) 
-        - --output=type=image,name=$(params.image),push=true,buildinfo-attrs=true
-        - --metadata-file=$(workspaces.source.path)/build-metadata.json
-        - $(params.extra_args[*])
-      securityContext:
-        runAsNonRoot: false
-        privileged: true
-        allowPrivilegeEscalation: true
+      script: |
+        #!/bin/sh
+        set -euo pipefail
+        destination_args=$(cat "$(results.destination_args.path)")
+        extra_args=$(cat "$(results.extra_args.path)")
+        image="$(params.image)"
+        image_cached="${image%%:*}:cache"
+        buildctl-daemonless.sh build \
+          --frontend=dockerfile.v0 \
+          --local context=$(workspaces.source.path)/$(params.docker_context) \
+          --local dockerfile=$(workspaces.source.path)/$(params.docker_context) \
+          --opt filename=$(params.docker_file) \
+          --opt build-arg:ENVIRONMENT=$(params.environment) \
+          --output type=image,"$destination_args",push=true,buildinfo-attrs=true \
+          --metadata-file=$(workspaces.source.path)/build-metadata.json \
+          --export-cache type=registry,mode=max,ref=$image_cached \
+          --import-cache type=registry,ref=$image_cached \
+          $extra_args
 
     # Extract image digest from build-metadata.json (BuildKit does not provide it automatically)
     - name: results
