@@ -30,8 +30,6 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: revision
-          value: "$(params.gitRevision)"
         - name: flags
           value: "--helm-set-string wordpress.repositoryRevision=$(params.gitRevision)"
     - name: deploy
