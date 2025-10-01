@@ -58,7 +58,7 @@ spec:
         fi
 
         # Build sync command with optional revision
-        SYNC_CMD="argocd app sync $(params.application) --server=argo-cd-argocd-server.argo-cd"
+        SYNC_CMD="argocd app sync $(params.application) --server=argo-cd-argocd-server.argo-cd --force"
 
         # Add revision if provided
         if [ -n "$(params.revision)" ]; then
