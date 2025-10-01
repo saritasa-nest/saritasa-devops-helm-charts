@@ -38,9 +38,9 @@ spec:
       description: dockerfile context path
 
     - name: extra_args
-      type: array
+      type: string
       description: extra args to be passed into buildkit builder
-      default: []
+      default: ''
 
     - name: sentry_project_name
       type: string
