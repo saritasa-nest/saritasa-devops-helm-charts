@@ -37,6 +37,13 @@ spec:
       script: |
         #!/usr/bin/env bash
         set +x
+
+        # Install kubectl
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        mv kubectl /usr/local/bin/
+
+        # Install argocd CLI
         curl --silent --location -o /usr/local/bin/argocd {{ .Values.images.argocd_cli }}
         chmod +x /usr/local/bin/argocd
 
@@ -56,25 +63,28 @@ spec:
           BRANCH=$(echo "$(params.flags)" | sed -n 's/.*wordpress.repositoryRevision=\([^ ]*\).*/\1/p')
           echo "Updating WordPress repositoryRevision to: $BRANCH"
 
-          # Get current Application spec and extract values
-          argocd app get $(params.application) --server=argo-cd-argocd-server.argo-cd -o json > /tmp/app.json
+          # Get current Application spec
+          kubectl get application $(params.application) -n argo-cd -o json > /tmp/app.json
 
-          # Update REVISION in values and save to file
-          jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' /tmp/app.json > /tmp/values.yaml
+          # Update REVISION in values using jq and create patch
+          NEW_VALUES=$(jq --arg branch "$BRANCH" -r '.spec.source.helm.values | gsub("REVISION=\"[^\"]*\""; "REVISION=\"" + $branch + "\"")' /tmp/app.json)
 
-          # Get other Application parameters
-          REPO_URL=$(jq -r '.spec.source.repoURL' /tmp/app.json)
-          CHART=$(jq -r '.spec.source.chart' /tmp/app.json)
-          TARGET_REVISION=$(jq -r '.spec.source.targetRevision' /tmp/app.json)
-          DEST_SERVER=$(jq -r '.spec.destination.server' /tmp/app.json)
-          DEST_NAMESPACE=$(jq -r '.spec.destination.namespace' /tmp/app.json)
-          PROJECT=$(jq -r '.spec.project' /tmp/app.json)
+          # Create strategic merge patch
+          cat > /tmp/patch.json <<EOF
+{
+  "spec": {
+    "source": {
+      "helm": {
+        "values": $(echo "$NEW_VALUES" | jq -Rs .)
+      }
+    }
+  }
+}
+EOF
 
-          # Update Application with new values using argocd app set
+          # Apply patch using kubectl
           echo "Updating Application with new values..."
-          argocd app set $(params.application) \
-            --server=argo-cd-argocd-server.argo-cd \
-            --values-literal-file /tmp/values.yaml
+          kubectl patch application $(params.application) -n argo-cd --type=merge --patch-file=/tmp/patch.json
           echo "Application updated successfully"
         elif [ -n "$(params.flags)" ]; then
           # For other flags, use app set
