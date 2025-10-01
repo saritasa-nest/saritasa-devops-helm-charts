@@ -38,14 +38,14 @@ spec:
       type: string
       description: environment name of the app being built, i.e. dev/staging/prod
 
-    - name: app_image
+    - name: image
       type: string
       description: the name of where to store the app image
 
   results:
-    - name: app_image_digest
+    - name: image_digest
       description: the digest of the built `image`
-    - name: app_image_url
+    - name: image_url
       description: the url of the built `image`
     - name: destination_args
       description: the destination args to pass to the build task
@@ -76,7 +76,7 @@ spec:
       script: |
         #!/bin/sh
         set -euo pipefail
-        ecr_registry=$(echo "$(params.app_image)" | cut -d/ -f1)
+        ecr_registry=$(echo "$(params.image)" | cut -d/ -f1)
         ecr_region=$(echo "$ecr_registry" | sed -n 's/.*\.ecr\.\(.*\)\.amazonaws\.com.*/\1/p')
         password=$(aws ecr get-login-password --region $ecr_region)
         auth=$(echo -n "AWS:${password}" | base64 | tr -d '\n')
@@ -109,7 +109,7 @@ spec:
         # Parse extra arguments to collect the `--destination` args separately from the
         # rest ones to use later in the build task, cause it accepts multiple tags only in such a format:
         # --output type=image,\"name=303629721857.dkr.ecr.us-east-1.amazonaws.com/usummit/prod/locust:latest,303629721857.dkr.ecr.us-east-1.amazonaws.com/usummit/prod/locust:test\",push=true,buildinfo-attrs=true
-        destination_args="name=$(params.app_image)"
+        destination_args="name=$(params.image)"
         extra_args=""
         for arg in "$@"; do
           case "$arg" in
@@ -145,7 +145,7 @@ spec:
         set -euo pipefail
         destination_args=$(cat "$(results.destination_args.path)")
         extra_args=$(cat "$(results.extra_args.path)")
-        image="$(params.app_image)"
+        image="$(params.image)"
         image_cached="${image%%:*}:cache"
         buildctl-daemonless.sh build \
           --frontend=dockerfile.v0 \
@@ -169,13 +169,13 @@ spec:
         privileged: false
         allowPrivilegeEscalation: false
       env:
-        - name: app_image
-          value: $(params.app_image)
+        - name: image
+          value: $(params.image)
       script: |
         #!/usr/bin/env bash
         set -eu
-        echo -n "${app_image}" \
-          | tee "$(results.app_image_url.path)"
+        echo -n "${image}" \
+          | tee "$(results.image_url.path)"
         echo -n "$(jq -r '.["containerimage.digest"]' $(workspaces.source.path)/build-metadata.json)" \
-          | tee "$(results.app_image_digest.path)"
+          | tee "$(results.image_digest.path)"
 {{ end }}

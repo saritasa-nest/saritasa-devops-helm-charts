@@ -85,7 +85,7 @@ spec:
           value: "$(params.docker_context)"
         - name: extra_args
           value: $(params.build_args[*])
-        - name: app_image
+        - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
       workspaces:
         - name: source
@@ -115,10 +115,10 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: app_image
-          value: "$(tasks.buildkit.results.app_image_url)"
-        - name: app_image_digest
-          value: "$(tasks.buildkit.results.app_image_digest)"
+        - name: image
+          value: "$(tasks.buildkit.results.image_url)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.image_digest)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch
@@ -143,8 +143,8 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
-        - name: app_image_digest
-          value: "$(tasks.buildkit.results.app_image_digest)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.image_digest)"
       runAfter:
         - {{ if (.Values.buildkit).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 
