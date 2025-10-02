@@ -31,7 +31,7 @@ saritasa-rbac
 
 ## `chart.version`
 
-![Version: 0.1.13](https://img.shields.io/badge/Version-0.1.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -170,4 +170,3 @@ extraRbac: |
 | rbac.developers.ingressNginx | bool | `false` | should we add ability to work with ingress-nginx pods in ingress-nginx ns |
 | rbac.developers.utils | bool | `false` | should we add utils (cli tools, port-forwarder for dbs) namespace access to client team members |
 | rbac.devops | bool | `false` | should we create cluster role/binding for devops team |
-

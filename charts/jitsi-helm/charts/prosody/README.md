@@ -48,4 +48,3 @@ A Helm chart for Kubernetes
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `nil` |  |
 | tolerations | list | `[]` |  |
-

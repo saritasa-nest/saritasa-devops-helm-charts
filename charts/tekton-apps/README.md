@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.2](https://img.shields.io/badge/Version-2.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.3](https://img.shields.io/badge/Version-2.1.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -1611,4 +1611,3 @@ whitelistIP: |
 | trigger.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | trigger.labels | object | `{"builder":"tekton"}` | labels to set on Triggers - for discovery by EventListener |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
-

@@ -31,7 +31,7 @@ prometheus-xrstf-github-exporter
 
 ## `chart.version`
 
-![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -73,4 +73,3 @@ kubectl -n prometheus create secret generic github-token \
 | securityContext | object | `{"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | security options for the running pod |
 | service | object | `{"port":9162,"type":"ClusterIP"}` | type of the service to create |
 | tolerations | list | `[]` |  |
-

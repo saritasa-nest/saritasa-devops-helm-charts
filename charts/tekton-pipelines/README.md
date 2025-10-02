@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 2.2.10](https://img.shields.io/badge/Version-2.2.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.11](https://img.shields.io/badge/Version-2.2.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -288,4 +288,3 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | sentry.org | string | `"saritasa"` |  |
 | sentry.url | string | `"https://sentry.saritasa.rocks/"` |  |
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |
-
