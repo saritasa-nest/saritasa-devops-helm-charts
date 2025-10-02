@@ -173,7 +173,7 @@ spec:
           value: $(params.image)
       script: |
         #!/usr/bin/env bash
-        set -eu
+        set -euo pipefail
         echo -n "${image}" \
           | tee "$(results.image_url.path)"
         echo -n "$(jq -r '.["containerimage.digest"]' $(workspaces.source.path)/build-metadata.json)" \
