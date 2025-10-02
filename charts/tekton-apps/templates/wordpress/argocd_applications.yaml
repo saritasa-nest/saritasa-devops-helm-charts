@@ -248,6 +248,8 @@ spec:
 
         metrics:
           enabled: true
+          image:
+            repository: bitnamilegacy/apache-exporter
 
         overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
 
