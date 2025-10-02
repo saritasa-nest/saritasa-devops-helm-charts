@@ -1,0 +1,159 @@
+{{ if .Values.buildkit.enabled }}
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: buildkit-build-pipeline
+  namespace: {{ .Release.Namespace }}
+  labels:
+    tekton: 'true'
+spec:
+  description: >-
+    Pipeline will build the image utilizing Dockerfile using buildkit and then send notification via slack.
+    The deployment is done via argocd
+
+  params:
+    {{ include "pipeline.defaultParams" . | nindent 4 }}
+    {{ include "pipeline.defaultDockerKubernetesParams" . | nindent 4 }}
+
+    - name: project
+      type: string
+      description: name of the project, which component is deployed
+
+    - name: namespace
+      type: string
+      description: project's namespace
+
+    - name: repository_ssh_url
+      type: string
+      description: git repository ssh url
+
+    - name: docker_file
+      type: string
+      default: Dockerfile
+      description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
+
+    - name: docker_context
+      type: string
+      default: "."
+      description: dockerfile context path
+
+    - name: build_args
+      type: array
+      description: extra args to be passed into buildkit builder
+      default: []
+
+    - name: sentry_project_name
+      type: string
+      description: name of the project in Sentry
+
+    - name: sourcemaps_dir
+      type: string
+      description: name of the dir where frontend sourcemaps would be stored in workspace
+      default: "sourcemaps"
+
+    - name: kubernetes_repository_ssh_url
+      type: string
+      description: git repository ssh url for kubernetes manifests repo
+
+  workspaces:
+    - name: source
+
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source
+      params:
+        - name: url
+          value: $(params.repository_ssh_url)
+        - name: revision
+          value: $(params.branch)
+
+    - name: buildkit
+      taskRef:
+        name: buildkit
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: docker_file
+          value: "$(params.docker_file)"
+        - name: docker_context
+          value: "$(params.docker_context)"
+        - name: extra_args
+          value: $(params.build_args[*])
+        - name: image
+          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - git-clone
+
+    - name: git-clone-gitops-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+        - name: subdirectory
+          value: gitops
+      workspaces:
+        - name: output
+          workspace: source
+      runAfter:
+        - buildkit
+
+    - name: kustomize
+      taskRef:
+        name: kustomize
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: image
+          value: "$(tasks.buildkit.results.image_url)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.image_digest)"
+        - name: kustomize_overlay_path
+          value: "$(params.kubernetes_repository_kustomize_path)"
+        - name: kubernetes_branch
+          value: "$(params.kubernetes_branch)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: subdirectory
+          value: gitops
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - git-clone-gitops-repository
+
+  {{- if (.Values.buildkit).preDeployTaskSteps }}
+  {{ include "pipeline.preDeploy" (dict "name" (printf "buildkit-pre-deploy")) | nindent 4 }}
+  {{ end }}
+
+    - name: deploy
+      taskRef:
+        name: argocd-deploy
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.image_digest)"
+      runAfter:
+        - {{ if (.Values.buildkit).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
+
+  {{ if .Values.sentry.enabled }}
+    {{ include "pipeline.sentryRelease" . | nindent 4 }}
+  {{ end }}
+
+  {{ include "pipeline.postDeploy" (dict "name" "buildkit-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
+
+  {{ include "pipeline.finalNotification" . | nindent 2 }}
+
+{{ end }}
