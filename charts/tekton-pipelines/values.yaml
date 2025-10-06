@@ -26,7 +26,7 @@ images:
   # -- python image
   python: saritasallc/python3:0.4     # https://github.com/saritasa-nest/saritasa-devops-docker-images/tree/main/public/python/python3-alpine-boto
   # -- tekton image
-  tekton: saritasallc/tekton:1.0.8
+  tekton: saritasallc/tekton:1.0.9
   # -- yamlfix image - format yaml files
   yamlfix: public.ecr.aws/saritasa/yamlfix:1.8.1    # https://lyz-code.github.io/yamlfix/
   # -- kubeval image - validate Kubernetes manifests
