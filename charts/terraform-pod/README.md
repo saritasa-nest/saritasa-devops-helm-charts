@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.39](https://img.shields.io/badge/Version-0.0.39-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
+![Version: 0.0.40](https://img.shields.io/badge/Version-0.0.40-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 ## Maintainers
 
@@ -192,4 +192,3 @@ unset creds
 | terraform.token | string | `""` | terraform api token value (optional, if passed - takes precedence over tokenSecret) |
 | terraform.tokenSecret | string | `"terraform-cli-token-saritasa-team"` | secret name containing terraform team API token name (optional) |
 | tolerations | list | `[]` | tolerations |
-

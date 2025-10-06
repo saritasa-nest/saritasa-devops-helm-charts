@@ -288,4 +288,3 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | sentry.org | string | `"saritasa"` |  |
 | sentry.url | string | `"https://sentry.saritasa.rocks/"` |  |
 | wordpress.enabled | bool | `false` | should we enable the wordpress pipeline |
-
