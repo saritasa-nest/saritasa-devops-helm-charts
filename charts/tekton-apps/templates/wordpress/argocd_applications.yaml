@@ -119,7 +119,15 @@ spec:
                 # git repo url with wp app files
                 URL="{{ .repositorySshUrl | required "Missed .wordpress.repositorySshUrl option"}}"
                 #  tag or branch of target git repo that will be used for persistent deployment
-                REVISION="{{ .repositoryRevision | default "" }}"
+                # Read revision from kustomization ConfigMap if exists, fallback to static value
+                KUSTOMIZATION_FILE="/kustomization/kustomization.yaml"
+                if [[ -f $KUSTOMIZATION_FILE ]]; then
+                  REVISION=$(grep '^revision:' $KUSTOMIZATION_FILE | awk '{print $2}')
+                  echo "Using revision from kustomization.yaml: $REVISION"
+                else
+                  REVISION="{{ .repositoryRevision | default "" }}"
+                  echo "Using static revision from values.yaml: $REVISION"
+                fi
                 #--------------------------------------------------------------------
                 # chart does not start wp setup if WP_ROOT is not empty
                 if [[ ! -d $WP_ROOT/wp-content && $COPY_WP_CONF == "false" ]]; then
@@ -154,6 +162,9 @@ spec:
             - mountPath: /home/app/.ssh/known_hosts
               name: github-known-hosts
               subPath: config.ssh
+            - mountPath: /kustomization
+              name: wordpress-kustomization
+              readOnly: true
           {{- with .extraInitContainers }}
             {{- toYaml . | nindent 10 }}
           {{- end }}
@@ -172,6 +183,10 @@ spec:
           - name: github-known-hosts
             configMap:
               name: github-known-hosts
+          - name: wordpress-kustomization
+            configMap:
+              name: {{ $component.name }}-kustomization
+              optional: true
           {{- if .extraVolumes }}
           {{- toYaml .extraVolumes | nindent 10 }}
           {{- end }}
