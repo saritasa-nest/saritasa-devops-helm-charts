@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-10-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/176)
+- Specify allowInsecureImages for WordPress application to allow bitnamilegacy images
+
 ## 2025-10-01
 
 [dev]
