@@ -75,7 +75,7 @@ spec:
         REVISION="$(params.wordpress_branch)-${SHORT_SHA}"
 
         # Determine kustomization file path based on environment
-        KUSTOMIZATION_FILE="apps/wordpress/$(params.environment)/kustomization.yaml"
+        KUSTOMIZATION_FILE="apps/wordpress/manifests/$(params.environment)/kustomization.yaml"
 
         echo "Updating kustomization.yaml"
         echo "File: ${KUSTOMIZATION_FILE}"
@@ -122,7 +122,7 @@ spec:
           CONFIG=$(realpath .yamlfix.toml)
         fi
 
-        KUSTOMIZATION_FILE="apps/wordpress/$(params.environment)/kustomization.yaml"
+        KUSTOMIZATION_FILE="apps/wordpress/manifests/$(params.environment)/kustomization.yaml"
         yamlfix --config-file=$CONFIG ${KUSTOMIZATION_FILE}
 
     - name: git-push
@@ -141,7 +141,7 @@ spec:
         fi
 
         SHORT_SHA=$(echo "$(params.wordpress_commit_sha)" | cut -c1-7)
-        KUSTOMIZATION_FILE="apps/wordpress/$(params.environment)/kustomization.yaml"
+        KUSTOMIZATION_FILE="apps/wordpress/manifests/$(params.environment)/kustomization.yaml"
         git commit -am "feat: $(params.environment) wordpress deployment, update $(params.component_name) to revision: $(params.wordpress_branch)-${SHORT_SHA}"
 
         # retry logic with pull --rebase
