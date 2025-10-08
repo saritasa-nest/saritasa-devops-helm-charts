@@ -66,10 +66,14 @@ spec:
       params:
         - name: application
           value: "$(params.application)"
+        - name: component_name
+          value: "$(params.component)"
         - name: wordpress_branch
           value: "$(params.gitRevision)"
         - name: wordpress_commit_sha
           value: "$(params.sha)"
+        - name: kubernetes_namespace
+          value: "$(params.kubernetes_namespace)"
         - name: kustomization_path
           value: "$(params.kustomization_path)"
         - name: kubernetes_branch
@@ -84,14 +88,27 @@ spec:
       runAfter:
         - git-clone-gitops-repository
 
-    - name: deploy
+    - name: argocd-sync
       taskRef:
         name: argocd-deploy
       params:
         - name: application
           value: "$(params.application)"
+        - name: flags
+          value: "--force"
       runAfter:
         - update-wordpress-kustomization
+
+    - name: rollout-restart
+      taskRef:
+        name: redeploy
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: kubernetes_namespace
+          value: "$(params.kubernetes_namespace)"
+      runAfter:
+        - argocd-sync
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 
