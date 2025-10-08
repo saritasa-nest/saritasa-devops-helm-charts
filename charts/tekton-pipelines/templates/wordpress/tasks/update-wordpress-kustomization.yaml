@@ -1,0 +1,148 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: update-wordpress-kustomization
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: >-
+    Updates WordPress git revision in kustomization.yaml
+
+  workspaces:
+    - name: source
+
+  params:
+    - name: application
+      type: string
+      description: name of the argocd application (e.g., aaoa-staging-wordpress-staging)
+
+    - name: wordpress_branch
+      type: string
+      description: WordPress branch (e.g., staging, release/4.0.0)
+
+    - name: wordpress_commit_sha
+      type: string
+      description: WordPress commit SHA (full or short)
+
+    - name: kustomization_path
+      type: string
+      description: path to kustomization.yaml file
+      default: "apps/wordpress/staging/kustomization.yaml"
+
+    - name: kubernetes_branch
+      type: string
+      default: "main"
+
+    - name: environment
+      type: string
+      description: environment name (staging/dev/prod)
+
+    - name: subdirectory
+      type: string
+      default: "gitops"
+
+  stepTemplate:
+    envFrom:
+      - configMapRef:
+          name: $(params.application)-build-pipeline-config
+
+  steps:
+    - name: git-set-user
+      image: {{ .Values.images.git | default "alpine/git:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
+      script: |
+        git config --global --add safe.directory $(workspaces.source.path)/$(params.subdirectory)
+        git config user.email "$DEVOPS_GROUP_EMAIL"
+        git config user.name "tekton-wordpress"
+
+    - name: update-kustomization
+      image: {{ .Values.images.yq | default "mikefarah/yq:4.47.1"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
+      script: |
+        # Get short SHA (first 7 chars)
+        SHORT_SHA=$(echo "$(params.wordpress_commit_sha)" | cut -c1-7)
+
+        # Format: branch-shortsha (e.g., staging-a1b2c3d or release/4.0.0-a1b2c3d)
+        REVISION="$(params.wordpress_branch)-${SHORT_SHA}"
+
+        echo "Updating kustomization.yaml"
+        echo "Path: $(params.kustomization_path)"
+        echo "Branch: $(params.wordpress_branch)"
+        echo "Commit SHA: $(params.wordpress_commit_sha)"
+        echo "Short SHA: ${SHORT_SHA}"
+        echo "Revision: ${REVISION}"
+
+        # Create directory if not exists
+        mkdir -p $(dirname $(params.kustomization_path))
+
+        # Update or create kustomization.yaml
+        if [ -f "$(params.kustomization_path)" ]; then
+          # Update existing file
+          yq eval -i '.revision = "'${REVISION}'"' $(params.kustomization_path)
+        else
+          # Create new file
+          cat > $(params.kustomization_path) << EOF
+        ---
+        apiVersion: kustomize.config.k8s.io/v1beta1
+        kind: Kustomization
+        # WordPress git revision
+        # Format: {branch}-{short_commit_sha}
+        # Updated by: Tekton wordpress-build-pipeline
+        revision: ${REVISION}
+        EOF
+        fi
+
+        echo "Updated kustomization.yaml:"
+        cat $(params.kustomization_path)
+
+    - name: yamlfix
+      image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
+      script: |
+        CONFIG=/workdir/yamlfix.toml
+        if [ -f .yamlfix.values.toml ]; then
+          CONFIG=$(realpath .yamlfix.values.toml)
+        elif [ -f .yamlfix.toml ]; then
+          CONFIG=$(realpath .yamlfix.toml)
+        fi
+
+        yamlfix --config-file=$CONFIG $(params.kustomization_path)
+
+    - name: git-push
+      image: {{ .Values.images.git | default "alpine/git:latest" }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
+      script: |
+        set +x
+        git config --global --add safe.directory $(workspaces.source.path)/$(params.subdirectory)
+        git checkout $(params.kubernetes_branch)
+
+        # apply changes only if it exists
+        if [ $(git status --porcelain | wc -l) -eq 0 ]; then
+          echo "There are no changes, nothing to commit"
+          exit
+        fi
+
+        SHORT_SHA=$(echo "$(params.wordpress_commit_sha)" | cut -c1-7)
+        git commit -am "feat: $(params.environment) wordpress deployment $(params.kustomization_path), new revision: $(params.wordpress_branch)-${SHORT_SHA}"
+
+        # retry logic with pull --rebase
+        set -- "0" "1" "3" "5"
+        for DELAY
+        do
+          if [ "$DELAY" != "0" ]; then
+            echo "retry in ${DELAY}s"
+          fi
+          sleep $DELAY
+
+          git fetch origin $(params.kubernetes_branch)
+          LOCAL_COMMIT=`git rev-parse @`
+          REMOTE_COMMIT=`git rev-parse origin/$(params.kubernetes_branch)`
+          if [ $LOCAL_COMMIT != $REMOTE_COMMIT ]; then
+            echo "Need to pull new changes"
+            git pull --rebase origin $(params.kubernetes_branch)
+          fi
+          git push origin $(params.kubernetes_branch) && break || true
+        done

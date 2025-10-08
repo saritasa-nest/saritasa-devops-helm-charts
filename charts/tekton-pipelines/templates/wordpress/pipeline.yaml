@@ -23,25 +23,75 @@ spec:
       description: git branch/tag to deploy
       default: develop
 
+    - name: sha
+      type: string
+      description: commit SHA from webhook
+      default: ""
+
+    - name: kubernetes_repository_ssh_url
+      type: string
+      description: git repository ssh url for kubernetes manifests repo
+
+    - name: kubernetes_branch
+      type: string
+      description: branch in kubernetes repo to update
+      default: main
+
+    - name: kustomization_path
+      type: string
+      description: path to kustomization.yaml in kubernetes repo
+      default: "apps/wordpress/staging/kustomization.yaml"
+
+  workspaces:
+    - name: source
+
   tasks:
-    - name: update-argocd-app
+    - name: git-clone-gitops-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+        - name: subdirectory
+          value: gitops
+      workspaces:
+        - name: output
+          workspace: source
+
+    - name: update-wordpress-kustomization
+      taskRef:
+        name: update-wordpress-kustomization
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: wordpress_branch
+          value: "$(params.gitRevision)"
+        - name: wordpress_commit_sha
+          value: "$(params.sha)"
+        - name: kustomization_path
+          value: "$(params.kustomization_path)"
+        - name: kubernetes_branch
+          value: "$(params.kubernetes_branch)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: subdirectory
+          value: gitops
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - git-clone-gitops-repository
+
+    - name: deploy
       taskRef:
         name: argocd-deploy
       params:
         - name: application
           value: "$(params.application)"
-        - name: flags
-          value: "--parameter wordpress.repositoryRevision=$(params.gitRevision)"
-    - name: deploy
-      taskRef:
-        name: redeploy
       runAfter:
-        - update-argocd-app
-      params:
-        - name: application
-          value: "$(params.application)"
-        - name: kubernetes_namespace
-          value: "$(params.kubernetes_namespace)"
+        - update-wordpress-kustomization
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}
 
