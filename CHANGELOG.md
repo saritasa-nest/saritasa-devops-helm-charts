@@ -1,5 +1,21 @@
 # Changelog
 
+## 2025-10-01
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/175)
+- Update metrics server image in Wordpress chart to use bitnamilegacy
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/174)
+- Bump chart versions
+
+## 2025-09-26
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/171)
+- Add `buildkit`
+
 ## 2025-09-17
 
 [prod]
