@@ -37,8 +37,6 @@ spec:
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
   - name: gitRevision
     value: $(extensions.branch_name)
-  - name: sha
-    value: $(extensions.truncated_sha)
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_namespace" "default" ( include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project) ) ) | nindent 2 }}
   {{- if hasKey $project "kubernetesRepository" }}
   - name: kubernetes_repository_ssh_url
