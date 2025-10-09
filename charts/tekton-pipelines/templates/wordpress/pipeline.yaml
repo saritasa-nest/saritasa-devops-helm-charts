@@ -89,12 +89,14 @@ spec:
 
     - name: argocd-sync
       taskRef:
-        name: argocd-deploy
+        name: argocd-task-sync-and-wait
       params:
-        - name: application
+        - name: application-name
           value: "$(params.application)"
         - name: flags
-          value: "--force"
+          value: "--helm-set-string wordpress.repositoryRevision=$(params.gitRevision)"
+        - name: revision
+          value: "HEAD"
       runAfter:
         - update-wordpress-kustomization
 
