@@ -45,4 +45,10 @@ spec:
     value: {{ $project.kubernetesRepository.branch }}
   {{- end }}
   - name: kustomization_path
-    value: apps/wordpress/{{ $projectEnvironment }}/kustomization.yaml
+    value: apps/wordpress/manifests/{{ $projectEnvironment }}/kustomization.yaml
+
+---
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
