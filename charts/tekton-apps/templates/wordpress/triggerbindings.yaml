@@ -48,8 +48,7 @@ spec:
   {{- end }}
   - name: kustomization_path
     value: apps/wordpress/manifests/{{ $projectEnvironment }}/kustomization.yaml
-
----
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
