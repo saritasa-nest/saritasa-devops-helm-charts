@@ -34,6 +34,8 @@ spec:
           value: "$(tt.params.kubernetes_namespace)"
         - name: gitRevision
           value: "$(tt.params.gitRevision)"
+      workspaces:
+        {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
       podTemplate:
         volumes:
         - name: podinfo
