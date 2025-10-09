@@ -93,6 +93,12 @@
 
 - name: kubernetes_repository_ssh_url
   description: git repository ssh url for kubernetes manifests repo
+
+- name: kubernetes_repository_kustomize_path
+  description: path to kustomization file in kubernetes repository
+
+- name: kubernetes_branch
+  description: kubernetes repository branch
 {{- end}}
 
 
