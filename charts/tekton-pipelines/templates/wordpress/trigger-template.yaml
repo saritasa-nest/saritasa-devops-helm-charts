@@ -29,7 +29,7 @@ spec:
       pipelineRef:
         name: wordpress-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
+        {{- include "pipeline.defaultTTBoundParams" (dict "kubernetes" true) | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
         - name: gitRevision
