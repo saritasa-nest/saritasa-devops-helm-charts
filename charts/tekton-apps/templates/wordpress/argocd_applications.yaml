@@ -108,6 +108,8 @@ spec:
             env:
               - name: HOME
                 value: /home/app
+              - name: WP_GIT_REVISION
+                value: {{ .repositoryRevision | default "" | quote }}
             command:
               - bash
               - -c
@@ -123,10 +125,12 @@ spec:
                 # git repo url with wp app files
                 URL="{{ .repositorySshUrl | required "Missed .wordpress.repositorySshUrl option"}}"
                 #  tag or branch of target git repo that will be used for persistent deployment
-                # Read revision from kustomization ConfigMap if exists, fallback to static value
-                KUSTOMIZATION_FILE="/kustomization/kustomization.yaml"
-                if [[ -f $KUSTOMIZATION_FILE ]]; then
-                  REVISION=$(grep '^revision:' $KUSTOMIZATION_FILE | awk '{print $2}')
+                # Priority: 1) WP_GIT_REVISION env var, 2) kustomization ConfigMap, 3) static value
+                if [[ -n "${WP_GIT_REVISION:-}" ]]; then
+                  REVISION="${WP_GIT_REVISION}"
+                  echo "Using revision from WP_GIT_REVISION env var: $REVISION"
+                elif [[ -f "/kustomization/kustomization.yaml" ]]; then
+                  REVISION=$(grep '^revision:' /kustomization/kustomization.yaml | awk '{print $2}')
                   echo "Using revision from kustomization.yaml: $REVISION"
                 else
                   REVISION="{{ .repositoryRevision | default "" }}"
