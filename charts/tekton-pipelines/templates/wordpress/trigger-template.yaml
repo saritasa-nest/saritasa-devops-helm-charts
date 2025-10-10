@@ -14,6 +14,12 @@ spec:
     - name: gitRevision
       description: git branch/tag to deploy
 
+    - name: project
+      description: project name (e.g., aaoa-staging)
+
+    - name: component
+      description: component name (e.g., wordpress)
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -39,6 +45,10 @@ spec:
           value: "$(tt.params.kubernetes_namespace)"
         - name: gitRevision
           value: "$(tt.params.gitRevision)"
+        - name: project
+          value: "$(tt.params.project)"
+        - name: component
+          value: "$(tt.params.component)"
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
       podTemplate:
