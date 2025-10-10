@@ -44,6 +44,10 @@ spec:
       type: string
       description: environment name (staging/dev/prod)
 
+    - name: project
+      type: string
+      description: project name (e.g., aaoa-staging, aaoa-dev)
+
     - name: subdirectory
       type: string
       default: "gitops"
@@ -117,23 +121,25 @@ spec:
       script: |
         # Use WordPress branch directly (not branch-sha format)
         BRANCH="$(params.wordpress_branch)"
+        PROJECT="$(params.project)"
         
         # Determine values.yaml path based on environment
         VALUES_FILE="$(params.environment)/argocd/apps/values.yaml"
         
         echo "Updating values.yaml repositoryRevision"
         echo "File: ${VALUES_FILE}"
+        echo "Project: ${PROJECT}"
         echo "Environment: $(params.environment)"
         echo "Branch: ${BRANCH}"
         
         # Update repositoryRevision in values.yaml
-        # Find the wordpress component and update its repositoryRevision
+        # Find the wordpress component for specific project and update its repositoryRevision
         yq eval -i '
-          (.tekton.apps[] | select(.components != null) | .components[] | 
+          (.tekton.apps[] | select(.project == "'${PROJECT}'") | .components[] | 
           select(.name == "wordpress") | .wordpress.repositoryRevision) = "'${BRANCH}'"
         ' ${VALUES_FILE}
         
-        echo "Successfully updated repositoryRevision to: ${BRANCH}"
+        echo "Successfully updated repositoryRevision to: ${BRANCH} for project: ${PROJECT}"
 
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}

@@ -87,6 +87,8 @@ spec:
           value: "$(params.kubernetes_branch)"
         - name: environment
           value: "$(params.environment)"
+        - name: project
+          value: "$(params.project)"
         - name: subdirectory
           value: gitops
       workspaces:
