@@ -32,10 +32,14 @@ spec:
         # Get current Application manifest
         kubectl get application "$APPLICATION" -n argo-cd -o yaml > /tmp/app.yaml
         
-        # Update WP_GIT_REVISION value in initContainers env
-        yq eval '(.spec.source.helm.values | from_yaml | .initContainers[0].env[] | select(.name == "WP_GIT_REVISION") | .value) = "'"$REVISION"'"' /tmp/app.yaml > /tmp/app-updated.yaml
+        # Extract helm values, update WP_GIT_REVISION, and put back
+        yq eval '.spec.source.helm.values' /tmp/app.yaml > /tmp/values.yaml
+        yq eval '(.initContainers[0].env[] | select(.name == "WP_GIT_REVISION") | .value) = "'"$REVISION"'"' -i /tmp/values.yaml
+        
+        # Update Application manifest with new values
+        yq eval '.spec.source.helm.values = load_str("/tmp/values.yaml")' -i /tmp/app.yaml
         
         # Apply the updated manifest
-        kubectl apply -f /tmp/app-updated.yaml
+        kubectl apply -f /tmp/app.yaml
         
         echo "Application patched successfully"
