@@ -18,6 +18,14 @@ spec:
       type: string
       description: component name
 
+    - name: project
+      type: string
+      description: project name (e.g., aaoa-staging)
+
+    - name: component
+      type: string
+      description: component name (e.g., wordpress)
+
     - name: kubernetes_namespace
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
