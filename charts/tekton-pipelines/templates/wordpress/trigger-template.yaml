@@ -37,6 +37,8 @@ spec:
           taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
         - pipelineTaskName: update-wordpress-kustomization
           taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+        - pipelineTaskName: update-values-yaml
+          taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: wordpress-build-pipeline
       params:
