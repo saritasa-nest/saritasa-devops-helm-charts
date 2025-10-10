@@ -110,6 +110,31 @@ spec:
         echo "Updated kustomization.yaml:"
         cat ${KUSTOMIZATION_FILE}
 
+    - name: update-values-yaml
+      image: {{ .Values.images.yq | default "mikefarah/yq:4.47.1"}}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)/$(params.subdirectory)
+      script: |
+        # Use WordPress branch directly (not branch-sha format)
+        BRANCH="$(params.wordpress_branch)"
+        
+        # Determine values.yaml path based on environment
+        VALUES_FILE="$(params.environment)/argocd/apps/values.yaml"
+        
+        echo "Updating values.yaml repositoryRevision"
+        echo "File: ${VALUES_FILE}"
+        echo "Environment: $(params.environment)"
+        echo "Branch: ${BRANCH}"
+        
+        # Update repositoryRevision in values.yaml
+        # Find the wordpress component and update its repositoryRevision
+        yq eval -i '
+          (.projects[] | select(.components != null) | .components[] | 
+          select(.name == "wordpress") | .wordpress.repositoryRevision) = "'${BRANCH}'"
+        ' ${VALUES_FILE}
+        
+        echo "Successfully updated repositoryRevision to: ${BRANCH}"
+
     - name: yamlfix
       image: {{ .Values.images.yamlfix | default "public.ecr.aws/saritasa/yamlfix:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -123,7 +148,10 @@ spec:
         fi
 
         KUSTOMIZATION_FILE="apps/wordpress/manifests/$(params.environment)/kustomization.yaml"
+        VALUES_FILE="$(params.environment)/argocd/apps/values.yaml"
+        
         yamlfix --config-file=$CONFIG ${KUSTOMIZATION_FILE}
+        yamlfix --config-file=$CONFIG ${VALUES_FILE}
 
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
@@ -141,8 +169,8 @@ spec:
         fi
 
         SHORT_SHA=$(echo "$(params.wordpress_commit_sha)" | cut -c1-7)
-        KUSTOMIZATION_FILE="apps/wordpress/manifests/$(params.environment)/kustomization.yaml"
-        git commit -am "feat: $(params.environment) wordpress deployment, update $(params.component_name) to revision: $(params.wordpress_branch)-${SHORT_SHA}"
+        git add .
+        git commit -m "feat: $(params.environment) wordpress deployment, update $(params.component_name) to branch: $(params.wordpress_branch), commit: ${SHORT_SHA}"
 
         # retry logic with pull --rebase
         set -- "0" "1" "3" "5"

@@ -95,19 +95,6 @@ spec:
       runAfter:
         - git-clone-gitops-repository
 
-    - name: argocd-sync
-      taskRef:
-        name: argocd-deploy
-      params:
-        - name: application
-          value: "$(params.application)"
-        - name: revision
-          value: "HEAD"
-        - name: flags
-          value: "--helm-set-string repositoryRevision=$(params.gitRevision)"
-      runAfter:
-        - update-wordpress-kustomization
-
     - name: rollout-restart
       taskRef:
         name: redeploy
@@ -117,7 +104,7 @@ spec:
         - name: kubernetes_namespace
           value: "$(params.kubernetes_namespace)"
       runAfter:
-        - argocd-sync
+        - update-wordpress-kustomization
 
   finally:
     - name: slack-notification
