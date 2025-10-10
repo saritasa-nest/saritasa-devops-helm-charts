@@ -129,7 +129,7 @@ spec:
         # Update repositoryRevision in values.yaml
         # Find the wordpress component and update its repositoryRevision
         yq eval -i '
-          (.projects[] | select(.components != null) | .components[] | 
+          (.tekton.apps[] | select(.components != null) | .components[] | 
           select(.name == "wordpress") | .wordpress.repositoryRevision) = "'${BRANCH}'"
         ' ${VALUES_FILE}
         
