@@ -39,6 +39,11 @@ spec:
         # Change to workspace directory
         cd $(workspaces.source.path)/gitops
         
+        # Debug: check git status
+        echo "Current directory: $(pwd)"
+        ls -la
+        git status || echo "Git status failed"
+        
         # Install yq
         wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
         chmod +x /usr/local/bin/yq
