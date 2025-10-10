@@ -104,7 +104,7 @@ spec:
         - name: revision
           value: "HEAD"
         - name: flags
-          value: "--helm-set-string wordpress.repositoryRevision=$(params.gitRevision)"
+          value: "--helm-set-string repositoryRevision=$(params.gitRevision)"
       runAfter:
         - update-wordpress-kustomization
 
