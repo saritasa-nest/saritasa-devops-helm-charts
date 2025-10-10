@@ -1,0 +1,37 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: patch-argocd-application
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: Patch ArgoCD Application to update repositoryRevision parameter
+  params:
+    - name: application
+      type: string
+      description: ArgoCD Application name
+    - name: repositoryRevision
+      type: string
+      description: Git branch/tag to deploy
+  steps:
+    - name: patch-application
+      image: bitnami/kubectl:latest
+      script: |
+        #!/bin/bash
+        set -e
+        
+        APPLICATION="$(params.application)"
+        REVISION="$(params.repositoryRevision)"
+        
+        echo "Patching ArgoCD Application: $APPLICATION"
+        echo "Setting repositoryRevision to: $REVISION"
+        
+        # Patch ArgoCD Application to update repositoryRevision in values
+        kubectl patch application "$APPLICATION" -n argo-cd --type=json -p='[
+          {
+            "op": "replace",
+            "path": "/spec/source/helm/values",
+            "value": "'"$(kubectl get application "$APPLICATION" -n argo-cd -o jsonpath='{.spec.source.helm.values}' | sed "s/repositoryRevision: .*/repositoryRevision: $REVISION/")"'"
+          }
+        ]'
+        
+        echo "Application patched successfully"

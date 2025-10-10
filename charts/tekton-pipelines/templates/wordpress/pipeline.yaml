@@ -87,18 +87,27 @@ spec:
       runAfter:
         - git-clone-gitops-repository
 
+    - name: patch-argocd-application
+      taskRef:
+        name: patch-argocd-application
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: repositoryRevision
+          value: "$(params.gitRevision)"
+      runAfter:
+        - update-wordpress-kustomization
+
     - name: argocd-sync
       taskRef:
         name: argocd-deploy
       params:
         - name: application
           value: "$(params.application)"
-        - name: flags
-          value: "--helm-set-string wordpress.repositoryRevision=$(params.gitRevision)"
         - name: revision
           value: "HEAD"
       runAfter:
-        - update-wordpress-kustomization
+        - patch-argocd-application
 
     - name: rollout-restart
       taskRef:
