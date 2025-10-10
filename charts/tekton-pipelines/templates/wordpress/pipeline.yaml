@@ -95,24 +95,6 @@ spec:
       runAfter:
         - git-clone-gitops-repository
 
-    - name: update-values-yaml
-      taskRef:
-        name: update-values-yaml-repository-revision
-      params:
-        - name: project
-          value: "$(params.project)"
-        - name: component
-          value: "$(params.component)"
-        - name: repositoryRevision
-          value: "$(params.gitRevision)"
-        - name: kubernetes_branch
-          value: "$(params.kubernetes_branch)"
-      workspaces:
-        - name: source
-          workspace: source
-      runAfter:
-        - update-wordpress-kustomization
-
     - name: argocd-sync
       taskRef:
         name: argocd-deploy
@@ -121,8 +103,10 @@ spec:
           value: "$(params.application)"
         - name: revision
           value: "HEAD"
+        - name: flags
+          value: "--helm-set-string wordpress.repositoryRevision=$(params.gitRevision)"
       runAfter:
-        - update-values-yaml
+        - update-wordpress-kustomization
 
     - name: rollout-restart
       taskRef:
