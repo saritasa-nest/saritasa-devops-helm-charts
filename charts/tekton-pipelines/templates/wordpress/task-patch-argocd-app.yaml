@@ -26,11 +26,15 @@ spec:
         echo "Setting repositoryRevision to: $REVISION"
         
         # Patch ArgoCD Application to update repositoryRevision in values
+        # Get current values and replace repositoryRevision
+        CURRENT_VALUES=$(kubectl get application "$APPLICATION" -n argo-cd -o jsonpath='{.spec.source.helm.values}')
+        NEW_VALUES=$(echo "$CURRENT_VALUES" | sed "s|repositoryRevision: .*|repositoryRevision: $REVISION|")
+        
         kubectl patch application "$APPLICATION" -n argo-cd --type=json -p='[
           {
             "op": "replace",
             "path": "/spec/source/helm/values",
-            "value": "'"$(kubectl get application "$APPLICATION" -n argo-cd -o jsonpath='{.spec.source.helm.values}' | sed "s/repositoryRevision: .*/repositoryRevision: $REVISION/")"'"
+            "value": "'"$NEW_VALUES"'"
           }
         ]'
         
