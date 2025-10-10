@@ -14,7 +14,7 @@ spec:
       description: Git branch/tag to deploy
   steps:
     - name: patch-application
-      image: mikefarah/yq:4
+      image: alpine/k8s:1.28.3
       script: |
         #!/bin/sh
         set -e
@@ -24,6 +24,10 @@ spec:
         
         echo "Patching ArgoCD Application: $APPLICATION"
         echo "Setting repositoryRevision to: $REVISION"
+        
+        # Install yq
+        wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        chmod +x /usr/local/bin/yq
         
         # Get current Application manifest
         kubectl get application "$APPLICATION" -n argo-cd -o yaml > /tmp/app.yaml
