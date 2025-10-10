@@ -14,9 +14,9 @@ spec:
       description: Git branch/tag to deploy
   steps:
     - name: patch-application
-      image: bitnami/kubectl:latest
+      image: mikefarah/yq:4
       script: |
-        #!/bin/bash
+        #!/bin/sh
         set -e
         
         APPLICATION="$(params.application)"
@@ -25,17 +25,13 @@ spec:
         echo "Patching ArgoCD Application: $APPLICATION"
         echo "Setting repositoryRevision to: $REVISION"
         
-        # Patch ArgoCD Application to update repositoryRevision in values
-        # Get current values and replace repositoryRevision
-        CURRENT_VALUES=$(kubectl get application "$APPLICATION" -n argo-cd -o jsonpath='{.spec.source.helm.values}')
-        NEW_VALUES=$(echo "$CURRENT_VALUES" | sed "s|repositoryRevision: .*|repositoryRevision: $REVISION|")
+        # Get current Application manifest
+        kubectl get application "$APPLICATION" -n argo-cd -o yaml > /tmp/app.yaml
         
-        kubectl patch application "$APPLICATION" -n argo-cd --type=json -p='[
-          {
-            "op": "replace",
-            "path": "/spec/source/helm/values",
-            "value": "'"$NEW_VALUES"'"
-          }
-        ]'
+        # Update WP_GIT_REVISION value in initContainers env
+        yq eval '(.spec.source.helm.values | from_yaml | .initContainers[0].env[] | select(.name == "WP_GIT_REVISION") | .value) = "'"$REVISION"'"' /tmp/app.yaml > /tmp/app-updated.yaml
+        
+        # Apply the updated manifest
+        kubectl apply -f /tmp/app-updated.yaml
         
         echo "Application patched successfully"
