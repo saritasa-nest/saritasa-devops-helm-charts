@@ -21,6 +21,7 @@ spec:
     - name: project
       type: string
       description: project name (e.g., aaoa-staging)
+      default: ""
 
     - name: component
       type: string
