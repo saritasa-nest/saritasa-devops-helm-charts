@@ -19,6 +19,9 @@ spec:
       description: defines whether repository should be initialized with submodules or not (if false value is set, it means no repository submodules would be downloaded)
       default: "true"
 
+    - name: kubernetes_repository_ssh_url
+      description: git repository ssh url for kubernetes manifests repo
+
     - name: docker_file
       default: Dockerfile
       description: location of the dockerfile, should be Dockerfile if it is in the root of the repository
@@ -72,6 +75,8 @@ spec:
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
+        - name: kubernetes_repository_ssh_url
+          value: "$(tt.params.kubernetes_repository_ssh_url)"
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
