@@ -47,7 +47,6 @@ spec:
     - name: project
       type: string
       description: project name (e.g., aaoa-staging, aaoa-dev)
-      default: ""
 
     - name: subdirectory
       type: string
@@ -123,40 +122,23 @@ spec:
         # Use WordPress branch directly (not branch-sha format)
         BRANCH="$(params.wordpress_branch)"
         PROJECT="$(params.project)"
-        
+
         # Determine values.yaml path based on environment
         VALUES_FILE="$(params.environment)/argocd/apps/values.yaml"
-        
+
         echo "Updating values.yaml repositoryRevision"
         echo "File: ${VALUES_FILE}"
         echo "Project: ${PROJECT}"
         echo "Environment: $(params.environment)"
         echo "Branch: ${BRANCH}"
-        
-        # Skip if project parameter is empty (backward compatibility)
-        if [ -z "${PROJECT}" ]; then
-          echo "WARNING: project parameter is empty, skipping values.yaml update for backward compatibility"
-          exit 0
-        fi
-        
-        # Check if values.yaml exists
-        if [ ! -f "${VALUES_FILE}" ]; then
-          echo "WARNING: ${VALUES_FILE} not found, skipping update"
-          exit 0
-        fi
-        
+
         # Update repositoryRevision in values.yaml
         # Find the wordpress component for specific project and update its repositoryRevision
-        # Use || true to prevent failure if path doesn't exist
         yq eval -i '
-          (.tekton.apps[] | select(.project == "'${PROJECT}'") | .components[] | 
+          (.tekton.apps[] | select(.project == "'${PROJECT}'") | .components[] |
           select(.name == "wordpress") | .wordpress.repositoryRevision) = "'${BRANCH}'"
-        ' ${VALUES_FILE} || {
-          echo "WARNING: Failed to update repositoryRevision, path may not exist in values.yaml"
-          echo "This is expected for clusters with different values.yaml structure"
-          exit 0
-        }
-        
+        ' ${VALUES_FILE}
+
         echo "Successfully updated repositoryRevision to: ${BRANCH} for project: ${PROJECT}"
 
     - name: yamlfix
@@ -173,7 +155,7 @@ spec:
 
         KUSTOMIZATION_FILE="apps/wordpress/manifests/$(params.environment)/kustomization.yaml"
         VALUES_FILE="$(params.environment)/argocd/apps/values.yaml"
-        
+
         yamlfix --config-file=$CONFIG ${KUSTOMIZATION_FILE}
         yamlfix --config-file=$CONFIG ${VALUES_FILE}
 
