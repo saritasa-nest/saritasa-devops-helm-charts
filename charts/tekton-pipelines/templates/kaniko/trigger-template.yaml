@@ -75,8 +75,6 @@ spec:
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name
           value: "$(tt.params.sentry_project_name)"
-        - name: kubernetes_repository_ssh_url
-          value: "$(tt.params.kubernetes_repository_ssh_url)"
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
