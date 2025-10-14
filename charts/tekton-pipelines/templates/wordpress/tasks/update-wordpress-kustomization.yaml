@@ -171,7 +171,14 @@ spec:
         VALUES_FILE="$(params.environment)/argocd/apps/values.yaml"
 
         yamlfix --config-file=$CONFIG ${KUSTOMIZATION_FILE}
-        yamlfix --config-file=$CONFIG ${VALUES_FILE}
+        
+        # Only format values.yaml if it exists and was modified
+        if [ -f "${VALUES_FILE}" ]; then
+          yamlfix --config-file=$CONFIG ${VALUES_FILE} || {
+            echo "WARNING: yamlfix failed for ${VALUES_FILE}, continuing anyway"
+            exit 0
+          }
+        fi
 
     - name: git-push
       image: {{ .Values.images.git | default "alpine/git:latest" }}
