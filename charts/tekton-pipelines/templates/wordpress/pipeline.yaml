@@ -14,13 +14,90 @@ spec:
   params:
     {{ include "pipeline.defaultParams" . | nindent 4 }}
 
+    - name: component_name
+      type: string
+      description: component name
+
+    - name: project
+      type: string
+      description: project name (e.g., aaoa-staging)
+
+    - name: component
+      type: string
+      description: component name (e.g., wordpress)
+
     - name: kubernetes_namespace
       type: string
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
+    - name: gitRevision
+      type: string
+      description: git branch/tag to deploy
+      default: develop
+
+    - name: kubernetes_repository_ssh_url
+      type: string
+      description: git repository ssh url for kubernetes manifests repo
+
+    - name: kubernetes_branch
+      type: string
+      description: branch in kubernetes repo to update
+      default: main
+
+    - name: kustomization_path
+      type: string
+      description: path to kustomization.yaml in kubernetes repo
+      default: "apps/wordpress/staging/kustomization.yaml"
+
+  workspaces:
+    - name: source
 
   tasks:
-    - name: deploy
+    - name: git-clone-gitops-repository
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.kubernetes_repository_ssh_url)
+        - name: revision
+          value: $(params.kubernetes_branch)
+        - name: subdirectory
+          value: gitops
+      workspaces:
+        - name: output
+          workspace: source
+
+    - name: update-wordpress-kustomization
+      taskRef:
+        name: update-wordpress-kustomization
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: component_name
+          value: "$(params.component_name)"
+        - name: wordpress_branch
+          value: "$(params.gitRevision)"
+        - name: wordpress_commit_sha
+          value: "$(params.sha)"
+        - name: kubernetes_namespace
+          value: "$(params.kubernetes_namespace)"
+        - name: kustomization_path
+          value: "$(params.kustomization_path)"
+        - name: kubernetes_branch
+          value: "$(params.kubernetes_branch)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: project
+          value: "$(params.project)"
+        - name: subdirectory
+          value: gitops
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - git-clone-gitops-repository
+
+    - name: rollout-restart
       taskRef:
         name: redeploy
       params:
@@ -28,7 +105,37 @@ spec:
           value: "$(params.application)"
         - name: kubernetes_namespace
           value: "$(params.kubernetes_namespace)"
+      runAfter:
+        - update-wordpress-kustomization
 
-  {{ include "pipeline.finalNotification" . | nindent 2 }}
+  finally:
+    - name: slack-notification
+      taskRef:
+        name: slack-notification
+      params:
+        - name: application
+          value: "$(params.application)"
+        - name: sha
+          value: "$(params.sha)"
+        - name: head_commit
+          value: "$(params.head_commit)"
+        - name: head_commit_message
+          value: "$(params.head_commit_message)"
+        - name: pusher_name
+          value: "$(params.pusher_name)"
+        - name: pusher_email
+          value: "$(params.pusher_email)"
+        - name: pusher_avatar
+          value: "$(params.pusher_avatar)"
+        - name: pusher_url
+          value: "$(params.pusher_url)"
+        - name: repository_url
+          value: "$(params.repository_url)"
+        - name: branch
+          value: "$(params.branch)"
+        - name: environment
+          value: "$(params.environment)"
+        - name: status
+          value: "$(tasks.rollout-restart.status)"
 
 {{ end }}

@@ -11,6 +11,15 @@ spec:
     - name: kubernetes_namespace
       description: kubernetes namespace where wordpress is installed that requires POD redeployment
 
+    - name: gitRevision
+      description: git branch/tag to deploy
+
+    - name: project
+      description: project name (e.g., aaoa-staging)
+
+    - name: component
+      description: component name (e.g., wordpress)
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -23,12 +32,25 @@ spec:
         component: $(tt.params.component)
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
+      taskRunSpecs:
+        - pipelineTaskName: git-clone-gitops-repository
+          taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+        - pipelineTaskName: update-wordpress-kustomization
+          taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
       pipelineRef:
         name: wordpress-build-pipeline
       params:
-        {{- include "pipeline.defaultTTBoundParams" . | nindent 8 }}
+        {{- include "pipeline.defaultTTBoundParams" (dict "kubernetes" true) | nindent 8 }}
         - name: kubernetes_namespace
           value: "$(tt.params.kubernetes_namespace)"
+        - name: gitRevision
+          value: "$(tt.params.gitRevision)"
+        - name: project
+          value: "$(tt.params.project)"
+        - name: component
+          value: "$(tt.params.component)"
+      workspaces:
+        {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
       podTemplate:
         volumes:
         - name: podinfo

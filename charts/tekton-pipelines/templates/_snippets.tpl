@@ -85,8 +85,20 @@
 - name: component
   description: name of the application component, which is deployed
 
+- name: component_name
+  description: component name
+
 - name: branch
   description: git branch
+
+- name: kubernetes_repository_ssh_url
+  description: git repository ssh url for kubernetes manifests repo
+
+- name: kubernetes_repository_kustomize_path
+  description: path to kustomization file in kubernetes repository
+
+- name: kubernetes_branch
+  description: kubernetes repository branch
 {{- end}}
 
 
@@ -159,6 +171,8 @@
   value: "$(tt.params.repository_url)"
 - name: branch
   value: "$(tt.params.branch)"
+- name: component_name
+  value: "$(tt.params.component_name)"
 {{- if .docker }}
 - name: docker_registry
   value: "$(tt.params.docker_registry)"
@@ -166,6 +180,8 @@
   value: "$(tt.params.docker_registry_repository)"
 {{- end }}
 {{- if .kubernetes }}
+- name: kubernetes_repository_ssh_url
+  value: "$(tt.params.kubernetes_repository_ssh_url)"
 - name: kubernetes_repository_kustomize_path
   value: "$(tt.params.kubernetes_repository_kustomize_path)"
 - name: kubernetes_branch

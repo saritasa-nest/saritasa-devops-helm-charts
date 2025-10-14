@@ -1,0 +1,28 @@
+{{ if .Values.apps }}
+{{- range $project := .Values.apps }}
+{{- if $project.enabled }}
+{{- range $component := $project.components }}
+{{- if hasKey $component "wordpress" }}
+
+# initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise
+{{ $projectEnvironment := ternary $project.environment $.Values.environment (hasKey $project "environment") -}}
+
+{{- $data := dict "project"           $project
+                  "component"         $component
+                  "environment"       $projectEnvironment
+                  "namespace"         $.Release.Namespace
+                  "storageClassName"  $.Values.storageClassName }}
+
+{{ $pvc := $component.tekton }}
+
+# ========================================================================
+# 🌱 {{ $project.project | upper }}/{{ $component.name | upper }} COMPONENT WORKSPACE PVC
+# ========================================================================
+# workspace pvc contains git repo cloned for the component by tekton
+{{ include "tekton-apps.tekton-pvc" (set (set $data "suffix" "workspace-pvc") "storage" ($pvc.workspacePVC | default "10Gi")) }}
+
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

@@ -42,7 +42,7 @@ spec:
           value:
             - expression: body.head_commit.id.truncate(7)
               key: truncated_sha
-            - expression: body.ref.split('/')[2]
+            - expression: body.ref.split('/', 3)[2]
               key: branch_name
             - expression: body.head_commit.timestamp
               key: commit_timestamp

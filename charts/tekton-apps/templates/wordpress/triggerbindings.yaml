@@ -30,17 +30,24 @@ spec:
     value: {{ $project.project }}
   - name: component
     value: {{ $component.name }}
+  - name: component_name
+    value: {{ $component.name }}
   - name: namespace
     value: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "environment" "default" $projectEnvironment ) | nindent 2 }}
+  - name: gitRevision
+    value: $(extensions.branch_name)
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "kubernetes_namespace" "default" ( include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project) ) ) | nindent 2 }}
-  {{- if hasKey $component "triggerBinding" }}
-  {{- toYaml $component.triggerBinding | nindent 2 }}
+  {{- if hasKey $project "kubernetesRepository" }}
+  - name: kubernetes_repository_ssh_url
+    value: {{ $project.kubernetesRepository.url }}
+  - name: kubernetes_branch
+    value: {{ $project.kubernetesRepository.branch }}
   {{- end }}
----
-
-{{- end }} # if component.wordpress
-{{- end }} # range component
-{{- end }} # if project.enabled
-{{- end }} # range project
-{{- end }} # if apps
+  - name: kustomization_path
+    value: apps/wordpress/manifests/{{ $projectEnvironment }}/kustomization.yaml
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

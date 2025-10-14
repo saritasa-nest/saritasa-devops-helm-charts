@@ -44,6 +44,33 @@ subjects:
   namespace: {{ $.Release.Namespace }}
 
 ---
+# wordpress projects need permissions to patch ArgoCD Application to update repositoryRevision
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "argocd-patch-role") }}
+  namespace: argo-cd
+rules:
+  - apiGroups:  ["argoproj.io"]
+    resources:  ["applications"]
+    verbs:      ["get", "list", "patch"]
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "argocd-patch-role-binding") }}
+  namespace: argo-cd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "argocd-patch-role") }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "tekton-apps.resourceName" (set $data "suffix" "build-pipeline-sa") }}
+  namespace: {{ $.Release.Namespace }}
+
+---
 
 {{- end }} # if component.wordpress
 {{- end }} # range component

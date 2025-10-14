@@ -1,4 +1,3 @@
-
 # jitsi-meet
 
 ![Version: 1.2.3](https://img.shields.io/badge/Version-1.2.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: stable-6865](https://img.shields.io/badge/AppVersion-stable--6865-informational?style=flat-square)
@@ -140,3 +139,4 @@ A Helm chart for Kubernetes
 | xmpp.guestDomain | string | `nil` |  |
 | xmpp.internalMucDomain | string | `nil` |  |
 | xmpp.mucDomain | string | `nil` |  |
+

@@ -1,0 +1,45 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: patch-argocd-application
+  namespace: {{ .Release.Namespace }}
+spec:
+  description: Patch ArgoCD Application to update repositoryRevision parameter
+  params:
+    - name: application
+      type: string
+      description: ArgoCD Application name
+    - name: repositoryRevision
+      type: string
+      description: Git branch/tag to deploy
+  steps:
+    - name: patch-application
+      image: alpine/k8s:1.28.3
+      script: |
+        #!/bin/sh
+        set -e
+        
+        APPLICATION="$(params.application)"
+        REVISION="$(params.repositoryRevision)"
+        
+        echo "Patching ArgoCD Application: $APPLICATION"
+        echo "Setting repositoryRevision to: $REVISION"
+        
+        # Install yq
+        wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+        chmod +x /usr/local/bin/yq
+        
+        # Get current Application manifest
+        kubectl get application "$APPLICATION" -n argo-cd -o yaml > /tmp/app.yaml
+        
+        # Extract helm values, update WP_GIT_REVISION, and put back
+        yq eval '.spec.source.helm.values' /tmp/app.yaml > /tmp/values.yaml
+        yq eval '(.initContainers[0].env[] | select(.name == "WP_GIT_REVISION") | .value) = "'"$REVISION"'"' -i /tmp/values.yaml
+        
+        # Update Application manifest with new values
+        yq eval '.spec.source.helm.values = load_str("/tmp/values.yaml")' -i /tmp/app.yaml
+        
+        # Apply the updated manifest
+        kubectl apply -f /tmp/app.yaml
+        
+        echo "Application patched successfully"
