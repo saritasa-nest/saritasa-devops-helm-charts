@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 2.2.12](https://img.shields.io/badge/Version-2.2.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.13-dev.1](https://img.shields.io/badge/Version-2.2.13--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -214,6 +214,10 @@ After configuring these values, you will have an extra `sentry-release` step aft
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| buildkit.build_args | list | `[]` |  |
+| buildkit.enabled | bool | `true` | should we enable the buildkit pipeline |
+| buildkit.extraPostDeployTaskSteps | string | `nil` |  |
+| buildkit.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.cnbPlatformAPI | string | `"0.10"` | cnb (cloud native buildpacks) platform API to support see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md) |
 | buildpacks.enabled | bool | `false` | should we enable buildpack based pipelines |
 | buildpacks.generate.buildpackDjangoBuildPipeline.buildTaskName | string | `"buildpack-django"` | the generated name of the tekton task implementing the "build" step |
@@ -266,6 +270,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.argocd_cli | string | `"https://github.com/argoproj/argo-cd/releases/download/v2.14.15/argocd-linux-amd64"` | argocd cli downdload URL |
 | images.awscli | string | `"docker.io/amazon/aws-cli:2.7.4"` | aws cli image (used for aws ecr auth) |
 | images.bash | string | `"docker.io/library/bash:5.2.37"` | bash image (used for various ops in steps) |
+| images.buildkit | string | `"moby/buildkit:master-rootless"` | buildkit image (used for building containers containing docker files) |
 | images.git | string | `"alpine/git:v2.49.0"` | git image |
 | images.kaniko | string | `"gcr.io/kaniko-project/executor@sha256:4e7a52dd1f14872430652bb3b027405b8dfd17c4538751c620ac005741ef9698"` | kaniko image used to build containers containing docker files - v1.24.0, uploaded May 23 2025 |
 | images.kubectl | string | `"bitnamilegacy/kubectl:1.33.1"` | kubectl cli |
@@ -274,6 +279,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 | images.python | string | `"saritasallc/python3:0.4"` | python image |
 | images.sentry_cli | string | `"getsentry/sentry-cli:2.46.0"` | sentry cli image - needs to prepare Sentry releases |
 | images.slack | string | `"cloudposse/slack-notifier:0.4.0"` | slack notifier |
+| images.tekton | string | `"saritasallc/tekton:1.0.9"` | tekton image |
 | images.yamlfix | string | `"public.ecr.aws/saritasa/yamlfix:1.8.1"` | yamlfix image - format yaml files |
 | images.yq | string | `"mikefarah/yq:4.47.1"` | yq image |
 | kaniko.enabled | bool | `true` | should we enable the kaniko pipeline |

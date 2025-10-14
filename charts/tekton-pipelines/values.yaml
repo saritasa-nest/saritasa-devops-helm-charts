@@ -78,6 +78,9 @@ buildpacks:
           script: |
             #!/usr/bin/env bash
             set -o pipefail
+            buildpack_env_vars="$(params.buildpack_env_vars)"
+            buildpack_env_vars_key="${buildpack_env_vars%%=*}"
+            buildpack_env_vars_val="${buildpack_env_vars#*=}"
 
             if [[ ! -f package.json ]]; then
               echo "No package.json found, stepping out"
@@ -85,6 +88,11 @@ buildpacks:
               echo "Installing node.js dependencies"
               # set cache
               npm config set cache $(workspaces.app.path)/.npm --global
+              # set saritasa-nest Github Package as NPM registry
+              if [[ $buildpack_env_vars_key == "NPM_REGISTRY_GITHUB_TOKEN" ]]; then
+                npm config set @saritasa-nest:registry=https://npm.pkg.github.com/
+                npm config set //npm.pkg.github.com/:_authToken="${buildpack_env_vars_val}"
+              fi
               npm ci
               if [[ $? -ne 0 ]]; then
                 echo "unable to install dependencies, exit_code: $?"
