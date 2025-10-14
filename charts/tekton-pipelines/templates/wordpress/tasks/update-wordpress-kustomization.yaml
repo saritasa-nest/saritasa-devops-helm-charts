@@ -132,6 +132,20 @@ spec:
         echo "Environment: $(params.environment)"
         echo "Branch: ${BRANCH}"
 
+        # Check if values.yaml exists
+        if [ ! -f "${VALUES_FILE}" ]; then
+          echo "WARNING: ${VALUES_FILE} not found, skipping values.yaml update"
+          exit 0
+        fi
+
+        # Check if the wordpress component exists for this project
+        WORDPRESS_PATH=$(yq eval '(.tekton.apps[] | select(.project == "'${PROJECT}'") | .components[] | select(.name == "wordpress") | .wordpress.repositoryRevision)' ${VALUES_FILE})
+        
+        if [ -z "${WORDPRESS_PATH}" ] || [ "${WORDPRESS_PATH}" == "null" ]; then
+          echo "WARNING: WordPress component not found for project ${PROJECT}, skipping values.yaml update"
+          exit 0
+        fi
+
         # Update repositoryRevision in values.yaml
         # Find the wordpress component for specific project and update its repositoryRevision
         yq eval -i '
