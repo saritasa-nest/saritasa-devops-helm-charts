@@ -82,15 +82,12 @@ buildpacks:
             # Create env vars for each key=value pair inside buildpack_env_vars split by `;`
             # Will ignore every pair that doesn't have a `=` or a key
             if [[ -n "$buildpack_env_vars" ]]; then
-              IFS=';' read -r -a __pairs <<<"$buildpack_env_vars"
-              for pair in "${__pairs[@]}"; do
-
+              IFS=';' read -ra env_vars <<<"$buildpack_env_vars"
+              for pair in "${env_vars[@]}"; do
                 [[ -z "$pair" ]] && continue
                 [[ "$pair" != *"="* ]] && continue
-
                 key=${pair%%=*}
                 value=${pair#*=}
-
                 [[ -z "$key" ]] && continue
                 echo "Creating ${key} with value: ${value}"
                 export "$key"="$value"
@@ -105,6 +102,7 @@ buildpacks:
               npm config set cache $(workspaces.app.path)/.npm --global
               # set saritasa-nest Github Package as NPM registry
               if [[ -n "${NPM_REGISTRY_GITHUB_TOKEN:-}" ]]; then
+                echo "Setting GitHub Packages NPM registry"
                 npm config set @saritasa-nest:registry=https://npm.pkg.github.com/
                 npm config set //npm.pkg.github.com/:_authToken="${NPM_REGISTRY_GITHUB_TOKEN}"
               fi
