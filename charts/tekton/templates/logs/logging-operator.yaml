@@ -30,8 +30,7 @@ metadata:
      We need to store tekton logs on s3 bucket, in the case we provision ci nodes using karpenter,
      as such nodes are ephemeral by nature.
 spec:
- s3:
-   {{ .Values.logsOperator.output | toYaml | nindent 4 }}
+  {{ .Values.logsOperator.output | toYaml | nindent 2 }}
 ---
 apiVersion: logging.banzaicloud.io/v1beta1
 kind: Flow

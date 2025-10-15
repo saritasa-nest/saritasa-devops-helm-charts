@@ -1,7 +1,7 @@
 
 # saritasa-tekton
 
-![Version: 2.1.4](https://img.shields.io/badge/Version-2.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 2.1.5-dev.1](https://img.shields.io/badge/Version-2.1.5--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 A Helm chart for tekton
 
@@ -65,16 +65,16 @@ A Helm chart for tekton
 | logsOperator.logging.fluentd.labels."app.kubernetes.io/part-of" | string | `"tekton"` |  |
 | logsOperator.logging.fluentd.scaling.drain.enabled | bool | `true` |  |
 | logsOperator.logging.fluentd.serviceAccount.metadata.annotations."eks.amazonaws.com/role-arn" | string | `""` |  |
-| logsOperator.output.buffer.timekey | string | `"1m"` |  |
-| logsOperator.output.buffer.timekey_use_utc | bool | `true` |  |
-| logsOperator.output.buffer.timekey_wait | string | `"1m"` |  |
-| logsOperator.output.format.message_key | string | `"message"` |  |
-| logsOperator.output.format.type | string | `"single_value"` |  |
-| logsOperator.output.path | string | `"${tag}/"` |  |
-| logsOperator.output.s3_bucket | string | `""` |  |
-| logsOperator.output.s3_object_key_format | string | `"%{path}%{time_slice}_%{index}.log"` |  |
-| logsOperator.output.s3_region | string | `""` |  |
-| logsOperator.output.store_as | string | `"text"` |  |
+| logsOperator.output.s3.buffer.timekey | string | `"1m"` |  |
+| logsOperator.output.s3.buffer.timekey_use_utc | bool | `true` |  |
+| logsOperator.output.s3.buffer.timekey_wait | string | `"1m"` |  |
+| logsOperator.output.s3.format.message_key | string | `"message"` |  |
+| logsOperator.output.s3.format.type | string | `"single_value"` |  |
+| logsOperator.output.s3.path | string | `"${tag}/"` |  |
+| logsOperator.output.s3.s3_bucket | string | `""` |  |
+| logsOperator.output.s3.s3_object_key_format | string | `"%{path}%{time_slice}_%{index}.log"` |  |
+| logsOperator.output.s3.s3_region | string | `""` |  |
+| logsOperator.output.s3.store_as | string | `"text"` |  |
 | logsServer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/os"` |  |
 | logsServer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
 | logsServer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"linux"` |  |

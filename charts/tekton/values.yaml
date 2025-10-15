@@ -799,18 +799,24 @@ logsOperator:
           value: 'true'
           effect: NoSchedule
   output:
-    s3_bucket: ''  # client-prod-eks-tekton-logs
-    s3_region: ''  # us-east-1
-    s3_object_key_format: '%{path}%{time_slice}_%{index}.log'
-    store_as: text
-    path: ${tag}/  # the actual value is formed in the Flow crd, under filters.tag_normalizer and is equal to ${namespace_name}/${pod_name}/${container_name}
-    buffer:
-      timekey: 1m
-      timekey_wait: 1m
-      timekey_use_utc: true
-    format:
-      type: single_value
-      message_key: message
+    # Only define a single Fluentd output, either s3, azure, etc
+    # https://kube-logging.dev/docs/configuration/plugins/outputs/
+    s3:
+      s3_bucket: ''  # client-prod-eks-tekton-logs
+      s3_region: ''  # us-east-1
+      s3_object_key_format: '%{path}%{time_slice}_%{index}.log'
+      store_as: text
+      path: ${tag}/  # the actual value is formed in the Flow crd, under filters.tag_normalizer and is equal to ${namespace_name}/${pod_name}/${container_name}
+      buffer:
+        timekey: 1m
+        timekey_wait: 1m
+        timekey_use_utc: true
+      format:
+        type: single_value
+        message_key: message
+    # azure:
+    #   azure_container: ''
+    #   azure_storage_account: ''
   flow:
     # select pods by label that will be scraped by the fluentbit
     # these should be only the tekton provision pods
