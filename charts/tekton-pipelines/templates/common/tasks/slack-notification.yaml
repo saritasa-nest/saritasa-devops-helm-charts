@@ -49,23 +49,30 @@ spec:
       script: |
         #!/bin/sh
 
-        pipelinerun_name=$(awk -F= '/tekton.dev\/pipelineRun/ {gsub(/"/, "", $2);print $2}' /etc/podinfo/labels)
+        pipelinerun_name=$(awk -F= '$1 == "tekton.dev/pipelineRun" {gsub(/"/, "", $2); print $2}' /etc/podinfo/labels)
 
-        # get failed info from pipelinerun name
-        kubectl -n ci get pipelinerun $pipelinerun_name -o json |
-          jq '[.status.taskRuns | to_entries[] | select ( .value.status.conditions[0].reason == "Failed") |
-          { task: .value.pipelineTaskName, pod: .value.status.podName, steps: .value.status.steps[] } |
-          select (.steps.terminated.reason == "Error")][0] | { task: .task, pod: .pod, step: .steps.name }' \
-          > $(results.failed_info.path)
+        # Get names of taskRuns from the pipelineRun
+        taskruns=$(kubectl -n ci get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
+
+        # Get names of failed task and step from the taskRun
+        for taskrun_name in $taskruns; do
+          kubectl -n ci get taskrun $taskrun_name -o json |
+          jq -r 'select(.status.conditions[0].reason == "Failed") |
+          { pod: .status.podName, task: .metadata.labels["tekton.dev/pipelineTask"], step: (.status.steps[]? | select(.terminated.reason == "Error") | .name)}' \
+          >> $(results.failed_info.path)
+        done
 
         failed_pod_name=$(cat $(results.failed_info.path) | jq '.pod' -r)
         failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
         failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)
 
-        if [ "$failed_pod_name" != "null" ] && [ "$failed_step" != "null" ]; then
-          kubectl -n ci logs $failed_pod_name -c step-$failed_step | tail -c 1982 > $(results.logs.path)
+        # Fetch logs and save info about the failed task
+        if [ -n "$failed_pod_name" ] && [ -n "$failed_step" ]; then
           echo $failed_task > $(results.failed_task.path)
           echo $failed_step > $(results.failed_step.path)
+
+          echo "Fetching logs from: $logs_url"
+          curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > "$(results.logs.path)"
         fi
 
     - name: notification
