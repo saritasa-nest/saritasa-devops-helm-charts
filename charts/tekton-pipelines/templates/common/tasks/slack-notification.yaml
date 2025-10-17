@@ -49,14 +49,6 @@ spec:
       script: |
         #!/bin/sh
 
-        status="`echo $(params.status) | tr '[:upper:]' '[:lower:]'`"
-
-        # Exit early if deploy succeeded
-        if [ "$status" = "succeeded" ]; then
-          echo "Deploy succeeded, no failed tasks to analyze"
-          exit 0
-        fi
-
         pipelinerun_name=$(awk -F= '$1 == "tekton.dev/pipelineRun" {gsub(/"/, "", $2); print $2}' /etc/podinfo/labels)
 
         # Get names of taskRuns from the pipelineRun
@@ -82,6 +74,8 @@ spec:
           curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
           echo $failed_task > $(results.failed_task.path)
           echo $failed_step > $(results.failed_step.path)
+        else
+          echo 'No failed taskRuns'
         fi
 
     - name: notification
