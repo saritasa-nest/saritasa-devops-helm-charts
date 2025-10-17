@@ -35,6 +35,8 @@ images:
   sentry_cli: getsentry/sentry-cli:2.46.0    # https://github.com/getsentry/sentry-cli/
   # -- yq image
   yq: mikefarah/yq:4.47.1    # https://github.com/mikefarah/yq
+  # -- curl image
+  curl: curlimages/curl:8.16.0    # https://github.com/curl/curl-container
 
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
