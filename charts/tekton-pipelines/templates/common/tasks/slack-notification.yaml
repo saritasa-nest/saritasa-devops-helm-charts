@@ -23,6 +23,8 @@ spec:
       description: Name of a failed task.
     - name: failed_step
       description: Name of a failed step.
+    - name: failed_pod_name
+      description: Name of a failed pod.
     - name: logs
       description: Failed pod logs.
 
