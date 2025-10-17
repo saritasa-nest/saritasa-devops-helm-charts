@@ -26,6 +26,9 @@ rules:
   - apiGroups:  ["tekton.dev"]
     resources:  ["pipelineruns"]
     verbs:      ["get", "list", "create"]
+  - apiGroups:  ["tekton.dev"]
+    resources:  ["taskruns"]
+    verbs:      ["get", "list", "watch"]
 
 ---
 kind: RoleBinding
