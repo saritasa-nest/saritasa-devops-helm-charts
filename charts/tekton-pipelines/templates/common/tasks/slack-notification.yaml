@@ -64,27 +64,34 @@ spec:
           >> $(results.failed_info.path)
         done
 
+        if [ -s "$(results.failed_info.path)" ]; then
+          failed_pod_name=$(cat $(results.failed_info.path) | jq '.pod' -r)
+          failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
+          failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)   
+
+          echo $failed_task > $(results.failed_task.path)
+          echo $failed_step > $(results.failed_step.path)
+          echo $failed_pod_name > $(results.failed_pod_name.path)
+        fi
+
     - name: get-failed-logs
       image: {{ .Values.images.curl | default "curlimages/curl:latest"}}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
         #!/bin/sh
 
-        failed_pod_name=$(cat $(results.failed_info.path) | jq '.pod' -r)
-        failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
-        failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)
+        failed_pod_name=$(cat $(results.failed_pod_name.path))
+        failed_step=$(cat $(results.failed_step.path))
 
         if [ -n "$failed_pod_name" ] && [ -n "$failed_step" ]; then
           # Fetch logs and save info about the failed task
           echo "Fetching logs for failed task: ${failed_task}, step: ${failed_step}"
           curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
-          echo $failed_task > $(results.failed_task.path)
-          echo $failed_step > $(results.failed_step.path)
         else
           echo 'No failed taskRuns'
         fi
 
-        sleep 1000
+        sleep 300
 
     - name: notification
       image: {{ .Values.images.slack | default "cloudposse/slack-notifier:latest"}}
