@@ -89,6 +89,7 @@ spec:
           # Fetch logs and save info about the failed task
           echo "Fetching logs for failed step: ${failed_step}"
           curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
+          cat $(results.logs.path)
         else
           echo 'No failed taskRuns'
         fi
@@ -134,7 +135,7 @@ spec:
           failed_task=$(cat $(results.failed_task.path))
           failed_step=$(cat $(results.failed_step.path))
           failed="Task: $failed_task, Step: $failed_step"
-          error_msg=$(tail -c 1982 $(results.logs.path))
+          error_msg=$(cat $(results.logs.path))
         fi
 
         argo_app_url="$ARGOCD_SERVER/$ARGOCD_ROOT_PATH/applications/$(params.application)"
