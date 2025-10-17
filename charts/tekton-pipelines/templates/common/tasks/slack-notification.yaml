@@ -54,11 +54,11 @@ spec:
         pipelinerun_name=$(awk -F= '$1 == "tekton.dev/pipelineRun" {gsub(/"/, "", $2); print $2}' /etc/podinfo/labels)
 
         # Get names of taskRuns from the pipelineRun
-        taskruns=$(kubectl -n ci-experiments get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
+        taskruns=$(kubectl -n ci get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
 
         # Get names of failed pod, task and step from the taskRuns
         for taskrun_name in $taskruns; do
-          kubectl -n ci-experiments get taskrun $taskrun_name -o json |
+          kubectl -n ci get taskrun $taskrun_name -o json |
           jq -r 'select(.status.conditions[0].reason == "Failed") |
           { pod: .status.podName, 
             task: .metadata.labels["tekton.dev/pipelineTask"], 
@@ -87,13 +87,11 @@ spec:
 
         if [ -n "$failed_pod_name" ] && [ -n "$failed_step" ]; then
           # Fetch logs and save info about the failed task
-          echo "Fetching logs for failed task: ${failed_task}, step: ${failed_step}"
+          echo "Fetching logs for failed step: ${failed_step}"
           curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
         else
           echo 'No failed taskRuns'
         fi
-
-        sleep 300
 
     - name: notification
       image: {{ .Values.images.slack | default "cloudposse/slack-notifier:latest"}}
