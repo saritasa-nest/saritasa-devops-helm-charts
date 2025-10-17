@@ -89,7 +89,7 @@ spec:
           # Fetch logs and save info about the failed task
           echo "Fetching logs for failed step: ${failed_step}"
           echo "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}"
-          curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
+          curl -isk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
           cat $(results.logs.path)
         else
           echo 'No failed taskRuns'
