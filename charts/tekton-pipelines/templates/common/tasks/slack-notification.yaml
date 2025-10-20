@@ -138,7 +138,7 @@ spec:
           failed_task=$(cat $(results.failed_task.path))
           failed_step=$(cat $(results.failed_step.path))
           failed="Task: $failed_task, Step: $failed_step"
-          error_msg=$(cat $(results.logs.path))
+          error_msg=$(tail -c 1982 $(results.logs.path))
         fi
 
         argo_app_url="$ARGOCD_SERVER/$ARGOCD_ROOT_PATH/applications/$(params.application)"

@@ -62,8 +62,6 @@ spec:
         export newname="${img%%:*}"
         export tag="${img##*:}"
 
-        test_fail_test
-
         cd $(params.kustomize_overlay_path)
         # Use yq to update ECR image tag in kustomization.yaml file
         # select the element by name and update the image name and tag
