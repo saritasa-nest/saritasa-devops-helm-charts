@@ -71,9 +71,9 @@ spec:
           failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
           failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)   
 
+          echo $failed_pod_name > $(results.failed_pod_name.path)
           echo $failed_task > $(results.failed_task.path)
           echo $failed_step > $(results.failed_step.path)
-          echo $failed_pod_name > $(results.failed_pod_name.path)
         fi
 
     - name: get-failed-logs
@@ -82,14 +82,12 @@ spec:
       script: |
         #!/bin/sh
 
-        failed_pod_name=$(cat $(results.failed_pod_name.path))
-        failed_step=$(cat $(results.failed_step.path))
-
-        if [ -n "$failed_pod_name" ] && [ -n "$failed_step" ]; then
+        if [ -s "$(results.failed_pod_name.path)" ] && [ -s "$(results.failed_step.path)" ]; then
           # Fetch logs and save info about the failed task
           echo "Fetching logs for failed step: ${failed_step}"
           until [ -s "$(results.logs.path)" ]
           do
+          # It takes time for logs to appear, until then curl will return an empty string 
           sleep 5
           curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
           done
