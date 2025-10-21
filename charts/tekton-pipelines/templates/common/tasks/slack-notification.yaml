@@ -23,8 +23,6 @@ spec:
       description: Name of a failed task.
     - name: failed_step
       description: Name of a failed step.
-    - name: failed_pod_name
-      description: Name of a failed pod.
     - name: logs
       description: Failed pod logs.
 
@@ -54,11 +52,11 @@ spec:
         pipelinerun_name=$(awk -F= '$1 == "tekton.dev/pipelineRun" {gsub(/"/, "", $2); print $2}' /etc/podinfo/labels)
 
         # Get names of taskRuns from the pipelineRun
-        taskruns=$(kubectl -n ci get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
+        taskruns=$(kubectl -n ci-experiments get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
 
         # Get names of failed pod, task and step from the taskRuns
         for taskrun_name in $taskruns; do
-          kubectl -n ci get taskrun $taskrun_name -o json |
+          kubectl -n ci-experiments get taskrun $taskrun_name -o json |
           jq -r 'select(.status.conditions[0].reason == "Failed") |
           { pod: .status.podName, 
             task: .metadata.labels["tekton.dev/pipelineTask"], 
@@ -71,28 +69,9 @@ spec:
           failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
           failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)   
 
-          echo $failed_pod_name > $(results.failed_pod_name.path)
+          kubectl -n ci-experiments logs $failed_pod_name -c step-$failed_step | tail -c 1982 > $(results.logs.path)
           echo $failed_task > $(results.failed_task.path)
           echo $failed_step > $(results.failed_step.path)
-        fi
-
-    - name: get-failed-logs
-      image: {{ .Values.images.curl | default "curlimages/curl:latest"}}
-      imagePullPolicy: {{ .Values.imagePullPolicy }}
-      script: |
-        #!/bin/sh
-
-        if [ -s "$(results.failed_pod_name.path)" ] && [ -s "$(results.failed_step.path)" ]; then
-          # Fetch logs and save info about the failed task
-          echo "Fetching logs for failed step: ${failed_step}"
-          until [ -s "$(results.logs.path)" ]
-          do
-          # It takes time for logs to appear, until then curl will return an empty string 
-          sleep 5
-          curl -sk "https://tekton-logs-server.ci.svc.cluster.local/logs/ci/${failed_pod_name}/step-${failed_step}" | tail -c 1982 > $(results.logs.path)
-          done
-        else
-          echo 'No failed taskRuns'
         fi
 
     - name: notification
