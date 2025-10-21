@@ -7,6 +7,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/178)
 - Update slack-notification `get-failed-info` step
 
+## 2025-10-14
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/177)
+- Add NPM_REGISTRY_GITHUB_TOKEN to frontend vars
+
 ## 2025-10-06
 
 [dev]
