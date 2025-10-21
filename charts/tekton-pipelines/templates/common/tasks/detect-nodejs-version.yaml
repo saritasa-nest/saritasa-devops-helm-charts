@@ -29,7 +29,6 @@ spec:
         #!/usr/bin/env bash
         set -Eeo pipefail
 
-        test_fail
         if [ ! -f package.json ]; then
           echo "no package.json file found"
           echo -n "$(params.default_version)" > $(results.node-version.path)
