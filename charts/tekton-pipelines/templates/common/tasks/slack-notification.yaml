@@ -52,11 +52,11 @@ spec:
         pipelinerun_name=$(awk -F= '$1 == "tekton.dev/pipelineRun" {gsub(/"/, "", $2); print $2}' /etc/podinfo/labels)
 
         # Get names of taskRuns from the pipelineRun
-        taskruns=$(kubectl -n ci-experiments get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
+        taskruns=$(kubectl -n ci get pipelinerun $pipelinerun_name -o json | jq -r '.status.childReferences[]?.name')
 
         # Get names of failed pod, task and step from the taskRuns
         for taskrun_name in $taskruns; do
-          kubectl -n ci-experiments get taskrun $taskrun_name -o json |
+          kubectl -n ci get taskrun $taskrun_name -o json |
           jq -r 'select(.status.conditions[0].reason == "Failed") |
           { pod: .status.podName, 
             task: .metadata.labels["tekton.dev/pipelineTask"], 
@@ -64,12 +64,13 @@ spec:
           >> $(results.failed_info.path)
         done
 
+        # Save names of the failed task, step and its logs
         if [ -s "$(results.failed_info.path)" ]; then
           failed_pod_name=$(cat $(results.failed_info.path) | jq '.pod' -r)
           failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
           failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)   
 
-          kubectl -n ci-experiments logs $failed_pod_name -c step-$failed_step | tail -c 1982 > $(results.logs.path)
+          kubectl -n ci logs $failed_pod_name -c step-$failed_step | tail -c 1982 > $(results.logs.path)
           echo $failed_task > $(results.failed_task.path)
           echo $failed_step > $(results.failed_step.path)
         fi
