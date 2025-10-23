@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-10-23
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/179)
+- Update post-deploy task to be conditional and check for endpoint  
+
 ## 2025-10-16
 
 [dev]
