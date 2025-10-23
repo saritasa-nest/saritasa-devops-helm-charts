@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-10-01
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/172)
+- Adding labels settings for tekton argocd apps
+
 ## 2025-09-17
 
 [prod]
