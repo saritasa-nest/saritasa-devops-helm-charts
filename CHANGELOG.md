@@ -1,11 +1,36 @@
 # Changelog
 
+## 2025-10-14
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/177)
+- Add NPM_REGISTRY_GITHUB_TOKEN to frontend vars
+
+## 2025-10-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/176)
+- Specify allowInsecureImages for WordPress application to allow bitnamilegacy images
+
 ## 2025-10-01
 
-[prod]
+[dev]
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/175)
+- Update metrics server image in Wordpress chart to use bitnamilegacy
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/174)
+- Bump chart versions
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/172)
 - Adding labels settings for tekton argocd apps
+
+## 2025-09-26
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/171)
+- Add `buildkit`
 
 ## 2025-09-17
 

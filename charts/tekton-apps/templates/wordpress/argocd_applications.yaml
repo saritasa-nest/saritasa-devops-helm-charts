@@ -47,6 +47,10 @@ spec:
     chart: wordpress
     helm:
       values: |
+        global:
+          security:
+            allowInsecureImages: true
+
         image:
           repository: bitnamilegacy/wordpress
           tag: {{ (.image).tag | default "6.1.1" }}
@@ -252,6 +256,8 @@ spec:
 
         metrics:
           enabled: true
+          image:
+            repository: bitnamilegacy/apache-exporter
 
         overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
 
