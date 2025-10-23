@@ -11,7 +11,6 @@ spec:
     (for ex. run selenium tests or etc)
 
   params:
-
     - name: application
       type: string
       description: name of the argocd application we're going to deploy/sync
@@ -45,6 +44,14 @@ spec:
       script: |
         #!/usr/bin/env sh
 
+        ENDPOINT="build-succeed-eventsource-svc.argo-events.svc.cluster.local:12000/build-succeed"
+
+        # Try HEAD request to check if endpoint is reachable
+        if ! curl -Is --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
+          echo "Endpoint ${ENDPOINT} not reachable"
+          exit 0
+        fi
+
         # Env contains params passed from '*-build-pipeline-config' ConfigMap,
         # here we convert them to lowercased json and pass to JSON_PAYLOAD as 'extra'.
 
@@ -66,7 +73,7 @@ spec:
         echo "Payload: $JSON_PAYLOAD"
 
         OUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location \
-          --request POST "build-succeed-eventsource-svc.argo-events.svc.cluster.local:12000/build-succeed" \
+          --request POST "${ENDPOINT}" \
           --header 'Content-Type: application/json' \
           --data-raw "$JSON_PAYLOAD")
 
@@ -80,7 +87,7 @@ spec:
 
   # insert customized steps as defined in the values.yaml of the helm chart
   {{ if .extraSteps }}
-    {{ .extraSteps | toYaml | nindent 4}}
+    {{ .extraSteps | toYaml | nindent 4 }}
   {{ end }}
 ---
 {{- end }}
