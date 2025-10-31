@@ -12,7 +12,7 @@ appVersion: "v0.29.2"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.1.6-dev.1
+version: 2.1.6
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -120,6 +120,9 @@ description: |
                   applicationURL: https://api.staging.site.com
                   argocd:
                     syncWave: 220
+                    labels:
+                      team: devteam
+                      any-label-name: label-value
                   tekton:
                     workspacePVC: 15Gi
                     buildpacksPVC: 25Gi
@@ -138,6 +141,9 @@ description: |
                   applicationURL: https://staging.site.com
                   argocd:
                     syncWave: 220
+                    labels:
+                      team: opsteam
+                      any-label-name: label-value
                   tekton:
                     workspacePVC: 15Gi
                     buildpacksPVC: 25Gi
@@ -376,6 +382,10 @@ description: |
                     repository: xxx-backend
                     pipeline: buildpack
                     applicationURL: https://api.site.com
+                    argocd:
+                      labels:
+                        team: example-team
+                        any-label-name: label-value
                     eventlistener:
                       template: buildpack-backend-build-pipeline-trigger-template
                     extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
@@ -391,6 +401,10 @@ description: |
                     repository: xxx-frontend
                     pipeline: buildpack
                     applicationURL: https://site.com
+                    argocd:
+                      labels:
+                        team: example-team
+                        any-label-name: label-value
                     eventlistener:
                       enableWebhookSecret: false
                       filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
