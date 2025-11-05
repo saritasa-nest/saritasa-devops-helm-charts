@@ -29,6 +29,8 @@
 - Update metrics server image in Wordpress chart to use bitnamilegacy
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/174)
 - Bump chart versions
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/172)
+- Adding labels settings for tekton argocd apps
 
 ## 2025-09-26
 
