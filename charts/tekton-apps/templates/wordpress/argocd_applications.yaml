@@ -52,7 +52,8 @@ spec:
             allowInsecureImages: true
 
         image:
-          repository: bitnamilegacy/wordpress
+          registry: {{ (.image).registry | default "registry-1.docker.io" }}
+          repository: {{ (.image).repository | default "bitnamilegacy/wordpress" }}
           tag: {{ (.image).tag | default "6.1.1" }}
           debug: {{ (.image).debug | default "true" }}
 

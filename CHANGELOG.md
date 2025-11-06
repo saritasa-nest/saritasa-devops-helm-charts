@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-11-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/180)
+- Extend image configuration options for WordPress apps
+
 ## 2025-10-16
 
 [dev]
