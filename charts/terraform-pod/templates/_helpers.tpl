@@ -151,22 +151,9 @@ Define env vars containing argocd access to be passed as TF_VAR value into terra
 Define env vars for terraform
 */}}
 {{- define "terraform-pod.terraform-env-vars" -}}
-{{- $hasCustomTerraformToken := gt (len .Values.terraform.token) 0 -}}
-{{- $secretName := ternary (include "terraform-pod.terraform-token" .) .Values.terraform.tokenSecret $hasCustomTerraformToken }}
-
 # terraform vars
 - name: TF_ORG
   value: {{ .Values.terraform.organization }}
-- name: TF_TOKEN_app_terraform_io
-  valueFrom:
-    secretKeyRef:
-      name: {{ printf "%s" $secretName }}
-      key: token
-- name: TF_TOKEN_registry_terraform_io
-  valueFrom:
-    secretKeyRef:
-      name: {{ printf "%s" $secretName }}
-      key: token
 {{ include "terraform-pod.terraform-env-database-vars" . }}
 {{ include "terraform-pod.terraform-env-argocd-vars" . }}
 {{ include "terraform-pod.terraform-env-sentry-vars" . }}
@@ -315,14 +302,6 @@ terraform.organization:
 terraform.client:
     `client` is required and should be a non-empty string. It should contain client name, which would be used as a suffix for the workspace for infra-dev-aws solutions (skipped otherwise)
 {{- end -}}
-{{ if not (or (and .Values.terraform.tokenSecret (kindIs "string" .Values.terraform.tokenSecret))
-              (and .Values.terraform.token (kindIs "string" .Values.terraform.token))
-          ) }}
-terraform.tokenSecret|token:
-    You didn't set either tokenSecret or token. One is required for the terraform pod to be functional.
-    `tokenSecret` is required and should be a non-empty string. It should contain a name of the secret containing terraform auth token for the organnization.
-    or
-    `token` is required and should be a non-empty string. It should terraform api token as a string
 {{- end -}}
 {{ if not (and .Values.terraform.initCommand (kindIs "string" .Values.terraform.initCommand)) }}
 terraform.initCommand:
