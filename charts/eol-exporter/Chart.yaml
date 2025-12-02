@@ -102,12 +102,12 @@ type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 1.0.2
-appVersion: 1.0.0
+version: 1.0.3
+appVersion: 1.1.0
 
 dependencies:
-  # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=5.3.0
+  # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=6.13.0
   - name: application
-    version: 6.0.2
+    version: 6.13.0
     repository: https://stakater.github.io/stakater-charts/
     alias: exporter
