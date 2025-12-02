@@ -46,6 +46,42 @@ for more example values.
 
 Optionally, you can add any extra field and it will be added as a label in the metrics
 
+**App Update 1.1.0**
+
+Exporter now supports dynamically fetching current version of products for:
+- AWS RDS
+- AWS EKS
+
+If you are using any of the these products, then remember to enable the Service account and attach a role with the following permissions:
+
+```yaml
+rbac:
+  serviceAccount:
+    enabled: true
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::{account-id}:role/{role-name}
+```
+
+IAM permissions:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds:DescribeDBInstances",
+                "eks:DescribeCluster"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+## Prometheus server config
+
 In order to be able to watch the metrics in Prometheus you will need to use:
   1. Prometheus extra scrape config:
 
