@@ -152,7 +152,7 @@ spec:
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{ if .Values.postDeployTask.enabled }}
+  {{- if (.Values.kaniko).postDeployTaskSteps }}
     {{ include "pipeline.postDeploy" (dict "name" "kaniko-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
   {{ end }}
 

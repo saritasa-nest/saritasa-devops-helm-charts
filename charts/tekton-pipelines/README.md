@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 2.2.14-test.4](https://img.shields.io/badge/Version-2.2.14-test.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.16-dev.1](https://img.shields.io/badge/Version-2.2.16-dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -132,7 +132,7 @@ buildpacks:
           script: |
             #!/bin/bash
             echo "hello world"
-      extraPostDeployTaskSteps:
+      postDeployTaskSteps:
         - name: post-deploy-hello-world
           image: node:22
           imagePullPolicy: IfNotPresent
@@ -216,7 +216,7 @@ After configuring these values, you will have an extra `sentry-release` step aft
 |-----|------|---------|-------------|
 | buildkit.build_args | list | `[]` |  |
 | buildkit.enabled | bool | `true` | should we enable the buildkit pipeline |
-| buildkit.extraPostDeployTaskSteps | string | `nil` |  |
+| buildkit.postDeployTaskSteps | string | `nil` |  |
 | buildkit.preDeployTaskSteps | list | `[]` | steps to run in the `pre-deploy` task prior to ArgoCD sync command can be useful to prepare different backups and tests before real deploy |
 | buildpacks.cnbPlatformAPI | string | `"0.10"` | cnb (cloud native buildpacks) platform API to support see more details [here](https://buildpacks.io/docs/reference/spec/platform-api/) and [here](https://github.com/buildpacks/spec/blob/main/platform.md) |
 | buildpacks.enabled | bool | `false` | should we enable buildpack based pipelines |

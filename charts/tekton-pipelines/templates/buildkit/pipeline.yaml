@@ -152,7 +152,7 @@ spec:
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{ if .Values.postDeployTask.enabled }}
+  {{- if (.Values.buildkit).postDeployTaskSteps }}
     {{ include "pipeline.postDeploy" (dict "name" "buildkit-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
   {{ end }}
 

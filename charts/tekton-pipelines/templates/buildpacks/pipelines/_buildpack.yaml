@@ -271,7 +271,7 @@ spec:
     {{- end }}
   {{ end }}
 
-  {{- if .postDeployTask.enabled }}
+  {{- if (.pipeline).postDeployTaskSteps }}
     {{ include "pipeline.postDeploy" (dict "name" (printf "%s-post-deploy" .pipeline.name) "sentry_enabled" .sentry.enabled) | nindent 4 }}
   {{- end }}
 

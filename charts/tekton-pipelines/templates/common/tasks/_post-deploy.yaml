@@ -35,59 +35,21 @@ spec:
     envFrom:
       - configMapRef:
           name: $(params.application)-build-pipeline-config # project specific values
-
+    env:
+      - name: application
+        value: $(params.application)
+      - name: project
+        value: $(params.project)
+      - name: namespace
+        value: $(params.namespace)
+      - name: sha
+        value: $(params.sha)
+      - name: environment
+        value: $(params.environment)
   steps:
-    - name: argo-events
-      image: badouralix/curl-jq
-      imagePullPolicy: IfNotPresent
-      resources: {}
-      script: |
-        #!/usr/bin/env sh
-
-        ENDPOINT="build-succeed-eventsource-svc.argo-events.svc.cluster.local:12000/build-succeed"
-
-        # Try HEAD request to check if endpoint is reachable
-        if ! curl -Is --max-time 5 "${ENDPOINT}" >/dev/null 2>&1; then
-          echo "Endpoint ${ENDPOINT} not reachable"
-          exit 0
-        fi
-
-        # Env contains params passed from '*-build-pipeline-config' ConfigMap,
-        # here we convert them to lowercased json and pass to JSON_PAYLOAD as 'extra'.
-
-        # This workflow allows us to pass any dynamic custom parameters needed to argo-events
-        # sensors without changing tekton helm charts all the time, so any project may have
-        # any custom parameter, which will be passed to argo-events and then corresponding Sensor
-        # would be triggered based on this 'extra' params.
-        EXTRA=$(jq -n env | jq 'walk(if type=="object" then with_entries(.key|=ascii_downcase) else . end)')
-        JSON_TEMPLATE='{
-          "namespace": "$(params.namespace)",
-          "project": "$(params.project)",
-          "environment": "$(params.environment)",
-          "application": "$(params.application)",
-          "sha": "$(params.sha)",
-          "extra": %s
-        }'
-        JSON_PAYLOAD=$(printf "$JSON_TEMPLATE" "$EXTRA")
-
-        echo "Payload: $JSON_PAYLOAD"
-
-        OUTPUT=$(curl -s -o /dev/null -w httpcode=%{http_code} --location \
-          --request POST "${ENDPOINT}" \
-          --header 'Content-Type: application/json' \
-          --data-raw "$JSON_PAYLOAD")
-
-        STATUS_CODE=$(echo "${OUTPUT}" | sed -e 's/.*\httpcode=//')
-        if [ ${STATUS_CODE} -ne 204 ] && [ ${STATUS_CODE} -ne 200 ]; then
-            echo "Curl operation/command failed due to server return code - ${STATUS_CODE}"
-            exit 0
-        fi
-
-        echo "Sent 'build-succeed' webhook"
-
-  # insert customized steps as defined in the values.yaml of the helm chart
-  {{ if .extraSteps }}
-    {{ .extraSteps | toYaml | nindent 4 }}
-  {{ end }}
+    # insert customized steps as defined in the values.yaml of the helm chart
+    {{- if (.pipeline).postDeployTaskSteps }}
+    {{- .pipeline.postDeployTaskSteps | toYaml | nindent 4}}
+    {{ end }}
 ---
 {{- end }}

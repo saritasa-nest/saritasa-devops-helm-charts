@@ -148,6 +148,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: PHP                                                                                                       │
@@ -217,6 +226,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DJANGO                                                                                                    │
@@ -341,6 +359,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: DOTNET                                                                                                    │
@@ -476,6 +503,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: NODEJS                                                                                                    │
@@ -502,6 +538,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: GO                                                                                                        │
@@ -528,6 +573,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: RUBY                                                                                                      │
@@ -554,6 +608,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 # ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 # │ BUILDPACK: JAVA                                                                                                      │
@@ -580,6 +643,15 @@ buildpacks:
       #   script: |
       #     #!/bin/bash
       #     echo "hello world"
+      # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+      postDeployTaskSteps: []
+      # - name: post-deploy-hello-world
+      #   image: node:22
+      #   imagePullPolicy: IfNotPresent
+      #   workingDir: $(workspaces.app.path)
+      #   script: |
+      #     #!/bin/bash
+      #     echo "post deploy worked"
 
 kaniko:
   # -- should we enable the kaniko pipeline
@@ -594,6 +666,15 @@ kaniko:
   #   script: |
   #     #!/bin/bash
   #     echo "hello world"
+  # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+  postDeployTaskSteps: []
+  # - name: post-deploy-hello-world
+  #   image: node:22
+  #   imagePullPolicy: IfNotPresent
+  #   workingDir: $(workspaces.source.path)
+  #   script: |
+  #     #!/bin/bash
+  #     echo "post deploy worked"
 
 buildkit:
   # -- should we enable the buildkit pipeline
@@ -609,14 +690,15 @@ buildkit:
   #   script: |
   #     #!/bin/bash
   #     echo "hello world"
-  extraPostDeployTaskSteps:
+  # -- steps to run in the `post-deploy` task, either after `deploy` or `sentry-release` step
+  postDeployTaskSteps: []
   # - name: post-deploy-hello-world
   #   image: node:22
   #   imagePullPolicy: IfNotPresent
   #   workingDir: $(workspaces.source.path)
   #   script: |
   #     #!/bin/bash
-  #     echo "post delpoy worked"
+  #     echo "post deploy worked"
 
 
 wordpress:
@@ -664,10 +746,3 @@ sentry:
   authTokenSecretKey: "auth-token"
   org: "saritasa"
   url: https://sentry.saritasa.rocks/
-
-# ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-# │ post-deploy task                                                                                                     │
-# │                                                                                                                      │
-# └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-postDeployTask:
-  enabled: false
