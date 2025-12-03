@@ -61,7 +61,7 @@ exporter:
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 1
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       # Must specify either one of the following field when enabled
       httpGet:
         path: /metrics
@@ -74,7 +74,7 @@ exporter:
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 1
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       # Must specify either one of the following field when enabled
       httpGet:
         path: /metrics

@@ -176,7 +176,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.livenessProbe.failureThreshold | int | `3` |  |
 | exporter.deployment.livenessProbe.httpGet.path | string | `"/metrics"` |  |
 | exporter.deployment.livenessProbe.httpGet.port | int | `8080` |  |
-| exporter.deployment.livenessProbe.initialDelaySeconds | int | `10` |  |
+| exporter.deployment.livenessProbe.initialDelaySeconds | int | `30` |  |
 | exporter.deployment.livenessProbe.periodSeconds | int | `10` |  |
 | exporter.deployment.livenessProbe.successThreshold | int | `1` |  |
 | exporter.deployment.livenessProbe.tcpSocket | object | `{}` |  |
@@ -190,7 +190,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.readinessProbe.failureThreshold | int | `3` |  |
 | exporter.deployment.readinessProbe.httpGet.path | string | `"/metrics"` |  |
 | exporter.deployment.readinessProbe.httpGet.port | int | `8080` |  |
-| exporter.deployment.readinessProbe.initialDelaySeconds | int | `10` |  |
+| exporter.deployment.readinessProbe.initialDelaySeconds | int | `30` |  |
 | exporter.deployment.readinessProbe.periodSeconds | int | `10` |  |
 | exporter.deployment.readinessProbe.successThreshold | int | `1` |  |
 | exporter.deployment.readinessProbe.tcpSocket | object | `{}` |  |
