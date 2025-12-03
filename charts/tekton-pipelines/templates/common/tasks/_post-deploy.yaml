@@ -10,6 +10,9 @@ spec:
     Task performs custom post deploy actions, which are set from values.yaml
     (for ex. run selenium tests or etc)
 
+  workspaces:
+    - name: source
+
   params:
     - name: application
       type: string
