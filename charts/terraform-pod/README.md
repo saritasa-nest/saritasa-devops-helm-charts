@@ -83,7 +83,6 @@ For infra-aws repos you may want to pass short-term TTL AWS credentials from the
     --set github.username=YOUR-GITHUB-USERNAME \
     --set github.email=YOUR-GITHUB-EMAIL \
     --set gitCryptKey=$(base64 -w 0 path/to/git-crypt-key) \
-    --set terraform.token=xxx \
     --set aws.accessKeyId=$(echo $creds | jq -r ".AccessKeyId") \
     --set aws.secretAccessKey=$(echo $creds | jq -r ".SecretAccessKey") \
     --set aws.sessionToken="$(echo $creds | jq -r ".SessionToken")" \
@@ -189,6 +188,4 @@ unset creds
 | terraform.client | string | `""` | terraform client name (used to decide what workspace in the org to use) |
 | terraform.initCommand | string | `"make _dev init"` | makefile target in the Makefile of  the repository to run during initialization phase (can be any valid bash one-liner if you want to skip the makefile targets of the repository) |
 | terraform.organization | string | `"saritasa-team"` | terraform org |
-| terraform.token | string | `""` | terraform api token value (optional, if passed - takes precedence over tokenSecret) |
-| terraform.tokenSecret | string | `"terraform-cli-token-saritasa-team"` | secret name containing terraform team API token name (optional) |
 | tolerations | list | `[]` | tolerations |

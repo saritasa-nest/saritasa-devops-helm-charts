@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.6-dev.1](https://img.shields.io/badge/Version-2.1.6-dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.8](https://img.shields.io/badge/Version-2.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -141,6 +141,9 @@ spec:
                 applicationURL: https://api.staging.site.com
                 argocd:
                   syncWave: 220
+                  labels:
+                    team: devteam
+                    any-label-name: label-value
                 tekton:
                   workspacePVC: 15Gi
                   buildpacksPVC: 25Gi
@@ -159,6 +162,9 @@ spec:
                 applicationURL: https://staging.site.com
                 argocd:
                   syncWave: 220
+                  labels:
+                    team: opsteam
+                    any-label-name: label-value
                 tekton:
                   workspacePVC: 15Gi
                   buildpacksPVC: 25Gi
@@ -230,6 +236,7 @@ spec:
     saritasa-wordpress-demo)
   - apps[PROJECT].components[NAME].pipeline - the name of the pipeline building the code from the repository above
   - apps[PROJECT].components[NAME].namespace - the name of the namespace for component. Optional parameter
+  - apps[PROJECT].components[NAME].argocd.labels - labels which are added to ArgoCD application
   - apps[PROJECT].components[NAME].argocd.source.syncWave - custom component ArgoCD application sync wave (default: "210")
   - apps[PROJECT].components[NAME].argocd.source.path - path to directory responsible for kubernetes resources creation of the ArgoCD Application (default: kubernetes repo path for basic
     projects "apps/<apps[PROJECT].components[NAME].name>/manifests/<environment>" or "null" for wordpress projects)
@@ -396,6 +403,10 @@ spec:
                   repository: xxx-backend
                   pipeline: buildpack
                   applicationURL: https://api.site.com
+                  argocd:
+                    labels:
+                      team: example-team
+                      any-label-name: label-value
                   eventlistener:
                     template: buildpack-backend-build-pipeline-trigger-template
                   extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
@@ -411,6 +422,10 @@ spec:
                   repository: xxx-frontend
                   pipeline: buildpack
                   applicationURL: https://site.com
+                  argocd:
+                    labels:
+                      team: example-team
+                      any-label-name: label-value
                   eventlistener:
                     enableWebhookSecret: false
                     filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))

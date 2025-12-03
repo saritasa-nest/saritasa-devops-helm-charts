@@ -23,6 +23,10 @@ metadata:
       {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
       {{- end }}
     {{- end }}
+  {{- if ($component.argocd).labels }}
+  labels:
+  {{- toYaml ($component.argocd).labels | nindent 4}}
+  {{- end }}
 spec:
   destination:
     namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
@@ -48,7 +52,8 @@ spec:
             allowInsecureImages: true
 
         image:
-          repository: bitnamilegacy/wordpress
+          registry: {{ (.image).registry | default "registry-1.docker.io" }}
+          repository: {{ (.image).repository | default "bitnamilegacy/wordpress" }}
           tag: {{ (.image).tag | default "6.1.1" }}
           debug: {{ (.image).debug | default "true" }}
 
