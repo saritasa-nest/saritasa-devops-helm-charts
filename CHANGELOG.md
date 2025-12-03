@@ -19,7 +19,8 @@
 [dev]
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/179)
-- Update post-deploy task to be conditional and check for endpoint
+- Update `post-deploy` task to be optional via `postDeployTaskSteps` in values.yaml
+- Move `argo-events` task to a separate task from `post-deploy`
 
 ## 2025-10-16
 
