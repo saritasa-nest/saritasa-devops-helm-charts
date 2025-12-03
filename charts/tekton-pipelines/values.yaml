@@ -298,7 +298,7 @@ buildpacks:
               echo "$value" > "${env_dir}/${key}"
             done
         - name: copy-requirements
-          image: docker.io/saritasallc/python-ci:0.0.1
+          image: docker.io/saritasallc/python-ci:0.0.2
           imagePullPolicy: IfNotPresent
           resources: {}
           workingDir: $(workspaces.app.path)

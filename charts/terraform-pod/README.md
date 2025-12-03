@@ -31,7 +31,7 @@ terraform-pod
 
 ## `chart.version`
 
-![Version: 0.0.40](https://img.shields.io/badge/Version-0.0.40-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
+![Version: 0.0.41](https://img.shields.io/badge/Version-0.0.41-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 ## Maintainers
 
@@ -83,6 +83,7 @@ For infra-aws repos you may want to pass short-term TTL AWS credentials from the
     --set github.username=YOUR-GITHUB-USERNAME \
     --set github.email=YOUR-GITHUB-EMAIL \
     --set gitCryptKey=$(base64 -w 0 path/to/git-crypt-key) \
+    --set terraform.token=xxx \
     --set aws.accessKeyId=$(echo $creds | jq -r ".AccessKeyId") \
     --set aws.secretAccessKey=$(echo $creds | jq -r ".SecretAccessKey") \
     --set aws.sessionToken="$(echo $creds | jq -r ".SessionToken")" \

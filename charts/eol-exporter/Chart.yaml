@@ -44,6 +44,42 @@ description: |
 
   Optionally, you can add any extra field and it will be added as a label in the metrics
 
+  **App Update 1.1.0**
+
+  Exporter now supports dynamically fetching current version of products for:
+  - AWS RDS
+  - AWS EKS
+
+  If you are using any of the these products, then remember to enable the Service account and attach a role with the following permissions:
+
+  ```yaml
+  rbac:
+    serviceAccount:
+      enabled: true
+      annotations:
+        eks.amazonaws.com/role-arn: arn:aws:iam::{account-id}:role/{role-name}
+  ```
+
+  IAM permissions:
+
+  ```json
+  {
+      "Version": "2012-10-17",
+      "Statement": [
+          {
+              "Effect": "Allow",
+              "Action": [
+                  "rds:DescribeDBInstances",
+                  "eks:DescribeCluster"
+              ],
+              "Resource": "*"
+          }
+      ]
+  }
+  ```
+
+  ## Prometheus server config
+
   In order to be able to watch the metrics in Prometheus you will need to use:
     1. Prometheus extra scrape config:
 
@@ -102,12 +138,12 @@ type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 1.0.2
-appVersion: 1.0.0
+version: 1.0.3
+appVersion: 1.1.0
 
 dependencies:
-  # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=5.3.0
+  # https://artifacthub.io/packages/helm/stakater/application?modal=values&compare-to=6.13.0
   - name: application
-    version: 6.0.2
+    version: 6.13.0
     repository: https://stakater.github.io/stakater-charts/
     alias: exporter

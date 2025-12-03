@@ -14,7 +14,7 @@ exporter:
       # Public image is available on:
       # https://hub.docker.com/r/saritasallc/eol-exporter/tags
       repository: saritasallc/eol-exporter
-      tag: 1.0.0
+      tag: 1.1.0
       digest: ''  # if set to a non empty value, digest takes precedence on the tag
       pullPolicy: IfNotPresent
     initContainers: []
@@ -61,7 +61,7 @@ exporter:
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 1
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       # Must specify either one of the following field when enabled
       httpGet:
         path: /metrics
@@ -74,7 +74,7 @@ exporter:
       periodSeconds: 10
       successThreshold: 1
       timeoutSeconds: 1
-      initialDelaySeconds: 10
+      initialDelaySeconds: 30
       # Must specify either one of the following field when enabled
       httpGet:
         path: /metrics
