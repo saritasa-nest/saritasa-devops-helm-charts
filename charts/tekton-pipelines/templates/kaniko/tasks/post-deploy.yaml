@@ -1,6 +1,6 @@
-{{ if and .Values.kaniko.enabled }}
-{{ $data := dict "extraSteps" .Values.kaniko.extraPostDeployTaskSteps
-                 "namespace"  $.Release.Namespace
-                 "namePrefix" "kaniko" }}
+{{ if and .Values.kaniko.enabled (.Values.kaniko).postDeployTaskSteps }}
+{{ $data := dict "namespace"  $.Release.Namespace
+                 "namePrefix" "kaniko"
+                 "pipeline" .Values.kaniko }}
 {{ include "task.postDeploy" $data }}
 {{ end }}

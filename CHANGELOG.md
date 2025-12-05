@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-11-10
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/181)
+- Update terraform-pod to not use terraform token secret
+
 ## 2025-11-06
 
 [dev]
@@ -7,12 +14,13 @@
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/180)
 - Extend image configuration options for WordPress apps
 
-## 2025-10-16
+## 2025-10-23
 
 [dev]
 
-- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/181)
-- Update terraform-pod to not use terraform token secret
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/179)
+- Update `post-deploy` task to be optional via `postDeployTaskSteps` in values.yaml
+- Remove `argo-events` task (not used anymore)
 
 ## 2025-10-16
 
