@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -45,6 +45,42 @@ for more example values.
 - Each product must have a field `product` with valid product as defined in: https://endoflife.date/api/{product}.json.
 
 Optionally, you can add any extra field and it will be added as a label in the metrics
+
+**App Update 1.1.0**
+
+Exporter now supports dynamically fetching current version of products for:
+- AWS RDS
+- AWS EKS
+
+If you are using any of the these products, then remember to enable the Service account and attach a role with the following permissions:
+
+```yaml
+rbac:
+  serviceAccount:
+    enabled: true
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::{account-id}:role/{role-name}
+```
+
+IAM permissions:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds:DescribeDBInstances",
+                "eks:DescribeCluster"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+## Prometheus server config
 
 In order to be able to watch the metrics in Prometheus you will need to use:
   1. Prometheus extra scrape config:
@@ -102,7 +138,7 @@ endoflife_failed_configs{} == 1
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://stakater.github.io/stakater-charts/ | exporter(application) | 6.0.2 |
+| https://stakater.github.io/stakater-charts/ | exporter(application) | 6.13.0 |
 
 ## Values
 
@@ -133,14 +169,14 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.image.digest | string | `""` |  |
 | exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| exporter.deployment.image.tag | string | `"1.0.0"` |  |
+| exporter.deployment.image.tag | string | `"1.1.0"` |  |
 | exporter.deployment.initContainers | list | `[]` |  |
 | exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | exporter.deployment.livenessProbe.exec | object | `{}` |  |
 | exporter.deployment.livenessProbe.failureThreshold | int | `3` |  |
 | exporter.deployment.livenessProbe.httpGet.path | string | `"/metrics"` |  |
 | exporter.deployment.livenessProbe.httpGet.port | int | `8080` |  |
-| exporter.deployment.livenessProbe.initialDelaySeconds | int | `10` |  |
+| exporter.deployment.livenessProbe.initialDelaySeconds | int | `30` |  |
 | exporter.deployment.livenessProbe.periodSeconds | int | `10` |  |
 | exporter.deployment.livenessProbe.successThreshold | int | `1` |  |
 | exporter.deployment.livenessProbe.tcpSocket | object | `{}` |  |
@@ -154,7 +190,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.readinessProbe.failureThreshold | int | `3` |  |
 | exporter.deployment.readinessProbe.httpGet.path | string | `"/metrics"` |  |
 | exporter.deployment.readinessProbe.httpGet.port | int | `8080` |  |
-| exporter.deployment.readinessProbe.initialDelaySeconds | int | `10` |  |
+| exporter.deployment.readinessProbe.initialDelaySeconds | int | `30` |  |
 | exporter.deployment.readinessProbe.periodSeconds | int | `10` |  |
 | exporter.deployment.readinessProbe.successThreshold | int | `1` |  |
 | exporter.deployment.readinessProbe.tcpSocket | object | `{}` |  |
