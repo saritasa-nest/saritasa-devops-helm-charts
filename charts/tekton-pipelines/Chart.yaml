@@ -6,7 +6,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.2.15
+version: 2.2.16
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -110,7 +110,7 @@ description: |
             script: |
               #!/bin/bash
               echo "hello world"
-        extraPostDeployTaskSteps:
+        postDeployTaskSteps:
           - name: post-deploy-hello-world
             image: node:22
             imagePullPolicy: IfNotPresent
