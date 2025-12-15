@@ -302,7 +302,6 @@ terraform.organization:
 terraform.client:
     `client` is required and should be a non-empty string. It should contain client name, which would be used as a suffix for the workspace for infra-dev-aws solutions (skipped otherwise)
 {{- end -}}
-{{- end -}}
 {{ if not (and .Values.terraform.initCommand (kindIs "string" .Values.terraform.initCommand)) }}
 terraform.initCommand:
     `initCommand` is required and should be a non-empty string. It should contain your terraform init execution call (typically makefile target, like `make _dev init`)
