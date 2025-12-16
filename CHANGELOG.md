@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-12-16
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/184)
+- Add `secondaryIngress` to wordpress tekton-apps template
+
 ## 2025-12-02
 
 [dev]
