@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-12-15
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/183)
+- Fix `terraform-pod` Helm syntax.
+
 ## 2025-12-02
 
 [dev]
