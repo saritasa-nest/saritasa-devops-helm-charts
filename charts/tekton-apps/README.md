@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.8](https://img.shields.io/badge/Version-2.1.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.9](https://img.shields.io/badge/Version-2.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -309,10 +309,23 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.ingress.hostname - wordpress ingress hostname (default: "<project_name>.saritasa.rocks", i.e. "taco.saritasa.rocks")
   - apps[PROJECT].components[NAME].wordpress.ingress.annotations - extra wordpress ingress annotations (default: null)
     - apps[PROJECT].components[NAME].wordpress.ingress.basicAuth - basic auth usage flag for wordpress ingress (default: null)
-  - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<compinent_name>-<env>-basic-auth",
+  - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<component_name>-<env>-basic-auth",
     i.e. "taco-wordpress-dev-basic-auth")
   - apps[PROJECT].components[NAME].wordpress.ingress.restrictAccessByIp - whitelist usage flag for wordpress ingress, enabled for any value except 'false' (default: null)
   - apps[PROJECT].components[NAME].wordpress.ingress.extraHosts - list of extra hosts that may be defined in ingress (default: null)
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.hostname - wordpress secondaryIngress hostname (default: "<project_name>.saritasa.rocks", i.e. "taco.saritasa.rocks")
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.annotations - extra wordpress secondaryIngress annotations (default: null)
+    - apps[PROJECT].components[NAME].wordpress.secondaryIngress.basicAuth - basic auth usage flag for wordpress secondaryIngress (default: null)
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.authSecret - name of kubernetes secret that should be used in secondaryIngress for basic auth, requires basicAuth flag (default: "<project_name>-<component_name>-<env>-basic-auth",
+    i.e. "taco-wordpress-dev-basic-auth")
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.restrictAccessByIp - whitelist usage flag for wordpress secondaryIngress, enabled for any value except 'false' (default: null)
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.path - secondaryIngress path (default: "/")
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.pathType - secondaryIngress pathType (default: "ImplementationSpecific")
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.extraPaths - additional paths for secondaryIngress (default: null)
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.extraRules - extra secondaryIngress rules (default: null)
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.tls - enable TLS (default: true)  
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.extraHosts - list of extra hosts that may be defined in secondaryIngress (default: null)
+  - apps[PROJECT].components[NAME].wordpress.secondaryIngress.extraTls - additional secondaryIngress TLS entries (default: null)
   - apps[PROJECT].components[NAME].wordpress.persistence - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
   - apps[PROJECT].components[NAME].wordpress.overrideDatabaseSettings - flag for initial Bitnami script that overrides  settings in DB with values from wp_config.php (default: false)
   - apps[PROJECT].components[NAME].wordpress.externalDatabase - map with settings for wordpress DB host (required)
@@ -1553,6 +1566,31 @@ spec:
                       extraHosts:
                         - name: test.xxx.site.url
                           path: /wp-admin
+                    secondaryIngress:
+                      hostname: test.xxx.site.url
+                      annotations:
+                        kubernetes.io/ingress.class: "nginx"
+                        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+                        nginx.ingress.kubernetes.io/proxy-body-size: 100m
+                        nginx.ingress.kubernetes.io/client-max-body-size: 100m
+                        nginx.ingress.kubernetes.io/server-snippet: |-
+                          add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+                        nginx.ingress.kubernetes.io/whitelist-source-range: |
+                          35.85.92.224/32,
+                          100.21.244.185/32
+                      path: /wp-json
+                      pathType: ImplementationSpecific
+                      extraHosts:
+                        - name: api.xxx.site.url
+                          path: /wp-admin
+                      extraPaths:
+                        - path: /wp-login
+                          pathType: ImplementationSpecific
+                          backend:
+                            service:
+                              name: wordpress
+                              port:
+                                number: 80
                     externalDatabase:
                       host: "xxx.xxx.us-west-2.rds.amazonaws.com"
                       user: "xxx-wp-user-dev"
