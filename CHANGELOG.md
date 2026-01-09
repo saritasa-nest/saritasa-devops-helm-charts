@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-12-30
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/185)
+- Add support for public ECR repositories in BuildKit pipeline
+
 ## 2025-12-16
 
 [dev]

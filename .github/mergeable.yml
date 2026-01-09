@@ -39,7 +39,7 @@ mergeable:
           changes_requested: true
           message: 'You have open changes requested from the reviewers'
         required:
-          reviewers: ['dmitry-mightydevops', 'kseniyashaydurova', 'luciano-buono']
+          reviewers: ['dmitry-mightydevops', 'luciano-buono']
 
   # CHANGELOG.md is required in the PR
   - when: pull_request.*

@@ -77,8 +77,14 @@ spec:
         #!/bin/sh
         set -euo pipefail
         ecr_registry=$(echo "$(params.image)" | cut -d/ -f1)
-        ecr_region=$(echo "$ecr_registry" | sed -n 's/.*\.ecr\.\(.*\)\.amazonaws\.com.*/\1/p')
-        password=$(aws ecr get-login-password --region $ecr_region)
+        if [ "$ecr_registry" = public.ecr.aws ]; then
+          ecr_type=ecr-public
+          ecr_region=us-east-1
+        else
+          ecr_type=ecr
+          ecr_region=$(echo "$ecr_registry" | sed -n 's/.*\.ecr\.\(.*\)\.amazonaws\.com.*/\1/p')
+        fi
+        password=$(aws "$ecr_type" get-login-password --region "$ecr_region")
         auth=$(echo -n "AWS:${password}" | base64 | tr -d '\n')
         mkdir -p $(workspaces.source.path)/docker
         cat > $(workspaces.source.path)/docker/config.json <<EOF
