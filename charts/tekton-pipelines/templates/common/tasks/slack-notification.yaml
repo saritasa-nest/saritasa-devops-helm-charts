@@ -63,7 +63,7 @@ spec:
         if [ -s "$(results.failed_info.path)" ]; then
           failed_pod_name=$(cat $(results.failed_info.path) | jq '.pod' -r)
           failed_task=$(cat $(results.failed_info.path) | jq '.task' -r)
-          failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)   
+          failed_step=$(cat $(results.failed_info.path) | jq '.step' -r)
 
           kubectl -n $ns logs $failed_pod_name -c step-$failed_step | tail -c 1982 > $(results.logs.path)
           echo $failed_task > $(results.failed_task.path)
