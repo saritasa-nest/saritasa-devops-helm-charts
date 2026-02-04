@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 1.0.3](https://img.shields.io/badge/Version-1.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -138,7 +138,7 @@ endoflife_failed_configs{} == 1
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://stakater.github.io/stakater-charts/ | exporter(application) | 6.13.0 |
+| https://stakater.github.io/stakater-charts/ | exporter(application) | 6.14.0 |
 
 ## Values
 
@@ -169,7 +169,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.image.digest | string | `""` |  |
 | exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| exporter.deployment.image.tag | string | `"1.1.0"` |  |
+| exporter.deployment.image.tag | string | `"1.1.1"` |  |
 | exporter.deployment.initContainers | list | `[]` |  |
 | exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | exporter.deployment.livenessProbe.exec | object | `{}` |  |

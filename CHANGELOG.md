@@ -1,6 +1,11 @@
 # Changelog
 
-## 2025-12-30
+## 2026-02-04
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/186)
+- Update `eol-exporter` chart to 1.0.4
 
 [dev]
 
