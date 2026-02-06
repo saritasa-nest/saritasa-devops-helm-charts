@@ -309,7 +309,7 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.ingress.hostname - wordpress ingress hostname (default: "<project_name>.saritasa.rocks", i.e. "taco.saritasa.rocks")
   - apps[PROJECT].components[NAME].wordpress.ingress.annotations - extra wordpress ingress annotations (default: null)
     - apps[PROJECT].components[NAME].wordpress.ingress.basicAuth - basic auth usage flag for wordpress ingress (default: null)
-  - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<compinent_name>-<env>-basic-auth",
+  - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<component_name>-<env>-basic-auth",
     i.e. "taco-wordpress-dev-basic-auth")
   - apps[PROJECT].components[NAME].wordpress.ingress.restrictAccessByIp - whitelist usage flag for wordpress ingress, enabled for any value except 'false' (default: null)
   - apps[PROJECT].components[NAME].wordpress.ingress.extraHosts - list of extra hosts that may be defined in ingress (default: null)
