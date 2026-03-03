@@ -1,7 +1,7 @@
 
 # saritasa-tekton
 
-![Version: 2.1.4](https://img.shields.io/badge/Version-2.1.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 2.1.5-dev.1](https://img.shields.io/badge/Version-2.1.5--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 A Helm chart for tekton
 
@@ -25,10 +25,10 @@ A Helm chart for tekton
 | dashboard.topologySpreadConstraints | object | `{}` |  |
 | eventlistener.enabled | bool | `true` |  |
 | eventlistener.ingress.annotations."cert-manager.io/cluster-issuer" | string | `"letsencrypt-prod"` |  |
-| eventlistener.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` |  |
 | eventlistener.ingress.annotations."nginx.ingress.kubernetes.io/proxy-body-size" | string | `"100m"` |  |
 | eventlistener.ingress.enabled | bool | `true` |  |
 | eventlistener.ingress.hostname | string | `"tekton-webhook.site.com"` |  |
+| eventlistener.ingress.ingressClassName | string | `"nginx"` |  |
 | eventlistener.ingress.name | string | `"github-webhook"` |  |
 | eventlistener.labelSelector.matchLabels.builder | string | `"tekton"` |  |
 | eventlistener.name | string | `"el"` |  |
