@@ -22,7 +22,7 @@ metadata:
   annotations:
     {{- .ingress.annotations | toYaml | nindent 4 }}
 spec:
-  ingressClassName: {{ default ("nginx") .ingress.ingressClassName }}
+  ingressClassName: {{ required "ingressClassName must be set" .ingress.ingressClassName }}
   rules:
     - host: {{ .ingress.hostname }}
       http:
