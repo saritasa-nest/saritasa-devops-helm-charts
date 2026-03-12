@@ -79,14 +79,32 @@ spec:
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       workingDir: $(workspaces.source.path)/$(params.subdirectory)
       script: |
-        CONFIG=/workdir/yamlfix.toml
+        GENERAL_CONFIG="/workdir/yamlfix.toml"
+        if [ -f /workdir/yamlfix.values.toml ]; then
+          VALUES_CONFIG="/workdir/yamlfix.values.toml"
+        else
+          VALUES_CONFIG="/workdir/yamlfix.toml"
+        fi
+        if [ -f .yamlfix.toml ]; then
+          GENERAL_CONFIG="$(realpath .yamlfix.toml)"
+        fi
         if [ -f .yamlfix.values.toml ]; then
-          CONFIG=$(realpath .yamlfix.values.toml)
-        elif [ -f .yamlfix.toml ]; then
-          CONFIG=$(realpath .yamlfix.toml)
+          VALUES_CONFIG="$(realpath .yamlfix.values.toml)"
         fi
 
-        find $(params.kustomize_overlay_path) -iname "*.yaml" -exec yamlfix --config-file=$CONFIG {} \;
+        find "$(params.kustomize_overlay_path)" -type f -name "*.yaml" | while read -r file; do
+          base="$(basename "$file")"
+          case "$base" in
+            kustomization.yaml|Chart*.yaml|values*.yaml)
+              echo "yamlfix (whitelines): $file"
+              yamlfix --config-file="$VALUES_CONFIG" "$file"
+              ;;
+            *)
+              echo "yamlfix (general): $file"
+              yamlfix --config-file="$GENERAL_CONFIG" "$file"
+              ;;
+          esac
+        done
 
     - name: kubeval
       image: {{ .Values.images.kubeval | default "public.ecr.aws/saritasa/kubeval:latest"}}
