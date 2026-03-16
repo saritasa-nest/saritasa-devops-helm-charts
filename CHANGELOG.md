@@ -2,6 +2,9 @@
 
 ## 2026-03-16
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/188)
+- Fix yamlfix step in tekton-pipelines
+
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/187)
 - Add ingressClass for tekton dashboard and webhook
 
