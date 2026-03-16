@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-03-16
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/187)
+- Add ingressClass for tekton dashboard and webhook
+
 ## 2026-02-04
 
 [dev]
