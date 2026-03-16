@@ -10,6 +10,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
+  ingressClassName: {{ required "ingressClassName must be set" .Values.dashboard.ingress.ingressClassName }}
   rules:
     {{- range .Values.dashboard.ingress.hosts }}
     - host: {{ .host | quote }}
