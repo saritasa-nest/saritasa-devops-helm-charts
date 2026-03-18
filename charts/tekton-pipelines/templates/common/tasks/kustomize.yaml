@@ -97,11 +97,19 @@ spec:
           case "$base" in
             kustomization.yaml|Chart*.yaml|values*.yaml)
               echo "yamlfix (whitelines): $file"
-              yamlfix --config-file="$VALUES_CONFIG" "$file"
+              yamlfix --config-file="$VALUES_CONFIG" "$file" || {
+                # yamlfix may fail if there are git-crypt encrypted files
+                echo "yamlfix failed for: $file" >&2
+                continue
+              }
               ;;
             *)
               echo "yamlfix (general): $file"
-              yamlfix --config-file="$GENERAL_CONFIG" "$file"
+              yamlfix --config-file="$GENERAL_CONFIG" "$file" || {
+                # yamlfix may fail if there are git-crypt encrypted files
+                echo "yamlfix failed for: $file" >&2
+                continue
+              }
               ;;
           esac
         done
