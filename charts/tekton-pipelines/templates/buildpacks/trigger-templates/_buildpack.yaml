@@ -77,7 +77,6 @@ spec:
 
     - name: commit_timestamp
       description: Timestamp of the commit that triggered the current pipeline.
-      type: string
       default: ""
 
   resourcetemplates:
