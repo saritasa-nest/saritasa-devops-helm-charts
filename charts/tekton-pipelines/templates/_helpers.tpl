@@ -60,3 +60,16 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "task.labels" -}}
+helm.sh/chart: {{ include "task.chart" . }}
+app.kubernetes.io/version: {{ .Chart.Version }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: {{ .Release.Name }}
+{{- with .Values.extraLabels }}
+{{ . | toYaml }}
+{{- end }}
+{{- end }}

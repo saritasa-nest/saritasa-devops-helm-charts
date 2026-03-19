@@ -71,6 +71,15 @@ spec:
     - name: sentry_project_name
       description: name of the project in Sentry
 
+    - name: terminate-concurrent-runs
+      description: whether to terminate concurrent runs of the same pipeline
+      default: ""
+
+    - name: commit_timestamp
+      description: Timestamp of the commit that triggered the current pipeline.
+      type: string
+      default: ""
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -128,6 +137,10 @@ spec:
           value: "$(tt.params.sentry_project_name)"
         - name: kubernetes_repository_ssh_url
           value: "$(tt.params.kubernetes_repository_ssh_url)"
+        - name: terminate_concurrent_runs
+          value: "$(tt.params.terminate_concurrent_runs)"
+        - name: commit_timestamp
+          value: "$(tt.params.commit_timestamp)"
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
