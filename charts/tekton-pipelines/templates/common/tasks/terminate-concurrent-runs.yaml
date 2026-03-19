@@ -49,7 +49,7 @@ spec:
         - name: commit_timestamp
           value: $(params.commit_timestamp)
         - name: namespace
-          value: $(params.namespace)
+          value: {{ .Release.Namespace }} # differ from infra-v3: use release namespace instead of param because pipelines are executed in the same namespace as tekton-pipelines chart
         - name: pipeline_name
           value: $(params.pipeline_name)
         - name: pipelinerun_name

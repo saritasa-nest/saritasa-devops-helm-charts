@@ -77,7 +77,6 @@ spec:
 
     - name: commit_timestamp
       description: Timestamp of the commit that triggered the current pipeline.
-      type: string
       default: ""
 
   resourcetemplates:
@@ -90,6 +89,8 @@ spec:
         project: $(tt.params.project)
         environment: $(tt.params.environment)
         component: $(tt.params.component)
+      annotations:
+        pipeline.tekton.dev/commit-timestamp: $(tt.params.commit_timestamp)
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
       taskRunSpecs:
@@ -137,8 +138,8 @@ spec:
           value: "$(tt.params.sentry_project_name)"
         - name: kubernetes_repository_ssh_url
           value: "$(tt.params.kubernetes_repository_ssh_url)"
-        - name: terminate_concurrent_runs
-          value: "$(tt.params.terminate_concurrent_runs)"
+        - name: terminate-concurrent-runs
+          value: "$(tt.params.terminate-concurrent-runs)"
         - name: commit_timestamp
           value: "$(tt.params.commit_timestamp)"
 
