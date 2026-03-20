@@ -89,6 +89,8 @@ spec:
         project: $(tt.params.project)
         environment: $(tt.params.environment)
         component: $(tt.params.component)
+      annotations:
+        pipeline.tekton.dev/commit-timestamp: $(tt.params.commit_timestamp)
     spec:
       serviceAccountName: $(tt.params.application)-build-pipeline-sa
       taskRunSpecs:
