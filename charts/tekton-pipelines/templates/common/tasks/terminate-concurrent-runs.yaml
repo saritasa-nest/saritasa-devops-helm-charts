@@ -1,0 +1,80 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: terminate-concurrent-runs
+  namespace: {{ .Release.Namespace }}
+  labels:
+    tekton.dev/utils: 'true'
+    {{- include "task.labels" . | nindent 4 }}
+spec:
+  description: |
+    Terminate concurrent runs of the same pipeline.
+
+    That is necessary to prevent race conditions when we build the same repository with multiple commits sent in sequence.
+    For example developer can create commit A, B (in chronological order) and push with little delay between them.
+    - where B fixes some issues of A
+    - but A still deployed if A pipeline execution takes longer than pipelinerun triggered by commit B
+
+    Solution:
+    - search for the same pipelineruns in the `Running` state by the `tekton.dev/pipeline` label and delete them.
+
+  params:
+    - name: commit_timestamp
+      description: Timestamp of the commit that triggered the current pipeline.
+      type: string
+    - name: namespace
+      description: Namespace executing pipelineruns.
+      type: string
+    - name: pipeline_name
+      description: Name of the pipeline to check for active PipelineRuns.
+      type: string
+    - name: pipelinerun_name
+      description: Name of the current PipelineRun.
+      type: string
+  steps:
+    - name: execute
+      image: {{ .Values.images.kubectl }}
+      imagePullPolicy: IfNotPresent
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        runAsNonRoot: false
+        privileged: false
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+      env:
+        - name: commit_timestamp
+          value: $(params.commit_timestamp)
+        - name: namespace
+          value: {{ .Release.Namespace }} # differ from infra-v3: use release namespace instead of param because pipelines are executed in the same namespace as tekton-pipelines chart
+        - name: pipeline_name
+          value: $(params.pipeline_name)
+        - name: pipelinerun_name
+          value: $(params.pipelinerun_name)
+      script: |
+        #!/usr/bin/env sh
+        set -eu
+        echo "Checking for running concurrent pipelineruns of the pipeline ${pipeline_name}..."
+
+        export name="${pipelinerun_name}"
+        export ts="${commit_timestamp}"
+        running=$(kubectl get pipelinerun \
+          -n ${namespace} \
+          -l tekton.dev/pipeline=${pipeline_name} \
+          -o yaml | \
+          yq '.items[]
+            | select(.status.conditions[0].reason == "Running" and .metadata.name != strenv(name))
+            | select(.metadata.annotations["pipeline.tekton.dev/commit-timestamp"] <= strenv(ts))
+            | .metadata.name')
+
+        if [ -n "${running}" ]; then
+          echo "Delete previously initiated pipelineruns of the ${pipeline_name}:"
+          for pipelinerun in ${running}; do
+            kubectl delete pipelinerun ${pipelinerun} -n ${namespace}
+          done
+        else
+          echo "No concurrent running pipelineruns detected."
+        fi
