@@ -136,8 +136,8 @@ spec:
           value: "$(tt.params.sentry_project_name)"
         - name: kubernetes_repository_ssh_url
           value: "$(tt.params.kubernetes_repository_ssh_url)"
-        - name: terminate_concurrent_runs
-          value: "$(tt.params.terminate_concurrent_runs)"
+        - name: terminate-concurrent-runs
+          value: "$(tt.params.terminate-concurrent-runs)"
         - name: commit_timestamp
           value: "$(tt.params.commit_timestamp)"
 
