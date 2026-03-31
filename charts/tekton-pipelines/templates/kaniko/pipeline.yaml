@@ -90,6 +90,8 @@ spec:
           value: $(context.pipeline.name)
         - name: pipelinerun_name
           value: $(context.pipelineRun.name)
+        - name: app
+          value: "$(params.application)"
 
     - name: git-clone
       taskRef:
