@@ -62,7 +62,7 @@ spec:
       script: |
         #!/usr/bin/env sh
         set -eu
-        echo "Checking for running concurrent pipelineruns of the pipeline ${pipeline_name}..."
+        echo "Checking for running concurrent pipelineruns of the pipeline ${pipeline_name}... for app ${app}"
 
         export name="${pipelinerun_name}"
         export ts="${commit_timestamp}"
