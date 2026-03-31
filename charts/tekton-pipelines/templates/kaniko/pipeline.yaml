@@ -64,6 +64,11 @@ spec:
       type: string
       default: ""
 
+    - name: app
+      type: string
+      description: name of the application
+      default: ""
+
   workspaces:
     - name: source
 

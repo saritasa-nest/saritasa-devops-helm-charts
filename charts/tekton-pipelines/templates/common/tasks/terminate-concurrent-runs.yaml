@@ -54,6 +54,8 @@ spec:
           value: $(params.pipeline_name)
         - name: pipelinerun_name
           value: $(params.pipelinerun_name)
+        - name: app
+          value: $(params.app)
       script: |
         #!/usr/bin/env sh
         set -eu
@@ -68,6 +70,7 @@ spec:
           yq '.items[]
             | select(.status.conditions[0].reason == "Running" and .metadata.name != strenv(name))
             | select(.metadata.annotations["pipeline.tekton.dev/commit-timestamp"] <= strenv(ts))
+            | select(.metadata.labels.app == strenv(app))
             | .metadata.name')
 
         if [ -n "${running}" ]; then
