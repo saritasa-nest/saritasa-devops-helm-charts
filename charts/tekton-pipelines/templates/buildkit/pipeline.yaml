@@ -64,6 +64,11 @@ spec:
       type: string
       default: ""
 
+    - name: app
+      type: string
+      description: name of the application
+      default: ""
+
   workspaces:
     - name: source
 
@@ -85,6 +90,8 @@ spec:
           value: $(context.pipeline.name)
         - name: pipelinerun_name
           value: $(context.pipelineRun.name)
+        - name: app
+          value: "$(params.application)"
 
     - name: git-clone
       taskRef:
