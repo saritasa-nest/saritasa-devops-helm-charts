@@ -17,7 +17,6 @@ spec:
       image: {{ .Values.images.kubectl | default "bitnamilegacy/kubectl:latest" }}
       imagePullPolicy: {{ .Values.imagePullPolicy }}
       script: |
-        kubectl -n $(params.kubernetes_namespace) delete pod -l "app.kubernetes.io/instance=$(params.application)"
-        kubectl -n $(params.kubernetes_namespace) rollout status deployment $(params.application) -w
-
+        kubectl -n $(params.kubernetes_namespace) rollout restart deployment -l "app.kubernetes.io/instance=$(params.application)"
+        kubectl -n $(params.kubernetes_namespace) rollout status deployment -l "app.kubernetes.io/instance=$(params.application)" -w
 {{ end }}
