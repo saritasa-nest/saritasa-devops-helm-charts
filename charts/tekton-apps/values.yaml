@@ -10,6 +10,11 @@ environment: ""
 gitBranchPrefixes:
   - develop
 
+# exact git branch matches used in default trigger filter: body.ref == 'refs/heads/<gitBranch>'
+# works together with gitBranchPrefixes
+gitBranch: []
+  # - main
+
 # -- storage class for PVCs associated with the apps
 storageClassName: gp3
 
@@ -114,6 +119,8 @@ apps: []
   #       applicationURL: https://site.com
   #       eventlistener:
   #         enableWebhookSecret: false
+  #         gitWebhookBranch:
+  #           - develop
   #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
   #         template: buildpack-frontend-build-pipeline-trigger-template
   #         extraOverlays: []
@@ -169,6 +176,8 @@ apps: []
   #           database: xxx-environment-wp
   #       eventlistener:
   #         enableWebhookSecret: false
+  #         gitWebhookBranch:
+  #           - develop
   #         filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
   #         template: wordpress-build-pipeline-trigger-template
   #         extraOverlays: []

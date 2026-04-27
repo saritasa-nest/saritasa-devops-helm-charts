@@ -5,10 +5,14 @@
 {{/* initialize `projectEnvironment` variable with either `$project.environment` if it exists or with `$.Values.environment` otherwise */}}
 {{ $projectEnvironment := coalesce $project.environment $.Values.environment -}}
 
+{{/* initialize `gitBranch` variable with either `$component.eventlistener.gitWebhookBranch` if it exists or `$.Values.gitBranch` otherwise */}}
+{{- $gitBranch := coalesce $component.eventlistener.gitWebhookBranch $.Values.gitBranch -}}
+
 {{/* initialize `gitBranchPrefixes` variable with either `$component.eventlistener.gitWebhookBranches` list if it exists or `$.Values.gitBranchPrefixes` otherwise */}}
 {{- $gitBranchPrefixes := coalesce $component.eventlistener.gitWebhookBranches $.Values.gitBranchPrefixes -}}
 
-{{- $filter := coalesce $component.eventlistener.filter (include "tekton-apps.eventlistener.filter" $gitBranchPrefixes) -}}
+{{- $filterConfig := dict "gitBranch" $gitBranch "gitBranchPrefixes" $gitBranchPrefixes -}}
+{{- $filter := coalesce $component.eventlistener.filter (include "tekton-apps.eventlistener.filter" $filterConfig) -}}
 
 {{- $data := dict "project"           $project
                   "component"         $component

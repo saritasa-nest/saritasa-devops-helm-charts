@@ -4,6 +4,9 @@ gitBranchPrefixes:
   - staging
   - release
 
+gitBranch:
+  - main
+
 storageClassName: "gp2"
 
 aws:
@@ -97,6 +100,8 @@ apps:
           buildpacksPVC: 25Gi
         eventlistener:
           template: buildpack-frontend-build-pipeline-trigger-template
+          gitWebhookBranch:
+            - feature/add-ci-cd
           # TODO: Ksusha - pls fix once you finalize the PR
           # https://github.com/saritasa-nest/nmbl-project-frontend/pull/1#pullrequestreview-962791245
           gitWebhookBranches:

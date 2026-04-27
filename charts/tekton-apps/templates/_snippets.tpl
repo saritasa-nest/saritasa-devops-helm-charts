@@ -58,14 +58,36 @@ Create a proper name prefix for various resources based on client, component, en
 {{/*
 Create a proper name prefix for various resources based on client, component, environment names
 */}}
-{{- define "tekton-apps.eventlistener._filter" -}}
-{{- range  $prefix := $  -}}
+{{- define "tekton-apps.eventlistener._branchFilter" -}}
+{{- if kindIs "slice" .gitBranch -}}
+{{- range $branch := .gitBranch -}}
+body.ref == 'refs/heads/{{- $branch -}}',
+{{- end -}}
+{{- else if .gitBranch -}}
+body.ref == 'refs/heads/{{- .gitBranch -}}',
+{{- end -}}
+{{- end }}
+
+{{/*
+Create a proper name prefix for various resources based on client, component, environment names
+*/}}
+{{- define "tekton-apps.eventlistener._branchPrefixesFilter" -}}
+{{- range  $prefix := .gitBranchPrefixes  -}}
 body.ref.startsWith('refs/heads/{{- $prefix -}}'),
 {{- end -}}
 {{- end }}
 
 {{- define "tekton-apps.eventlistener.filter" -}}
-({{ (join " || " (compact (splitList "," (include "tekton-apps.eventlistener._filter" $ )))) }})
+{{- $filters := list -}}
+{{- $branchFilter := include "tekton-apps.eventlistener._branchFilter" . | trim | trimSuffix "," -}}
+{{- if $branchFilter -}}
+{{- $filters = append $filters $branchFilter -}}
+{{- end -}}
+{{- $branchPrefixesFilter := include "tekton-apps.eventlistener._branchPrefixesFilter" . | trim -}}
+{{- range $filter := compact (splitList "," $branchPrefixesFilter) -}}
+{{- $filters = append $filters ($filter | trim) -}}
+{{- end -}}
+({{ join " || " $filters }})
 {{- end }}
 
 {{/*
