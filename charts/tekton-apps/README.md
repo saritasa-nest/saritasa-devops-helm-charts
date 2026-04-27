@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.9](https://img.shields.io/badge/Version-2.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.11](https://img.shields.io/badge/Version-2.1.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -89,6 +89,8 @@ spec:
     helm:
       values: |
         environment: staging
+        gitBranch:
+          - main
         gitBranchPrefixes:
           - staging
         storageClassName: gp3
@@ -254,7 +256,10 @@ spec:
   - apps[PROJECT].components[NAME].eventlistener.filter - custom filter for the component of the eventlistener
   - apps[PROJECT].components[NAME].eventlistener.extraOverlays - extra overlays to be added into the eventlistener for the component
   - apps[PROJECT].components[NAME].eventlistener.eventTypes - github event types to trigger the ci/cd
-  - apps[PROJECT].components[NAME].eventlistener.gitWebhookBranches[] - list of branches, push to which triggers ci/cd
+  - gitBranch[] - exact branch names used in default trigger filter with `body.ref == 'refs/heads/<branch>'` (not required)
+  - gitBranchPrefixes[] - list of branch prefixes used in default trigger filter with `body.ref.startsWith('refs/heads/<prefix>')` (not required)
+  - apps[PROJECT].components[NAME].eventlistener.gitWebhookBranch[] - exact branch override for the component default trigger filter (not required)
+  - apps[PROJECT].components[NAME].eventlistener.gitWebhookBranches[] - list of branch prefix overrides for the component default trigger filter (not required)
   - apps[PROJECT].components[NAME].extraBuildConfigParams - additional key/values to be added into `build-pipeline-config configmap` ConfigMap associated with the app
   - apps[PROJECT].components[NAME].triggerBinding - values to be added into the TriggerBinding manifest except default ones
 
@@ -1614,6 +1619,7 @@ whitelistIP: |
 | aws | object | `{}` | aws configuration |
 | defaultRegistry | string | `""` | default docker registry ex: XXX.dkr.ecr.us-west-2.amazonaws.com |
 | environment | string | `""` | environment these apps are handling possible values: dev, staging, prod |
+| gitBranch[0] | string | `"main"` | exact git branch match used in default trigger filter: `body.ref == 'refs/heads/<gitBranch>'` |
 | gitBranchPrefixes[0] | string | `"develop"` |  |
 | runPostInstallMountPvcJob | bool | `false` | run job that will mount created (but not bound) PVCs in order for argocd to mark the app as "healthy" |
 | serviceAccount.name | string | `"build-bot-sa"` |  |
