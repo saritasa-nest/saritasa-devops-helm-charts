@@ -2,6 +2,9 @@
 
 ## 2026-03-16
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/189)
+- Add terminate-concurrent-runs task
+
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/188)
 - Fix yamlfix step in tekton-pipelines
 

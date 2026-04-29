@@ -25,3 +25,5 @@ spec:
     value: $(body.repository.ssh_url)
   - name: branch
     value: $(body.ref)
+  - name: commit_timestamp
+    value: $(body.head_commit.timestamp)

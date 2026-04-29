@@ -55,10 +55,39 @@ spec:
       type: string
       description: git repository ssh url for kubernetes manifests repo
 
+    - name: terminate-concurrent-runs
+      description: whether to terminate concurrent runs of the same pipeline
+      default: ""
+
+    - name: commit_timestamp
+      description: Timestamp of the commit that triggered the current pipeline.
+      type: string
+      default: ""
+
   workspaces:
     - name: source
 
   tasks:
+    - name: terminate-concurrent-runs
+      when:
+        - input: $(params.terminate-concurrent-runs)
+          operator: in
+          values:
+            - 'true'
+      taskRef:
+        name: terminate-concurrent-runs
+      params:
+        - name: commit_timestamp
+          value: $(params.commit_timestamp)
+        - name: namespace
+          value: $(params.namespace)
+        - name: pipeline_name
+          value: $(context.pipeline.name)
+        - name: pipelinerun_name
+          value: $(context.pipelineRun.name)
+        - name: application
+          value: $(params.application)
+
     - name: git-clone
       taskRef:
         name: git-clone
