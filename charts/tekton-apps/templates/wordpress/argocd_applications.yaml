@@ -23,6 +23,10 @@ metadata:
       {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
       {{- end }}
     {{- end }}
+  {{- if ($component.argocd).labels }}
+  labels:
+  {{- toYaml ($component.argocd).labels | nindent 4}}
+  {{- end }}
 spec:
   destination:
     namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $component "project" $project "component_name" "component") }}
@@ -43,8 +47,13 @@ spec:
     chart: wordpress
     helm:
       values: |
+        global:
+          security:
+            allowInsecureImages: true
+
         image:
-          repository: bitnami/wordpress
+          registry: {{ (.image).registry | default "registry-1.docker.io" }}
+          repository: {{ (.image).repository | default "bitnamilegacy/wordpress" }}
           tag: {{ (.image).tag | default "6.1.1" }}
           debug: {{ (.image).debug | default "true" }}
 
@@ -241,6 +250,53 @@ spec:
           {{- end }}
         {{- end }}
 
+        {{- with .secondaryIngress }}
+        secondaryIngress:
+          enabled: true
+          hostname: {{ .hostname | default (printf "%s.saritasa.rocks" $project.project) }}
+          annotations:
+            kubernetes.io/ingress.class: "nginx"
+            {{- if .basicAuth }}
+            nginx.ingress.kubernetes.io/auth-type: basic
+            nginx.ingress.kubernetes.io/auth-secret: {{ .authSecret | default (printf "%s-%s-%s-basic-auth" $project.project $component.name $projectEnvironment) }}
+            nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+            {{- end }}
+            {{- if .annotations }}
+            {{- toYaml .annotations | nindent 12 }}
+            {{- else }}
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
+            nginx.ingress.kubernetes.io/proxy-body-size: 100m
+            nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+            nginx.ingress.kubernetes.io/proxy-next-upstream-timeout: "300"
+            nginx.ingress.kubernetes.io/server-snippet: |-
+              add_header X-Robots-Tag "noindex, nofollow, nosnippet, noarchive";
+            {{- if ne .restrictAccessByIp "false" }}
+            nginx.ingress.kubernetes.io/satisfy: "any"
+            nginx.ingress.kubernetes.io/whitelist-source-range: |
+              {{- index $.Values.whitelistIP | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          {{- if .extraPaths }}
+          extraPaths:
+          {{- toYaml .extraPaths | nindent 12 }}
+          {{- end }}          
+          path: {{ .path | default "/" | quote }}
+          pathType: {{ .pathType | default "ImplementationSpecific" | quote }}
+          {{- if .extraRules }}
+          extraRules:
+          {{- toYaml .extraRules | nindent 12 }}
+          {{- end }}
+          tls: {{ .tls | default true }}
+          {{- if .extraHosts }}
+          extraHosts:
+          {{- toYaml .extraHosts | nindent 12 }}
+          {{- end }}
+          {{- if .extraTls }}
+          extraTls:
+          {{- toYaml .extraTls | nindent 12 }}
+          {{- end }}          
+        {{- end }}
+
         {{- if .persistence }}
         persistence:
         {{- toYaml .persistence | nindent 10 }}
@@ -248,6 +304,8 @@ spec:
 
         metrics:
           enabled: true
+          image:
+            repository: bitnamilegacy/apache-exporter
 
         overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
 
@@ -263,7 +321,7 @@ spec:
         smtpExistingSecret: {{ .existingSecret }}
         {{- end }}
         smtpHost: {{ .smtpHost | default "mailhog.mailhog.svc.cluster.local" }}
-        smtpPort: {{ .smtpHort | default 1025 }}
+        smtpPort: {{ .smtpPort | default 1025 }}
         smtpUser: {{ .smtpUser | default $project.project }}
         smtpPassword: {{ .smtpPassword | default "anypassword" }}
         {{ if .externalDatabase }}
@@ -277,7 +335,7 @@ spec:
         {{- end }}
 
 
-    repoURL: {{ $argocd.source.repoUrl | default "https://charts.bitnami.com/bitnami" }}
+    repoURL: {{ $argocd.source.repoUrl | default "registry-1.docker.io/bitnamicharts" }}
     targetRevision: {{ $argocd.source.targetRevision | default "15.2.40" }}
     {{ if (ternary $argocd.source.kustomizeHelmChart false (hasKey $argocd.source "kustomizeHelmChart")) -}}
     plugin:

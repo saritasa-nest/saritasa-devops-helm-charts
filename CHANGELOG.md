@@ -1,9 +1,128 @@
 # Changelog
 
+## 2026-03-16
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/189)
+- Add terminate-concurrent-runs task
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/188)
+- Fix yamlfix step in tekton-pipelines
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/187)
+- Add ingressClass for tekton dashboard and webhook
+
+## 2026-02-04
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/186)
+- Update `eol-exporter` chart to 1.0.4
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/185)
+- Add support for public ECR repositories in BuildKit pipeline
+
+## 2025-12-16
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/184)
+- Add `secondaryIngress` to wordpress tekton-apps template
+
+## 2025-12-15
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/183)
+- Fix `terraform-pod` Helm syntax.
+
+## 2025-12-02
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/182)
+- Update `eol-exporter` chart
+
+## 2025-11-10
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/181)
+- Update terraform-pod to not use terraform token secret
+
+## 2025-11-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/180)
+- Extend image configuration options for WordPress apps
+
+## 2025-10-23
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/179)
+- Update `post-deploy` task to be optional via `postDeployTaskSteps` in values.yaml
+- Remove `argo-events` task (not used anymore)
+
+## 2025-10-16
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/178)
+- Update slack-notification `get-failed-info` step
+
+## 2025-10-14
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/177)
+- Add NPM_REGISTRY_GITHUB_TOKEN to frontend vars
+
+## 2025-10-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/176)
+- Specify allowInsecureImages for WordPress application to allow bitnamilegacy images
+
+## 2025-10-01
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/175)
+- Update metrics server image in Wordpress chart to use bitnamilegacy
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/174)
+- Bump chart versions
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/172)
+- Adding labels settings for tekton argocd apps
+
+## 2025-09-26
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/171)
+- Add `buildkit`
+
+## 2025-09-17
+
+[prod]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/169)
+- Migrate bitnami kubectl to bitnamilegacy
+
+## 2025-09-15
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/170)
+- Release new `saritasa-tekton-apps` chart version `2.1.2`
+
 ## 2025-09-05
 
 [dev]
 
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/168)
+- Update default repository for wordpress to `bitnamilegacy/wordpress`
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/167)
 - Added secret to terraform-pod for delmar rds instance
 

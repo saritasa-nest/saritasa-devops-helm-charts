@@ -1,14 +1,14 @@
-{{ if .Values.kaniko.enabled }}
+{{ if .Values.buildkit.enabled }}
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: kaniko-build-pipeline
+  name: buildkit-build-pipeline
   namespace: {{ .Release.Namespace }}
   labels:
     tekton: 'true'
 spec:
   description: >-
-    Pipeline will only build the image utilizing dockerfile using kaniko and then send notification via slack.
+    Pipeline will build the image utilizing Dockerfile using buildkit and then send notification via slack.
     The deployment is done via argocd
 
   params:
@@ -37,10 +37,10 @@ spec:
       default: "."
       description: dockerfile context path
 
-    - name: kaniko_extra_args
-      type: string
-      description: extra args to be passed into kaniko builder
-      default: ''
+    - name: build_args
+      type: array
+      description: extra args to be passed into buildkit builder
+      default: []
 
     - name: sentry_project_name
       type: string
@@ -86,28 +86,26 @@ spec:
         - name: pipelinerun_name
           value: $(context.pipelineRun.name)
         - name: application
-          value: $(params.application)
+          value: "$(params.application)"
 
     - name: git-clone
       taskRef:
         name: git-clone
       workspaces:
-      - name: output
-        workspace: source
+        - name: output
+          workspace: source
       params:
-      - name: url
-        value: $(params.repository_ssh_url)
-      - name: revision
-        value: $(params.branch)
+        - name: url
+          value: $(params.repository_ssh_url)
+        - name: revision
+          value: $(params.branch)
 
-    - name: kaniko
+    - name: buildkit
       taskRef:
-        name: kaniko
+        name: buildkit
       params:
         - name: application
           value: "$(params.application)"
-        - name: docker_registry
-          value: $(params.docker_registry)
         - name: environment
           value: "$(params.environment)"
         - name: docker_file
@@ -115,8 +113,7 @@ spec:
         - name: docker_context
           value: "$(params.docker_context)"
         - name: extra_args
-          value:
-            - $(params.kaniko_extra_args)
+          value: $(params.build_args[*])
         - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
       workspaces:
@@ -139,7 +136,7 @@ spec:
         - name: output
           workspace: source
       runAfter:
-        - kaniko
+        - buildkit
 
     - name: kustomize
       taskRef:
@@ -148,7 +145,9 @@ spec:
         - name: application
           value: "$(params.application)"
         - name: image
-          value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+          value: "$(tasks.buildkit.results.image_url)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.image_digest)"
         - name: kustomize_overlay_path
           value: "$(params.kubernetes_repository_kustomize_path)"
         - name: kubernetes_branch
@@ -163,26 +162,27 @@ spec:
       runAfter:
         - git-clone-gitops-repository
 
-  {{- if (.Values.kaniko).preDeployTaskSteps }}
-  {{ include "pipeline.preDeploy" (dict "name" (printf "kaniko-pre-deploy")) | nindent 4 }}
+  {{- if (.Values.buildkit).preDeployTaskSteps }}
+  {{ include "pipeline.preDeploy" (dict "name" (printf "buildkit-pre-deploy")) | nindent 4 }}
   {{ end }}
 
     - name: deploy
       taskRef:
         name: argocd-deploy
       params:
-        - name : application
+        - name: application
           value: "$(params.application)"
+        - name: image_digest
+          value: "$(tasks.buildkit.results.image_digest)"
       runAfter:
-        - {{ if (.Values.kaniko).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
-
+        - {{ if (.Values.buildkit).preDeployTaskSteps }} pre-deploy {{ else }} kustomize {{ end }}
 
   {{ if .Values.sentry.enabled }}
     {{ include "pipeline.sentryRelease" . | nindent 4 }}
   {{ end }}
 
-  {{- if (.Values.kaniko).postDeployTaskSteps }}
-    {{ include "pipeline.postDeploy" (dict "name" "kaniko-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
+  {{- if (.Values.buildkit).postDeployTaskSteps }}
+    {{ include "pipeline.postDeploy" (dict "name" "buildkit-post-deploy" "sentry_enabled" .Values.sentry.enabled) | nindent 4 }}
   {{ end }}
 
   {{ include "pipeline.finalNotification" . | nindent 2 }}

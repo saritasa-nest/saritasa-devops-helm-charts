@@ -32,10 +32,6 @@ terraform:
   organization: saritasa-team
   # -- terraform client name (used to decide what workspace in the org to use)
   client: ""
-  # -- secret name containing terraform team API token name (optional)
-  tokenSecret: terraform-cli-token-saritasa-team
-  # -- terraform api token value (optional, if passed - takes precedence over tokenSecret)
-  token: ""
   # -- makefile target in the Makefile of  the repository to run during initialization phase (can be any valid bash one-liner if you want to skip the makefile targets of the repository)
   initCommand: make _dev init
 

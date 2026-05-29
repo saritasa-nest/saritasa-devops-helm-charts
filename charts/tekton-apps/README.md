@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.1](https://img.shields.io/badge/Version-2.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.1](https://img.shields.io/badge/AppVersion-v0.29.1-informational?style=flat-square)
+![Version: 2.1.10](https://img.shields.io/badge/Version-2.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -141,6 +141,9 @@ spec:
                 applicationURL: https://api.staging.site.com
                 argocd:
                   syncWave: 220
+                  labels:
+                    team: devteam
+                    any-label-name: label-value
                 tekton:
                   workspacePVC: 15Gi
                   buildpacksPVC: 25Gi
@@ -159,6 +162,9 @@ spec:
                 applicationURL: https://staging.site.com
                 argocd:
                   syncWave: 220
+                  labels:
+                    team: opsteam
+                    any-label-name: label-value
                 tekton:
                   workspacePVC: 15Gi
                   buildpacksPVC: 25Gi
@@ -230,11 +236,12 @@ spec:
     saritasa-wordpress-demo)
   - apps[PROJECT].components[NAME].pipeline - the name of the pipeline building the code from the repository above
   - apps[PROJECT].components[NAME].namespace - the name of the namespace for component. Optional parameter
+  - apps[PROJECT].components[NAME].argocd.labels - labels which are added to ArgoCD application
   - apps[PROJECT].components[NAME].argocd.source.syncWave - custom component ArgoCD application sync wave (default: "210")
   - apps[PROJECT].components[NAME].argocd.source.path - path to directory responsible for kubernetes resources creation of the ArgoCD Application (default: kubernetes repo path for basic
     projects "apps/<apps[PROJECT].components[NAME].name>/manifests/<environment>" or "null" for wordpress projects)
   - apps[PROJECT].components[NAME].argocd.source.repoUrl - url of repository which should be used for ArgoCD Application (default: kubernetes repo for basic projects
-    "<apps[PROJECT].kubernetesRepository.url>" or `https://charts.bitnami.com/bitnami` for wordpress projects)
+    "<apps[PROJECT].kubernetesRepository.url>" or `https://registry-1.docker.io/bitnamicharts` for wordpress projects)
   - apps[PROJECT].components[NAME].argocd.source.targetRevision - tag or branch in the repository for ArgoCD Application (default: kubernetes branch for basic projects
     "<apps[PROJECT].kubernetesRepository.branch>" or "11.0.14" for wordpress projects)
   - apps[PROJECT].components[NAME].argocd.ignoreDeploymentReplicasDiff - flag whether this exact ArgoCD application should ignore `Replicas` count differences for deployments. It may be needed for `staging` and `prod` environments which use HPA (default: false)
@@ -302,7 +309,7 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.ingress.hostname - wordpress ingress hostname (default: "<project_name>.saritasa.rocks", i.e. "taco.saritasa.rocks")
   - apps[PROJECT].components[NAME].wordpress.ingress.annotations - extra wordpress ingress annotations (default: null)
     - apps[PROJECT].components[NAME].wordpress.ingress.basicAuth - basic auth usage flag for wordpress ingress (default: null)
-  - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<compinent_name>-<env>-basic-auth",
+  - apps[PROJECT].components[NAME].wordpress.ingress.authSecret - name of kubernetes secret that should be used in ingress for basic auth, requires basicAuth flag (default: "<project_name>-<component_name>-<env>-basic-auth",
     i.e. "taco-wordpress-dev-basic-auth")
   - apps[PROJECT].components[NAME].wordpress.ingress.restrictAccessByIp - whitelist usage flag for wordpress ingress, enabled for any value except 'false' (default: null)
   - apps[PROJECT].components[NAME].wordpress.ingress.extraHosts - list of extra hosts that may be defined in ingress (default: null)
@@ -396,6 +403,10 @@ spec:
                   repository: xxx-backend
                   pipeline: buildpack
                   applicationURL: https://api.site.com
+                  argocd:
+                    labels:
+                      team: example-team
+                      any-label-name: label-value
                   eventlistener:
                     template: buildpack-backend-build-pipeline-trigger-template
                   extraBuildConfigParams: # what additional K/V pairs you want to add into the build-pipeline-config configmap
@@ -411,6 +422,10 @@ spec:
                   repository: xxx-frontend
                   pipeline: buildpack
                   applicationURL: https://site.com
+                  argocd:
+                    labels:
+                      team: example-team
+                      any-label-name: label-value
                   eventlistener:
                     enableWebhookSecret: false
                     filter: (body.ref.startsWith('refs/heads/develop') || body.ref.startsWith('refs/heads/release/'))
@@ -1272,7 +1287,7 @@ spec:
                     # In staging/prod client cluster use webhook integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
-                  - https://charts.bitnami.com/bitnami
+                  - https://registry-1.docker.io/bitnamicharts
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -1284,10 +1299,6 @@ spec:
                   repository: xxx-wordpress
                   pipeline: wordpress-build-pipeline
                   applicationURL: https://xxx.site.url
-                  argocd:
-                    ignoreDeploymentReplicasDiff: true
-                    source:
-                      targetRevision: 15.0.16
                   wordpress:
                     repository_ssh_url: git@github.com:saritasa-nest/xxx-wordpress.git
                     externalDatabase:
@@ -1356,7 +1367,7 @@ spec:
                     # In staging/prod client cluster use webhook integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
-                  - https://charts.bitnami.com/bitnami
+                  - https://registry-1.docker.io/bitnamicharts
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
               jiraURL: https://saritasa.atlassian.net/browse/xxx
@@ -1439,7 +1450,7 @@ spec:
                     # In staging/prod client cluster use webhook integration:
                     notifications.argoproj.io/subscribe.on-health-degraded.project-webhook: enabled
                 sourceRepos:
-                  - https://charts.bitnami.com/bitnami
+                  - https://registry-1.docker.io/bitnamicharts
                   - git@github.com:saritasa-nest/xxx-kubernetes-aws.git
               mailList: xxx@saritasa.com
               devopsMailList: devops+xxx@saritasa.com
@@ -1615,6 +1626,3 @@ whitelistIP: |
 | trigger.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | trigger.labels | object | `{"builder":"tekton"}` | labels to set on Triggers - for discovery by EventListener |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
-
-----------------------------------------------
-Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

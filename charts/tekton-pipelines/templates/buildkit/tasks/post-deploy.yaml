@@ -1,0 +1,6 @@
+{{ if and .Values.buildkit.enabled (.Values.buildkit).postDeployTaskSteps }}
+{{ $data := dict "namespace"  $.Release.Namespace
+                 "namePrefix" "buildkit"
+                 "pipeline" .Values.buildkit }}
+{{ include "task.postDeploy" $data }}
+{{ end }}

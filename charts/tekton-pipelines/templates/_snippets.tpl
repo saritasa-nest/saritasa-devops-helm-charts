@@ -291,6 +291,9 @@ finally:
       value: "$(params.sha)"
     - name: environment
       value: "$(params.environment)"
+  workspaces:
+    - name: source
+      workspace: source
   runAfter:
     - {{ if .sentry_enabled }} sentry-release {{ else }} deploy {{ end }}
 {{- end }}

@@ -21,6 +21,10 @@ metadata:
       {{- toYaml $project.argocd.notifications.annotations | nindent 4}}
       {{- end }}
     {{- end }}
+  {{- if ($extraApp.argocd).labels }}
+  labels:
+  {{- toYaml ($extraApp.argocd).labels | nindent 4}}
+  {{- end }}
 spec:
   destination:
     namespace: {{ include "tekton-apps.set-namespace-from-component-or-project" (dict "component" $extraApp "project" $project "component_name" "extraApp") }}

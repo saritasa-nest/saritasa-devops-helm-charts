@@ -1,8 +1,8 @@
-{{ if .Values.kaniko.enabled }}
+{{ if .Values.buildkit.enabled }}
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: kaniko-build-pipeline-trigger-template
+  name: buildkit-build-pipeline-trigger-template
   namespace: {{ .Release.Namespace }}
 spec:
   params:
@@ -30,9 +30,9 @@ spec:
       default: "."
       description: dockerfile context path
 
-    - name: kaniko_extra_args
+    - name: buildkit_extra_args
       default: ''
-      description: additional arguments to pass to 'kaniko build' (similar to 'docker build')
+      description: additional arguments to pass to 'buildctl build' (similar to 'docker build')
 
     - name: sentry_project_name
       description: name of the project in Sentry
@@ -49,7 +49,7 @@ spec:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
     metadata:
-      generateName: $(tt.params.application)-kaniko-build-pipeline-run-
+      generateName: $(tt.params.application)-buildkit-build-pipeline-run-
       labels:
         app: $(tt.params.application)
         project: $(tt.params.project)
@@ -65,8 +65,10 @@ spec:
           taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
         - pipelineTaskName: git-clone-gitops-repository
           taskServiceAccountName: $(tt.params.application)-build-pipeline-kustomize-sa
+
       pipelineRef:
-        name: kaniko-build-pipeline
+        name: buildkit-build-pipeline
+
       params:
         {{- include "pipeline.defaultTTBoundParams" (dict  "docker" true "kubernetes" true)  | nindent 8 }}
         - name: project
@@ -79,8 +81,8 @@ spec:
           value: "$(tt.params.docker_file)"
         - name: docker_context
           value: "$(tt.params.docker_context)"
-        - name: kaniko_extra_args
-          value: "$(tt.params.kaniko_extra_args)"
+        - name: buildkit_extra_args
+          value: "$(tt.params.buildkit_extra_args)"
         - name: repository_submodules
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name
