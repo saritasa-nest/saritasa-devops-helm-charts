@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-06-103
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/192)
+- Update copy-requirements step for Django pipeline
+
 ## 2026-03-16
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/188)
