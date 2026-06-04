@@ -332,10 +332,10 @@ buildpacks:
               echo "'uv.lock' is found, preparing requirements.txt"
               if [[ "$(params.environment)" == "dev" ]]; then
                 echo "Export with 'dev' targets dependencies"
-                uv export --format requirements-txt --all-groups --output-file requirements.txt
+                uv export --format requirements-txt --group dev --output-file requirements.txt
                 exit 0
               fi
-              uv export --format requirements-txt --no-dev --output-file requirements.txt
+              uv export --format requirements-txt --output-file requirements.txt
               exit 0
             fi
 
