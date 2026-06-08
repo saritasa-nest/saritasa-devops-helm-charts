@@ -162,10 +162,10 @@ exporter:
             annotations:
               tags: prometheus,kubernetes,eol
               summary: |
-                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 30d`}}
+                {{End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 30d}}
               summary_group: EKS EOL less than 30d
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}
           - alert: EndOfLifeEks10days
             expr: |
               sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
@@ -181,10 +181,10 @@ exporter:
             annotations:
               tags: prometheus,kubernetes,eol
               summary: |
-                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 10 days`}}
+                {{End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 10 days}}
               summary_group: EKS EOL less than 10days
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}
           - alert: EndOfLifeEks1day
             expr: |
               sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
@@ -200,10 +200,10 @@ exporter:
             annotations:
               tags: prometheus,kubernetes,eol
               summary: |
-                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 1 day`}}
+                {{End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 1 day}}
               summary_group: EKS EOL less than 1 day
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is about to end. Consider making an upgrade`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is about to end. Consider making an upgrade}}
           - alert: EndOfLifeEksReached
             expr: endoflife_expired{name="eks"} == 1
             for: 2h
@@ -214,10 +214,10 @@ exporter:
             annotations:
               tags: prometheus,kubernetes,eol
               summary: |
-                {{`Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support`}}
+                {{Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support}}
               summary_group: EKS EOL reached
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended. Version has entered in AWS extended support with a cost increase`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended. Version has entered in AWS extended support with a cost increase}}
           - alert: EndOfLifeExpiration90days
             expr: |
               sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
@@ -233,10 +233,10 @@ exporter:
             annotations:
               tags: prometheus,eol
               summary: |
-                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 90 days`}}
+                {{End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 90 days}}
               summary_group: Multiple components will become EOL in less than 90 days
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}
           - alert: EndOfLifeExpiration30days
             expr: |
               sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
@@ -252,10 +252,10 @@ exporter:
             annotations:
               tags: prometheus,eol
               summary: |
-                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 30 days`}}
+                {{End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 30 days}}
               summary_group: Multiple components will become EOL in less than 30 days
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}
           - alert: EndOfLifeExpiration1day
             expr: |
               sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (
@@ -271,10 +271,10 @@ exporter:
             annotations:
               tags: prometheus,eol
               summary: |
-                {{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 1 day`}}
+                {{End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 1 day}}
               summary_group: Multiple components will become EOL in less than 1 day
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}
           - alert: EndOfLifeExpirationReached
             expr: endoflife_expired{name!="eks"} == 1
             for: 2h
@@ -285,10 +285,10 @@ exporter:
             annotations:
               tags: prometheus,eol
               summary: |
-                {{`Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support`}}
+                {{Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support}}
               summary_group: Multiple components EOL reached
               description: |
-                {{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended`}}
+                {{Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended}}
           - alert: EndOfLifeFailedConfigs
             expr: endoflife_failed_configs == 1
             for: 2h
@@ -299,10 +299,10 @@ exporter:
             annotations:
               tags: prometheus,eol
               summary: |
-                {{`Product *{{ $labels.name }}* *{{ $labels.version }}* failed to be fetched`}}
+                {{Product *{{ $labels.name }}* *{{ $labels.version }}* failed to be fetched}}
               summary_group: Multiple components failed to be fetched
               description: |
-                {{`There was an error fetching the product *{{ $labels.name }}* version *{{ $labels.version }}*. Please check that the version exists and the product is correctly typed`}}
+                {{There was an error fetching the product *{{ $labels.name }}* version *{{ $labels.version }}*. Please check that the version exists and the product is correctly typed}}
   pdb:
     enabled: false
     minAvailable: 1

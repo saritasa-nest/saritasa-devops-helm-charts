@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 1.0.4](https://img.shields.io/badge/Version-1.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
+![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -227,8 +227,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.enabled | bool | `false` |  |
 | exporter.prometheusRule.groups[0].name | string | `"eol.alerts"` |  |
 | exporter.prometheusRule.groups[0].rules[0].alert | string | `"EndOfLifeEks30days"` |  |
-| exporter.prometheusRule.groups[0].rules[0].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[0].annotations.summary | string | `"{{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 30d`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[0].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[0].annotations.summary | string | `"{{End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 30d}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[0].annotations.summary_group | string | `"EKS EOL less than 30d"` |  |
 | exporter.prometheusRule.groups[0].rules[0].annotations.tags | string | `"prometheus,kubernetes,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[0].expr | string | `"sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (\n  (endoflife_expiration_timestamp_seconds{product=\"eks\"} - time())\n  >= ((60 * 60 * 24) * 10)\n  and (endoflife_expiration_timestamp_seconds{product=\"eks\"} - time()) <= ((60 * 60 * 24) * 30)\n)\n"` |  |
@@ -237,8 +237,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[0].labels.priority | string | `"P3"` |  |
 | exporter.prometheusRule.groups[0].rules[0].labels.severity | string | `"warning"` |  |
 | exporter.prometheusRule.groups[0].rules[1].alert | string | `"EndOfLifeEks10days"` |  |
-| exporter.prometheusRule.groups[0].rules[1].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[1].annotations.summary | string | `"{{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 10 days`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[1].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[1].annotations.summary | string | `"{{End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 10 days}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[1].annotations.summary_group | string | `"EKS EOL less than 10days"` |  |
 | exporter.prometheusRule.groups[0].rules[1].annotations.tags | string | `"prometheus,kubernetes,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[1].expr | string | `"sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (\n  (endoflife_expiration_timestamp_seconds{product=\"eks\"} - time())\n  >= (60 * 60 * 24)\n  and (endoflife_expiration_timestamp_seconds{product=\"eks\"} - time()) <= ((60 * 60 * 24) * 10)\n)\n"` |  |
@@ -247,8 +247,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[1].labels.priority | string | `"P2"` |  |
 | exporter.prometheusRule.groups[0].rules[1].labels.severity | string | `"critical"` |  |
 | exporter.prometheusRule.groups[0].rules[2].alert | string | `"EndOfLifeEks1day"` |  |
-| exporter.prometheusRule.groups[0].rules[2].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is about to end. Consider making an upgrade`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[2].annotations.summary | string | `"{{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 1 day`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[2].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is about to end. Consider making an upgrade}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[2].annotations.summary | string | `"{{End of life of *{{ $labels.name }}* *{{ $labels.version }}* is less than 1 day}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[2].annotations.summary_group | string | `"EKS EOL less than 1 day"` |  |
 | exporter.prometheusRule.groups[0].rules[2].annotations.tags | string | `"prometheus,kubernetes,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[2].expr | string | `"sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (\n  (endoflife_expiration_timestamp_seconds{product=\"eks\"} - time())\n  > 0\n  and (endoflife_expiration_timestamp_seconds{product=\"eks\"} - time()) <= (60 * 60 * 24)\n)\n"` |  |
@@ -257,8 +257,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[2].labels.priority | string | `"P1"` |  |
 | exporter.prometheusRule.groups[0].rules[2].labels.severity | string | `"critical"` |  |
 | exporter.prometheusRule.groups[0].rules[3].alert | string | `"EndOfLifeEksReached"` |  |
-| exporter.prometheusRule.groups[0].rules[3].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended. Version has entered in AWS extended support with a cost increase`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[3].annotations.summary | string | `"{{`Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[3].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended. Version has entered in AWS extended support with a cost increase}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[3].annotations.summary | string | `"{{Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[3].annotations.summary_group | string | `"EKS EOL reached"` |  |
 | exporter.prometheusRule.groups[0].rules[3].annotations.tags | string | `"prometheus,kubernetes,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[3].expr | string | `"endoflife_expired{name=\"eks\"} == 1"` |  |
@@ -267,8 +267,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[3].labels.priority | string | `"P1"` |  |
 | exporter.prometheusRule.groups[0].rules[3].labels.severity | string | `"critical"` |  |
 | exporter.prometheusRule.groups[0].rules[4].alert | string | `"EndOfLifeExpiration90days"` |  |
-| exporter.prometheusRule.groups[0].rules[4].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[4].annotations.summary | string | `"{{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 90 days`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[4].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[4].annotations.summary | string | `"{{End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 90 days}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[4].annotations.summary_group | string | `"Multiple components will become EOL in less than 90 days"` |  |
 | exporter.prometheusRule.groups[0].rules[4].annotations.tags | string | `"prometheus,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[4].expr | string | `"sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (\n  (endoflife_expiration_timestamp_seconds{product!=\"eks\"} - time())\n  >= ((60 * 60 * 24) * 30)\n  and (endoflife_expiration_timestamp_seconds{product!=\"eks\"} - time()) <= ((60 * 60 * 24) * 90)\n)\n"` |  |
@@ -277,8 +277,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[4].labels.priority | string | `"P3"` |  |
 | exporter.prometheusRule.groups[0].rules[4].labels.severity | string | `"warning"` |  |
 | exporter.prometheusRule.groups[0].rules[5].alert | string | `"EndOfLifeExpiration30days"` |  |
-| exporter.prometheusRule.groups[0].rules[5].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[5].annotations.summary | string | `"{{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 30 days`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[5].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[5].annotations.summary | string | `"{{End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 30 days}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[5].annotations.summary_group | string | `"Multiple components will become EOL in less than 30 days"` |  |
 | exporter.prometheusRule.groups[0].rules[5].annotations.tags | string | `"prometheus,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[5].expr | string | `"sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (\n  (endoflife_expiration_timestamp_seconds{product!=\"eks\"} - time())\n  >= (60 * 60 * 24)\n  and (endoflife_expiration_timestamp_seconds{product!=\"eks\"} - time()) <= ((60 * 60 * 24) * 30)\n)\n"` |  |
@@ -287,8 +287,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[5].labels.priority | string | `"P2"` |  |
 | exporter.prometheusRule.groups[0].rules[5].labels.severity | string | `"warning"` |  |
 | exporter.prometheusRule.groups[0].rules[6].alert | string | `"EndOfLifeExpiration1day"` |  |
-| exporter.prometheusRule.groups[0].rules[6].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[6].annotations.summary | string | `"{{`End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 1 day`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[6].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[6].annotations.summary | string | `"{{End of life of *{{ $labels.name }}* *{{ $labels.version }}* in less than 1 day}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[6].annotations.summary_group | string | `"Multiple components will become EOL in less than 1 day"` |  |
 | exporter.prometheusRule.groups[0].rules[6].annotations.tags | string | `"prometheus,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[6].expr | string | `"sum without (latestMinor, latestMinorReleaseDate, latestMajor, latestMajorReleaseDate) (\n  (endoflife_expiration_timestamp_seconds{product!=\"eks\"} - time())\n  > 0\n  and (endoflife_expiration_timestamp_seconds{product!=\"eks\"} - time()) <= (60 * 60 * 24)\n)\n"` |  |
@@ -297,8 +297,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[6].labels.priority | string | `"P1"` |  |
 | exporter.prometheusRule.groups[0].rules[6].labels.severity | string | `"critical"` |  |
 | exporter.prometheusRule.groups[0].rules[7].alert | string | `"EndOfLifeExpirationReached"` |  |
-| exporter.prometheusRule.groups[0].rules[7].annotations.description | string | `"{{`Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[7].annotations.summary | string | `"{{`Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[7].annotations.description | string | `"{{Support for *{{ $labels.name }}* version *{{ $labels.version }}* has ended}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[7].annotations.summary | string | `"{{Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[7].annotations.summary_group | string | `"Multiple components EOL reached"` |  |
 | exporter.prometheusRule.groups[0].rules[7].annotations.tags | string | `"prometheus,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[7].expr | string | `"endoflife_expired{name!=\"eks\"} == 1"` |  |
@@ -307,8 +307,8 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[7].labels.priority | string | `"P1"` |  |
 | exporter.prometheusRule.groups[0].rules[7].labels.severity | string | `"critical"` |  |
 | exporter.prometheusRule.groups[0].rules[8].alert | string | `"EndOfLifeFailedConfigs"` |  |
-| exporter.prometheusRule.groups[0].rules[8].annotations.description | string | `"{{`There was an error fetching the product *{{ $labels.name }}* version *{{ $labels.version }}*. Please check that the version exists and the product is correctly typed`}}\n"` |  |
-| exporter.prometheusRule.groups[0].rules[8].annotations.summary | string | `"{{`Product *{{ $labels.name }}* *{{ $labels.version }}* failed to be fetched`}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[8].annotations.description | string | `"{{There was an error fetching the product *{{ $labels.name }}* version *{{ $labels.version }}*. Please check that the version exists and the product is correctly typed}}\n"` |  |
+| exporter.prometheusRule.groups[0].rules[8].annotations.summary | string | `"{{Product *{{ $labels.name }}* *{{ $labels.version }}* failed to be fetched}}\n"` |  |
 | exporter.prometheusRule.groups[0].rules[8].annotations.summary_group | string | `"Multiple components failed to be fetched"` |  |
 | exporter.prometheusRule.groups[0].rules[8].annotations.tags | string | `"prometheus,eol"` |  |
 | exporter.prometheusRule.groups[0].rules[8].expr | string | `"endoflife_failed_configs == 1"` |  |
