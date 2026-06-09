@@ -128,6 +128,8 @@
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/168)
 - Update default repository for wordpress to `bitnamilegacy/wordpress`
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/167)
+- Added secret to terraform-pod for delmar rds instance
 
 ## 2025-08-28
 
