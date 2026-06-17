@@ -205,7 +205,7 @@ exporter:
               description: |
                 Support for *{{ $labels.name }}* version *{{ $labels.version }}* is about to end. Consider making an upgrade
           - alert: EndOfLifeEksReached
-            expr: endoflife_expired{name="eks"} == 1
+            expr: endoflife_expired{product="eks"} == 1
             for: 2h
             labels:
               severity: critical
@@ -276,7 +276,7 @@ exporter:
               description: |
                 Support for *{{ $labels.name }}* version *{{ $labels.version }}* is near the end of life. Consider making an upgrade
           - alert: EndOfLifeExpirationReached
-            expr: endoflife_expired{name!="eks"} == 1
+            expr: endoflife_expired{product!="eks"} == 1
             for: 2h
             labels:
               severity: critical

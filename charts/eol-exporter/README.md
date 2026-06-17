@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 1.0.5](https://img.shields.io/badge/Version-1.0.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
+![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -261,7 +261,7 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[3].annotations.summary | string | `"Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support\n"` |  |
 | exporter.prometheusRule.groups[0].rules[3].annotations.summary_group | string | `"EKS EOL reached"` |  |
 | exporter.prometheusRule.groups[0].rules[3].annotations.tags | string | `"prometheus,kubernetes,eol"` |  |
-| exporter.prometheusRule.groups[0].rules[3].expr | string | `"endoflife_expired{name=\"eks\"} == 1"` |  |
+| exporter.prometheusRule.groups[0].rules[3].expr | string | `"endoflife_expired{product=\"eks\"} == 1"` |  |
 | exporter.prometheusRule.groups[0].rules[3].for | string | `"2h"` |  |
 | exporter.prometheusRule.groups[0].rules[3].labels.eol | string | `"true"` |  |
 | exporter.prometheusRule.groups[0].rules[3].labels.priority | string | `"P1"` |  |
@@ -301,7 +301,7 @@ endoflife_failed_configs{} == 1
 | exporter.prometheusRule.groups[0].rules[7].annotations.summary | string | `"Product *{{ $labels.name }}* *{{ $labels.version }}* is out of support\n"` |  |
 | exporter.prometheusRule.groups[0].rules[7].annotations.summary_group | string | `"Multiple components EOL reached"` |  |
 | exporter.prometheusRule.groups[0].rules[7].annotations.tags | string | `"prometheus,eol"` |  |
-| exporter.prometheusRule.groups[0].rules[7].expr | string | `"endoflife_expired{name!=\"eks\"} == 1"` |  |
+| exporter.prometheusRule.groups[0].rules[7].expr | string | `"endoflife_expired{product!=\"eks\"} == 1"` |  |
 | exporter.prometheusRule.groups[0].rules[7].for | string | `"2h"` |  |
 | exporter.prometheusRule.groups[0].rules[7].labels.eol | string | `"true"` |  |
 | exporter.prometheusRule.groups[0].rules[7].labels.priority | string | `"P1"` |  |
