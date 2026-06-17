@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-06-08
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/193)
+- Fix `eol-exporter` PrometheusRule annotation templating (drop stray Helm escape that broke Prometheus label substitution)
+
 ## 2026-06-103
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/192)
