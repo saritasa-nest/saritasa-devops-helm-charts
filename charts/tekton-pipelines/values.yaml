@@ -336,7 +336,7 @@ buildpacks:
               key="${env_pair%%=*}"
               value="${env_pair#*=}"
               echo "Creating ${env_dir}/${key} with the value: ${value}"
-              echo "${value}" > "${env_dir}/${key}"
+              echo -n "${value}" > "${env_dir}/${key}"
             done
         - name: copy-requirements
           image: docker.io/saritasallc/python-ci:0.0.2
