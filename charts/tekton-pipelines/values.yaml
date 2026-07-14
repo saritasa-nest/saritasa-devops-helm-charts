@@ -297,15 +297,27 @@ buildpacks:
             mkdir -p "${env_dir}"
 
             # Default values for BP environment variables
+            # If the variables are not defined in the buildpack_env_vars parameter, these values will be used
             declare -A env_vars=(
+              # paketo-buildpacks/poetry-install:
+              # configure which groups from pyproject.toml file will be installed
               ["BP_POETRY_INSTALL_ONLY"]="main"
+              # paketo-buildpacks/python-package-managers-run(uv):
+              # exit with an error if the lock file is not up-to-date with the pyproject.toml
               ["BP_UV_LOCKED"]="1"
+              # paketo-buildpacks/python-package-managers-run(uv):
+              # instruct uv to compile Python source files to bytecode after installation (to improve startup time)
               ["BP_UV_COMPILE_BYTECODE"]="1"
             )
 
             # Default values for environment-specific BP variables
+            # These values are later merged with env_vars based on the current environment, adding keys or overriding common values
             declare -A env_overrides=(
+              # paketo-buildpacks/poetry-install:
+              # configure which groups from pyproject.toml file will be installed
               ["dev|BP_POETRY_INSTALL_ONLY"]="main,dev"
+              # paketo-buildpacks/python-package-managers-run(uv):
+              # configure which groups from pyproject.toml file will be installed
               ["dev|BP_UV_INSTALL_GROUPS"]="dev"
             )
 
