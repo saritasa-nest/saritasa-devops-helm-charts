@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-15
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/194)
+- Update how the buildpack-django pipeline handles uv
+
 ## 2026-06-08
 
 [dev]
