@@ -291,29 +291,64 @@ buildpacks:
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
+
             buildpack_env_vars="$(params.buildpack_env_vars)"
             env_dir="${source_path}/${platform_dir}/env"
-            mkdir -p ${env_dir}
+            mkdir -p "${env_dir}"
 
-            # Add `BP_POETRY_INSTALL_ONLY` variable that specifies
-            # which package groups should be installed during build
-            if ! echo "${buildpack_env_vars}" | grep -q "BP_POETRY_INSTALL_ONLY"; then
-              echo "Adding BP_POETRY_INSTALL_ONLY environment variable"
-              bp_poetry_install_only="main"
-              if [[ "${environment}" == "dev" ]]; then
-                bp_poetry_install_only="${bp_poetry_install_only},dev"
+            # Default values for BP environment variables
+            # If the variables are not defined in the buildpack_env_vars parameter, these values will be used
+            declare -A env_vars=(
+              # paketo-buildpacks/poetry-install:
+              # configure which groups from pyproject.toml file will be installed
+              ["BP_POETRY_INSTALL_ONLY"]="main"
+              # paketo-buildpacks/python-package-managers-run(uv):
+              # exit with an error if the lock file is not up-to-date with the pyproject.toml
+              ["BP_UV_LOCKED"]="1"
+              # paketo-buildpacks/python-package-managers-run(uv):
+              # instruct uv to compile Python source files to bytecode after installation (to improve startup time)
+              ["BP_UV_COMPILE_BYTECODE"]="1"
+            )
+
+            # Default values for environment-specific BP variables
+            # These values are later merged with env_vars based on the current environment, adding keys or overriding common values
+            declare -A env_overrides=(
+              # paketo-buildpacks/poetry-install:
+              # configure which groups from pyproject.toml file will be installed
+              ["dev|BP_POETRY_INSTALL_ONLY"]="main,dev"
+              # paketo-buildpacks/python-package-managers-run(uv):
+              # configure which groups from pyproject.toml file will be installed
+              ["dev|BP_UV_INSTALL_GROUPS"]="dev"
+            )
+
+            # Apply environment-dependent overrides to env_vars
+            for key in "${!env_overrides[@]}"; do
+              key_environment="${key%%|*}"
+              key_name="${key#*|}"
+              if [[ "${environment}" == "${key_environment}" ]]; then
+                env_vars["${key_name}"]="${env_overrides[${key}]}"
               fi
-              buildpack_env_vars="BP_POETRY_INSTALL_ONLY=${bp_poetry_install_only};${buildpack_env_vars}"
-              echo "Added BP_POETRY_INSTALL_ONLY=${bp_poetry_install_only}"
-            fi
+            done
 
-            # parse environment variables and add them to the platform directory
-            IFS=';' read -ra env_vars <<< "${buildpack_env_vars}"
-            for env_var in "${env_vars[@]}"; do
-              key=$(echo ${env_var} | cut -d'=' -f1)
-              value=$(echo ${env_var} | cut -d'=' -f2-)
-              echo "Creating ${env_dir}/${key} with value: ${value}"
-              echo "$value" > "${env_dir}/${key}"
+            # If the variables from env_vars are not defined in buildpack_env_vars,
+            # add them with the default values specified above
+            for env_var in "${!env_vars[@]}"; do
+              if [[ ";${buildpack_env_vars}" == *";${env_var}="* ]]; then
+                echo "[!] Variable ${env_var} is set explicitly, ignoring defaults"
+                continue
+              fi
+              default_value="${env_vars[${env_var}]}"
+              buildpack_env_vars="${env_var}=${default_value}${buildpack_env_vars:+;${buildpack_env_vars}}"
+            done
+
+            # Parse buildpack_env_vars to add them to the platform directory
+            # https://github.com/buildpacks/spec/blob/b745fcfd90d7139d6a04cca2878b47ec402be943/platform.md#user-provided-variables
+            IFS=';' read -ra env_pairs <<< "${buildpack_env_vars}"
+            for env_pair in "${env_pairs[@]}"; do
+              key="${env_pair%%=*}"
+              value="${env_pair#*=}"
+              echo "Creating ${env_dir}/${key} with the value: ${value}"
+              echo -n "${value}" > "${env_dir}/${key}"
             done
         - name: copy-requirements
           image: docker.io/saritasallc/python-ci:0.0.2
@@ -323,21 +358,6 @@ buildpacks:
           script: |
             #!/usr/bin/env bash
             set -eo pipefail
-
-            if [[ -f uv.lock ]]; then
-              if [[ ! $(command -v uv) ]]; then
-                echo "uv is not installed or not in PATH. Halting execution."
-                exit 1
-              fi
-              echo "'uv.lock' is found, preparing requirements.txt"
-              if [[ "$(params.environment)" == "dev" ]]; then
-                echo "Export with 'dev' targets dependencies"
-                uv export --format requirements-txt --group dev --output-file requirements.txt
-                exit 0
-              fi
-              uv export --format requirements-txt --output-file requirements.txt
-              exit 0
-            fi
 
             if ls requirements/$(params.environment)*.txt >/dev/null 2>&1; then
               echo "'requirements' folder is found, preparing requirements.txt"
