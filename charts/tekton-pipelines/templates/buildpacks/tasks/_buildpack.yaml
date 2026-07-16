@@ -44,7 +44,7 @@ spec:
         useful for injecting sensitive values (e.g. NPM_REGISTRY_GITHUB_TOKEN)
         without embedding encrypted blobs into the central pipelines values.
         the secret is referenced with optional=true, so a missing secret does not
-        break the pipeline run — this keeps the param safely defaulted for projects
+        break the pipeline run. This keeps the param safely defaulted for projects
         that don't need it.
       default: "buildpack-env-vars-not-set"
 
