@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-22
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/196)
+- Add Git LFS support to git-clone
+
 ## 2026-07-15
 
 [dev]

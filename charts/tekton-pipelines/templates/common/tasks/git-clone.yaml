@@ -233,6 +233,25 @@ spec:
           -depth="${PARAM_DEPTH}" \
           -sparseCheckoutDirectories="${PARAM_SPARSE_CHECKOUT_DIRECTORIES}"
         cd "${CHECKOUT_DIR}"
+
+        lfs_issue=""
+        lfs_files=""
+        if ! command -v git-lfs > /dev/null 2>&1; then
+          lfs_issue="git-lfs is not available"
+        elif ! lfs_files="$(git lfs ls-files --name-only)"; then
+          lfs_issue="failed to inspect Git LFS state"
+        elif [ -z "${lfs_files}" ]; then
+          lfs_issue="Git LFS is not used in the current revision"
+        fi
+
+        if [ -z "${lfs_issue}" ]; then
+          git lfs install --local
+          git lfs pull
+          echo "Git LFS files pull completed"
+        else
+          echo "${lfs_issue}, skipping LFS files pull"
+        fi
+
         RESULT_SHA="$(git rev-parse HEAD)"
         EXIT_CODE="$?"
         if [ "${EXIT_CODE}" != 0 ] ; then
