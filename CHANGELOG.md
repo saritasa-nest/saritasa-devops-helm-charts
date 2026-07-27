@@ -6,6 +6,8 @@
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/194)
 - Update how the buildpack-django pipeline handles uv
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/195)
+- Update update-frontend-pipeline
 
 ## 2026-06-08
 

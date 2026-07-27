@@ -55,6 +55,16 @@ spec:
         expected string format: 'BP_POETRY_INSTALL_ONLY=main,dev;BP_OCI_VENDOR=saritasa'
       default: ""
 
+    - name: buildpack_env_vars_secret
+      type: string
+      description: |-
+        optional name of a Kubernetes Secret in the pipeline namespace whose keys
+        are exposed as env vars in the build task via envFrom (optional: true).
+        allows sourcing sensitive build-time env vars from a project-owned Secret
+        (e.g. materialized by ExternalSecret) instead of encoding them into this
+        central pipelines chart values.
+      default: "buildpack-env-vars-not-set"
+
     - name: source_subpath
       type: string
       description: a subpath within the `source` input where the source to build is located.
@@ -187,6 +197,8 @@ spec:
           value: "$(params.buildpack_runner_image)"
         - name: buildpack_env_vars
           value: "$(params.buildpack_env_vars)"
+        - name: buildpack_env_vars_secret
+          value: "$(params.buildpack_env_vars_secret)"
         - name: docker_registry
           value: $(params.docker_registry)
         - name: cache
