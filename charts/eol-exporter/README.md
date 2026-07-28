@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 1.0.7-dev.1](https://img.shields.io/badge/Version-1.0.7--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
+![Version: 1.0.7-dev.2](https://img.shields.io/badge/Version-1.0.7--dev.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -16,8 +16,16 @@ You must supply a valid configmap with a list of products with its versions:
 # https://endoflife.date/api/{product}.json
 eks:
   product: eks
-  version: '1.30'
+  version: dynamic
   comment: EKS
+postgres:
+  product: postgresql
+  version: dynamic
+  comment: database
+redis:
+  product: amazon-elasticache-redis
+  version: dynamic
+  comment: cache
 django:
   product: django
   version: '5.1'
@@ -36,6 +44,17 @@ python-allstar-elevator-we:
   product: python
   version: '3.11'
   dockerfile: https://github.com/saritasa-nest/allstar-elevator-we-backend/blob/develop/Dockerfile
+
+services:
+  - aws/eks
+  - aws/rds
+  - aws/elasticache
+regions:
+  - us-west-2
+searchByTag:
+  Environment: prod
+exclude:
+  - '-test$'
 ```
 
 Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
@@ -51,6 +70,10 @@ Optionally, you can add any extra field and it will be added as a label in the m
 Exporter now supports dynamically fetching current version of products for:
 - AWS RDS
 - AWS EKS
+- AWS ElastiCache
+
+Dynamic AWS discovery supports `aws/eks`, `aws/rds`, and `aws/elasticache`
+services with optional `regions`, `searchByTag`, and `exclude` top-level keys.
 
 If you are using any of the these products, then remember to enable the Service account and attach a role with the following permissions:
 
@@ -72,7 +95,10 @@ IAM permissions:
             "Effect": "Allow",
             "Action": [
                 "rds:DescribeDBInstances",
-                "eks:DescribeCluster"
+                "eks:DescribeCluster",
+                "elasticache:DescribeCacheClusters",
+                "elasticache:DescribeReplicationGroups",
+                "tag:GetResources"
             ],
             "Resource": "*"
         }
@@ -212,7 +238,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.strategy.type | string | `"RollingUpdate"` |  |
 | exporter.deployment.tolerations | list | `[]` |  |
 | exporter.deployment.topologySpreadConstraints | object | `{}` |  |
-| exporter.deployment.volumeMounts.config.mountPath | string | `"/workspace/app/config.yaml"` |  |
+| exporter.deployment.volumeMounts.config.mountPath | string | `"/app/config.yaml"` |  |
 | exporter.deployment.volumeMounts.config.subPath | string | `"config.yaml"` |  |
 | exporter.deployment.volumes.config.configMap.name | string | `"eol-exporter-config"` |  |
 | exporter.enabled | bool | `true` |  |

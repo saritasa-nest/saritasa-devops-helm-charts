@@ -41,7 +41,7 @@ exporter:
         protocol: TCP
     volumeMounts:
       config:
-        mountPath: /workspace/app/config.yaml
+        mountPath: /app/config.yaml
         subPath: config.yaml
     volumes:
       config:

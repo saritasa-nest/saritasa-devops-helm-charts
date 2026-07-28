@@ -14,8 +14,16 @@ description: |
   # https://endoflife.date/api/{product}.json
   eks:
     product: eks
-    version: '1.30'
+    version: dynamic
     comment: EKS
+  postgres:
+    product: postgresql
+    version: dynamic
+    comment: database
+  redis:
+    product: amazon-elasticache-redis
+    version: dynamic
+    comment: cache
   django:
     product: django
     version: '5.1'
@@ -34,6 +42,17 @@ description: |
     product: python
     version: '3.11'
     dockerfile: https://github.com/saritasa-nest/allstar-elevator-we-backend/blob/develop/Dockerfile
+
+  services:
+    - aws/eks
+    - aws/rds
+    - aws/elasticache
+  regions:
+    - us-west-2
+  searchByTag:
+    Environment: prod
+  exclude:
+    - '-test$'
   ```
 
   Check https://github.com/saritasa-nest/saritasa-devops-tools-eol-exporter/blob/main/config.yaml.example
@@ -49,6 +68,10 @@ description: |
   Exporter now supports dynamically fetching current version of products for:
   - AWS RDS
   - AWS EKS
+  - AWS ElastiCache
+
+  Dynamic AWS discovery supports `aws/eks`, `aws/rds`, and `aws/elasticache`
+  services with optional `regions`, `searchByTag`, and `exclude` top-level keys.
 
   If you are using any of the these products, then remember to enable the Service account and attach a role with the following permissions:
 
@@ -70,7 +93,10 @@ description: |
               "Effect": "Allow",
               "Action": [
                   "rds:DescribeDBInstances",
-                  "eks:DescribeCluster"
+                  "eks:DescribeCluster",
+                  "elasticache:DescribeCacheClusters",
+                  "elasticache:DescribeReplicationGroups",
+                  "tag:GetResources"
               ],
               "Resource": "*"
           }
@@ -138,7 +164,7 @@ type: application
 
 # The chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 1.0.7-dev.1
+version: 1.0.7-dev.2
 appVersion: 1.2.0
 
 dependencies:
