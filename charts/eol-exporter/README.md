@@ -1,7 +1,7 @@
 
 # eol-prometheus-exporter
 
-![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.1](https://img.shields.io/badge/AppVersion-1.1.1-informational?style=flat-square)
+![Version: 1.0.7-dev.1](https://img.shields.io/badge/Version-1.0.7--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 End of life prometheus exporter.
 
@@ -148,9 +148,6 @@ endoflife_failed_configs{} == 1
 | exporter.applicationName | string | `"eol-exporter"` |  |
 | exporter.configMap | object | `{}` |  |
 | exporter.deployment.additionalLabels | object | `{}` |  |
-| exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"kubernetes.io/arch"` |  |
-| exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
-| exporter.deployment.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"amd64"` |  |
 | exporter.deployment.args | list | `[]` |  |
 | exporter.deployment.command | string | `""` |  |
 | exporter.deployment.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
@@ -169,7 +166,7 @@ endoflife_failed_configs{} == 1
 | exporter.deployment.image.digest | string | `""` |  |
 | exporter.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | exporter.deployment.image.repository | string | `"saritasallc/eol-exporter"` |  |
-| exporter.deployment.image.tag | string | `"1.1.1"` |  |
+| exporter.deployment.image.tag | string | `"1.2.0"` |  |
 | exporter.deployment.initContainers | list | `[]` |  |
 | exporter.deployment.livenessProbe.enabled | bool | `true` |  |
 | exporter.deployment.livenessProbe.exec | object | `{}` |  |
