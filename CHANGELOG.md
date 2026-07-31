@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-31
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/197)
+- Update EOL chart to 1.0.7
+- Update EOL app to 1.2.0 with ARM64 and dynamic discovery
+
 ## 2026-07-22
 
 [dev]
