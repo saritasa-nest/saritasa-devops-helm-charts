@@ -279,7 +279,7 @@ spec:
           {{- if .extraPaths }}
           extraPaths:
           {{- toYaml .extraPaths | nindent 12 }}
-          {{- end }}          
+          {{- end }}
           path: {{ .path | default "/" | quote }}
           pathType: {{ .pathType | default "ImplementationSpecific" | quote }}
           {{- if .extraRules }}
@@ -294,7 +294,7 @@ spec:
           {{- if .extraTls }}
           extraTls:
           {{- toYaml .extraTls | nindent 12 }}
-          {{- end }}          
+          {{- end }}
         {{- end }}
 
         {{- if .persistence }}

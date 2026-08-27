@@ -171,6 +171,18 @@ spec:
       securityContext:
         privileged: true
 
+    - name: generate-git-hash
+      image: {{ .images.git }}
+      imagePullPolicy: {{ .imagePullPolicy }}
+      resources: {}
+      workingDir: $(workspaces.app.path)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        git config --local --add safe.directory $(workspaces.app.path)
+        git rev-parse --short HEAD > .git_hash
+        echo "Generated .git_hash: $(cat .git_hash)"
+
     # insert customized steps as defined in the values.yaml of the helm chart
     {{- if .pipeline.buildTaskSteps }}
     {{- .pipeline.buildTaskSteps | toYaml | nindent 4}}
