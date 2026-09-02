@@ -58,6 +58,17 @@ spec:
           name: $(params.application)-build-pipeline-config # project specific values
 
   steps:
+    - name: generate-git-hash
+      image: {{ .Values.images.git }}
+      imagePullPolicy: {{ .Values.imagePullPolicy }}
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env sh
+        set -e
+        git config --global --add safe.directory $(workspaces.source.path)
+        git rev-parse --short HEAD > .git_hash
+        echo "Generated .git_hash: $(cat .git_hash)"
+
     # Buildkit can't push to AWS ECR with AWS IRSA only, it needs docker-like credentials
     # https://github.com/moby/buildkit/issues/3947
     # Docker credentials file is created in manual way to avoid creating custom Docker image
