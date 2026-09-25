@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25
+
+[dev]
+
+- Add per-pipeline `imagePullPolicy` override for buildpack pipelines
+
 ## 2026-07-31
 
 [dev]

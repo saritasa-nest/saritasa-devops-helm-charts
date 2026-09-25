@@ -1,9 +1,10 @@
 {{- range $pipeline := .Values.buildpacks.generate }}
+{{- $imagePullPolicy := coalesce $pipeline.imagePullPolicy $.Values.imagePullPolicy }}
 {{$data := dict "pipeline"        $pipeline
                 "namespace"       $.Release.Namespace
                 "cnbPlatformAPI"  $.Values.buildpacks.cnbPlatformAPI
                 "images"          $.Values.images
-                "imagePullPolicy" $.Values.imagePullPolicy }}
+                "imagePullPolicy" $imagePullPolicy }}
 {{ if and $.Values.buildpacks.enabled $pipeline.enabled }}
 {{ include "task.buildpack" $data }}
 {{ end }}
