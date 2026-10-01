@@ -50,6 +50,9 @@ spec:
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "sentry_project_name" "default" (printf "%s-%s" $project.project $component.name) ) | nindent 2 }}
   {{- include "tekton-apps.get-triggerbinding-value-or-default" (dict "triggerBinding" $component.triggerBinding "name" "add_tag_latest" "default" "'false'" ) | nindent 2 }}
 
+  - name: imagePullPolicy
+    value: {{ dig "pipelineImagePullPolicy" "IfNotPresent" $component | quote }}
+
   {{- if $argocdSource }}
   # ! OLD WAY:
   # If you see this message - pls transfer kubernetes manifests into dedicated kubernetes git repo

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-25
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/201)
+- Add per-component `pipelineImagePullPolicy` override to `tekton-apps` chart
+
 ## 2026-07-31
 
 [dev]

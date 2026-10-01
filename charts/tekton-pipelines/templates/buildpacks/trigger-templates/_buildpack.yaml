@@ -85,6 +85,10 @@ spec:
       description: Timestamp of the commit that triggered the current pipeline.
       default: ""
 
+    - name: imagePullPolicy
+      description: image pull policy for task steps (Always, IfNotPresent, Never)
+      default: {{ .imagePullPolicy | default "IfNotPresent" }}
+
   resourcetemplates:
   - kind: PipelineRun
     apiVersion: tekton.dev/v1beta1
@@ -150,6 +154,8 @@ spec:
           value: "$(tt.params.terminate-concurrent-runs)"
         - name: commit_timestamp
           value: "$(tt.params.commit_timestamp)"
+        - name: imagePullPolicy
+          value: "$(tt.params.imagePullPolicy)"
 
       workspaces:
         {{- include "pipeline.defaultWorkspaces" . | nindent 8 }}
