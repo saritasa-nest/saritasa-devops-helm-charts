@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.11-dev.2](https://img.shields.io/badge/Version-2.1.11--dev.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.11-dev.3](https://img.shields.io/badge/Version-2.1.11--dev.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -257,6 +257,8 @@ spec:
   - apps[PROJECT].components[NAME].eventlistener.gitWebhookBranches[] - list of branches, push to which triggers ci/cd
   - apps[PROJECT].components[NAME].extraBuildConfigParams - additional key/values to be added into `build-pipeline-config configmap` ConfigMap associated with the app
   - apps[PROJECT].components[NAME].triggerBinding - values to be added into the TriggerBinding manifest except default ones
+  - apps[PROJECT].components[NAME].pipelineImagePullPolicy - override image pull policy (`Always`, `IfNotPresent` or `Never`) for all task steps of this component's build pipeline
+    (not required, default: IfNotPresent, i.e. the global `imagePullPolicy` from `tekton-pipelines` values)
 
   What is important to know is that any key defined in apps[PROJECT].components[NAME].triggerBinding would be added as is
   into the generated triggerbinding associated with your app. However the chart renders some default values based on the values
@@ -1193,6 +1195,79 @@ spec:
                       value: ovio-api-buildpack.yml
                     - name: project_config_filename
                       value: ovio-api-project.toml
+
+      repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      targetRevision: "0.1.16"
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true
+      syncOptions:
+        - CreateNamespace=true
+  ```
+
+  If you want to override the image pull policy for all task steps of a specific component's build pipeline, set the
+  `apps[PROJECT].components[NAME].pipelineImagePullPolicy` param (allowed values: `Always`, `IfNotPresent`, `Never`). If not set,
+  the global `imagePullPolicy` from `tekton-pipelines` values is used as default (`IfNotPresent`). Example:
+
+  ```yaml
+  apiVersion: argoproj.io/v1alpha1
+  kind: Application
+  metadata:
+    name: tekton-apps
+    namespace: argo-cd
+    finalizers:
+    - resources-finalizer.argocd.argoproj.io
+    annotations:
+      argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+      argocd.argoproj.io/sync-wave: "41"
+  spec:
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ci
+    project: default
+    source:
+      chart: saritasa-tekton-apps
+      helm:
+        values: |
+          environment: staging
+          ...
+          apps:
+            - project: xxx
+              enabled: true
+              argocd:
+                labels:
+                  created-by: xxx
+                namespace: xxx
+                notifications:
+                  annotations:
+                    notifications.argoproj.io/subscribe.on-health-degraded.slack: project-xxx; project-xxx-alarms
+              mailList: xxx@saritasa.com
+              devopsMailList: devops+xxx@saritasa.com
+              jiraURL: https://saritasa.atlassian.net/browse/xxx
+              tektonURL: https://tekton.saritasa.rocks/#/namespaces/ci/pipelineruns
+              slack: client-xxx-ci
+              kubernetesRepository:
+                name: xxx-kubernetes-aws
+                branch: main
+                url: git@github.com:saritasa-nest/xxx-kubernetes-aws.git
+
+              components:
+                - name: backend
+                  repository: xxx-backend
+                  pipeline: buildpack-django-build-pipeline
+                  applicationURL: https://xxx.site.url
+                  # override image pull policy for all task steps of this component's pipeline
+                  pipelineImagePullPolicy: Always
+                  eventlistener:
+                    template: buildpack-django-build-pipeline-trigger-template
+                  triggerBinding:
+                    - name: docker_registry_repository
+                      value: xxx.dkr.ecr.us-west-2.amazonaws.com/xxx/backend
+                    - name: buildpack_builder_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/builder:v1
+                    - name: buildpack_runner_image
+                      value: public.ecr.aws/saritasa/buildpacks/google/runner:v1
 
       repoURL: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
       targetRevision: "0.1.16"
