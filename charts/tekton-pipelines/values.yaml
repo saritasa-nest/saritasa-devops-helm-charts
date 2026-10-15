@@ -100,11 +100,12 @@ buildpacks:
               echo "Installing node.js dependencies"
               # set cache
               npm config set cache $(workspaces.app.path)/.npm --global
-              # set saritasa-nest Github Package as NPM registry
+              # Configure the GitHub Packages scope independently of authentication.
+              echo "Setting GitHub Packages NPM registry"
+              npm config set "@${NPM_REGISTRY_GITHUB_ORG:-saritasa-nest}:registry=https://npm.pkg.github.com/"
               if [[ -n "${NPM_REGISTRY_GITHUB_TOKEN:-}" ]]; then
-                echo "Setting GitHub Packages NPM registry"
-                npm config set @saritasa-nest:registry=https://npm.pkg.github.com/
-                npm config set //npm.pkg.github.com/:_authToken="${NPM_REGISTRY_GITHUB_TOKEN}"
+                echo "Setting GitHub Packages NPM authentication"
+                npm config set "//npm.pkg.github.com/:_authToken=${NPM_REGISTRY_GITHUB_TOKEN}"
               fi
               npm ci
               if [[ $? -ne 0 ]]; then
