@@ -136,6 +136,11 @@ spec:
       type: string
       description: new image for the application
 
+    - name: imagePullPolicy
+      type: string
+      description: image pull policy for task steps (Always, IfNotPresent, Never)
+      default: {{ .imagePullPolicy }}
+
   stepTemplate:
     env:
       - name: CNB_PLATFORM_API
@@ -153,7 +158,7 @@ spec:
   steps:
     - name: prepare
       image: {{ .images.bash | default "docker.io/library/bash:latest" }}
-      imagePullPolicy: {{ .imagePullPolicy }}
+      imagePullPolicy: $(params.imagePullPolicy)
       resources: {}
       script: |
           #!/usr/bin/env bash
@@ -173,7 +178,7 @@ spec:
 
     - name: generate-git-hash
       image: {{ .images.git }}
-      imagePullPolicy: {{ .imagePullPolicy }}
+      imagePullPolicy: $(params.imagePullPolicy)
       resources: {}
       workingDir: $(workspaces.app.path)
       script: |
@@ -198,7 +203,7 @@ spec:
     # k exec -ti `k --no-headers=true get pods -l tekton.dev/task=buildpack | awk '{print $1}'` -c step-create bash
     - name: build
       image: $(params.builder_image)
-      imagePullPolicy: {{ .imagePullPolicy }}
+      imagePullPolicy: $(params.imagePullPolicy)
       resources: {}
       workingDir: $(workspaces.app.path)
       script: |
