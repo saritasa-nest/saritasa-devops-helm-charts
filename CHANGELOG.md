@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-14
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/202)
+- Update Tekton pipelines chart to 2.2.26
+- Add `NPM_REGISTRY_GITHUB_ORG` to configure the frontend GitHub Packages scope, defaulting to `saritasa-nest` for existing token-only builds
+- Configure the GitHub Packages scope independently of `NPM_REGISTRY_GITHUB_TOKEN` authentication
+
 ## 2026-09-25
 
 [dev]

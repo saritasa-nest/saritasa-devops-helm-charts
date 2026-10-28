@@ -31,7 +31,7 @@ saritasa-tekton-pipelines
 
 ## `chart.version`
 
-![Version: 2.2.25](https://img.shields.io/badge/Version-2.2.25-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.2.26](https://img.shields.io/badge/Version-2.2.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 ## Maintainers
 
@@ -209,6 +209,23 @@ sentry:
 ```
 
 After configuring these values, you will have an extra `sentry-release` step after `argocd-deploy` one for buildpacks and kaniko builds.
+
+## Frontend private NPM registry
+
+The frontend build step configures the GitHub Packages scope and authentication
+independently. Set these variables through `buildpack_env_vars` or the Secret named
+by `buildpack_env_vars_secret`:
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `NPM_REGISTRY_GITHUB_TOKEN` | None | Token used to authenticate to the registry. |
+| `NPM_REGISTRY_GITHUB_ORG` | `saritasa-nest` | GitHub organization without the leading `@`; configures its package scope to use `https://npm.pkg.github.com/`. |
+
+For a GitHub organization, use `NPM_REGISTRY_GITHUB_ORG=my-org`.
+Keep the token in `buildpack_env_vars_secret`.
+An unset or empty organization defaults to `saritasa-nest`, preserving token-only
+builds. Scope configuration does not require a token. Authentication is skipped
+when the token is unset or empty.
 
 ## `chart.valuesTable`
 
