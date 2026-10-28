@@ -87,7 +87,6 @@ spec:
 
     - name: imagePullPolicy
       description: image pull policy for task steps (Always, IfNotPresent, Never)
-      default: {{ .imagePullPolicy | default "IfNotPresent" }}
 
   resourcetemplates:
   - kind: PipelineRun
