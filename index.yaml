@@ -197014,6 +197014,86 @@ entries:
     version: 0.1.0
   saritasa-tekton-pipelines:
   - apiVersion: v2
+    created: "2026-10-28T13:32:47.928718901Z"
+    dependencies:
+    - condition: saritasa-tekton.enabled
+      name: saritasa-tekton
+      repository: https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      version: ~2.0.x
+    description: 'A Helm chart for Tekton Pipelines  Implements: - common tekton tasks
+      - common tekton pipelines - common tekton trigger templates - common tekton
+      trigger bindings  Implemented pipelines include: - buildpack based pipelines
+      based on generator template (php, python, frontend, nodejs, ruby, go) - kaniko
+      pipeline - wordpress pipeline  ## `example usage with argocd`  Install the chart:  ```
+      helm repo add saritasa https://saritasa-nest.github.io/saritasa-devops-helm-charts/
+      ```  then if you want to support only frontend and django pipelines based on
+      buildpack without any script modifications:  ```yaml apiVersion: argoproj.io/v1alpha1
+      kind: Application metadata:   name: tekton-pipelines   namespace: argo-cd   finalizers:   -
+      resources-finalizer.argocd.argoproj.io   annotations:     argocd.argoproj.io/sync-options:
+      SkipDryRunOnMissingResource=true     argocd.argoproj.io/sync-wave: "60" spec:   destination:     server:
+      https://kubernetes.default.svc     namespace: ci   project: default   source:     chart:
+      saritasa-tekton-pipelines     helm:       values: |         buildpacks:           enabled:
+      true           generate:             buildpackFrontendBuildPipeline:               enabled:
+      true              buildpackDjangoBuildPipeline:               enabled: true      repoURL:
+      https://saritasa-nest.github.io/saritasa-devops-helm-charts/     targetRevision:
+      "0.1.4"   syncPolicy:     automated:       prune: true       selfHeal: true     syncOptions:       -
+      CreateNamespace=true ```  If you want to modify the behavior of the build step
+      you can easily do that by redefining steps you want to run prior to running
+      the `build` step of the associated buildpack pipeline. You can create multiple
+      versions of pipelines as a result. Just make sure to give them a different name  an
+      example:  ```yaml buildpacks:   enabled: true   generate:     buildpackFrontendBuildPipelineNew:       name:
+      buildpack-frontend-build-pipeline-new       enabled: false       buildTaskName:
+      buildpack-frontend-new       buildTaskSteps:         - name: build-hello-world           image:
+      node:22           imagePullPolicy: IfNotPresent           workingDir: $(workspaces.source.path)           script:
+      |             #!/bin/bash             echo "hello world"       preDeployTaskSteps:         -
+      name: pre-deploy-hello-world           image: node:22           imagePullPolicy:
+      IfNotPresent           workingDir: $(workspaces.source.path)           script:
+      |             #!/bin/bash             echo "hello world"       postDeployTaskSteps:         -
+      name: post-deploy-hello-world           image: node:22           imagePullPolicy:
+      IfNotPresent           workingDir: $(workspaces.source.path)           script:
+      |             #!/bin/bash             echo "hello world" ```  If you want to
+      modify `build` step from buildpack''s `build` Task added by default, you just
+      need to add a new `overrideBuildStep` key with new step content in values.yaml
+      for required pipeline and helm chart will provision a custom `build` step:   ```yaml
+      buildpacks:   enabled: true   generate:     buildpackFrontendBuildPipelineNew:       name:
+      buildpack-frontend-build-pipeline-new       enabled: false       buildTaskName:
+      buildpack-frontend-new        overrideBuildStep:         name: build         image:
+      node:22         imagePullPolicy: IfNotPresent         workingDir: $(workspaces.source.path)         script:
+      |           #!/bin/bash           az login --identity --username <managed-indentity>           az
+      acr login --name <container-registry>           /cnb/lifecycle/creator \             -app=$(params.source_subpath)
+      \             -project-metadata=project.toml \             -cache-dir=/cache
+      \             -layers=/layers \             -platform=$(workspaces.source.path)/$(params.platform_dir)
+      \             -report=/layers/report.toml \             -cache-image=$(params.cache_image)
+      \             -uid=$(params.user_id) \             -gid=$(params.group_id) \             -process-type=$(params.process_type)
+      \             -skip-restore=$(params.skip_restore) \             -previous-image=$(params.docker_registry_repository)
+      \             -run-image=$(params.run_image) \             $(params.image)        buildTaskSteps:         -
+      name: build-hello-world           image: node:22           imagePullPolicy:
+      IfNotPresent           workingDir: $(workspaces.source.path)           script:
+      |             #!/bin/bash             echo "hello world" ```  If you want to
+      modify Kaniko build arguments, you can pass `kaniko_extra_args` parameter to
+      `kaniko-pipeline`. For example, if you want to pass `BASE_IMAGE` build argument
+      value to be used in Dockerfile you can add following line to specific project
+      trigger-binding: ```yaml - name: kaniko_extra_args   value: --build-arg=BASE_IMAGE=965067289393.dkr.ecr.us-west-2.amazonaws.com/saritasa/legacy/php:php71-smart-screen-base
+      ```  Chart has possibility to perform `Sentry` releases if it is needed, you
+      can configure it by updating below settings in values.yaml:  ```yaml sentry:   enabled:
+      true   authTokenSecret: "sentry-auth-token"  # auth token to connect to Sentry
+      API (change it if you have custom value)   authTokenSecretKey: "auth-token"      #
+      key for auth token in `authTokenSecret` secret (change it if you have custom
+      value)   org: "saritasa"                       # name of your Sentry organization
+      (change it if you have custom value)   url: https://sentry.saritasa.rocks/   #
+      Sentry url (change it if you have custom value) ```  After configuring these
+      values, you will have an extra `sentry-release` step after `argocd-deploy` one
+      for buildpacks and kaniko builds. '
+    digest: 33a3c34662091adcc9e3ccd1d2b5b57d24e429ed4489fa4b7c54666ac4ff2873
+    maintainers:
+    - name: Saritasa
+      url: https://www.saritasa.com/
+    name: saritasa-tekton-pipelines
+    type: application
+    urls:
+    - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/saritasa-tekton-pipelines-2.2.26/saritasa-tekton-pipelines-2.2.26.tgz
+    version: 2.2.26
+  - apiVersion: v2
     created: "2026-10-15T15:58:33.700223191Z"
     dependencies:
     - condition: saritasa-tekton.enabled
@@ -243560,4 +243640,4 @@ entries:
     urls:
     - https://github.com/saritasa-nest/saritasa-devops-helm-charts/releases/download/terraform-pod-0.0.1/terraform-pod-0.0.1.tgz
     version: 0.0.1
-generated: "2026-10-23T04:53:12.978928116Z"
+generated: "2026-10-28T13:32:47.931068808Z"
