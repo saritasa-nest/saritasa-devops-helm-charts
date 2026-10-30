@@ -307,7 +307,7 @@ spec:
           image:
             repository: bitnamilegacy/apache-exporter
 
-        overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
+        overrideDatabaseSettings: {{ if hasKey . "overrideDatabaseSettings" }}{{ .overrideDatabaseSettings }}{{ else if .repositoryUseWPConfig }}true{{ else }}false{{ end }}
 
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
         existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default "" }}
