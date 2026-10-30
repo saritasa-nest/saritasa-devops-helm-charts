@@ -51,6 +51,8 @@ in all the repositories to be scrapped
 kubectl -n prometheus create secret generic github-token \
   --from-literal=token=YOUR_TOKEN
 
+## `chart.valuesTable`
+
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
