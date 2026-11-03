@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-03
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/205)
+- Update Tekton pipelines chart to 2.2.27
+- Limit `set -x` tracing in the `git-clone` task to the git commands (`set -x` ... `set +x`) so it is no longer enabled for the whole script, e.g. `git-clone-gitops-repository`
+
 ## 2026-10-14
 
 [dev]
