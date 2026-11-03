@@ -23,3 +23,23 @@
 ## `chart.valuesTable`
 
 {{ template "chart.valuesTable" . }}
+
+## Namespace metadata
+
+`argocd.namespaceMetadata` sets defaults for generated Applications. Override it under
+`apps[].argocd.namespaceMetadata`, then under `components[].argocd.namespaceMetadata`
+or `extraApps[].argocd.namespaceMetadata`. Later settings override earlier ones;
+labels and annotations are merged. Apps sharing a namespace must use consistent metadata.
+
+```yaml
+apps:
+  - project: example
+    argocd:
+      namespaceMetadata:
+        labels:
+          istio-discovery: enabled
+```
+
+Set `namespaceMetadata.enabled: false` at any of these levels to omit
+`managedNamespaceMetadata`. `CreateNamespace=true` remains enabled. Defaults preserve
+`external-secrets/allow: 'true'`; an override can change its value.

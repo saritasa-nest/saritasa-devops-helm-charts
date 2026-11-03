@@ -49,3 +49,18 @@ Selector labels
 app.kubernetes.io/name: {{ include "tekton-apps.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/* Namespace metadata defaults < project overrides < component/extraApp overrides. */}}
+{{- define "tekton-apps.namespace-metadata" -}}
+{{- $global := default dict .root.Values.argocd.namespaceMetadata -}}
+{{- $project := default dict (default dict .project.argocd).namespaceMetadata -}}
+{{- $component := default dict (default dict .component.argocd).namespaceMetadata -}}
+{{- $settings := mergeOverwrite (dict "enabled" true "labels" (dict "external-secrets/allow" "true")) (deepCopy $global) (deepCopy $project) (deepCopy $component) -}}
+{{- if $settings.enabled }}
+managedNamespaceMetadata:
+  labels: {{ toYaml $settings.labels | nindent 4 }}
+  {{- with $settings.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
+{{- end -}}
