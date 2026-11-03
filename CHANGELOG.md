@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-03
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/204)
+- Configure namespace labels and annotations globally, per project, and per component.
+- Allow namespace metadata management to be disabled.
+- Publish Tekton apps chart 2.1.12-dev.2.
+
 ## 2026-10-14
 
 [dev]

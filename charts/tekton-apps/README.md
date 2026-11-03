@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.11](https://img.shields.io/badge/Version-2.1.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.12-dev.2](https://img.shields.io/badge/Version-2.1.12--dev.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -1684,6 +1684,10 @@ whitelistIP: |
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | apps | list | `[]` | list of projects and the project's apps to be triggered |
+| argocd.namespaceMetadata | object | `{"annotations":{},"enabled":true,"labels":{"external-secrets/allow":"true"}}` | Namespace metadata defaults. Project/component argocd.namespaceMetadata overrides these settings. |
+| argocd.namespaceMetadata.annotations | object | `{}` | Namespace annotations; merged with project/component overrides. |
+| argocd.namespaceMetadata.enabled | bool | `true` | Disable to omit managedNamespaceMetadata; CreateNamespace remains enabled. |
+| argocd.namespaceMetadata.labels | object | `{"external-secrets/allow":"true"}` | Namespace labels; merged with project/component overrides. All apps sharing a namespace must agree. |
 | argocd.rootPath | string | `"/"` | argocd root path (web URL root path) |
 | argocd.server | string | `"deploy.site.com"` | argocd public URL |
 | aws | object | `{}` | aws configuration |
@@ -1701,3 +1705,23 @@ whitelistIP: |
 | trigger.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | trigger.labels | object | `{"builder":"tekton"}` | labels to set on Triggers - for discovery by EventListener |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
+
+## Namespace metadata
+
+`argocd.namespaceMetadata` sets defaults for generated Applications. Override it under
+`apps[].argocd.namespaceMetadata`, then under `components[].argocd.namespaceMetadata`
+or `extraApps[].argocd.namespaceMetadata`. Later settings override earlier ones;
+labels and annotations are merged. Apps sharing a namespace must use consistent metadata.
+
+```yaml
+apps:
+  - project: example
+    argocd:
+      namespaceMetadata:
+        labels:
+          istio-discovery: enabled
+```
+
+Set `namespaceMetadata.enabled: false` at any of these levels to omit
+`managedNamespaceMetadata`. `CreateNamespace=true` remains enabled. Defaults preserve
+`external-secrets/allow: 'true'`; an override can change its value.

@@ -36,6 +36,15 @@ argocd:
   server: deploy.site.com
   # -- argocd root path (web URL root path)
   rootPath: "/"
+  # -- Namespace metadata defaults. Project/component argocd.namespaceMetadata overrides these settings.
+  namespaceMetadata:
+    # -- Disable to omit managedNamespaceMetadata; CreateNamespace remains enabled.
+    enabled: true
+    # -- Namespace labels; merged with project/component overrides. All apps sharing a namespace must agree.
+    labels:
+      external-secrets/allow: 'true'
+    # -- Namespace annotations; merged with project/component overrides.
+    annotations: {}
 
 trigger:
   # -- should tekton triggers check secret passed by GitHub webhook?
