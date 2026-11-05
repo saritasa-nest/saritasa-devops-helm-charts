@@ -6,7 +6,8 @@
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/205)
 - Update Tekton pipelines chart to 2.2.27
-- Limit `set -x` tracing in the `git-clone` task to the git commands (`set -x` ... `set +x`) so it is no longer enabled for the whole script, e.g. `git-clone-gitops-repository`
+- Disable `set -x` command tracing in the `git-clone` task by default (`verbose` param now defaults to `false`), so clone output (e.g. `git-clone-gitops-repository`) is as clean as other tasks
+- When `verbose: "true"` is set explicitly, tracing is limited to the git commands (`set -x` ... `set +x`) instead of the whole script
 
 ## 2026-10-14
 
