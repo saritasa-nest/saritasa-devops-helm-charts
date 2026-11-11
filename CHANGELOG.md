@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-11
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/TBD)
+- Switch WordPress apache-exporter sidecar from archived `bitnamilegacy/apache-exporter` to upstream `quay.io/lusitaniae/apache-exporter:v1.1.1` pinned by digest
+
 ## 2026-10-14
 
 [dev]

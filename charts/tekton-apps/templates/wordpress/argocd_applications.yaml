@@ -305,7 +305,10 @@ spec:
         metrics:
           enabled: true
           image:
-            repository: bitnamilegacy/apache-exporter
+            registry: quay.io
+            repository: lusitaniae/apache-exporter
+            tag: v1.1.1
+            digest: sha256:438b1b6177eb0ef6c22aad003f671ad1ee1872b28e08addbd9197abcd84c9d5c
 
         overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
 
