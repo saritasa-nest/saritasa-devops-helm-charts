@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-06
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/203)
+- Update Tekton apps chart to 2.1.12
+
 ## 2026-10-14
 
 [dev]
