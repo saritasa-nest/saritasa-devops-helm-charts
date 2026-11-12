@@ -305,7 +305,7 @@ spec:
         metrics:
           enabled: true
           image:
-            repository: bitnamilegacy/apache-exporter
+            {{- toYaml $.Values.wordpress.metrics.image | nindent 12 }}
 
         overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
 

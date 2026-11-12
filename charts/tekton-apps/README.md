@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.11](https://img.shields.io/badge/Version-2.1.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.12](https://img.shields.io/badge/Version-2.1.12-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -1701,3 +1701,7 @@ whitelistIP: |
 | trigger.extraOverlays | list | `[]` | should we add additional overlays for each app running under trigger? |
 | trigger.labels | object | `{"builder":"tekton"}` | labels to set on Triggers - for discovery by EventListener |
 | whitelistIP | string | `""` | Comma-separated list of IP masks to bypass access limitation (if applicable, ex. for legacy projects protected with basic authentication) |
+| wordpress.metrics.image.digest | string | `"sha256:438b1b6177eb0ef6c22aad003f671ad1ee1872b28e08addbd9197abcd84c9d5c"` | default digest for the WordPress Apache exporter image; set to an empty string to use the tag instead |
+| wordpress.metrics.image.registry | string | `"quay.io"` | default registry for the WordPress Apache exporter image |
+| wordpress.metrics.image.repository | string | `"lusitaniae/apache-exporter"` | default repository for the WordPress Apache exporter image |
+| wordpress.metrics.image.tag | string | `"v1.1.1"` | default tag for the WordPress Apache exporter image |
