@@ -22,6 +22,18 @@ aws: {}
 # ex: XXX.dkr.ecr.us-west-2.amazonaws.com
 defaultRegistry: ""
 
+wordpress:
+  metrics:
+    image:
+      # -- default registry for the WordPress Apache exporter image
+      registry: quay.io
+      # -- default repository for the WordPress Apache exporter image
+      repository: lusitaniae/apache-exporter
+      # -- default tag for the WordPress Apache exporter image
+      tag: v1.1.1
+      # -- default digest for the WordPress Apache exporter image; set to an empty string to use the tag instead
+      digest: sha256:438b1b6177eb0ef6c22aad003f671ad1ee1872b28e08addbd9197abcd84c9d5c
+
 slack:
   # -- channel prefix
   prefix: client
