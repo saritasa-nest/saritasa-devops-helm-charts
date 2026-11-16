@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-16
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/207)
+- Add `wordpress.podAnnotations` pass-through to the WordPress Argo CD application
+- Update Tekton apps chart to 2.1.14
+
 ## 2026-11-11
 
 [dev]
