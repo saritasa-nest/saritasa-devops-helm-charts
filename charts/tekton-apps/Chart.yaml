@@ -12,7 +12,7 @@ appVersion: "v0.29.2"
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.1.13
+version: 2.1.14-dev.1
 
 maintainers:
   - url: https://www.saritasa.com/
@@ -269,6 +269,7 @@ description: |
     - apps[PROJECT].components[NAME].wordpress.image.debug - Bitnami debug mode, exposes credentials (default: "true")
     - apps[PROJECT].components[NAME].wordpress.resources - wordpress pod resources params (default: requests.cpu: 100m, requests.memory: 128Mi)
     - apps[PROJECT].components[NAME].wordpress.commonLabels - wordpress pod common labels (default: commonLabels.tech_stack: php, commonLabels.application: wordpress)
+    - apps[PROJECT].components[NAME].wordpress.podAnnotations - optional - pass through to bitnami/wordpress `podAnnotations`, i.e. `descheduler.alpha.kubernetes.io/prefer-no-eviction: "true"` (default: null)
     - apps[PROJECT].components[NAME].wordpress.updateStrategy - strategy that should be used for wordpress pod update (default: updateStrategy.type: RollingUpdate,
       updateStrategy.rollingUpdate.maxSurge: 0%, updateStrategy.rollingUpdate.maxUnavailable: 100%, i.e. stop old pod and then create a new one)
     - apps[PROJECT].components[NAME].wordpress.replica_count - wordpress deployment replica count (default: 1)

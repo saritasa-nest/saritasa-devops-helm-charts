@@ -31,7 +31,7 @@ saritasa-tekton-apps
 
 ## `chart.version`
 
-![Version: 2.1.13](https://img.shields.io/badge/Version-2.1.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
+![Version: 2.1.14-dev.1](https://img.shields.io/badge/Version-2.1.14--dev.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.29.2](https://img.shields.io/badge/AppVersion-v0.29.2-informational?style=flat-square)
 
 ## Maintainers
 
@@ -290,6 +290,7 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.image.debug - Bitnami debug mode, exposes credentials (default: "true")
   - apps[PROJECT].components[NAME].wordpress.resources - wordpress pod resources params (default: requests.cpu: 100m, requests.memory: 128Mi)
   - apps[PROJECT].components[NAME].wordpress.commonLabels - wordpress pod common labels (default: commonLabels.tech_stack: php, commonLabels.application: wordpress)
+  - apps[PROJECT].components[NAME].wordpress.podAnnotations - optional - pass through to bitnami/wordpress `podAnnotations`, i.e. `descheduler.alpha.kubernetes.io/prefer-no-eviction: "true"` (default: null)
   - apps[PROJECT].components[NAME].wordpress.updateStrategy - strategy that should be used for wordpress pod update (default: updateStrategy.type: RollingUpdate,
     updateStrategy.rollingUpdate.maxSurge: 0%, updateStrategy.rollingUpdate.maxUnavailable: 100%, i.e. stop old pod and then create a new one)
   - apps[PROJECT].components[NAME].wordpress.replica_count - wordpress deployment replica count (default: 1)
