@@ -6,6 +6,7 @@
 
 - [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/206)
 - Switch WordPress apache-exporter sidecar from archived `bitnamilegacy/apache-exporter` to upstream `quay.io/lusitaniae/apache-exporter:v1.1.1` pinned by digest
+- Update Tekton apps chart to 2.1.13
 
 ## 2026-11-06
 
