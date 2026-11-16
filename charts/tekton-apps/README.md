@@ -316,7 +316,7 @@ spec:
   - apps[PROJECT].components[NAME].wordpress.ingress.restrictAccessByIp - whitelist usage flag for wordpress ingress, enabled for any value except 'false' (default: null)
   - apps[PROJECT].components[NAME].wordpress.ingress.extraHosts - list of extra hosts that may be defined in ingress (default: null)
   - apps[PROJECT].components[NAME].wordpress.persistence - optional - pass through [bitnami/wordpress Persistense](https://github.com/bitnami/charts/tree/main/bitnami/wordpress#persistence-parameters) section options
-  - apps[PROJECT].components[NAME].wordpress.overrideDatabaseSettings - flag for initial Bitnami script that overrides  settings in DB with values from wp_config.php (default: false)
+  - apps[PROJECT].components[NAME].wordpress.overrideDatabaseSettings - flag for initial Bitnami script that overrides  settings in DB with values from wp_config.php (default: true if repositoryUseWPConfig is set, otherwise false; explicit value always wins)
   - apps[PROJECT].components[NAME].wordpress.externalDatabase - map with settings for wordpress DB host (required)
   - apps[PROJECT].components[NAME].wordpress.externalDatabase.host - wordpress DB host (required)
   - apps[PROJECT].components[NAME].wordpress.externalDatabase.user - wordpress DB user (required)

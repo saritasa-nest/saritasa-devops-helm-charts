@@ -307,7 +307,7 @@ spec:
           image:
             {{- toYaml $.Values.wordpress.metrics.image | nindent 12 }}
 
-        overrideDatabaseSettings: {{ if .repositoryUseWPConfig}}true{{ else }}{{ .overrideDatabaseSettings | default "false"}}{{ end }}
+        overrideDatabaseSettings: {{ dig "overrideDatabaseSettings" (.repositoryUseWPConfig | default false) . }}
 
         wordpressSkipInstall: {{ .wordpressSkipInstall | default "false" }}
         existingWordPressConfigurationSecret: {{ .existingWordPressConfigurationSecret | default "" }}
