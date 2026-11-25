@@ -1,37 +1,9 @@
 
 # capacity-prometheus-exporter
 
-## `license`
-```
-          ,-.
- ,     ,-.   ,-.
-/ \   (   )-(   )
-\ |  ,.>-(   )-<
- \|,' (   )-(   )
-  Y ___`-'   `-'
-  |/__/   `-'
-  |
-  |
-  |    -hi-
-__|_____________
-
-/* Copyright (C) Saritasa,LLC - All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Saritasa Devops Team, April 2022
- */
-
-```
-
-## `chart.deprecationWarning`
-
-## `chart.name`
-
-capacity-prometheus-exporter
-
-## `chart.version`
-
 ![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+
+A Kubernetes's helm chart for a exporter that get information about Kubernetes nodes and serve the results in order to be scrapped by Prometheus
 
 ## Maintainers
 
@@ -39,11 +11,7 @@ capacity-prometheus-exporter
 | ---- | ------ | --- |
 | Saritasa | <nospam@saritasa.com> | <https://www.saritasa.com/> |
 
-## `chart.description`
-
-A Kubernetes's helm chart for a exporter that get information about Kubernetes nodes and serve the results in order to be scrapped by Prometheus
-
-## `chart.valuesTable`
+## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|

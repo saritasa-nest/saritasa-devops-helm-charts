@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-25
+
+[dev]
+
+- [associated PR](https://github.com/saritasa-nest/saritasa-devops-helm-charts/pull/208)
+- Add `buildkit_env_vars_secret` to the BuildKit pipeline
+
 ## 2026-11-11
 
 [dev]
