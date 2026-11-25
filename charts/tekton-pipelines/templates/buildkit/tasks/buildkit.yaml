@@ -42,6 +42,18 @@ spec:
       type: string
       description: the name of where to store the app image
 
+    - name: buildkit_env_vars_secret
+      type: string
+      description: |-
+        optional name of a Kubernetes Secret in the task namespace whose keys are
+        exposed as env vars to all steps via envFrom.
+        useful for injecting sensitive values (e.g. NPM_REGISTRY_GITHUB_TOKEN)
+        without embedding encrypted blobs into the central pipelines values.
+        the secret is referenced with optional=true, so a missing secret does not
+        break the pipeline run. This keeps the param safely defaulted for projects
+        that don't need it.
+      default: "buildkit-env-vars-not-set"
+
   results:
     - name: image_digest
       description: the digest of the built `image`
@@ -56,6 +68,14 @@ spec:
     envFrom:
       - configMapRef:
           name: $(params.application)-build-pipeline-config # project specific values
+      - secretRef:
+          # optional: true → task run does not fail if the secret is absent,
+          # which allows the default placeholder value of `buildkit_env_vars_secret`
+          # to safely resolve to a non-existent secret for projects that don't need it.
+          name: $(params.buildkit_env_vars_secret)
+          optional: true
+        # The prefix lets the build step tell the secret keys apart and pass them to buildctl.
+        prefix: BUILDKIT_SECRET_
 
   steps:
     - name: generate-git-hash
@@ -164,6 +184,11 @@ spec:
         extra_args=$(cat "$(results.extra_args.path)")
         image="$(params.image)"
         image_cached="${image%%:*}:cache"
+        # Each BUILDKIT_SECRET_<KEY> env var becomes `--secret id=<KEY>`, which a Dockerfile reads with `RUN --mount=type=secret,id=<KEY>`.
+        secret_args=""
+        for var in $(env | cut -d= -f1 | grep '^BUILDKIT_SECRET_'); do
+          secret_args="$secret_args --secret id=${var#BUILDKIT_SECRET_},env=$var"
+        done
         buildctl-daemonless.sh build \
           --frontend=dockerfile.v0 \
           --local context=$(workspaces.source.path)/$(params.docker_context) \
@@ -174,6 +199,7 @@ spec:
           --metadata-file=$(workspaces.source.path)/build-metadata.json \
           --export-cache type=registry,mode=max,ref=$image_cached \
           --import-cache type=registry,ref=$image_cached \
+          $secret_args \
           $extra_args
 
     # Extract image digest from build-metadata.json (BuildKit does not provide it automatically)

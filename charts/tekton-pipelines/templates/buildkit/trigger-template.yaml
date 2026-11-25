@@ -34,6 +34,12 @@ spec:
       default: ''
       description: additional arguments to pass to 'buildctl build' (similar to 'docker build')
 
+    - name: buildkit_env_vars_secret
+      description: |-
+        optional name of a Kubernetes Secret to source build env vars from via
+        envFrom (optional: true) — see the pipeline/task definitions for details.
+      default: "buildkit-env-vars-not-set"
+
     - name: sentry_project_name
       description: name of the project in Sentry
 
@@ -83,6 +89,8 @@ spec:
           value: "$(tt.params.docker_context)"
         - name: buildkit_extra_args
           value: "$(tt.params.buildkit_extra_args)"
+        - name: buildkit_env_vars_secret
+          value: "$(tt.params.buildkit_env_vars_secret)"
         - name: repository_submodules
           value: "$(tt.params.repository_submodules)"
         - name: sentry_project_name

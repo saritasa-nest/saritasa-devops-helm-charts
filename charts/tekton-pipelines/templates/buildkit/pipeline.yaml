@@ -42,6 +42,16 @@ spec:
       description: extra args to be passed into buildkit builder
       default: []
 
+    - name: buildkit_env_vars_secret
+      type: string
+      description: |-
+        optional name of a Kubernetes Secret in the pipeline namespace whose keys
+        are exposed as env vars in the build task via envFrom (optional: true).
+        allows sourcing sensitive build-time env vars from a project-owned Secret
+        (e.g. materialized by ExternalSecret) instead of encoding them into this
+        central pipelines chart values.
+      default: "buildkit-env-vars-not-set"
+
     - name: sentry_project_name
       type: string
       description: name of the project in Sentry
@@ -116,6 +126,8 @@ spec:
           value: $(params.build_args[*])
         - name: image
           value: "$(params.docker_registry_repository):$(params.environment)-$(params.sha)"
+        - name: buildkit_env_vars_secret
+          value: "$(params.buildkit_env_vars_secret)"
       workspaces:
         - name: source
           workspace: source
